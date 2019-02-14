@@ -16,8 +16,6 @@ class FiltersTest : public testing::Test {
             avg1.setRange(1);
             avg5.setRange(5);
             avg2.setRange(2);
-
-            // avg1->setRange(1);
         }
 };
 

@@ -76,7 +76,6 @@ CATKIN_PACKAGE(
 FILE(GLOB files "${CMAKE_CURRENT_SOURCE_DIR}/testsuites/*.cpp")
 
 catkin_add_gtest(${PROJECT_NAME}-test ${files})
-# catkin_add_gtest(${PROJECT_NAME}-test testsuites)
 
 if(TARGET ${PROJECT_NAME}-test)
   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
