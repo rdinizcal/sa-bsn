@@ -73,7 +73,11 @@ CATKIN_PACKAGE(
 
 ###########################################################################
 ## Add gtest based cpp test target and link libraries
-catkin_add_gtest(${PROJECT_NAME}-test testsuites/ConfigurationTestSuite.cpp)
+FILE(GLOB files "${CMAKE_CURRENT_SOURCE_DIR}/testsuites/*.cpp")
+
+catkin_add_gtest(${PROJECT_NAME}-test ${files})
+# catkin_add_gtest(${PROJECT_NAME}-test testsuites)
+
 if(TARGET ${PROJECT_NAME}-test)
   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 endif()

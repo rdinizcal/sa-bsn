@@ -48,6 +48,10 @@ namespace bsn {
 			return this->id;
 		}
 
+		void SensorConfiguration::setId(const int32_t id) {
+			this->id = id;
+		}
+
 		// Retorna o quão deslocado do meio um valor está
 		double SensorConfiguration::getDisplacement(Range range, double number, string logic = "crescent") {
 			// Crescent indica o quão deslocado um elemento está do começo
