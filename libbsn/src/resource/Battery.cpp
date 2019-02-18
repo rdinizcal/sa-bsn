@@ -25,9 +25,9 @@ namespace bsn {
 
         Battery::Battery() :
             id(),
-            capacity(),
-            currentLevel(),
-            unit() {}
+            capacity(100),
+            currentLevel(100),
+            unit(1) {}
         
         Battery::Battery(const Battery &obj) : 
             id(obj.getId()),

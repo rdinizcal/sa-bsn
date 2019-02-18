@@ -100,11 +100,11 @@ TEST_F(IntegrationTest, IntegrationLow) {
     avg2.insert(mar2.calculate_state(), "thermometer");
     double data = avg2.getValue("thermometer ");
 
-    ASSERT_EQ(data, 37.5);
-    ASSERT_EQ(36.5, data);
+    ASSERT_LE(data, 37.5);
+    ASSERT_LE(36.5, data);
 
-    ASSERT_EQ(s.evaluateNumber(data), 0.2);
-    ASSERT_EQ(0.0, s.evaluateNumber(data));
+    ASSERT_LE(s.evaluateNumber(data), 0.2);
+    ASSERT_LE(0.0, s.evaluateNumber(data));
 }
 
 TEST_F(IntegrationTest, IntegrationHigh) {
@@ -113,11 +113,11 @@ TEST_F(IntegrationTest, IntegrationHigh) {
     avg4.insert(mar4.calculate_state(), "thermometer");
     double data = avg4.getValue("thermometer ");
 
-    ASSERT_EQ(data, 42);
-    ASSERT_EQ(39.1, data);
+    ASSERT_LE(data, 42);
+    ASSERT_LE(39.1, data);
 
-    ASSERT_EQ(s.evaluateNumber(data), 1.0);
-    ASSERT_EQ(0.66, s.evaluateNumber(data));
+    ASSERT_LE(s.evaluateNumber(data), 1.0);
+    ASSERT_LE(0.66, s.evaluateNumber(data));
 }
 
 TEST_F(IntegrationTest, IntegrationMedium) {
@@ -126,9 +126,9 @@ TEST_F(IntegrationTest, IntegrationMedium) {
     avg1.insert(mar1.calculate_state(), "thermometer");
     double data = avg1.getValue("thermometer ");
 
-    ASSERT_EQ(data, 36.4);
-    ASSERT_EQ(33.1, data);
+    ASSERT_LE(data, 36.4);
+    ASSERT_LE(33.1, data);
 
-    ASSERT_EQ(s.evaluateNumber(data), 0.65);
-    ASSERT_EQ(0.21, s.evaluateNumber(data));
+    ASSERT_LE(s.evaluateNumber(data), 0.65);
+    ASSERT_LE(0.21, s.evaluateNumber(data));
 }
