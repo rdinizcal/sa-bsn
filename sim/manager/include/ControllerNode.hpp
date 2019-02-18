@@ -20,6 +20,9 @@ class ControllerNode {
     	ControllerNode(int &argc, char **argv, std::string name);
     	virtual ~ControllerNode();
 
+		void ControllerNode::receiveTaskInfo(const std_msgs::String::ConstPtr& /*msg*/);
+		void ControllerNode::receiveContextInfo(const std_msgs::String::ConstPtr& /*msg*/);
+
     	void run();
 
   	private:

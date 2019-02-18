@@ -20,6 +20,21 @@ void ControllerNode::setUp() {}
 
 void ControllerNode::tearDown() {}
 
+
+/**
+ * This tutorial demonstrates simple receipt of messages over the ROS system.
+ * I suppose one can declare several chatterCallbacks, each one for each type of
+ * message. Cool isn't it ? It should be especially util for receiving distinct
+ * tasks and contexts.
+ */
+void ControllerNode::receiveTaskInfo(const std_msgs::String::ConstPtr& msg) {
+    ROS_INFO("I heard: [%s]", msg->data.c_str());
+}
+
+void ControllerNode::receiveContextInfo(const std_msgs::String::ConstPtr& msg) {
+    ROS_INFO("I heard: [%s]", msg->data.c_str());
+}
+
 void ControllerNode::run(){
 
     /**
@@ -27,7 +42,8 @@ void ControllerNode::run(){
      * The first NodeHandle constructed will fully initialize this node, and the last
      * NodeHandle destructed will close down the node.
      */
-    ros::NodeHandle node_handle;
+    ros::NodeHandle publisher_handler;
+    ros::NodeHandle subscriber_handler;
 
     /**
      * The advertise() function is how you tell ROS that you want to
@@ -46,39 +62,65 @@ void ControllerNode::run(){
      * than we can send them, the number here specifies how many messages to
      * buffer up before throwing some away.
      */
-	ros::Publisher chatter_pub = node_handle.advertise<std_msgs::String>("chatter", 1000);
+	ros::Publisher actuator_pub = publisher_handler.advertise<std_msgs::String>("manager_actuator", 1000);
 
-	ros::Rate loop_rate(10);
-
+    /** **********************************************
+     *                      MONITOR 
+    /* ***********************************************
+     * receive task (id, cost, reliability)
+     *      update list of tasks
+     * receive context (id, bool)
+     *      reset setpoints (cost and reliability)
+     * ***********************************************
+     */ 
     /**
-     * A count of how many messages we have sent. This is used to create
-     * a unique string for each message.
+     * The subscribe() call is how you tell ROS that you want to receive messages
+     * on a given topic.  This invokes a call to the ROS
+     * master node, which keeps a registry of who is publishing and who
+     * is subscribing.  Messages are passed to a callback function, here
+     * called chatterCallback.  subscribe() returns a Subscriber object that you
+     * must hold on to until you want to unsubscribe.  When all copies of the Subscriber
+     * object go out of scope, this callback will automatically be unsubscribed from
+     * this topic.
+     *
+     * The second parameter to the subscribe() function is the size of the message
+     * queue.  If messages are arriving faster than they are being processed, this
+     * is the number of messages that will be buffered up before beginning to throw
+     * away the oldest ones.
      */
-    int count = 0;
+    ros::Subscriber sensor_task_sub = subscriber_handler.subscribe("manager_sensor", 1000, receiveTaskInfo);
+    ros::Subscriber sensor_context_sub = subscriber_handler.subscribe("manager_sensor", 1000, receiveContextInfo);
+
+	ros::Rate loop_rate(10); // execution frequency f = 10 Hz
+
     while (ros::ok()){
-        /**
-         * This is a message object. You stuff it with data, and then publish it.
-         */
-        std_msgs::String msg;
-
-        std::stringstream ss;
-        ss << "hello world " << count;
-        msg.data = ss.str();
-
-        ROS_INFO("%s", msg.data.c_str());
-
-        /**
-         * The publish() function is how you send messages. The parameter
-         * is the message object. The type of this object must agree with the type
-         * given as a template parameter to the advertise<>() call, as was done
-         * in the constructor above.
-         */
-        chatter_pub.publish(msg);
-
-        ros::spinOnce();
 
         loop_rate.sleep();
-        ++count;
+
+        /**
+        /** ***********************************************
+         *                      ANALYZE
+        /* ***********************************************
+         * analyze whether the setpoints have been violat-
+         * ed
+         *      plug in formulae and evaluate current cost
+         *           and reliabiliy
+         *      compare current values with tresholds
+         * ***********************************************
+        /** ***********************************************
+         *                       PLAN
+        /* ***********************************************
+         * exhaustively analyze whether an action fits the
+         *  setpoints
+         * ***********************************************
+        /** ***********************************************
+         *                      EXECUTE
+        /* ***********************************************
+         * if so, send messages containing the actions to 
+         *    the modules
+         * ***********************************************
+         */
+
     }
 
     return;
