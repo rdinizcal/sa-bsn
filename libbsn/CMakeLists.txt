@@ -16,18 +16,30 @@ SET (CMAKE_MODULE_PATH "${CMAKE_INSTALL_PREFIX}/share/cmake-${CMAKE_MAJOR_VERSIO
 INCLUDE (${CMAKE_CURRENT_SOURCE_DIR}/cmake.Modules/CompileFlags.cmake)
 
 ###########################################################################
-# Find and configure CxxTest.
-SET (CXXTEST_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/testsuites") 
-INCLUDE (${CMAKE_CURRENT_SOURCE_DIR}/cmake.Modules/CheckCxxTestEnvironment.cmake)
+# Find Catkin.
+FIND_PACKAGE ( 
+    catkin REQUIRED
+    std_msgs
+    message_generation
+)
 
 ###########################################################################
-# Find Catkin.
-FIND_PACKAGE (catkin REQUIRED)
+# Set message generation.
+ADD_MESSAGE_FILES(
+  FILES
+  info/ContextInfo.msg
+  info/TaskInfo.msg
+)
+
+GENERATE_MESSAGES(
+  DEPENDENCIES
+  std_msgs
+)
 
 ###########################################################################
 # Set linking libraries to successfully link test suites and binaries.
 # SET (BSN_LIB ${PROJECT_NAME})
-# SET (CMAKE_CXX_FLAGS "-Wall ${CMAKE_CXX_FLAGS}")
+SET (CMAKE_CXX_FLAGS "-Wall ${CMAKE_CXX_FLAGS}")
 
 ###########################################################################
 # Set header files from OpenDaVINCI.
@@ -43,40 +55,22 @@ ADD_LIBRARY (${PROJECT_NAME}        STATIC $<TARGET_OBJECTS:${PROJECT_NAME}-core
 TARGET_LINK_LIBRARIES (${PROJECT_NAME} ${catkin_LIBRARIES}) 
 
 ###########################################################################
-# Enable CxxTest for all available testsuites. (taken from odsupercomponent)
-IF(CXXTEST_FOUND)
-    FILE(GLOB -testsuites "${CMAKE_CURRENT_SOURCE_DIR}/testsuites/*.h")
-
-    FOREACH(testsuite ${${PROJECT_NAME}-testsuites})
-        STRING(REPLACE "/" ";" testsuite-list ${testsuite})
-
-        LIST(LENGTH testsuite-list len)
-        MATH(EXPR lastItem "${len}-1")
-        LIST(GET testsuite-list "${lastItem}" testsuite-short)
-
-        SET(CXXTEST_TESTGEN_ARGS ${CXXTEST_TESTGEN_ARGS} --world=${PROJECT_NAME}-${testsuite-short})
-        CXXTEST_ADD_TEST(${testsuite-short}-TestSuite ${testsuite-short}-TestSuite.cpp ${testsuite})
-        SET_SOURCE_FILES_PROPERTIES(${testsuite-short}-TestSuite.cpp PROPERTIES COMPILE_FLAGS "-Wno-effc++ -Wno-float-equal")
-
-        SET_TESTS_PROPERTIES(${testsuite-short}-TestSuite PROPERTIES TIMEOUT 3000)
-        TARGET_LINK_LIBRARIES(${testsuite-short}-TestSuite ${PROJECT_NAME} ${OPENDAVINCI_LIBRARIES})
-    ENDFOREACH()
-
-ENDIF()
-
-###########################################################################
 # Export catkin package.
 CATKIN_PACKAGE(
     INCLUDE_DIRS include
     LIBRARIES ${PROJECT_NAME}
+    CATKIN_DEPENDS message_runtime
 )
 
 ###########################################################################
 ## Add gtest based cpp test target and link libraries
-catkin_add_gtest(${PROJECT_NAME}-test testsuites/ConfigurationTestSuite.cpp)
-if(TARGET ${PROJECT_NAME}-test)
-  target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
-endif()
+FILE(GLOB files "${CMAKE_CURRENT_SOURCE_DIR}/testsuites/*.cpp")
+
+CATKIN_ADD_GTEST(${PROJECT_NAME}-test ${files})
+
+IF(TARGET ${PROJECT_NAME}-test)
+  TARGET_LINK_LIBRARIES(${PROJECT_NAME}-test ${PROJECT_NAME})
+ENDIF()
 
 ###########################################################################
 # Install library in local catkin environment.
