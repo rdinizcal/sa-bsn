@@ -72,6 +72,16 @@ CATKIN_PACKAGE(
 )
 
 ###########################################################################
+## Add gtest based cpp test target and link libraries
+FILE(GLOB files "${CMAKE_CURRENT_SOURCE_DIR}/testsuites/*.cpp")
+
+catkin_add_gtest(${PROJECT_NAME}-test ${files})
+
+if(TARGET ${PROJECT_NAME}-test)
+  target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
+endif()
+
+###########################################################################
 # Install library in local catkin environment.
 
 INSTALL(TARGETS ${PROJECT_NAME}

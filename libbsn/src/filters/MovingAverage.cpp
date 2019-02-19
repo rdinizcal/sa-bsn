@@ -37,7 +37,7 @@ namespace bsn {
 
         double MovingAverage::getValue(std::string type) {
             int32_t index = defineType(type);
-            computedAverage = 0;
+            computedAverage = 0.0;
 
             if(buffer[index].size() < range){
                 return buffer[index].back();
@@ -50,7 +50,6 @@ namespace bsn {
                     computedAverage /= range;
                 }
                 return computedAverage;
-
             }
 
         }
