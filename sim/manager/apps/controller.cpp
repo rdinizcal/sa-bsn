@@ -6,6 +6,8 @@
 int main(int argc, char **argv) {
     
     ControllerNode controllerNode(argc, argv, "controller");
+
+    controllerNode.setUp();
     controllerNode.run();
 
     return 0;

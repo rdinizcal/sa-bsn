@@ -1,6 +1,7 @@
 CMAKE_MINIMUM_REQUIRED (VERSION 2.8.3)
-
 PROJECT(manager)
+
+add_compile_options(-std=c++11)
 
 ## Find catkin and any catkin packages
 FIND_PACKAGE(catkin REQUIRED COMPONENTS 
@@ -8,14 +9,8 @@ FIND_PACKAGE(catkin REQUIRED COMPONENTS
     rospy 
     std_msgs 
     genmsg
-    bsn)
-
-## Declare ROS messages and services
-#add_message_files(FILES Num.msg)
-#add_service_files(FILES AddTwoInts.srv)
-
-## Generate added messages and services
-#GENERATE_MESSAGES(DEPENDENCIES std_msgs)
+    bsn
+    lepton)
 
 ## Declare a catkin package
 CATKIN_PACKAGE()
