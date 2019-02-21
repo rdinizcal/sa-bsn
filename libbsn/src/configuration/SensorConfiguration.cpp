@@ -1,4 +1,4 @@
-#include "bsn/configuration/SensorConfiguration.hpp"
+#include "configuration/SensorConfiguration.hpp"
 
 using namespace std;
 using namespace bsn::range;

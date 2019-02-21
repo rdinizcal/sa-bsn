@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "bsn/filters/MovingAverage.hpp"
+#include "filters/MovingAverage.hpp"
 
 using namespace std;
 using namespace bsn::filters;

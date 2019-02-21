@@ -11,22 +11,22 @@
 #include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/base/FIFOQueue.h"
 
-#include "bsn/goalmodel/Task.hpp"
-#include "bsn/goalmodel/Context.hpp"
+#include "goalmodel/Task.hpp"
+#include "goalmodel/Context.hpp"
 
-#include "bsn/msg/info/TaskInfo.hpp"
-#include "bsn/msg/info/ContextInfo.hpp"
-#include "bsn/msg/info/PatientStatusInfo.h"
+#include "msg/info/TaskInfo.hpp"
+#include "msg/info/ContextInfo.hpp"
+#include "msg/info/PatientStatusInfo.h"
 
-#include "bsn/msg/control/ThermometerControlCommand.hpp"
-#include "bsn/msg/control/OximeterControlCommand.hpp"
-#include "bsn/msg/control/ECGControlCommand.hpp"
-#include "bsn/msg/control/BloodpressureControlCommand.hpp"
-#include "bsn/msg/control/CentralHubControlCommand.hpp"
+#include "msg/control/ThermometerControlCommand.hpp"
+#include "msg/control/OximeterControlCommand.hpp"
+#include "msg/control/ECGControlCommand.hpp"
+#include "msg/control/BloodpressureControlCommand.hpp"
+#include "msg/control/CentralHubControlCommand.hpp"
 
-#include "bsn/time/TimeData.hpp"
+#include "time/TimeData.hpp"
 
-#include "lepton/Lepton.h"
+#include "Lepton.h"
 
 class ControllerModule : public odcore::base::module::TimeTriggeredConferenceClientModule {
 

@@ -1,10 +1,10 @@
 #include <gtest/gtest.h>
 #include <stdint.h>
 
-#include "bsn/range/Range.hpp"
-#include "bsn/generator/Markov.hpp"
-#include "bsn/filters/MovingAverage.hpp"
-#include "bsn/configuration/SensorConfiguration.hpp"
+#include "range/Range.hpp"
+#include "generator/Markov.hpp"
+#include "filters/MovingAverage.hpp"
+#include "configuration/SensorConfiguration.hpp"
 
 using namespace std;
 using namespace bsn::range;

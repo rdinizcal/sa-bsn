@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <sstream>
 
-#include "bsn/range/Range.hpp"
+#include "range/Range.hpp"
 
 /*  OBS.: Para simplificação
     O vetor de transições contém as probabilidades de tal forma:

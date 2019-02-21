@@ -7,10 +7,10 @@
 
 #include "ros/ros.h"
 
-#include "bsn/goalmodel/Task.hpp"
-#include "bsn/goalmodel/Context.hpp"
+#include "goalmodel/Task.hpp"
+#include "goalmodel/Context.hpp"
 
-#include "lepton/Lepton.h"
+#include "Lepton.h"
 
 #include "bsn/TaskInfo.h"
 #include "bsn/ContextInfo.h"

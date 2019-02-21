@@ -1,7 +1,10 @@
-#ifndef TASK_HPP
-#define TASK_HPP
+#ifndef GOALMODEL_TASK_HPP
+#define GOALMODEL_TASK_HPP
 
 #include <string>
+
+#include "goalmodel/Context.hpp"
+#include "goalmodel/Property.hpp"
 
 namespace bsn {
     namespace goalmodel {
@@ -9,51 +12,39 @@ namespace bsn {
         class Task {
 
             public:
-                Task(const std::string &/*task_id*/, const std::string &/*description*/, const std::string &/*cost_symbol*/, const std::string &/*reliability_symbol*/, const std::string &/*frequency_symbol*/);
-                Task(const std::string &/*task_id*/, const std::string &/*description*/, const std::string &/*cost_symbol*/, const double &/*cost*/, const std::string &/*reliability_symbol*/, const double &/*reliability*/, const std::string &/*frequency_symbol*/, const double &/*frequency*/);
-                
+                Task(const std::string &/*id*/, const std::string &/*description*/, const goalmodel::Context &/*context*/, const goalmodel::Property &/*cost*/, const goalmodel::Property &/*reliability*/, const goalmodel::Property &/*frequency*/);
+
                 Task();
                 ~Task();
 
                 Task(const Task &);
                 Task &operator=(const Task &);
 
-                void setTask(const std::string &/*task_id*/);
-                std::string getTask() const;
+                void setID(const std::string &/*id*/);
+                std::string getID() const;
 
                 void setDescription(const std::string &/*description*/);
                 std::string getDescription() const;
+                
+                void setContext(const goalmodel::Context &/*cost*/);
+                goalmodel::Context getContext() const;
 
-                void setCostSymbol(const std::string &/*cost_symbol*/);
-                std::string getCostSymbol() const;
+                void setCost(const goalmodel::Property &/*cost*/);
+                goalmodel::Property getCost() const;
 
-                void setCost(const double &/*cost*/);
-                double getCost() const;
+                void setReliability(const goalmodel::Property &/*reliability*/);
+                goalmodel::Property getReliability() const;
 
-                void setReliabilitySymbol(const std::string &/*reliability_symbol*/);
-                std::string getReliabilitySymbol() const;
-
-                void setReliability(const double &/*reliability*/);
-                double getReliability() const;
-
-                void setFrequencySymbol(const std::string &/*frequency_symbol*/);
-                std::string getFrequencySymbol() const;
-
-                void setFrequency(const double &/*frequency*/);
-                double getFrequency() const;
+                void setFrequency(const goalmodel::Property &/*frequency*/);
+                goalmodel::Property getFrequency() const;
 
             private:
-                std::string task_id;
+                std::string id;
                 std::string description;
-
-                std::string cost_symbol;
-                double cost;
-
-                std::string reliability_symbol;
-                double reliability;
-
-                std::string frequency_symbol;
-                double frequency;
+                goalmodel::Context context;
+                goalmodel::Property cost;
+                goalmodel::Property reliability;
+                goalmodel::Property frequency;
         };
     }  
 }

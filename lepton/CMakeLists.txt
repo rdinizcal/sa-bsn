@@ -12,31 +12,17 @@ SET (CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake.Modules" ${CMAKE_MODUL
 SET (CMAKE_MODULE_PATH "${CMAKE_INSTALL_PREFIX}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules" ${CMAKE_MODULE_PATH})
 
 ###########################################################################
-# Include flags for compiling.
-# INCLUDE (${CMAKE_CURRENT_SOURCE_DIR}/cmake.Modules/CompileFlags.cmake)
-
-###########################################################################
 # Find Catkin.
 FIND_PACKAGE ( 
     catkin REQUIRED
+    std_msgs
 )
 
 ###########################################################################
-# Set linking libraries to successfully link test suites and binaries.
-# SET (CMAKE_CXX_FLAGS "-Wall ${CMAKE_CXX_FLAGS}")
-
-###########################################################################
-# Set header files from OpenDaVINCI.
+# Set header files from Catkin.
 INCLUDE_DIRECTORIES (${catkin_INCLUDE_DIRS})
 # Set include directory.
 INCLUDE_DIRECTORIES(include)
-
-###########################################################################
-# Build project.
-FILE(GLOB_RECURSE ${PROJECT_NAME}-sources "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
-ADD_LIBRARY (${PROJECT_NAME}-core   OBJECT ${${PROJECT_NAME}-sources})
-ADD_LIBRARY (${PROJECT_NAME}        STATIC $<TARGET_OBJECTS:${PROJECT_NAME}-core>)
-TARGET_LINK_LIBRARIES (${PROJECT_NAME} ${catkin_LIBRARIES}) 
 
 ###########################################################################
 # Export catkin package.
@@ -44,6 +30,12 @@ CATKIN_PACKAGE(
     INCLUDE_DIRS include
     LIBRARIES ${PROJECT_NAME}
 )
+
+###########################################################################
+# Build project.
+FILE(GLOB_RECURSE ${PROJECT_NAME}-srcs "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+ADD_LIBRARY(${PROJECT_NAME} ${${PROJECT_NAME}-srcs})
+TARGET_LINK_LIBRARIES (${PROJECT_NAME} ${catkin_LIBRARIES}) 
 
 ###########################################################################
 # Install library in local catkin environment.

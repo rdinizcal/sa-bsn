@@ -37,22 +37,12 @@ GENERATE_MESSAGES(
 )
 
 ###########################################################################
-# Set linking libraries to successfully link test suites and binaries.
-# SET (BSN_LIB ${PROJECT_NAME})
-SET (CMAKE_CXX_FLAGS "-Wall ${CMAKE_CXX_FLAGS}")
-
-###########################################################################
-# Set header files from OpenDaVINCI.
+# Set header files from Catkin.
 INCLUDE_DIRECTORIES (${catkin_INCLUDE_DIRS})
 # Set include directory.
 INCLUDE_DIRECTORIES(include)
-
-###########################################################################
-# Build project.
-FILE(GLOB_RECURSE ${PROJECT_NAME}-sources "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
-ADD_LIBRARY (${PROJECT_NAME}-core   OBJECT ${${PROJECT_NAME}-sources})
-ADD_LIBRARY (${PROJECT_NAME}        STATIC $<TARGET_OBJECTS:${PROJECT_NAME}-core>)
-TARGET_LINK_LIBRARIES (${PROJECT_NAME} ${catkin_LIBRARIES}) 
+# Set compilation flags
+SET (CMAKE_CXX_FLAGS "-Wall ${CMAKE_CXX_FLAGS}")
 
 ###########################################################################
 # Export catkin package.
@@ -63,8 +53,14 @@ CATKIN_PACKAGE(
 )
 
 ###########################################################################
+# Build project.
+FILE(GLOB_RECURSE ${PROJECT_NAME}-srcs "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+ADD_LIBRARY(${PROJECT_NAME} ${${PROJECT_NAME}-srcs})
+TARGET_LINK_LIBRARIES (${PROJECT_NAME} ${catkin_LIBRARIES}) 
+
+###########################################################################
 ## Add gtest based cpp test target and link libraries
-FILE(GLOB files "${CMAKE_CURRENT_SOURCE_DIR}/testsuites/*.cpp")
+FILE(GLOB_RECURSE files "${CMAKE_CURRENT_SOURCE_DIR}/test/*.cpp")
 
 CATKIN_ADD_GTEST(${PROJECT_NAME}-test ${files})
 

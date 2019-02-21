@@ -3,53 +3,58 @@
 namespace bsn {
     namespace goalmodel {
         
-        Context::Context(const std::string &_context_id, const bool &_value, const std::string &_context_symbol) :
-            context_id(_context_id),
-            value(_value),
-            context_symbol(_context_symbol) {}
+        Context::Context(const std::string &id, const std::string &description, const bool &value) :
+            id(id),
+            value(value),
+            description(description) {}
 
         Context::Context() :
-            context_id(),
+            id(),
             value(),
-            context_symbol() {}
-        
-        Context::Context(const Context &obj) : 
-            context_id(obj.getContext()),
-            value(obj.getValue()),
-            context_symbol(obj.getContextSymbol()) {}
-
-        Context& Context::operator=(const Context &obj) {
-            context_id = obj.getContext();  
-            value = obj.getValue();
-            context_symbol = obj.getContextSymbol();  
-            return (*this);
-        }
+            description() {}
 
         Context::~Context(){};
         
-        void Context::setContext(const std::string &_context_id) {
-            context_id = _context_id;
+        Context::Context(const Context &obj) : 
+            id(obj.getID()),
+            value(obj.getValue()),
+            description(obj.getDescription()) {}
+
+        Context& Context::operator=(const Context &obj) {
+            this->id = obj.getID();  
+            this->value = obj.getValue();
+            this->description = obj.getDescription();  
+            return (*this);
         }
 
-        std::string Context::getContext() const {
-            return context_id;
+        bool Context::operator==(const Context &rhs) {
+            return this->id == rhs.id;
+        }
+        
+        void Context::setID(const std::string &id) {
+            this->id = id;
         }
 
-        void Context::setValue(const bool &_value) {
-            value = _value;
+        std::string Context::getID() const {
+            return this->id;
+        }
+
+        void Context::setDescription(const std::string &description) {
+            this->description = description;
+        }
+
+        std::string Context::getDescription() const {
+            return this->description;
+        }
+
+        void Context::setValue(const bool &value) {
+            this->value = value;
         }
 
         bool Context::getValue() const {
-            return value;
+            return this->value;
         }
 
-        void Context::setContextSymbol(const std::string &_context_symbol) {
-            context_symbol = _context_symbol;
-        }
-
-        std::string Context::getContextSymbol() const {
-            return context_symbol;
-        }
 
     }
 }

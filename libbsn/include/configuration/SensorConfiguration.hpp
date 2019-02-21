@@ -7,7 +7,7 @@
 #include <array>
 #include <sstream>
 
-#include "bsn/range/Range.hpp"
+#include "range/Range.hpp"
 
 namespace bsn {
 	namespace configuration {

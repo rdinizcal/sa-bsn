@@ -1,4 +1,4 @@
-#include "bsn/operation/Operation.hpp"
+#include "operation/Operation.hpp"
 
 using namespace std;
 

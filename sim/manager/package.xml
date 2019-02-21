@@ -50,8 +50,10 @@
   <!--   <doc_depend>doxygen</doc_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>roscpp</build_depend>
-  <build_depend>rospy</build_depend>
   <build_depend>std_msgs</build_depend>
+  <depend>bsn</depend>
+  <depend>lepton</depend>
+  <depend>message_runtime</depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->

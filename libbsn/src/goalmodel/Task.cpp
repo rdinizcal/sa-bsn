@@ -3,97 +3,81 @@
 namespace bsn {
     namespace goalmodel {
         
-        Task::Task(const std::string &_task_id, const std::string &_description, const std::string &_cost_symbol, const std::string &_reliability_symbol, const std::string &_frequency_symbol) : task_id(_task_id), description(_description), cost_symbol(_cost_symbol), cost(0), reliability_symbol(_reliability_symbol), reliability(0), frequency_symbol(_frequency_symbol), frequency(0) {}
+        Task::Task(const std::string &id, const std::string &description, const goalmodel::Context &context, const goalmodel::Property &cost, const  goalmodel::Property &reliability, const goalmodel::Property &frequency) : 
+            id(id), 
+            description(description), 
+            context(context), 
+            cost(cost), 
+            reliability(reliability), 
+            frequency(frequency) {}
 
-        Task::Task(const std::string &_task_id, const std::string &_description, const std::string &_cost_symbol, const double &_cost, const std::string &_reliability_symbol, const double &_reliability, const std::string &_frequency_symbol, const double &_frequency) : task_id(_task_id), description(_description), cost_symbol(_cost_symbol), cost(_cost), reliability_symbol(_reliability_symbol), reliability(_reliability), frequency_symbol(_frequency_symbol), frequency(_frequency){}
-
-        Task::Task() : task_id(), description(), cost_symbol(), cost(), reliability_symbol(), reliability(), frequency_symbol(), frequency() {}
+        Task::Task() : id(), description(), context(), cost(), reliability(), frequency() {}
         
         Task::Task(const Task &obj) : 
-            task_id(obj.getTask()),
+            id(obj.getID()),
             description(obj.getDescription()),
-            cost_symbol(obj.getCostSymbol()),
+            context(obj.getContext()),
             cost(obj.getCost()),
-            reliability_symbol(obj.getReliabilitySymbol()),
             reliability(obj.getReliability()),
-            frequency_symbol(obj.getFrequencySymbol()),
             frequency(obj.getFrequency()) {}
 
         Task& Task::operator=(const Task &obj) {
-            task_id = obj.getTask();  
+            id = obj.getID();  
             description = obj.getDescription(); 
-            cost_symbol = obj.getCostSymbol();
+            context = obj.getContext();
             cost = obj.getCost();
-            reliability_symbol = obj.getReliabilitySymbol();        
             reliability = obj.getReliability();
-            frequency_symbol = obj.getFrequencySymbol();        
             frequency = obj.getFrequency();        
             return (*this);
         }
 
         Task::~Task(){};
 
-        void Task::setTask(const std::string &_task_id) {
-            task_id = _task_id;
+        void Task::setID(const std::string &id) {
+            this->id = id;
         }
 
-        std::string Task::getTask() const {
-            return task_id;
+        std::string Task::getID() const {
+            return id;
         }
 
-        void Task::setDescription(const std::string &_description) {
-            description = _description;
+        void Task::setDescription(const std::string &description) {
+            this->description = description;
         }
 
         std::string Task::getDescription() const {
             return description;
         }
 
-        void Task::setCostSymbol(const std::string &_cost_symbol) {
-            cost_symbol = _cost_symbol;
+        void Task::setContext(const goalmodel::Context &context) {
+            this->context = context;
         }
 
-        std::string Task::getCostSymbol() const {
-            return cost_symbol;
+        goalmodel::Context Task::getContext() const {
+            return this->context;
         }
 
-        void Task::setCost(const double &_cost) {
-            cost = _cost;
+        void Task::setCost(const goalmodel::Property &cost) {
+            this->cost = cost;
         }
 
-        double Task::getCost() const {
+        goalmodel::Property Task::getCost() const {
             return cost;
         }
 
-        void Task::setReliabilitySymbol(const std::string &_reliability_symbol) {
-            reliability_symbol = _reliability_symbol;
+        void Task::setReliability(const goalmodel::Property &reliability) {
+            this->reliability = reliability;
         }
 
-        std::string Task::getReliabilitySymbol() const{
-            return reliability_symbol;
-        }
-
-        void Task::setReliability(const double &_reliability) {
-            reliability = _reliability;
-        }
-
-        double Task::getReliability() const {
+        goalmodel::Property Task::getReliability() const {
             return reliability;
         }
 
-        void Task::setFrequencySymbol(const std::string &_frequency_symbol) {
-            frequency_symbol = _frequency_symbol;
+        void Task::setFrequency(const goalmodel::Property &frequency) {
+            this->frequency = frequency;
         }
 
-        std::string Task::getFrequencySymbol() const{
-            return frequency_symbol;
-        }
-
-        void Task::setFrequency(const double &_frequency) {
-            frequency = _frequency;
-        }
-
-        double Task::getFrequency() const {
+        goalmodel::Property Task::getFrequency() const {
             return frequency;
         }
     }

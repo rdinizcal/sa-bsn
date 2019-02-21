@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 #include <stdint.h>
 
-#include "bsn/generator/Markov.hpp"
-#include "bsn/range/Range.hpp"
+#include "generator/Markov.hpp"
+#include "range/Range.hpp"
 
 using namespace std;
 using namespace bsn::range;

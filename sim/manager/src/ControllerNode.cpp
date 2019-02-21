@@ -38,7 +38,7 @@ ControllerNode::ControllerNode(int  &argc, char **argv, std::string name):
 ControllerNode::~ControllerNode() {}
 
 void ControllerNode::setUp() {
-
+    /*
     { // Set up map {id,object} of leaf task from goal model
         // Pulse oximeter
         tasks.insert(std::pair<std::string,Task>("G3_T1.11",Task("G3_T1.11","Read data","W_G3_T1_11","R_G3_T1_11","F_G3_T1_11")));
@@ -114,14 +114,14 @@ void ControllerNode::setUp() {
 
     { // Set up actions
         
-        /*actions = std::vector<std::vector<double>> {
+        actions = std::vector<std::vector<double>> {
                                         {0.8,0.85,0.9,0.95,1},
                                         {0.8,0.85,0.9,0.95,1},
                                         {0.8,0.85,0.9,0.95,1},
                                         {0.8,0.85,0.9,0.95,1}};
-        */
         
-        /*
+        
+        
         for (int idx = 0, v = 0, w = 0, x = 0, y = 0, z = 0; idx < std::pow(5,7); ++idx){
             actions.push_back({(double)v, (double)w, (double)x, (double)y, (double)z});
 
@@ -152,34 +152,34 @@ void ControllerNode::setUp() {
                 else if ((int)*itt == 5) *itt = 0.9625;
                 else if ((int)*itt == 6) *itt = 1;
             }
-        }*/
+        }
 
         for (double idx = 0; idx <= 1; idx += 0.0009765625) actions.push_back({idx});
-    }
+    }*/
 }
 
 
-/** **********************************************
- *                   MONITOR 
-/* ***********************************************
+/** **************************************************************
+ *                          MONITOR 
+/* ***************************************************************
  * receive task (id, cost, reliability) update list of tasks
  * receive context (id, bool) reset setpoints (cost and reliability)
- * ***********************************************
+ * ***************************************************************
 */ 
 /**
- * This tutorial demonstrates simple receipt of messages over the ROS system.
- * I suppose one can declare several chatterCallbacks, each one for each type of
- * message. Cool isn't it ? It should be especially util for receiving distinct
- * tasks and contexts.
- */
+ * This tutorial demonstrates simple receipt of messages over the 
+ * ROS system. I suppose one can declare several chatterCallbacks, 
+ * each one for each type of message. Cool isn't it ? It should be
+ * especially util for receiving distinct tasks and contexts.
+*/
 void ControllerNode::receiveTaskInfo(const bsn::TaskInfo::ConstPtr& msg) {
     ROS_INFO("I heard: [%s]", msg->task_id.c_str());
 
     std::string id = msg->task_id;
 
-    tasks[id].setCost(msg->cost);
-    tasks[id].setReliability(msg->reliability);
-    tasks[id].setFrequency(msg->frequency);
+    //tasks[id].setCost(msg->cost);
+    //tasks[id].setReliability(msg->reliability);
+    //tasks[id].setFrequency(msg->frequency);
 
     analyze();
 }
@@ -189,7 +189,7 @@ void ControllerNode::receiveContextInfo(const bsn::ContextInfo::ConstPtr& msg) {
 
     std::string id = msg->context_id;
 
-    contexts[id].setValue(msg->status.data);
+    //contexts[id].setValue(msg->status.data);
 
     analyze();
 }
@@ -200,10 +200,10 @@ void ControllerNode::receiveContextInfo(const bsn::ContextInfo::ConstPtr& msg) {
  * analyze whether the setpoints have been violated
  *      -plug in formulae and evaluate current cost and reliabiliy   
  *      -compare current values with tresholds
- * ****************************************************************
+ * ***************************************************************
 */ 
 void ControllerNode::analyze() {
-    double reliability;
+    /*double reliability;
     double cost;
 
     { // plug in costs, reliabilities, frequencies and contexts and evaluate formulas
@@ -253,17 +253,17 @@ void ControllerNode::analyze() {
         
         plan();
 
-    }
+    }*/
 }
 
 /** **************************************************************
  *                          PLAN
 /* ***************************************************************
  * exhaustively analyze whether an action fits the setpoints
- * ****************************************************************
+ * ***************************************************************
 */
 void ControllerNode::plan() {
-    std::map<std::vector<double>, std::vector<double>> policies;
+    /*std::map<std::vector<double>, std::vector<double>> policies;
     double cost;
     double reliability;
 
@@ -311,7 +311,7 @@ void ControllerNode::plan() {
 
     for (std::pair<std::vector<double>,std::vector<double>> policy : policies) {
 
-        std::cout << "[" << policy.first[0] /*<< "," << policy.first[1] << "," << policy.first[2] << "," << policy.first[3] << ", " << policy.first[4] <<*/ << "] ";
+        std::cout << "[" << policy.first[0] /*<< "," << policy.first[1] << "," << policy.first[2] << "," << policy.first[3] << ", " << policy.first[4] << << "] ";
         std::cout << "--> reliability: " << policy.second[0] << " cost: " << policy.second[1] << std::endl;
 
         if(policy.second[0] >= reliability_setpoint*0.98 && policy.second[0] <= reliability_setpoint*1.05 &&
@@ -322,14 +322,14 @@ void ControllerNode::plan() {
 
             break;
         }
-    }
+    }*/
 }
 
 /** **************************************************************
  *                         EXECUTE
 /* ***************************************************************
  * if so, send messages containing the actions to the modules
- * ****************************************************************
+ * ***************************************************************
 */
 void ControllerNode::execute() {
     

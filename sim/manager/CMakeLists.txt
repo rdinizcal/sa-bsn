@@ -6,14 +6,17 @@ add_compile_options(-std=c++11)
 ## Find catkin and any catkin packages
 FIND_PACKAGE(catkin REQUIRED COMPONENTS 
     roscpp 
-    rospy 
     std_msgs 
     genmsg
     bsn
     lepton)
 
-## Declare a catkin package
-CATKIN_PACKAGE()
+# Export catkin package.
+CATKIN_PACKAGE(
+    INCLUDE_DIRS include
+    LIBRARIES ${PROJECT_NAME}
+    CATKIN_DEPENDS bsn lepton message_runtime
+)
 
 ###########################################################################
 # Set catkin directory.
@@ -24,8 +27,6 @@ INCLUDE_DIRECTORIES(include)
 
 ###########################################################################
 # Build this project.
-FILE(GLOB_RECURSE thisproject-sources "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
-ADD_LIBRARY (${PROJECT_NAME}lib-static STATIC ${thisproject-sources})
-ADD_EXECUTABLE (controller "${CMAKE_CURRENT_SOURCE_DIR}/apps/controller.cpp")
-TARGET_LINK_LIBRARIES (controller ${PROJECT_NAME}lib-static ${catkin_LIBRARIES}) 
-ADD_DEPENDENCIES(controller manager_generate_messages_cpp)
+FILE(GLOB_RECURSE ${PROJECT_NAME}-srcs "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+ADD_EXECUTABLE (${PROJECT_NAME} "${CMAKE_CURRENT_SOURCE_DIR}/apps/controller.cpp" ${${PROJECT_NAME}-srcs})
+TARGET_LINK_LIBRARIES (${PROJECT_NAME} ${catkin_LIBRARIES}) 

@@ -1,17 +1,17 @@
 #include <gtest/gtest.h>
 #include <vector>
 
-#include "bsn/range/Range.hpp"
+#include "range/Range.hpp"
 
 using namespace std;
 using namespace bsn::range;
 
-class RangesTest : public testing::Test {
+class RangeTest : public testing::Test {
     protected:
         Range r1;
         Range r2;
 
-        RangesTest() : r1(), r2() {}
+        RangeTest() : r1(), r2() {}
 
         virtual void SetUp () {
             r1.setLowerBound(2.5);
@@ -22,23 +22,23 @@ class RangesTest : public testing::Test {
         }
 };
 
-TEST_F(RangesTest, TestConstructor) {
+TEST_F(RangeTest, TestConstructor) {
     ASSERT_EQ(r1.getLowerBound(), 2.5);
     ASSERT_EQ(r1.getUpperBound(), 5.0);
 }
 
-TEST_F(RangesTest, IllegalConstruction) {
+TEST_F(RangeTest, IllegalConstruction) {
     ASSERT_THROW(Range r(7.5, 5.0), std::invalid_argument);
 }
 
-TEST_F(RangesTest, InRange) {
+TEST_F(RangeTest, InRange) {
     ASSERT_EQ(true, r1.in_range(3.0));
 }
 
-TEST_F(RangesTest, OutRange) {
+TEST_F(RangeTest, OutRange) {
     ASSERT_EQ(false, r1.in_range(8.0));
 }
 
-TEST_F(RangesTest, Convert) {
+TEST_F(RangeTest, Convert) {
     ASSERT_EQ(3.0, r2.convert(2, 3, 10.0));
 }

@@ -1,4 +1,4 @@
-#include "bsn/filters/MovingAverage.hpp"
+#include "filters/MovingAverage.hpp"
 #include <iostream>
 
 using namespace std;
