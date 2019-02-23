@@ -3,32 +3,24 @@
 namespace bsn {
     namespace goalmodel {
         
-        Task::Task(const std::string &id, const std::string &description, const goalmodel::Context &context, const goalmodel::Property &cost, const  goalmodel::Property &reliability, const goalmodel::Property &frequency) : 
+        Task::Task(const std::string &id, const std::string &description) : 
             id(id), 
-            description(description), 
-            context(context), 
-            cost(cost), 
-            reliability(reliability), 
-            frequency(frequency) {}
+            description(description) {}
 
-        Task::Task() : id(), description(), context(), cost(), reliability(), frequency() {}
+        Task::Task() : id(), description() {}
         
         Task::Task(const Task &obj) : 
             id(obj.getID()),
-            description(obj.getDescription()),
-            context(obj.getContext()),
-            cost(obj.getCost()),
-            reliability(obj.getReliability()),
-            frequency(obj.getFrequency()) {}
+            description(obj.getDescription()) {}
 
         Task& Task::operator=(const Task &obj) {
             id = obj.getID();  
             description = obj.getDescription(); 
-            context = obj.getContext();
-            cost = obj.getCost();
-            reliability = obj.getReliability();
-            frequency = obj.getFrequency();        
             return (*this);
+        }
+
+        bool Task::operator==(const Task &rhs) {
+            return this->id == rhs.id;
         }
 
         Task::~Task(){};
@@ -38,7 +30,7 @@ namespace bsn {
         }
 
         std::string Task::getID() const {
-            return id;
+            return this->id;
         }
 
         void Task::setDescription(const std::string &description) {
@@ -46,39 +38,33 @@ namespace bsn {
         }
 
         std::string Task::getDescription() const {
-            return description;
+            return this->description;
         }
 
-        void Task::setContext(const goalmodel::Context &context) {
-            this->context = context;
+        std::vector<Task> Task::getChildren() const {
+            return this->children;
         }
 
-        goalmodel::Context Task::getContext() const {
-            return this->context;
+        void Task::addChild(const Task &task) {
+            this->children.push_back(task);
         }
 
-        void Task::setCost(const goalmodel::Property &cost) {
-            this->cost = cost;
+        void Task::removeChild(const std::string &id) {
+            int pos = findChild(id); 
+
+            if (pos!=-1) {
+                this->children.erase(this->children.begin()+pos);
+            } 
         }
 
-        goalmodel::Property Task::getCost() const {
-            return cost;
-        }
+        int Task::findChild(const std::string &id) {
+            for(std::vector<Task>::const_iterator it = this->children.begin();
+                    it != this->children.end(); ++it) {
+                
+                if ((*it).getID()==id) return it-this->children.begin();
+            }
 
-        void Task::setReliability(const goalmodel::Property &reliability) {
-            this->reliability = reliability;
-        }
-
-        goalmodel::Property Task::getReliability() const {
-            return reliability;
-        }
-
-        void Task::setFrequency(const goalmodel::Property &frequency) {
-            this->frequency = frequency;
-        }
-
-        goalmodel::Property Task::getFrequency() const {
-            return frequency;
+            return -1;
         }
     }
 }
