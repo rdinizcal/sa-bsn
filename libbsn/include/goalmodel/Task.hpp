@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <stdexcept> 
 
 #include "goalmodel/Task.hpp"
 #include "goalmodel/Property.hpp"

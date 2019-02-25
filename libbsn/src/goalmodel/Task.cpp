@@ -53,15 +53,13 @@ namespace bsn {
         }
 
         void Task::removeChild(const std::string &id) {
-            int pos = findChild(id); 
-
-            if (pos!=-1) this->children.erase(this->children.begin()+pos);
+            int pos = findChild(id);
+            this->children.erase(this->children.begin()+pos);
         }
 
         Task Task::getChild(const std::string &id) {
             int pos = findChild(id); 
-
-            if (pos!=-1) return this->children.at(pos);
+            return this->children.at(pos);
         }
 
         //TODO: throw exception when doesnt find child
@@ -72,7 +70,7 @@ namespace bsn {
                 if ((*it).getID()==id) return it-this->children.begin();
             }
 
-            return -1;
+            throw std::out_of_range("Not Found");
         }
     }
 }
