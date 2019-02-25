@@ -32,7 +32,7 @@ namespace bsn {
 
                 void addChild(const Task &/*task*/);
                 void removeChild(const std::string &/*id*/);
-                //Task* getChild(const std::string &/*id*/);
+                Task getChild(const std::string &/*id*/);
 
             private:
                 int findChild(const std::string &/*id*/);

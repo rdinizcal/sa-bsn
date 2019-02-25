@@ -5,17 +5,20 @@ namespace bsn {
         
         Task::Task(const std::string &id, const std::string &description) : 
             id(id), 
-            description(description) {}
+            description(description),
+            children() {}
 
-        Task::Task() : id(), description() {}
+        Task::Task() : id(), description(), children() {}
         
         Task::Task(const Task &obj) : 
             id(obj.getID()),
-            description(obj.getDescription()) {}
+            description(obj.getDescription()),
+            children(obj.getChildren()) {}
 
         Task& Task::operator=(const Task &obj) {
             id = obj.getID();  
             description = obj.getDescription(); 
+            children = obj.getChildren();
             return (*this);
         }
 
@@ -52,11 +55,16 @@ namespace bsn {
         void Task::removeChild(const std::string &id) {
             int pos = findChild(id); 
 
-            if (pos!=-1) {
-                this->children.erase(this->children.begin()+pos);
-            } 
+            if (pos!=-1) this->children.erase(this->children.begin()+pos);
         }
 
+        Task Task::getChild(const std::string &id) {
+            int pos = findChild(id); 
+
+            if (pos!=-1) return this->children.at(pos);
+        }
+
+        //TODO: throw exception when doesnt find child
         int Task::findChild(const std::string &id) {
             for(std::vector<Task>::const_iterator it = this->children.begin();
                     it != this->children.end(); ++it) {

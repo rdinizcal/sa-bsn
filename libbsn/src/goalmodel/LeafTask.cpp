@@ -12,6 +12,7 @@ namespace bsn {
         
         LeafTask::LeafTask(const std::string &id, const std::string &description, const goalmodel::Property &cost, const  goalmodel::Property &reliability, const goalmodel::Property &frequency) : 
             Task(id, description),
+            context(),
             cost(cost), 
             reliability(reliability), 
             frequency(frequency) {}
@@ -20,13 +21,15 @@ namespace bsn {
         LeafTask::~LeafTask(){};
         
         LeafTask::LeafTask(const LeafTask &obj) : 
+            Task(obj.getID(), obj.getDescription()),
             context(obj.getContext()),
             cost(obj.getCost()),
             reliability(obj.getReliability()),
             frequency(obj.getFrequency()) {}
 
         LeafTask& LeafTask::operator=(const LeafTask &obj) {
-
+            id = obj.getID();
+            description = obj.getDescription();
             context = obj.getContext();
             cost = obj.getCost();
             reliability = obj.getReliability();

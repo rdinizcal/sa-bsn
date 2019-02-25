@@ -47,3 +47,14 @@ TEST_F(TaskTest, RemoveChild) {
 
     ASSERT_EQ(parentTask.getChildren().size(), 0);
 }
+
+TEST_F(TaskTest, GetChild) {
+
+    Task parentTask("G3_T1.41", "Read ABP");
+    LeafTask childTask(std::string("G3_T1.412"), std::string("Read systolic"), Property("W_G3_T1_412",1), Property("R_G3_T1_412",1), Property("F_G3_T1_412",1));
+    parentTask.addChild(childTask);
+
+    Task returnedTask = parentTask.getChild("G3_T1.412");
+
+    ASSERT_EQ(returnedTask.getID(), "G3_T1.412");
+}
