@@ -4,8 +4,7 @@
 #include <fstream>
 #include <chrono>
 
-#include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
-#include "opendavinci/odcore/base/FIFOQueue.h"
+#include "ros/ros.h"
 
 #include "bsn/range/Range.hpp"
 #include "bsn/resource/Battery.hpp"
@@ -14,19 +13,19 @@
 #include "bsn/operation/Operation.hpp"
 #include "bsn/configuration/SensorConfiguration.hpp"
 
-#include "bsn/msg/data/SensorData.h"
+#include "bsn/SensorData.h"
+
 #include "bsn/msg/info/TaskInfo.hpp"
 #include "bsn/msg/info/ContextInfo.hpp"
-#include "bsn/msg/info/MonitorTaskInfo.hpp"
-#include "bsn/msg/info/MonitorContextInfo.hpp"
 #include "bsn/msg/control/ThermometerControlCommand.hpp"
 
-class ThermometerModule : public odcore::base::module::TimeTriggeredConferenceClientModule{
+class ThermometerModule {
     
 	private:
       	ThermometerModule(const ThermometerModule &);
     	ThermometerModule &operator=(const ThermometerModule &);
 		
+  	public:
     	virtual void setUp();
     	virtual void tearDown();
 
@@ -36,14 +35,13 @@ class ThermometerModule : public odcore::base::module::TimeTriggeredConferenceCl
 		void sendMonitorTaskInfo(const std::string &/*task_id*/, const double &/*cost*/, const double &/*reliability*/, const double &/*frequency*/);
 		void sendMonitorContextInfo(const std::string &/*context_id*/, const bool &/*value*/);
 
-  	public:
     	ThermometerModule(const int32_t &argc, char **argv);
     	virtual ~ThermometerModule();
 
-    	odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+    	void run();
 
   	private:
-	    odcore::base::FIFOQueue buffer;
+	    // odcore::base::FIFOQueue buffer;
 		
 		std::string type;
 		bsn::resource::Battery battery;

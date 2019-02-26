@@ -51,9 +51,13 @@
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>std_msgs</build_depend>
-  <depend>bsn</depend>
-  <depend>lepton</depend>
-  <depend>message_runtime</depend>
+  <build_depend>message_generation</build_depend>
+  <build_depend>lepton</build_depend>
+  <build_depend>bsn</build_depend>
+
+  <exec_depend>bsn</exec_depend>
+  <exec_depend>lepton</exec_depend>
+  <exec_depend>message_runtime</exec_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->
