@@ -28,76 +28,94 @@ ThermometerModule::ThermometerModule(const int32_t &argc, char **argv/*, std::st
 ThermometerModule::~ThermometerModule() {}
 
 void ThermometerModule::setUp() {
-    //srand(time(NULL));
-    // addDataStoreFor(900, buffer);
-    
-    // Operation op;
-    
-    // std::vector<string> t_probs;
-    // std::array<float, 25> transitions;
-    // std::array<bsn::range::Range,5> ranges;
 
-    // for(uint32_t i = 0; i < transitions.size(); i++){
-    //     for(uint32_t j = 0; j < 5; j++){
-    //         t_probs = op.split(getKeyValueConfiguration().getValue<std::string>("thermometer.state"+to_string(j)), ',');
-    //         for(uint32_t k = 0; k < 5; k++){
-    //             transitions[i++] = stod(t_probs[k]);
-    //         }
-    //     }
-    // }
-    
-    // { // Configure markov chain
-    //     vector<string> lrs,mrs0,hrs0,mrs1,hrs1;
-
-    //     lrs = op.split(getKeyValueConfiguration().getValue<string>("thermometer.LowRisk"), ',');
-    //     mrs0 = op.split(getKeyValueConfiguration().getValue<string>("thermometer.MidRisk0"), ',');
-    //     hrs0 = op.split(getKeyValueConfiguration().getValue<string>("thermometer.HighRisk0"), ',');
-    //     mrs1 = op.split(getKeyValueConfiguration().getValue<string>("thermometer.MidRisk1"), ',');
-    //     hrs1 = op.split(getKeyValueConfiguration().getValue<string>("thermometer.HighRisk1"), ',');
-
-    //     ranges[0] = Range(stod(hrs0[0]), stod(hrs0[1]));
-    //     ranges[1] = Range(stod(mrs0[0]), stod(mrs0[1]));
-    //     ranges[2] = Range(stod(lrs[0]),  stod(lrs[1]));
-    //     ranges[3] = Range(stod(mrs1[0]), stod(mrs1[1]));
-    //     ranges[4] = Range(stod(hrs1[0]), stod(hrs1[1]));
-
-    //     markov = Markov(transitions, ranges, 2);
-    // }
-
-    // { // Configure sensor configuration
-    //     Range low_range = ranges[2];
+    ros::NodeHandle configHandler;
+    srand(time(NULL));
         
-    //     array<Range,2> midRanges;
-    //     midRanges[0] = ranges[1];
-    //     midRanges[1] = ranges[3];
+    Operation op;
+    
+    std::vector<std::string> t_probs;
+    std::array<float, 25> transitions;
+    std::array<bsn::range::Range,5> ranges;
+    std::string s;
+    bool b;
+    double d;
+
+    for(uint32_t i = 0; i < transitions.size(); i++){
+        for(uint32_t j = 0; j < 5; j++){
+            configHandler.getParam("state" + std::to_string(j), s);
+            ROS_INFO("%s", s.c_str());
+            t_probs = op.split(s, ',');
+            for(uint32_t k = 0; k < 5; k++){
+                transitions[i++] = std::stod(t_probs[k]);
+            }
+        }
+    }
+    
+    { // Configure markov chain
+        std::vector<std::string> lrs,mrs0,hrs0,mrs1,hrs1;
+
+        configHandler.getParam("LowRisk", s);
+        lrs = op.split(s, ',');
+        configHandler.getParam("MidRisk0", s);
+        mrs0 = op.split(s, ',');
+        configHandler.getParam("MidRisk0", s);
+        hrs0 = op.split(s, ',');
+        configHandler.getParam("MidRisk0", s);
+        mrs1 = op.split(s, ',');
+        configHandler.getParam("MidRisk0", s);
+        hrs1 = op.split(s, ',');
+
+        ranges[0] = Range(std::stod(hrs0[0]), std::stod(hrs0[1]));
+        ranges[1] = Range(std::stod(mrs0[0]), std::stod(mrs0[1]));
+        ranges[2] = Range(std::stod(lrs[0]), std::stod(lrs[1]));
+        ranges[3] = Range(std::stod(mrs1[0]), std::stod(mrs1[1]));
+        ranges[4] = Range(std::stod(hrs1[0]), std::stod(hrs1[1]));
+
+        markov = Markov(transitions, ranges, 2);
+    }
+
+    { // Configure sensor configuration
+        Range low_range = ranges[2];
         
-    //     array<Range,2> highRanges;
-    //     highRanges[0] = ranges[0];
-    //     highRanges[1] = ranges[4];
+        std::array<Range,2> midRanges;
+        midRanges[0] = ranges[1];
+        midRanges[1] = ranges[3];
+        
+        std::array<Range,2> highRanges;
+        highRanges[0] = ranges[0];
+        highRanges[1] = ranges[4];
 
-    //     array<Range,3> percentages;
+        std::array<Range,3> percentages;
 
-    //     vector<string> low_p = op.split(getKeyValueConfiguration().getValue<string>("global.lowrisk"), ',');
-    //     percentages[0] = Range(stod(low_p[0]),stod(low_p[1]));
+        configHandler.getParam("lowrisk", s);
+        std::vector<std::string> low_p = op.split(s, ',');
+        percentages[0] = Range(std::stod(low_p[0]), std::stod(low_p[1]));
 
-    //     vector<string> mid_p = op.split(getKeyValueConfiguration().getValue<string>("global.midrisk"), ',');
-    //     percentages[1] = Range(stod(mid_p[0]),stod(mid_p[1]));
+        configHandler.getParam("midrisk", s);
+        std::vector<std::string> mid_p = op.split(s, ',');
+        percentages[1] = Range(std::stod(mid_p[0]), std::stod(mid_p[1]));
 
-    //     vector<string> high_p = op.split(getKeyValueConfiguration().getValue<string>("global.highrisk"), ',');
-    //     percentages[2] = Range(stod(high_p[0]),stod(high_p[1]));
+        configHandler.getParam("highrisk", s);
+        std::vector<std::string> high_p = op.split(s, ',');
+        percentages[2] = Range(std::stod(high_p[0]), std::stod(high_p[1]));
 
-    //     sensorConfig = SensorConfiguration(0,low_range,midRanges,highRanges,percentages);
-    // }
+        sensorConfig = SensorConfiguration(0, low_range, midRanges, highRanges, percentages);
+    }
 
  
-    // { // Configure sensor data_accuracy
-    //     data_accuracy = getKeyValueConfiguration().getValue<double>("thermometer.data_accuracy") / 100;
-    //     comm_accuracy = getKeyValueConfiguration().getValue<double>("thermometer.data_accuracy") / 100;
-    // }
+    { // Configure sensor data_accuracy
+        configHandler.getParam("data_accuracy", d);
+        data_accuracy = d / 100;
+        configHandler.getParam("comm_accuracy", d);
+        comm_accuracy = d / 100;
+    }
 
     { // Configure sensor persistency
-    //     persist = getKeyValueConfiguration().getValue<int>("thermometer.persist");
-    //     path = getKeyValueConfiguration().getValue<std::string>("thermometer.path");
+        configHandler.getParam("persist", b);
+        persist = b;
+        configHandler.getParam("path", s);
+        path = s;
 
         if (persist) {
             fp.open(path);
@@ -149,7 +167,7 @@ void ThermometerModule::run() {
 
     ros::Publisher sensor_pub = n.advertise<bsn::SensorData>("thermometer_data", 10);
 
-    ros::Rate loop_rate(10);
+    ros::Rate loop_rate(1);
 
     while (ros::ok()) {
         

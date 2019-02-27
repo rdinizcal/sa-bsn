@@ -3,6 +3,8 @@
 
 #include <fstream>
 #include <chrono>
+#include <string>
+#include <iostream>
 
 #include "ros/ros.h"
 
