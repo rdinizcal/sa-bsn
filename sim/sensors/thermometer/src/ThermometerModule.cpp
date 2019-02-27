@@ -44,7 +44,6 @@ void ThermometerModule::setUp() {
     for(uint32_t i = 0; i < transitions.size(); i++){
         for(uint32_t j = 0; j < 5; j++){
             configHandler.getParam("state" + std::to_string(j), s);
-            ROS_INFO("%s", s.c_str());
             t_probs = op.split(s, ',');
             for(uint32_t k = 0; k < 5; k++){
                 transitions[i++] = std::stod(t_probs[k]);
@@ -126,8 +125,9 @@ void ThermometerModule::setUp() {
 }
 
 void ThermometerModule::tearDown() {
-    // if (persist)
-    //     fp.close();
+    if (persist)
+        ROS_INFO("I CAN PERSIST AAAA");
+        fp.close();
 }
 
 void ThermometerModule::sendTaskInfo(const std::string &task_id, const double &cost, const double &reliability, const double &frequency) {
@@ -295,7 +295,10 @@ void ThermometerModule::run() {
             //             (std::chrono::high_resolution_clock::now()).time_since_epoch()).count() << endl;
             // }
         }
+        ros::spinOnce();
+
+        loop_rate.sleep();
     }
 
-    return;
+    return tearDown();
 }
