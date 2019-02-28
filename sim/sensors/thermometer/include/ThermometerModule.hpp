@@ -17,10 +17,6 @@
 
 #include "bsn/SensorData.h"
 
-#include "bsn/msg/info/TaskInfo.hpp"
-#include "bsn/msg/info/ContextInfo.hpp"
-#include "bsn/msg/control/ThermometerControlCommand.hpp"
-
 class ThermometerModule {
     
 	private:
@@ -43,8 +39,6 @@ class ThermometerModule {
     	void run();
 
   	private:
-	    // odcore::base::FIFOQueue buffer;
-		
 		std::string type;
 		bsn::resource::Battery battery;
 		bool available;

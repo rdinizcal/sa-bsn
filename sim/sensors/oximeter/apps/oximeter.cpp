@@ -2,6 +2,11 @@
 
 int32_t main(int32_t argc, char **argv) {
     OximeterModule sensor(argc, argv);
-    
-    return sensor.runModule();
+
+    ros::init(argc, argv, "oximeter");
+
+    sensor.setUp();
+    sensor.run();
+
+    return 0;
 }

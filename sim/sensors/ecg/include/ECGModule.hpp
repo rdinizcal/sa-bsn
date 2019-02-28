@@ -3,9 +3,10 @@
 
 #include <fstream>
 #include <chrono>
+#include <string>
+#include <iostream>
 
-#include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
-#include "opendavinci/odcore/base/FIFOQueue.h"
+#include "ros/ros.h"
 
 #include "bsn/range/Range.hpp"
 #include "bsn/resource/Battery.hpp"
@@ -14,20 +15,14 @@
 #include "bsn/operation/Operation.hpp"
 #include "bsn/configuration/SensorConfiguration.hpp"
 
-#include "bsn/msg/data/SensorData.h"
-#include "bsn/msg/info/TaskInfo.hpp"
-#include "bsn/msg/info/ContextInfo.hpp"
-#include "bsn/msg/info/MonitorTaskInfo.hpp"
-#include "bsn/msg/info/MonitorContextInfo.hpp"
-#include "bsn/msg/control/ECGControlCommand.hpp"
+#include "bsn/SensorData.h"
 
-class ECGModule : public odcore::base::module::TimeTriggeredConferenceClientModule{
+class ECGModule {
     
 	private:
       	ECGModule(const ECGModule &);
     	ECGModule &operator=(const ECGModule &);
 
-    	virtual void setUp();
     	virtual void tearDown();
 
 		void sendTaskInfo(const std::string &/*task_id*/, const double &/*cost*/, const double &/*reliability*/, const double &/*frequency*/);
@@ -37,14 +32,14 @@ class ECGModule : public odcore::base::module::TimeTriggeredConferenceClientModu
 		void sendMonitorContextInfo(const std::string &/*context_id*/, const bool &/*value*/);
 
   	public:
+    	virtual void setUp();
+
     	ECGModule(const int32_t &argc, char **argv);
     	virtual ~ECGModule();
 
-    	odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+    	void run();
 
   	private:
-	    odcore::base::FIFOQueue buffer;
-		
 		std::string type;
 		bsn::resource::Battery battery;
 		bool available;

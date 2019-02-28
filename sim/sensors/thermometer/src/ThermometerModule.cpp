@@ -6,9 +6,6 @@ using namespace bsn::generator;
 using namespace bsn::operation;
 using namespace bsn::configuration;
 
-// using namespace bsn::msg::data;
-// using namespace bsn::msg::info;
-// using namespace bsn::msg::control;
 
 ThermometerModule::ThermometerModule(const int32_t &argc, char **argv/*, std::string name*/) :
     type("thermometer"),
@@ -28,7 +25,6 @@ ThermometerModule::ThermometerModule(const int32_t &argc, char **argv/*, std::st
 ThermometerModule::~ThermometerModule() {}
 
 void ThermometerModule::setUp() {
-
     ros::NodeHandle configHandler;
     srand(time(NULL));
         
@@ -126,7 +122,6 @@ void ThermometerModule::setUp() {
 
 void ThermometerModule::tearDown() {
     if (persist)
-        ROS_INFO("I CAN PERSIST AAAA");
         fp.close();
 }
 
@@ -155,7 +150,6 @@ void ThermometerModule::sendMonitorContextInfo(const std::string &context_id, co
 }
 
 void ThermometerModule::run() {
-
     // Container container;
     double data;
     double risk;
@@ -263,8 +257,8 @@ void ThermometerModule::run() {
                 data = filter.getValue(type);
                 battery.consume(0.1*params["m_avg"]);
 
-                //for debugging
                 msg.data = data;
+                //for debugging
                 std::cout << "Filtered data: " << data << std::endl;
             }
             
@@ -286,14 +280,14 @@ void ThermometerModule::run() {
         }
 
         { // Persist sensor data
-            // if (persist) {
-            //     fp << id++ << ",";
-            //     fp << data << ",";
-            //     fp << risk << ",";
-            //     fp << std::chrono::duration_cast<std::chrono::milliseconds>
-            //             (std::chrono::time_point_cast<std::chrono::milliseconds>
-            //             (std::chrono::high_resolution_clock::now()).time_since_epoch()).count() << endl;
-            // }
+            if (persist) {
+                fp << id++ << ",";
+                fp << data << ",";
+                fp << risk << ",";
+                fp << std::chrono::duration_cast<std::chrono::milliseconds>
+                        (std::chrono::time_point_cast<std::chrono::milliseconds>
+                        (std::chrono::high_resolution_clock::now()).time_since_epoch()).count() << std::endl;
+            }
         }
         ros::spinOnce();
 
