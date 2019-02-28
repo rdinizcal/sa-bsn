@@ -23,7 +23,7 @@ TEST_F(GoalTest, SimpleConstruct) {
     ASSERT_EQ(task.getID(), id);
     ASSERT_EQ(task.getDescription(), description);
 }
-/*
+
 TEST_F(GoalTest, AddChild) {
 
     Goal parentGoal("G3_T1", "Read");
@@ -42,7 +42,7 @@ TEST_F(GoalTest, RemoveChild) {
     Goal childGoal("G3_T1.4", "Read ABP");
     parentGoal.addChild(childGoal);
 
-    parentGoal.removeChild("G3_T1.412");
+    parentGoal.removeChild("G3_T1.4");
 
     ASSERT_EQ(parentGoal.getChildren().size(), 0);
 }
@@ -68,9 +68,9 @@ TEST_F(GoalTest, GetChild) {
     Goal childGoal("G3_T1.4", "Read ABP");
     parentGoal.addChild(childGoal);
 
-    Goal returnedGoal = parentGoal.getChild("G3_T1.412");
+    Goal returnedGoal = parentGoal.getChild("G3_T1.4");
 
-    ASSERT_EQ(returnedGoal.getID(), "G3_T1.412");
+    ASSERT_EQ(returnedGoal.getID(), "G3_T1.4");
 }
 
 TEST_F(GoalTest, GetChildNotFound) {
@@ -86,4 +86,4 @@ TEST_F(GoalTest, GetChildNotFound) {
     catch(std::out_of_range const & err) {
         EXPECT_EQ(err.what(),std::string("Not Found"));
     }
-}*/
+}
