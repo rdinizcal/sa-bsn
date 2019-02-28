@@ -5,25 +5,25 @@ namespace bsn {
         
         Context::Context(const std::string &id, const std::string &description, const bool &value) :
             id(id),
-            value(value),
-            description(description) {}
+            description(description),
+            value(value) {}
 
         Context::Context() :
             id(),
-            value(),
-            description() {}
+            description(),
+            value() {}
 
         Context::~Context(){};
         
         Context::Context(const Context &obj) : 
             id(obj.getID()),
-            value(obj.getValue()),
-            description(obj.getDescription()) {}
+            description(obj.getDescription()),
+            value(obj.getValue()) {}
 
         Context& Context::operator=(const Context &obj) {
             this->id = obj.getID();  
-            this->value = obj.getValue();
             this->description = obj.getDescription();  
+            this->value = obj.getValue();
             return (*this);
         }
 

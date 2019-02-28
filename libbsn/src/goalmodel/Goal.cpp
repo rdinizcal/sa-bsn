@@ -1,69 +1,69 @@
-#include "goalmodel/Task.hpp"
+#include "goalmodel/Goal.hpp"
 
 namespace bsn {
     namespace goalmodel {
         
-        Task::Task(const std::string &id, const std::string &description) : 
+        Goal::Goal(const std::string &id, const std::string &description) : 
             id(id), 
             description(description),
             children() {}
 
-        Task::Task() : id(), description(), children() {}
+        Goal::Goal() : id(), description(), children() {}
         
-        Task::Task(const Task &obj) : 
+        Goal::Goal(const Goal &obj) : 
             id(obj.getID()),
             description(obj.getDescription()),
             children(obj.getChildren()) {}
 
-        Task& Task::operator=(const Task &obj) {
+        Goal& Goal::operator=(const Goal &obj) {
             id = obj.getID();  
             description = obj.getDescription(); 
             children = obj.getChildren();
             return (*this);
         }
 
-        bool Task::operator==(const Task &rhs) {
+        bool Goal::operator==(const Goal &rhs) {
             return this->id == rhs.id;
         }
 
-        Task::~Task(){};
+        Goal::~Goal(){};
 
-        void Task::setID(const std::string &id) {
+        void Goal::setID(const std::string &id) {
             this->id = id;
         }
 
-        std::string Task::getID() const {
+        std::string Goal::getID() const {
             return this->id;
         }
 
-        void Task::setDescription(const std::string &description) {
+        void Goal::setDescription(const std::string &description) {
             this->description = description;
         }
 
-        std::string Task::getDescription() const {
+        std::string Goal::getDescription() const {
             return this->description;
         }
 
-        std::vector<Task> Task::getChildren() const {
+        std::vector<Goal> Goal::getChildren() const {
             return this->children;
         }
 
-        void Task::addChild(const Task &task) {
+        void Goal::addChild(const Goal &task) {
             this->children.push_back(task);
         }
 
-        void Task::removeChild(const std::string &id) {
+        void Goal::removeChild(const std::string &id) {
             int pos = findChild(id);
             this->children.erase(this->children.begin()+pos);
         }
 
-        Task Task::getChild(const std::string &id) {
+        Goal Goal::getChild(const std::string &id) {
             int pos = findChild(id); 
             return this->children.at(pos);
         }
 
-        int Task::findChild(const std::string &id) {
-            for(std::vector<Task>::const_iterator it = this->children.begin();
+        int Goal::findChild(const std::string &id) {
+            for(std::vector<Goal>::const_iterator it = this->children.begin();
                     it != this->children.end(); ++it) {
                 
                 if ((*it).getID()==id) return it-this->children.begin();

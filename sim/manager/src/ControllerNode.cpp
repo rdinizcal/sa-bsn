@@ -38,6 +38,7 @@ ControllerNode::ControllerNode(int  &argc, char **argv, std::string name):
 ControllerNode::~ControllerNode() {}
 
 void ControllerNode::setUp() {
+    Goal newGoal("yo", "kk");
     /*
     { // Set up map {id,object} of leaf task from goal model
         // Pulse oximeter
