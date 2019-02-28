@@ -4,6 +4,7 @@
 #include "goalmodel/Property.hpp"
 #include "goalmodel/Task.hpp"
 #include "goalmodel/LeafTask.hpp"
+#include "goalmodel/Node.hpp"
 
 using namespace bsn::goalmodel;
 
@@ -69,7 +70,7 @@ TEST_F(TaskTest, GetChild) {
     LeafTask childTask(std::string("G3_T1.412"), std::string("Read systolic"), Property("W_G3_T1_412",1), Property("R_G3_T1_412",1), Property("F_G3_T1_412",1));
     parentTask.addChild(childTask);
 
-    Task returnedTask = parentTask.getChild("G3_T1.412");
+    Node returnedTask = parentTask.getChild("G3_T1.412");
 
     ASSERT_EQ(returnedTask.getID(), "G3_T1.412");
 }
@@ -81,7 +82,7 @@ TEST_F(TaskTest, GetChildNotFound) {
     parentTask.addChild(childTask);
 
     try {
-        Task returnedTask = parentTask.getChild("XXX");
+         Node returnedTask = parentTask.getChild("XXX");
         FAIL() << "Expected Not Found exception";
     }
     catch(std::out_of_range const & err) {

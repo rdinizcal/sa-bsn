@@ -8,7 +8,6 @@
 #include "goalmodel/Property.hpp"
 #include "goalmodel/Task.hpp"
 
-
 namespace bsn {
     namespace goalmodel {
 

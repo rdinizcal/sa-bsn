@@ -3,6 +3,7 @@
 #include "goalmodel/Context.hpp"
 #include "goalmodel/Property.hpp"
 #include "goalmodel/Goal.hpp"
+#include "goalmodel/Node.hpp"
 
 using namespace bsn::goalmodel;
 
@@ -18,10 +19,10 @@ TEST_F(GoalTest, SimpleConstruct) {
     std::string id = "G3_T1.11";
     std::string description = "Read data";
 
-    Goal task(id, description);
+    Goal goal(id, description);
 
-    ASSERT_EQ(task.getID(), id);
-    ASSERT_EQ(task.getDescription(), description);
+    ASSERT_EQ(goal.getID(), id);
+    ASSERT_EQ(goal.getDescription(), description);
 }
 
 TEST_F(GoalTest, AddChild) {
@@ -68,7 +69,7 @@ TEST_F(GoalTest, GetChild) {
     Goal childGoal("G3_T1.4", "Read ABP");
     parentGoal.addChild(childGoal);
 
-    Goal returnedGoal = parentGoal.getChild("G3_T1.4");
+    Node returnedGoal = parentGoal.getChild("G3_T1.4");
 
     ASSERT_EQ(returnedGoal.getID(), "G3_T1.4");
 }
@@ -80,7 +81,7 @@ TEST_F(GoalTest, GetChildNotFound) {
     parentGoal.addChild(childGoal);
 
     try {
-        Goal returnedGoal = parentGoal.getChild("XXX");
+        Node returnedGoal = parentGoal.getChild("XXX");
         FAIL() << "Expected Not Found exception";
     }
     catch(std::out_of_range const & err) {
