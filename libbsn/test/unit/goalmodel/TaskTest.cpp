@@ -5,6 +5,7 @@
 #include "goalmodel/Task.hpp"
 #include "goalmodel/LeafTask.hpp"
 #include "goalmodel/Node.hpp"
+#include "goalmodel/Goal.hpp"
 
 using namespace bsn::goalmodel;
 
@@ -35,6 +36,21 @@ TEST_F(TaskTest, AddChild) {
 
     ASSERT_EQ(parentTask.getChildren().size(), 1);
     EXPECT_TRUE(parentTask.getChildren().at(0)==childTask);
+
+}
+
+TEST_F(TaskTest, AddGoalAsChild) {
+
+    Task parentTask("G3_T1.41", "Read ABP");
+    Goal childGoal("G3_T1", "Read Sensor Info");
+
+    try {
+        parentTask.addChild(childGoal);
+        FAIL() << "Expected not to be able to add a goal as child of a task";
+    }
+    catch(std::exception const & err) {
+        EXPECT_EQ(err.what(),std::string("Tasks cannot contain goals as children"));
+    }
 
 }
 

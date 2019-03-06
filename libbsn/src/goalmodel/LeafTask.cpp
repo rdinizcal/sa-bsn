@@ -68,5 +68,9 @@ namespace bsn {
         goalmodel::Property LeafTask::getFrequency() const {
             return frequency;
         }
+
+        void LeafTask::addChild(const Node &node) {
+            throw std::invalid_argument("Leaf Tasks cannot contain children");
+        }
     }
 }

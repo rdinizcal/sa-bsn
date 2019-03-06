@@ -47,3 +47,18 @@ TEST_F(LeafTaskTest, SimpleConstructNoContext) {
     EXPECT_TRUE(leafTask.getReliability()==reliability);
     EXPECT_TRUE(leafTask.getFrequency()==frequency);
 }
+
+TEST_F(LeafTaskTest, PreventAddChild) {
+
+    LeafTask parentTask(std::string("G3_T1.412"), std::string("Read systolic"), Property("W_G3_T1_412",1), Property("R_G3_T1_412",1), Property("F_G3_T1_412",1));
+    LeafTask childTask(std::string("G3_T1.412"), std::string("Read systolic"), Property("W_G3_T1_412",1), Property("R_G3_T1_412",1), Property("F_G3_T1_412",1));
+
+    try {
+        parentTask.addChild(childTask);
+        FAIL() << "Expected not to be able to add a child to a leaf task";
+    }
+    catch(std::exception const & err) {
+        EXPECT_EQ(err.what(),std::string("Leaf Tasks cannot contain children"));
+    }
+
+}
