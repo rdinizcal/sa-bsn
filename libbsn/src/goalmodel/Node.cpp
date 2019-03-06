@@ -48,8 +48,8 @@ namespace bsn {
             return this->children;
         }
 
-        void Node::addChild(const Node &task) {
-            this->children.push_back(task);
+        void Node::addChild(const Node &node) {
+            this->children.push_back(node);
         }
 
         void Node::removeChild(const std::string &id) {
