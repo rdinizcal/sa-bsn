@@ -14,11 +14,11 @@
     <param name="state4" value="10,10,10,20,40" />
 
     <!-- risk values -->
-    <param name="HighRisk0" value="0,31.99" />
-    <param name="MidRisk0" value="32,35.99" />
-    <param name="LowRisk" value="36,37.99" />
-    <param name="MidRisk1" value="38,40.99" />
-    <param name="HighRisk1" value="41,50" />
+    <param name="HighRisk0" value="0,70" />
+    <param name="MidRisk0" value="70,85" />
+    <param name="LowRisk" value="85,97" />
+    <param name="MidRisk1" value="97,115" />
+    <param name="HighRisk1" value="115,300" />
 
     <!-- accuracy in percentage -->
     <param name="data_accuracy" value="90" type="double" />

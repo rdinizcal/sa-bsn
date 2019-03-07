@@ -56,9 +56,9 @@ void ThermometerModule::setUp() {
         mrs0 = op.split(s, ',');
         configHandler.getParam("MidRisk0", s);
         hrs0 = op.split(s, ',');
-        configHandler.getParam("MidRisk0", s);
+        configHandler.getParam("MidRisk1", s);
         mrs1 = op.split(s, ',');
-        configHandler.getParam("MidRisk0", s);
+        configHandler.getParam("HighRisk1", s);
         hrs1 = op.split(s, ',');
 
         ranges[0] = Range(std::stod(hrs0[0]), std::stod(hrs0[1]));

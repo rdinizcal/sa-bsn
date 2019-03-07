@@ -64,15 +64,17 @@ void CentralhubModule::sendMonitorTaskInfo(const std::string &task_id, const dou
 void CentralhubModule::receiveSensorData(const bsn::SensorData::ConstPtr& msg) {
     std::string type = msg->type;
     double risk = msg->risk;
-    
-    // if(type=="null"){ continue; } // for joker packages
-    int32_t sensor_id = get_sensor_id(type);
-    data[sensor_id] = msg->data;
-    
-    // // if (int32_t(risk) == -1) { continue; }
-    data_list[sensor_id].push_back(risk);
 
-    patient_status = data_fuse(data_list);
+    std::cout << "Received data from " + type << std::endl; 
+    
+    if(type != "null" && int32_t(risk) != -1) {  
+        int32_t sensor_id = get_sensor_id(type);
+        data[sensor_id] = msg->data;
+    
+        data_list[sensor_id].push_back(risk);
+
+        patient_status = data_fuse(data_list);
+    }
 }
 
 void CentralhubModule::run() {   
@@ -90,11 +92,11 @@ void CentralhubModule::run() {
     //     sender.connect();
     // }
 
-
     ros::Subscriber thermometerSub = nh.subscribe("thermometer_data", 10, &CentralhubModule::receiveSensorData, this);
     ros::Subscriber oximeterSub = nh.subscribe("oximeter_data", 10, &CentralhubModule::receiveSensorData, this);
     ros::Subscriber ecgSub = nh.subscribe("ecg_data", 10, &CentralhubModule::receiveSensorData, this);
-    ros::Subscriber bloodpressureSub = nh.subscribe("bloodpressure_data", 10, &CentralhubModule::receiveSensorData, this);
+    ros::Subscriber diastolicSub = nh.subscribe("diastolic_data", 100, &CentralhubModule::receiveSensorData, this);
+    ros::Subscriber systolicSub = nh.subscribe("systolic_data", 100, &CentralhubModule::receiveSensorData, this);
 
     ros::spin();
     // while (ros::ok()) {

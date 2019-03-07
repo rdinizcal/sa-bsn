@@ -46,24 +46,20 @@ void OximeterModule::setUp() {
     }
     
     { // Configure markov chain
-        std::vector<std::string> lrs,mrs0,hrs0,mrs1,hrs1;
+        std::vector<std::string> lrs, mrs, hrs;
 
         configHandler.getParam("LowRisk", s);
         lrs = op.split(s, ',');
-        configHandler.getParam("MidRisk0", s);
-        mrs0 = op.split(s, ',');
-        configHandler.getParam("MidRisk0", s);
-        hrs0 = op.split(s, ',');
-        configHandler.getParam("MidRisk0", s);
-        mrs1 = op.split(s, ',');
-        configHandler.getParam("MidRisk0", s);
-        hrs1 = op.split(s, ',');
+        configHandler.getParam("MidRisk", s);
+        mrs = op.split(s, ',');
+        configHandler.getParam("HighRisk", s);
+        hrs = op.split(s, ',');
 
-        ranges[0] = Range(std::stod(hrs0[0]), std::stod(hrs0[1]));
-        ranges[1] = Range(std::stod(mrs0[0]), std::stod(mrs0[1]));
+        ranges[0] = Range(-1, -1);
+        ranges[1] = Range(-1, -1);
         ranges[2] = Range(std::stod(lrs[0]), std::stod(lrs[1]));
-        ranges[3] = Range(std::stod(mrs1[0]), std::stod(mrs1[1]));
-        ranges[4] = Range(std::stod(hrs1[0]), std::stod(hrs1[1]));
+        ranges[3] = Range(std::stod(mrs[0]), std::stod(mrs[1]));
+        ranges[4] = Range(std::stod(hrs[0]), std::stod(hrs[1]));
 
         markov = Markov(transitions, ranges, 2);
     }

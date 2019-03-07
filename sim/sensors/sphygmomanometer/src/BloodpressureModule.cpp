@@ -56,24 +56,20 @@ void BloodpressureModule::setUp() {
         }
 
         { // Configure markov chain
-            std::vector<std::string> lrs, mrs0, hrs0, mrs1, hrs1;
+            std::vector<std::string> lrs, mrs, hrs;
 
             configHandler.getParam(x + "LowRisk", s);
             lrs = op.split(s, ',');
-            configHandler.getParam(x + "MidRisk0", s);
-            mrs0 = op.split(s, ',');
-            configHandler.getParam(x + "MidRisk0", s);
-            hrs0 = op.split(s, ',');
-            configHandler.getParam(x + "MidRisk0", s);
-            mrs1 = op.split(s, ',');
-            configHandler.getParam(x + "MidRisk0", s);
-            hrs1 = op.split(s, ',');
+            configHandler.getParam(x + "MidRisk", s);
+            mrs = op.split(s, ',');
+            configHandler.getParam(x + "HighRisk", s);
+            hrs = op.split(s, ',');
 
             ranges[0] = Range(-1, -1);
             ranges[1] = Range(-1, -1);
             ranges[2] = Range(std::stod(lrs[0]), std::stod(lrs[1]));
-            ranges[3] = Range(std::stod(mrs1[0]), std::stod(mrs1[1]));
-            ranges[4] = Range(std::stod(hrs1[0]), std::stod(hrs1[1]));
+            ranges[3] = Range(std::stod(mrs[0]), std::stod(mrs[1]));
+            ranges[4] = Range(std::stod(hrs[0]), std::stod(hrs[1]));
 
             if(i==0){
                 markovSystolic = Markov(transitions, ranges, 2);
@@ -178,9 +174,10 @@ void BloodpressureModule::run() {
     bsn::SensorData msgS, msgD;
     ros::NodeHandle n;
 
-    ros::Publisher sensor_pub = n.advertise<bsn::SensorData>("bloodpressure_data", 10);
+    ros::Publisher systolic_pub = n.advertise<bsn::SensorData>("systolic_data", 100);
+    ros::Publisher diastolic_pub = n.advertise<bsn::SensorData>("diastolic_data", 100);
 
-    ros::Rate loop_rate(1);
+    ros::Rate loop_rate(10);
 
     while (ros::ok()) {
         
@@ -310,7 +307,7 @@ void BloodpressureModule::run() {
                 msgS.risk = risk;
                 
                 if((rand() % 100)+1 > int32_t(systcomm_accuracy*100))
-                    sensor_pub.publish(msgS);
+                    systolic_pub.publish(msgS);
                 battery.consume(0.1);
 
                 // for debugging
@@ -321,7 +318,7 @@ void BloodpressureModule::run() {
                 msgD.risk = risk;
                 
                 if((rand() % 100)+1 > int32_t(diascomm_accuracy*100))
-                    sensor_pub.publish(msgD);
+                    diastolic_pub.publish(msgD);
                 battery.consume(0.1);
 
                 // for debugging
