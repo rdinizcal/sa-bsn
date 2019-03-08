@@ -174,10 +174,10 @@ void BloodpressureModule::run() {
     bsn::SensorData msgS, msgD;
     ros::NodeHandle n;
 
-    ros::Publisher systolic_pub = n.advertise<bsn::SensorData>("systolic_data", 100);
-    ros::Publisher diastolic_pub = n.advertise<bsn::SensorData>("diastolic_data", 100);
+    ros::Publisher systolic_pub = n.advertise<bsn::SensorData>("systolic_data", 10);
+    ros::Publisher diastolic_pub = n.advertise<bsn::SensorData>("diastolic_data", 10);
 
-    ros::Rate loop_rate(10);
+    ros::Rate loop_rate(1);
 
     while (ros::ok()) {
         
@@ -280,8 +280,8 @@ void BloodpressureModule::run() {
                 
 
                 //for debugging 
-               std::cout << "New data (systolic): " << dataS <<std::endl;
-               std::cout << "New data (diastolic): " << dataD <<std::endl <<std::endl;
+               std::cout << std::endl << "New data (systolic): " << dataS <<std::endl;
+               std::cout << "New data (diastolic): " << dataD <<std::endl;
             }
 
             { // TASK: Filter data with moving average
@@ -311,7 +311,7 @@ void BloodpressureModule::run() {
                 battery.consume(0.1);
 
                 // for debugging
-                //cout << "Risk: " << risk << "%"  <<std::endl;
+                std::cout << "Risk: " << risk << "%"  <<std::endl;
 
                 risk = sensorConfigDiastolic.evaluateNumber(dataD);
                 msgD.data = dataD;
@@ -322,7 +322,7 @@ void BloodpressureModule::run() {
                 battery.consume(0.1);
 
                 // for debugging
-                //cout << "Risk: " << risk << "%"  <<std::endl;
+                std::cout << "Risk: " << risk << "%"  <<std::endl;
             }
 
         }

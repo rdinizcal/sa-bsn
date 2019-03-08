@@ -259,12 +259,11 @@ void OximeterModule::run(){
                 risk = sensorConfig.evaluateNumber(data);
 
                 msg.risk = risk;
-                sensor_pub.publish(msg);
 
-                // SensorData sdata(type, data, risk);  
-                // Container sdataContainer(sdata);
-                // if((rand() % 100)+1 > int32_t(comm_accuracy*100)) getConference().send(sdataContainer);
-                // battery.consume(0.1);
+                if((rand() % 100)+1 > int32_t(comm_accuracy*100))
+                    sensor_pub.publish(msg);
+                
+                battery.consume(0.1);
 
                 // for debugging
                 std::cout << "Risk: " << risk << "%" << std::endl;

@@ -95,8 +95,8 @@ void CentralhubModule::run() {
     ros::Subscriber thermometerSub = nh.subscribe("thermometer_data", 10, &CentralhubModule::receiveSensorData, this);
     ros::Subscriber oximeterSub = nh.subscribe("oximeter_data", 10, &CentralhubModule::receiveSensorData, this);
     ros::Subscriber ecgSub = nh.subscribe("ecg_data", 10, &CentralhubModule::receiveSensorData, this);
-    ros::Subscriber diastolicSub = nh.subscribe("diastolic_data", 100, &CentralhubModule::receiveSensorData, this);
-    ros::Subscriber systolicSub = nh.subscribe("systolic_data", 100, &CentralhubModule::receiveSensorData, this);
+    ros::Subscriber diastolicSub = nh.subscribe("diastolic_data", 10, &CentralhubModule::receiveSensorData, this);
+    ros::Subscriber systolicSub = nh.subscribe("systolic_data", 10, &CentralhubModule::receiveSensorData, this);
 
     ros::spin();
     // while (ros::ok()) {

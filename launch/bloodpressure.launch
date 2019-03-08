@@ -20,7 +20,7 @@
 
     <!-- accuracy in percentage for diastolic -->
     <param name="diasdata_accuracy" value="90" type="double" />
-    <param name="diascomm_accuracy" value="90" type="double" />
+    <param name="diascomm_accuracy" value="0" type="double" />
 
     <!-- markov chain for systolic -->
     <param name="syststate0" value="0,0,0,0,0" />
@@ -36,7 +36,7 @@
 
     <!-- accuracy in percentage for systolic -->
     <param name="systdata_accuracy" value="90" type="double" />
-    <param name="systcomm_accuracy" value="90" type="double" />
+    <param name="systcomm_accuracy" value="0" type="double" />
 
     <!-- persistence -->
     <param name="persist" value="true" type="bool" />
