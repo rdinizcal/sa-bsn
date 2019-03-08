@@ -306,7 +306,7 @@ void BloodpressureModule::run() {
                 msgS.data = dataS;
                 msgS.risk = risk;
                 
-                if((rand() % 100)+1 > int32_t(systcomm_accuracy*100))
+                if ((rand() % 100) <= systcomm_accuracy * 100)
                     systolic_pub.publish(msgS);
                 battery.consume(0.1);
 
@@ -316,8 +316,8 @@ void BloodpressureModule::run() {
                 risk = sensorConfigDiastolic.evaluateNumber(dataD);
                 msgD.data = dataD;
                 msgD.risk = risk;
-                
-                if((rand() % 100)+1 > int32_t(diascomm_accuracy*100))
+
+                if ((rand() % 100) <= diascomm_accuracy * 100)
                     diastolic_pub.publish(msgD);
                 battery.consume(0.1);
 

@@ -20,7 +20,7 @@
 
     <!-- accuracy in percentage -->
     <param name="data_accuracy" value="90" type="double" />
-    <param name="comm_accuracy" value="0" type="double" />
+    <param name="comm_accuracy" value="100" type="double" />
 
     <!-- persistence -->
     <param name="persist" value="true" type="bool" />
