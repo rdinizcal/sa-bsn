@@ -69,7 +69,7 @@ namespace bsn {
                 if ((*it).getID()==id) return it-this->children.begin();
             }
 
-            throw std::out_of_range("Not Found");
+            throw std::out_of_range("Child Not Found");
         }
     }
 }

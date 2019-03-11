@@ -25,17 +25,18 @@ namespace bsn {
                 void setActor(const std::string &/*actor*/);
                 std::string getActor() const;
 
-                void addRootGoal(const Goal &/*goal*/);
-                Node getNode(const std::string &/*node*/);
+                void addRootGoal(Goal &/*goal*/);
+                void addNode (Node &/*node*/, const std::string &/*parent*/);
+                Node* getNode(const std::string &/*node*/);
                 
-                int getSize();
+                int getSize() const;
 
             private:
-                std::map<std::string, Node> getNodes() const;
+                std::map<std::string, Node*> getNodes() const;
 
             private:
                 std::string actor;
-                std::map<std::string, Node> nodes;
+                std::map<std::string, Node*> nodes;
         };
     }  
 }

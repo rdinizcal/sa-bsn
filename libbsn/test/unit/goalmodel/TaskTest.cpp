@@ -73,10 +73,10 @@ TEST_F(TaskTest, RemoveChildNotFound) {
 
     try {
         parentTask.removeChild("XXX");
-        FAIL() << "Expected Not Found exception";
+        FAIL() << "Expected our of range exception";
     }
     catch(std::out_of_range const & err) {
-        EXPECT_EQ(err.what(),std::string("Not Found"));
+        EXPECT_EQ(err.what(),std::string("Child Not Found"));
     }
 }
 
@@ -99,9 +99,9 @@ TEST_F(TaskTest, GetChildNotFound) {
 
     try {
          Node returnedTask = parentTask.getChild("XXX");
-        FAIL() << "Expected Not Found exception";
+        FAIL() << "Expected out of range exception";
     }
     catch(std::out_of_range const & err) {
-        EXPECT_EQ(err.what(),std::string("Not Found"));
+        EXPECT_EQ(err.what(),std::string("Child Not Found"));
     }
 }
