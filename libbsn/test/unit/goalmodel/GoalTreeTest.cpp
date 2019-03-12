@@ -87,5 +87,42 @@ TEST_F(GoalTreeTest, AddGoalWParent) {
     ASSERT_TRUE(goaltree.getNode("G2")==&goal2);
     ASSERT_TRUE((*goaltree.getNode("G1")).getChildren().size()==1);
     ASSERT_TRUE((*goaltree.getNode("G1")).getChild("G2")==goal2);
+}
 
+TEST_F(GoalTreeTest, AddGoalWNonExistentParent) {
+    std::string actor = "Body Sensor Network";
+    GoalTree goaltree(actor);
+    Goal goal1("G1", "Emergency is detected");
+    goaltree.addRootGoal(goal1);
+    Goal goal2("G2", "Patient status is monitored");
+
+    try {
+        goaltree.addNode(goal2, "GX");
+        FAIL() << "Expected not to allow an insertion of goal without parent";
+    }
+    catch(std::out_of_range const & err) {
+        EXPECT_EQ(err.what(),std::string("Could not find node"));
+    }
+
+}
+
+TEST_F(GoalTreeTest, AddGoalWChildren) {
+    std::string actor = "Body Sensor Network";
+    GoalTree goaltree(actor);
+    Goal goal1("G1", "Emergency is detected");
+    goaltree.addRootGoal(goal1);
+
+    Goal goal2("G2", "Patient status is monitored");
+    Goal goal3("G3", "Vital signs are monitored");
+    Goal goal4("G4", "Vital signs are analyzed");
+
+    goal2.addChild(goal3);
+    goal2.addChild(goal4);
+    goaltree.addNode(goal2, "G1");
+
+    ASSERT_EQ(goaltree.getSize(),4);
+    ASSERT_TRUE(goaltree.getNode("G2")==&goal2);
+    ASSERT_EQ((*goaltree.getNode("G2")).getChildren().size(),2);
+    ASSERT_TRUE((*goaltree.getNode("G2")).getChild("G3")==goal3);
+    ASSERT_TRUE((*goaltree.getNode("G2")).getChild("G4")==goal4);
 }

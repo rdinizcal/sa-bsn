@@ -1,7 +1,5 @@
 #include "goalmodel/GoalTree.hpp"
 
-#include <iostream>
-
 namespace bsn {
     namespace goalmodel {
         
@@ -48,15 +46,30 @@ namespace bsn {
 
         void GoalTree::addNode(Node &node, const std::string &parent_id){ 
             Node *parent = this->getNode(parent_id); 
-            parent->addChild(node);
 
-            std::cout << "Parent: " << parent->getID() << ": " << parent->getDescription() << std::endl;
-            std::cout << parent->getChildren().size() << " / " << parent->getChildren().at(0).getID() << std::endl;
+            /* if parent doesnt find child, it throws an out_of_range excp and we must add it,
+                otherwise, it already has that child and we simply add it to the tree*/
+            try {
+                parent->getChild(node.getID());
+            } catch (std::out_of_range & err) {
+                parent->addChild(node);
+            }
 
             this->nodes.insert(std::pair<std::string, Node*> (node.getID(), &node));
+
+            if (node.hasChildren()){
+                std::vector<Node> children = node.getChildren();
+
+                for (std::vector<Node>::iterator it = children.begin(); it != children.end(); ++it ){
+                    this->addNode((*it), node.getID()); 
+                } 
+            }
         }
 
         Node* GoalTree::getNode(const std::string &nodeID) {
+            auto it = this->getNodes().find(nodeID);
+            if (it == this->getNodes().end()) throw std::out_of_range("Could not find node");
+
             return this->getNodes().at(nodeID);
         }
 

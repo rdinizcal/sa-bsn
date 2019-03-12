@@ -4,6 +4,7 @@
 #include <string>
 #include <map>
 #include <stdexcept> 
+#include <vector>
 
 #include "goalmodel/Node.hpp"
 #include "goalmodel/Goal.hpp"

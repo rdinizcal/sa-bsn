@@ -44,6 +44,10 @@ namespace bsn {
             return this->description;
         }
 
+        bool Node::hasChildren() const {
+            return this->children.size()>0;
+        }
+
         std::vector<Node> Node::getChildren() const {
             return this->children;
         }

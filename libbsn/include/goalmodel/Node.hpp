@@ -25,6 +25,7 @@ namespace bsn {
                 void setDescription(const std::string &/*description*/);
                 std::string getDescription() const;
 
+                bool hasChildren() const;
                 std::vector<Node> getChildren() const;
 
                 void addChild(const Node &/*goal*/);
