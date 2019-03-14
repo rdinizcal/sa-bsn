@@ -6,11 +6,10 @@
 
 #include "ros/ros.h"
 
-#include "bsn/processor/Processor.hpp"
-#include "bsn/communication/TCPSend.hpp"
+#include "processor/Processor.hpp"
 
 // #include "bsn/msg/info/TaskInfo.h"
-#include "bsn/msg/data/SensorData.h"
+// #include "bsn/msg/data/SensorData.h"
 // #include "bsn/msg/info/ContextInfo.hpp"
 // #include "bsn/msg/info/MonitorTaskInfo.hpp"
 #include "bsn/SensorData.h"

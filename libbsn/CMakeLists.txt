@@ -17,10 +17,10 @@ INCLUDE (${CMAKE_CURRENT_SOURCE_DIR}/cmake.Modules/CompileFlags.cmake)
 
 ###########################################################################
 # Find Catkin.
-find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  std_msgs
-  message_generation
+FIND_PACKAGE ( 
+    catkin REQUIRED
+    std_msgs
+    message_generation
 )
 
 ###########################################################################
@@ -29,12 +29,19 @@ ADD_MESSAGE_FILES(
   FILES
   info/ContextInfo.msg
   info/TaskInfo.msg
-  data/SensorData.msg
 )
 
 GENERATE_MESSAGES(
   DEPENDENCIES
   std_msgs
+)
+
+###########################################################################
+# Export catkin package.
+CATKIN_PACKAGE(
+  INCLUDE_DIRS include
+  LIBRARIES ${PROJECT_NAME}
+  CATKIN_DEPENDS message_runtime
 )
 
 ###########################################################################
@@ -44,15 +51,7 @@ INCLUDE_DIRECTORIES (${catkin_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(include)
 # Set compilation flags
 SET (CMAKE_CXX_FLAGS "-Wall ${CMAKE_CXX_FLAGS}")
-
-###########################################################################
-# Export catkin package.
-CATKIN_PACKAGE(
-    INCLUDE_DIRS include
-    LIBRARIES ${PROJECT_NAME}
-    CATKIN_DEPENDS message_runtime
-)
-
+  
 ###########################################################################
 # Build project.
 FILE(GLOB_RECURSE ${PROJECT_NAME}-srcs "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
@@ -78,6 +77,6 @@ INSTALL(TARGETS ${PROJECT_NAME}
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-INSTALL(DIRECTORY include/
+INSTALL(DIRECTORY include/${PROJECT_NAME}
     DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
 )

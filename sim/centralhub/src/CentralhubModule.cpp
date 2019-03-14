@@ -1,13 +1,6 @@
 #include "CentralhubModule.hpp"
 
-using namespace odcore::data;
-
 using namespace bsn::processor;
-
-// using namespace bsn::msg::data;
-
-using namespace bsn::communication;
-
 
 CentralhubModule::CentralhubModule(const int32_t &argc, char **argv) :
     active(true),
