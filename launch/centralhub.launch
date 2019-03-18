@@ -1,0 +1,3 @@
+<launch> 
+    <node name="centralhub" pkg="centralhub" type="centralhub" output="screen" />
+</launch>

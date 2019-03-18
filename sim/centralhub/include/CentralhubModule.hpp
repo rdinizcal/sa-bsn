@@ -4,41 +4,40 @@
 #include <fstream>
 #include <chrono>
 
-#include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
-#include "opendavinci/odcore/base/FIFOQueue.h"
+#include "ros/ros.h"
 
-#include "bsn/processor/Processor.hpp"
-#include "bsn/communication/TCPSend.hpp"
+#include "processor/Processor.hpp"
 
-#include "bsn/msg/info/TaskInfo.hpp"
-#include "bsn/msg/info/ContextInfo.hpp"
-#include "bsn/msg/info/MonitorTaskInfo.hpp"
-#include "bsn/msg/data/SensorData.h"
-#include "bsn/msg/control/CentralHubControlCommand.hpp"
-
+// #include "bsn/msg/info/TaskInfo.h"
+// #include "bsn/msg/data/SensorData.h"
+// #include "bsn/msg/info/ContextInfo.hpp"
+// #include "bsn/msg/info/MonitorTaskInfo.hpp"
+#include "bsn/SensorData.h"
+// #include "bsn/msg/control/CentralHubControlCommand.hpp"
 
 
-class CentralhubModule : public odcore::base::module::TimeTriggeredConferenceClientModule{
+
+class CentralhubModule {
     private:
         CentralhubModule(const CentralhubModule & /*obj*/);
         CentralhubModule &operator=(const CentralhubModule & /*obj*/);
-        virtual void setUp();
         virtual void tearDown();   
 
 		void sendTaskInfo(const std::string &/*task_id*/, const double &/*cost*/, const double &/*reliability*/, const double &/*frequency*/);
 		
         void sendMonitorTaskInfo(const std::string &/*task_id*/, const double &/*cost*/, const double &/*reliability*/, const double &/*frequency*/);
 
+        void receiveSensorData(const bsn::SensorData::ConstPtr&);
+
+
     public:
+        void setUp();
         CentralhubModule(const int32_t &argc, char **argv);
         virtual ~CentralhubModule();
 
-        odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+        void run();
 
     private:
-        odcore::base::FIFOQueue buffer;
-        odcore::base::FIFOQueue localQueue;
-
         bool active;
 		std::map<std::string,double> params;
 
@@ -49,6 +48,10 @@ class CentralhubModule : public odcore::base::module::TimeTriggeredConferenceCli
         uint32_t persist;
         std::ofstream fp;
         std::string path;
+
+        std::array<double, 5> data;
+        std::vector<std::list<double>> data_list;
+        double patient_status;
 };
 
 #endif 

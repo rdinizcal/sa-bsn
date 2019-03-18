@@ -37,21 +37,21 @@ GENERATE_MESSAGES(
 )
 
 ###########################################################################
+# Export catkin package.
+CATKIN_PACKAGE(
+  INCLUDE_DIRS include
+  LIBRARIES ${PROJECT_NAME}
+  CATKIN_DEPENDS message_runtime
+)
+
+###########################################################################
 # Set header files from Catkin.
 INCLUDE_DIRECTORIES (${catkin_INCLUDE_DIRS})
 # Set include directory.
 INCLUDE_DIRECTORIES(include)
 # Set compilation flags
 SET (CMAKE_CXX_FLAGS "-Wall ${CMAKE_CXX_FLAGS}")
-
-###########################################################################
-# Export catkin package.
-CATKIN_PACKAGE(
-    INCLUDE_DIRS include
-    LIBRARIES ${PROJECT_NAME}
-    CATKIN_DEPENDS message_runtime
-)
-
+  
 ###########################################################################
 # Build project.
 FILE(GLOB_RECURSE ${PROJECT_NAME}-srcs "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
@@ -77,6 +77,6 @@ INSTALL(TARGETS ${PROJECT_NAME}
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-INSTALL(DIRECTORY include/${PROJECT_NAME}/
+INSTALL(DIRECTORY include/${PROJECT_NAME}
     DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
 )
