@@ -5,10 +5,9 @@ using namespace bsn::processor;
 CentralhubModule::CentralhubModule(const int32_t &argc, char **argv) :
     active(true),
     params({{"freq",1}}),
-    connect(1),
-    port(6060),
-    ip("localhost"),
-    persist(1),
+    connect(true),
+    database_url(),
+    persist(true),
     fp(),
     path("centralhub_output.csv"),
     data(),
@@ -18,14 +17,11 @@ CentralhubModule::CentralhubModule(const int32_t &argc, char **argv) :
 CentralhubModule::~CentralhubModule() {}
 
 void CentralhubModule::setUp() {
-    // addDataStoreFor(873, buffer);
-    // addDataStoreFor(904, buffer);
-
-    // connect = getKeyValueConfiguration().getValue<int>("centralhub.connect");
-    // port = getKeyValueConfiguration().getValue<int>("centralhub.port");
-    // ip = getKeyValueConfiguration().getValue<std::string>("centralhub.ip");
-    // persist = getKeyValueConfiguration().getValue<int>("centralhub.persist");
-    // path = getKeyValueConfiguration().getValue<std::string>("centralhub.path");
+    ros::NodeHandle configHandler;
+    configHandler.getParam("connect", connect);
+    configHandler.getParam("db_url", database_url);
+    configHandler.getParam("persist", persist);
+    configHandler.getParam("path", path);
 
     if (persist) {
         fp.open(path);
@@ -73,7 +69,7 @@ void CentralhubModule::receiveSensorData(const bsn::SensorData::ConstPtr& msg) {
     std::string type = msg->type;
     double risk = msg->risk;
     int session = 0;
-    web::http::client::http_client client(U("https://my-project-1516369881504.firebaseio.com"));
+    web::http::client::http_client client(U(database_url));
     web::json::value json_obj; 
 
     std::cout << "Received data from " + type << std::endl; 
@@ -86,8 +82,10 @@ void CentralhubModule::receiveSensorData(const bsn::SensorData::ConstPtr& msg) {
 
         patient_status = data_fuse(data_list);
 
-        json_obj["data"] = web::json::value::string(makePacket());
-        client.request(web::http::methods::PUT, U("/sessions/" + std::to_string(session) + ".json") ,json_obj);
+        if (connect) {
+            json_obj["data"] = web::json::value::string(makePacket());
+            client.request(web::http::methods::PUT, U("/sessions/" + std::to_string(session) + ".json") ,json_obj);
+        }
     }
 }
 

@@ -44,11 +44,10 @@ class CentralhubModule {
         bool active;
 		std::map<std::string,double> params;
 
-        uint32_t connect;
-        uint32_t port;
-        std::string ip;
+        bool connect;
+        std::string database_url;
         
-        uint32_t persist;
+        bool persist;
         std::ofstream fp;
         std::string path;
 
