@@ -8,12 +8,13 @@
 
 #include "goalmodel/Node.hpp"
 #include "goalmodel/Goal.hpp"
+#include "goalmodel/Task.hpp"
 
 namespace bsn {
     namespace goalmodel {
 
         class GoalTree {
-
+            
             public:
                 GoalTree(const std::string &/*actor*/);
                 GoalTree();
@@ -23,21 +24,23 @@ namespace bsn {
                 GoalTree &operator=(const GoalTree &);
                 bool operator==(const GoalTree &rhs);
 
+            private:
+                std::map<std::string, Node> getNodes() const;
+                void addChildren(const std::vector<Node> &/*child*/);
+                void addNode(const Node &/*node*/);
+            
+            public:
                 void setActor(const std::string &/*actor*/);
                 std::string getActor() const;
 
                 void addRootGoal(Goal &/*goal*/);
-                void addNode (Node &/*node*/, const std::string &/*parent*/);
-                Node* getNode(const std::string &/*node*/);
+                Node getNode(const std::string &/*node*/) const;
                 
                 int getSize() const;
 
             private:
-                std::map<std::string, Node*> getNodes() const;
-
-            private:
                 std::string actor;
-                std::map<std::string, Node*> nodes;
+                std::map<std::string, Node> nodes;
         };
     }  
 }

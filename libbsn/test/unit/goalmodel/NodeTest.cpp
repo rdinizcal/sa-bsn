@@ -30,7 +30,7 @@ TEST_F(NodeTest, AddChild) {
     parentNode.addChild(childNode);
 
     ASSERT_EQ(parentNode.getChildren().size(), 1);
-    EXPECT_TRUE(parentNode.getChildren().at(0)==childNode);
+    EXPECT_TRUE(parentNode.getChild("G3_T1.4") == childNode);
 
 }
 
@@ -84,4 +84,47 @@ TEST_F(NodeTest, GetChildNotFound) {
     catch(std::out_of_range const & err) {
         EXPECT_EQ(err.what(),std::string("Child Not Found"));
     }
+}
+
+TEST_F(NodeTest, AddChildWChild) {
+
+    Node parentNode("G3_T1", "Read");
+    Node childNode("G3_T1.4", "Read ABP");
+    Node grandchildNode("G3_T1.41", "Read Dyastolic");
+
+    childNode.addChild(grandchildNode);
+    parentNode.addChild(childNode);
+
+    ASSERT_EQ(parentNode.getChildren().size(), 1);
+    EXPECT_TRUE(parentNode.getChild("G3_T1.4")==childNode);
+    ASSERT_EQ(childNode.getChildren().size(), 1);
+    EXPECT_TRUE(childNode.getChild("G3_T1.41")==grandchildNode);
+    EXPECT_TRUE(parentNode.getChild("G3_T1.4").getChild("G3_T1.41")==grandchildNode);
+
+}
+
+TEST_F(NodeTest, AddChildWChildrenWChild) {
+
+    Node parentNode("Parent", "Read");
+    Node boyChildNode("Boy Child", "Read ABPb");
+    Node girlChildNode("Girl Child", "Read ABPg");
+    Node grandchildNode("Boy GrandChild", "Read Dyastolic 1");
+    Node greatgrandchildNode("Boy GreatGrandChild", "Read Dyastolic 1.7");
+
+    grandchildNode.addChild(greatgrandchildNode);
+    boyChildNode.addChild(grandchildNode);
+    parentNode.addChild(girlChildNode);    
+    parentNode.addChild(boyChildNode);
+
+    ASSERT_EQ(parentNode.getChildren().size(), 2);
+    EXPECT_TRUE(parentNode.getChild("Boy Child")==boyChildNode);
+    EXPECT_TRUE(parentNode.getChild("Girl Child")==girlChildNode);
+    ASSERT_EQ(boyChildNode.getChildren().size(), 1);
+    ASSERT_EQ(girlChildNode.getChildren().size(), 0);
+    EXPECT_TRUE(boyChildNode.getChild("Boy GrandChild")==grandchildNode);
+
+
+    EXPECT_TRUE(parentNode.getChild("Boy Child").getChild("Boy GrandChild")==grandchildNode);
+    EXPECT_TRUE(parentNode.getChild("Boy Child").getChild("Boy GrandChild").getChild("Boy GreatGrandChild")==greatgrandchildNode);
+
 }

@@ -18,13 +18,12 @@ namespace bsn {
         GoalTree& GoalTree::operator=(const GoalTree &obj) {
             actor = obj.getActor();  
             nodes = obj.getNodes();
-            return (*this);
+            return (*this); 
         }
 
         bool GoalTree::operator==(const GoalTree &rhs) {
             return this->actor == rhs.actor;
         }
-
 
         void GoalTree::setActor(const std::string &actor) {
             this->actor = actor;
@@ -34,47 +33,42 @@ namespace bsn {
             return this->actor;
         }
 
-        std::map<std::string, Node*> GoalTree::getNodes() const {
+        std::map<std::string, Node> GoalTree::getNodes() const {
             return this->nodes;
         }
+
+        void GoalTree::addChildren(const std::vector<Node> &children) { 
+            /*
+                What if the goal node has tasks nodes as children? 
+                                    oh no
+            */
+            for (std::vector<Node>::const_iterator it = children.begin();
+                         it != children.end(); ++it )
+                this->addNode(*it); 
+        }
+
+        void GoalTree::addNode(const Node &node) { 
+            this->nodes.insert(std::pair<std::string, Node> (node.getID(), node));
+            if (node.hasChildren()) this->addChildren(node.getChildren());
+        } 
 
         void GoalTree::addRootGoal(Goal &rootgoal) {
             if (nodes.size() >= 1) throw std::invalid_argument("No more than 1 root goals allowed");
 
-            this->nodes.insert(std::pair<std::string, Goal*> (rootgoal.getID(), &rootgoal));
+            return this->addNode(rootgoal);
         }
 
-        void GoalTree::addNode(Node &node, const std::string &parent_id){ 
-            Node *parent = this->getNode(parent_id); 
-
-            /* if parent doesnt find child, it throws an out_of_range excp and we must add it,
-                otherwise, it already has that child and we simply add it to the tree*/
+        Node GoalTree::getNode(const std::string &nodeID) const { 
             try {
-                parent->getChild(node.getID());
-            } catch (std::out_of_range & err) {
-                parent->addChild(node);
-            }
-
-            this->nodes.insert(std::pair<std::string, Node*> (node.getID(), &node));
-
-            if (node.hasChildren()){
-                std::vector<Node> children = node.getChildren();
-
-                for (std::vector<Node>::iterator it = children.begin(); it != children.end(); ++it ){
-                    this->addNode((*it), node.getID()); 
-                } 
-            }
-        }
-
-        Node* GoalTree::getNode(const std::string &nodeID) {
-            auto it = this->getNodes().find(nodeID);
-            if (it == this->getNodes().end()) throw std::out_of_range("Could not find node");
-
-            return this->getNodes().at(nodeID);
+                return (*this->getNodes().find(nodeID)).second;
+            } catch (std::out_of_range const &err) {
+                throw std::out_of_range("Could not find node."); 
+            } 
         }
 
         int GoalTree::getSize() const {
             return this->getNodes().size();
         }
+        
     }
 }

@@ -17,7 +17,8 @@ namespace bsn {
 
                 Node(const Node &);
                 Node &operator=(const Node &);
-                bool operator==(const Node &rhs);
+                bool operator==(const Node &rhs) const;
+                friend std::ostream& operator<<(std::ostream &/*stream*/, const Node &/*node*/);
 
                 void setID(const std::string &/*id*/);
                 std::string getID() const;
@@ -31,6 +32,7 @@ namespace bsn {
                 void addChild(const Node &/*goal*/);
                 void removeChild(const std::string &/*id*/);
                 Node getChild(const std::string &/*id*/);
+
 
             private:
                 int findChild(const std::string &/*id*/);

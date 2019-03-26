@@ -1,32 +1,36 @@
 #include "goalmodel/Node.hpp"
 
+#include <iostream>
+
 namespace bsn {
     namespace goalmodel {
         
-        Node::Node(const std::string &id, const std::string &description) : 
-            id(id), 
-            description(description),
-            children() {}
-
         Node::Node() : id(), description(), children() {}
-        
-        Node::Node(const Node &obj) : 
-            id(obj.getID()),
-            description(obj.getDescription()),
-            children(obj.getChildren()) {}
-
-        Node& Node::operator=(const Node &obj) {
-            id = obj.getID();  
-            description = obj.getDescription(); 
-            children = obj.getChildren();
-            return (*this);
-        }
-
-        bool Node::operator==(const Node &rhs) {
-            return this->id == rhs.id;
-        }
 
         Node::~Node(){};
+
+        Node::Node(const std::string &id, const std::string &description) : id(id), description(description), children() {}
+        
+        Node::Node(const Node &obj) : id(obj.getID()), description(obj.getDescription()), children(obj.getChildren()){}
+
+        Node& Node::operator=(const Node &obj) {
+            if(this != &obj){
+                this->id = obj.getID();  
+                this->description = obj.getDescription(); 
+                this->children = obj.getChildren();
+            }
+
+            return *this;
+        }
+
+        bool Node::operator==(const Node &rhs) const {
+            return  this->id == rhs.getID() && 
+                    this->description == rhs.getDescription();
+        }
+
+        std::ostream& operator<<(std::ostream &stream, const Node &node) {
+            return stream << "bsn::goalmodel::Node(" << node.getID() << ", " << node.getDescription() << ", " "has " << node.getChildren().size() << " children" << ")";
+        }
 
         void Node::setID(const std::string &id) {
             this->id = id;
@@ -45,7 +49,7 @@ namespace bsn {
         }
 
         bool Node::hasChildren() const {
-            return this->children.size()>0;
+            return !this->children.empty();
         }
 
         std::vector<Node> Node::getChildren() const {
