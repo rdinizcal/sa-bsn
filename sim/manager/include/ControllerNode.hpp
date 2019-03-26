@@ -9,6 +9,7 @@
 
 #include "goalmodel/Task.hpp"
 #include "goalmodel/Context.hpp"
+#include "goalmodel/Goal.hpp"
 
 #include "Lepton.h"
 

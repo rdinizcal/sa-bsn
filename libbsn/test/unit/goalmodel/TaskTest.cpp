@@ -3,6 +3,9 @@
 #include "goalmodel/Context.hpp"
 #include "goalmodel/Property.hpp"
 #include "goalmodel/Task.hpp"
+#include "goalmodel/LeafTask.hpp"
+#include "goalmodel/Node.hpp"
+#include "goalmodel/Goal.hpp"
 
 using namespace bsn::goalmodel;
 
@@ -14,21 +17,91 @@ class TaskTest : public testing::Test {
         }
 };
 
-TEST_F(TaskTest, SimpleConstructNoChildren) {
+TEST_F(TaskTest, SimpleConstruct) {
     std::string id = "G3_T1.11";
     std::string description = "Read data";
-    Context context("CTX_G3_T1_1","SaO2_available",false);
-    Property cost("W_G3_T1_11",1);
-    Property reliability("R_G3_T1_11",1);
-    Property frequency("F_G3_T1_11",1);
 
-    Task task(id, description, context, cost, reliability, frequency);
+    Task task(id, description);
 
     ASSERT_EQ(task.getID(), id);
     ASSERT_EQ(task.getDescription(), description);
-    EXPECT_TRUE(task.getContext()==context);
-    EXPECT_TRUE(task.getCost()==cost);
-    EXPECT_TRUE(task.getReliability()==reliability);
-    EXPECT_TRUE(task.getFrequency()==frequency);
+}
 
+TEST_F(TaskTest, AddChild) {
+
+    Task parentTask("G3_T1.41", "Read ABP");
+    LeafTask childTask(std::string("G3_T1.412"), std::string("Read systolic"), Property("W_G3_T1_412",1), Property("R_G3_T1_412",1), Property("F_G3_T1_412",1));
+
+    parentTask.addChild(childTask);
+
+    ASSERT_EQ(parentTask.getChildren().size(), 1);
+    EXPECT_TRUE(parentTask.getChildren().at(0)==childTask);
+
+}
+
+TEST_F(TaskTest, AddGoalAsChild) {
+
+    Task parentTask("G3_T1.41", "Read ABP");
+    Goal childGoal("G3_T1", "Read Sensor Info");
+
+    try {
+        parentTask.addChild(childGoal);
+        FAIL() << "Expected not to be able to add a goal as child of a task";
+    }
+    catch(std::exception const & err) {
+        EXPECT_EQ(err.what(),std::string("Tasks cannot contain goals as children"));
+    }
+
+}
+
+TEST_F(TaskTest, RemoveChild) {
+
+    Task parentTask("G3_T1.41", "Read ABP");
+    LeafTask childTask(std::string("G3_T1.412"), std::string("Read systolic"), Property("W_G3_T1_412",1), Property("R_G3_T1_412",1), Property("F_G3_T1_412",1));
+    parentTask.addChild(childTask);
+
+    parentTask.removeChild("G3_T1.412");
+
+    ASSERT_EQ(parentTask.getChildren().size(), 0);
+}
+
+TEST_F(TaskTest, RemoveChildNotFound) {
+
+    Task parentTask("G3_T1.41", "Read ABP");
+    LeafTask childTask(std::string("G3_T1.412"), std::string("Read systolic"), Property("W_G3_T1_412",1), Property("R_G3_T1_412",1), Property("F_G3_T1_412",1));
+    parentTask.addChild(childTask);
+
+    try {
+        parentTask.removeChild("XXX");
+        FAIL() << "Expected our of range exception";
+    }
+    catch(std::out_of_range const & err) {
+        EXPECT_EQ(err.what(),std::string("Child Not Found"));
+    }
+}
+
+TEST_F(TaskTest, GetChild) {
+
+    Task parentTask("G3_T1.41", "Read ABP");
+    LeafTask childTask(std::string("G3_T1.412"), std::string("Read systolic"), Property("W_G3_T1_412",1), Property("R_G3_T1_412",1), Property("F_G3_T1_412",1));
+    parentTask.addChild(childTask);
+
+    Node returnedTask = parentTask.getChild("G3_T1.412");
+
+    ASSERT_EQ(returnedTask.getID(), "G3_T1.412");
+}
+
+TEST_F(TaskTest, GetChildNotFound) {
+
+    Task parentTask("G3_T1.41", "Read ABP");
+    LeafTask childTask(std::string("G3_T1.412"), std::string("Read systolic"), Property("W_G3_T1_412",1), Property("R_G3_T1_412",1), Property("F_G3_T1_412",1));
+    parentTask.addChild(childTask);
+
+    try {
+         Node returnedTask = parentTask.getChild("XXX");
+        FAIL() << "Expected out of range exception";
+    }
+    catch(std::out_of_range const & err) {
+        EXPECT_EQ(err.what(),std::string("Child Not Found"));
+    }
 }
