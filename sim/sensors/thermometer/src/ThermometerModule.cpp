@@ -29,6 +29,7 @@ void ThermometerModule::setUp() {
     srand(time(NULL));
         
     Operation op;
+    int i = .2;
     
     std::vector<std::string> t_probs;
     std::array<float, 25> transitions;

@@ -4,6 +4,8 @@
 #include <fstream>
 #include <chrono>
 
+#include<cpprest/http_client.h>
+#include<cpprest/json.h>
 #include "ros/ros.h"
 
 #include "processor/Processor.hpp"
@@ -29,6 +31,7 @@ class CentralhubModule {
 
         void receiveSensorData(const bsn::SensorData::ConstPtr&);
 
+        std::string makePacket();
 
     public:
         void setUp();

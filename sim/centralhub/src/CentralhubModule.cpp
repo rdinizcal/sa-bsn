@@ -27,10 +27,10 @@ void CentralhubModule::setUp() {
     // persist = getKeyValueConfiguration().getValue<int>("centralhub.persist");
     // path = getKeyValueConfiguration().getValue<std::string>("centralhub.path");
 
-    // if (persist) {
-    //     fp.open(path);
-    //     fp << "ID,SPO2_DATA,ECG_DATA,TEMP_DATA,BLOODPRESSURE_DATA,OVERALL_STATUS,PATIENT_STATE,TIME_MS" << endl;
-    // }
+    if (persist) {
+        fp.open(path);
+        fp << "ID,SPO2_DATA,ECG_DATA,TEMP_DATA,BLOODPRESSURE_DATA,OVERALL_STATUS,PATIENT_STATE,TIME_MS" << std::endl;
+    }
     for(std::vector<std::list<double>>::iterator it = data_list.begin();
         it != data_list.end(); ++it) {
             (*it).push_back(0.0);
@@ -54,9 +54,27 @@ void CentralhubModule::sendMonitorTaskInfo(const std::string &task_id, const dou
     // getConference().send(taskContainer);
 }
 
+std::string CentralhubModule::makePacket() {
+    std::string packet = "";
+    int i = 0;
+    for (std::list<double> li : data_list) {
+        if (!li.empty()) {
+            double element = li.front();
+            packet += std::to_string(element) += "=";
+            packet += std::to_string(data[i]) + "/";
+        }
+        i++;                    
+    }
+    packet += std::to_string(patient_status);
+    return packet;
+}
+
 void CentralhubModule::receiveSensorData(const bsn::SensorData::ConstPtr& msg) {
     std::string type = msg->type;
     double risk = msg->risk;
+    int session = 0;
+    web::http::client::http_client client(U("https://my-project-1516369881504.firebaseio.com"));
+    web::json::value json_obj; 
 
     std::cout << "Received data from " + type << std::endl; 
     
@@ -67,6 +85,9 @@ void CentralhubModule::receiveSensorData(const bsn::SensorData::ConstPtr& msg) {
         data_list[sensor_id].push_back(risk);
 
         patient_status = data_fuse(data_list);
+
+        json_obj["data"] = web::json::value::string(makePacket());
+        client.request(web::http::methods::PUT, U("/sessions/" + std::to_string(session) + ".json") ,json_obj);
     }
 }
 
