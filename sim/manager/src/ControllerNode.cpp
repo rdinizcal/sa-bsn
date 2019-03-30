@@ -38,12 +38,85 @@ ControllerNode::ControllerNode(int  &argc, char **argv, std::string name):
 ControllerNode::~ControllerNode() {}
 
 void ControllerNode::setUp() {
-    Goal newGoal("yo", "kk");
-    /*
+    { // Set up the goal tree model
+        LeafTask g3_t1_11("G3_T1.11","Read data", Property("W_G3_T1_11", 1),Property("R_G3_T1_11", 1),Property("F_G3_T1_11",1));
+        LeafTask g3_t1_12("G3_T1.12","Filter data", Property("W_G3_T1_12", 1),Property("R_G3_T1_12", 1),Property("F_G3_T1_12",1));
+        LeafTask g3_t1_13("G3_T1.13","Transfer data", Property("W_G3_T1_13", 1),Property("R_G3_T1_13", 1),Property("F_G3_T1_13",1));
+
+        Task g3_t1_1("G3_T1.1", "Collect SaO2 data");
+        g3_t1_1.addChild(g3_t1_11);
+        g3_t1_1.addChild(g3_t1_12);
+        g3_t1_1.addChild(g3_t1_13);
+
+        LeafTask g3_t1_21("G3_T1.21","Read data", Property("W_G3_T1_21", 1),Property("R_G3_T1_21", 1),Property("F_G3_T1_21",1));
+        LeafTask g3_t1_22("G3_T1.22","Filter data", Property("W_G3_T1_22", 1),Property("R_G3_T1_22", 1),Property("F_G3_T1_22",1));
+        LeafTask g3_t1_23("G3_T1.23","Transfer data", Property("W_G3_T1_23", 1),Property("R_G3_T1_23", 1),Property("F_G3_T1_23",1));
+
+        Task g3_t1_2("G3_T1.2", "Collect ECG data");
+        g3_t1_2.addChild(g3_t1_21);
+        g3_t1_2.addChild(g3_t1_22);
+        g3_t1_2.addChild(g3_t1_23);
+
+        LeafTask g3_t1_31("G3_T1.31","Read data", Property("W_G3_T1_31", 1),Property("R_G3_T1_31", 1),Property("F_G3_T1_31",1));
+        LeafTask g3_t1_32("G3_T1.32","Filter data", Property("W_G3_T1_32", 1),Property("R_G3_T1_32", 1),Property("F_G3_T1_32",1));
+        LeafTask g3_t1_33("G3_T1.33","Transfer data", Property("W_G3_T1_33", 1),Property("R_G3_T1_33", 1),Property("F_G3_T1_33",1));
+
+        Task g3_t1_3("G3_T1.3", "Collect TEMP data");
+        g3_t1_3.addChild(g3_t1_31);
+        g3_t1_3.addChild(g3_t1_32);
+        g3_t1_3.addChild(g3_t1_33);
+
+        LeafTask g3_t1_411("G3_T1.411","Read diastolic", Property("W_G3_T1_411", 1),Property("R_G3_T1_411", 1),Property("F_G3_T1_411",1));
+        LeafTask g3_t1_412("G3_T1.412","Read systolic", Property("W_G3_T1_412", 1),Property("R_G3_T1_412", 1),Property("F_G3_T1_412",1));
+        LeafTask g3_t1_42("G3_T1.42","Filter data", Property("W_G3_T1_42", 1),Property("R_G3_T1_42", 1),Property("F_G3_T1_42",1));
+        LeafTask g3_t1_43("G3_T1.43","Transfer data", Property("W_G3_T1_43", 1),Property("R_G3_T1_43", 1),Property("F_G3_T1_43",1));
+
+        Task g3_t1_4("G3_T1.4", "Collect ABP data");
+        g3_t1_4.addChild(g3_t1_411);
+        g3_t1_4.addChild(g3_t1_412);
+        g3_t1_4.addChild(g3_t1_42);
+        g3_t1_4.addChild(g3_t1_43);
+
+        Task g3_t1("G3_T1", "Monitor vital signs");
+        g3_t1.addChild(g3_t1_1);
+        g3_t1.addChild(g3_t1_2);
+        g3_t1.addChild(g3_t1_3);
+        g3_t1.addChild(g3_t1_4);
+
+        Goal g3("G3", "Vital signs are monitored");
+        g3.addChild(g3_t1);
+
+        LeafTask g4_t1_1("G4_T1.1","Read data", Property("W_G4_T1_1", 1),Property("R_G4_T1_1", 1),Property("F_G4_T1_1",1));
+        LeafTask g4_t1_2("G4_T1.2","Filter data", Property("W_G4_T1_2", 1),Property("R_G4_T1_2", 1),Property("F_G4_T1_3",1));
+        LeafTask g4_t1_3("G4_T1.3","Transfer data", Property("W_G4_T1_3", 1),Property("R_G4_T1_3", 1),Property("F_G4_T1_3",1));
+
+        Task g4_t1("G4_T1", "Analyze vital signs");
+        g4_t1.addChild(g4_t1_1);
+        g4_t1.addChild(g4_t1_2);
+        g4_t1.addChild(g4_t1_3);
+
+        Goal g4("G4", "Vital signs are analyzed");
+        g4.addChild(g4_t1);
+
+        Goal g2("G2", "Patient status is monitored");
+        g2.addChild(g3);
+        g2.addChild(g4);
+
+        Goal g1("G1", "Emergency is detected");
+        g1.addChild(g2);
+
+        GoalTree model("Body Sensor Network");
+        model.addRootGoal(g1);
+    }
+
+    
     { // Set up map {id,object} of leaf task from goal model
+
+        /*Implement a method in goaltree .getLeafTasks() that returns a leaftasks vctor*/
+
         // Pulse oximeter
-        tasks.insert(std::pair<std::string,Task>("G3_T1.11",Task("G3_T1.11","Read data","W_G3_T1_11","R_G3_T1_11","F_G3_T1_11")));
-        tasks.insert(std::pair<std::string,Task>("G3_T1.12",Task("G3_T1.12","Filter data","W_G3_T1_12","R_G3_T1_12","F_G3_T1_12")));
+        tasks.insert(std::pair<std::string,Task>("G3_T1.11",model.getNode("G3_T1.11"));
+        tasks.insert(std::pair<std::string,Task>("G3_T1.12",model.getNode("G3_T1.12"));
         tasks.insert(std::pair<std::string,Task>("G3_T1.13",Task("G3_T1.13","Transfer data","W_G3_T1_13","R_G3_T1_13","F_G3_T1_13")));
 
         // Electrocardiograph
@@ -68,6 +141,7 @@ void ControllerNode::setUp() {
         tasks.insert(std::pair<std::string,Task>("G4_T1.3",Task("G4_T1.3","Persist data","W_G4_T1_3","R_G4_T1_3","F_G4_T1_3")));
     }
 
+    /*
     { // Set up map {id,object} of context from goal model
         contexts.insert(std::pair<std::string,Context>("SaO2_available",Context("SaO2_available",false,"CTX_G3_T1_1")));
         contexts.insert(std::pair<std::string,Context>("ECG_available",Context("ECG_available",false,"CTX_G3_T1_2")));

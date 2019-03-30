@@ -9,6 +9,7 @@
 #include "goalmodel/Node.hpp"
 #include "goalmodel/Goal.hpp"
 #include "goalmodel/Task.hpp"
+#include "goalmodel/LeafTask.hpp"
 
 namespace bsn {
     namespace goalmodel {
@@ -37,6 +38,8 @@ namespace bsn {
                 Node getNode(const std::string &/*node*/) const;
                 
                 int getSize() const;
+
+                std::vector<Node> getLeafTasks() const;
 
             private:
                 std::string actor;

@@ -8,8 +8,11 @@
 #include "ros/ros.h"
 
 #include "goalmodel/Task.hpp"
+#include "goalmodel/LeafTask.hpp"
 #include "goalmodel/Context.hpp"
 #include "goalmodel/Goal.hpp"
+#include "goalmodel/Property.hpp"
+#include "goalmodel/GoalTree.hpp"
 
 #include "Lepton.h"
 

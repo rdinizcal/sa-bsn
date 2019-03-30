@@ -1,5 +1,7 @@
 #include "goalmodel/GoalTree.hpp"
 
+#include <iostream>
+
 namespace bsn {
     namespace goalmodel {
         
@@ -68,6 +70,23 @@ namespace bsn {
 
         int GoalTree::getSize() const {
             return this->getNodes().size();
+        }
+
+        std::vector<Node> GoalTree::getLeafTasks() const {
+            std::cout << "std::vector<Node> GoalTree::getLeafTasks() const" << std::endl;
+            std::vector<Node> leafTasks;
+
+            std::cout << "Nodes vector size:" << this->getSize() << std::endl;
+            for(std::map<std::string, Node>::const_iterator it = nodes.begin();
+                    it != nodes.end(); ++it){
+
+                std::cout << (*it).first << std::endl;
+                if(!(*it).second.hasChildren()) leafTasks.push_back((*it).second);
+
+            }
+
+            std::cout << "return leafTasks" << std::endl;
+            return leafTasks;
         }
         
     }

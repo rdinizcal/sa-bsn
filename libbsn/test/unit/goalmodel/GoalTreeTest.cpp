@@ -6,6 +6,7 @@
 #include "goalmodel/LeafTask.hpp"
 
 #include <ostream>
+#include <algorithm> // std::find
 
 using namespace bsn::goalmodel;
 
@@ -219,4 +220,35 @@ TEST_F(GoalTreeTest, AddTaskWChildren) {
     ASSERT_EQ(goaltree.getNode("G4"), goal4);
 
     ASSERT_EQ(8, goaltree.getSize());
+}
+
+TEST_F(GoalTreeTest, GetLeafTasks) {
+    /*Arrange*/
+        std::string actor = "Body Sensor Network";
+        GoalTree goaltree(actor);
+        Goal goal1("G1", "Emergency is detected");
+        Goal goal2("G2", "Patient status is monitored");
+        Goal goal4("G4", "Vital signs are analyzed");
+        Task task1("T1", "Analyze vital signs");
+        LeafTask task111("T1.11", "Fuse sensors data", Property("W_G4_T1_11",1), Property("R_G4_T1_11",1), Property("F_G4_T1_11",1));
+        LeafTask task112("T1.12", "Detect patient status", Property("W_G4_T1_12",1), Property("R_G4_T1_12",1), Property("F_G4_T1_12",1));
+        LeafTask task113("T1.13", "Persist patient data", Property("W_G4_T1_13",1), Property("R_G4_T1_13",1), Property("F_G4_T1_13",1));
+
+        task1.addChild(task111);
+        task1.addChild(task112);
+        task1.addChild(task113);
+        goal4.addChild(task1);
+        goal2.addChild(goal4);
+        goal1.addChild(goal2);
+        goaltree.addRootGoal(goal1);
+    
+    /*Act*/
+        std::vector<Node> LTvec = goaltree.getLeafTasks();
+
+    /*Assert*/
+        ASSERT_EQ(3 ,LTvec.size());
+
+        ASSERT_EQ((*std::find(LTvec.begin(), LTvec.end(), task111)), task111);
+        ASSERT_EQ((*std::find(LTvec.begin(), LTvec.end(), task112)), task112);
+        ASSERT_EQ((*std::find(LTvec.begin(), LTvec.end(), task113)), task113);
 }
