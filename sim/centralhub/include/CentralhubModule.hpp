@@ -33,6 +33,10 @@ class CentralhubModule {
 
         std::string makePacket();
 
+        void persistData(std::vector<std::string>&);
+
+        std::vector<std::string> getPatientStatus();
+
     public:
         void setUp();
         CentralhubModule(const int32_t &argc, char **argv);
