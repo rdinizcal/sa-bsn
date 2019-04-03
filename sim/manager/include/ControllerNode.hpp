@@ -7,11 +7,12 @@
 
 #include "ros/ros.h"
 
+#include "goalmodel/Node.hpp"
+#include "goalmodel/Goal.hpp"
 #include "goalmodel/Task.hpp"
+#include "goalmodel/Property.hpp"
 #include "goalmodel/LeafTask.hpp"
 #include "goalmodel/Context.hpp"
-#include "goalmodel/Goal.hpp"
-#include "goalmodel/Property.hpp"
 #include "goalmodel/GoalTree.hpp"
 
 #include "Lepton.h"
@@ -42,7 +43,7 @@ class ControllerNode {
 
   	private:
 
-	std::map<std::string, bsn::goalmodel::Task> tasks;
+	std::vector<bsn::goalmodel::Node> tasks;
 	std::map<std::string, bsn::goalmodel::Context> contexts;
 
 	Lepton::CompiledExpression cost_expression;
