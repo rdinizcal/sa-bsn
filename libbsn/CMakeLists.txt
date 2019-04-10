@@ -29,6 +29,7 @@ ADD_MESSAGE_FILES(
   FILES
   info/ContextInfo.msg
   info/TaskInfo.msg
+  data/SensorData.msg
 )
 
 GENERATE_MESSAGES(
