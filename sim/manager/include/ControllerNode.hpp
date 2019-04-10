@@ -17,6 +17,8 @@
 
 #include "Lepton.h"
 
+#include "FormulaRefs.hpp"
+
 #include "bsn/TaskInfo.h"
 #include "bsn/ContextInfo.h"
 

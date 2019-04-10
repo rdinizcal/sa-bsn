@@ -10,6 +10,11 @@ void FormulaRefs::addTask(std::string taskname, double& reli, double& freq, doub
     task_cost.insert(std::pair<std::string, double&>(taskname,cost));
 }  
 
+void FormulaRefs::addTask(std::string taskname, double& reli, double& freq) {
+    task_reliability.insert(std::pair<std::string, double&>(taskname,reli));
+    task_frequency.insert(std::pair<std::string, double&>(taskname,freq));
+} 
+
 
 double& FormulaRefs::getReliabilityRef(std::string ref) const {
     return task_reliability.find(ref)->second;

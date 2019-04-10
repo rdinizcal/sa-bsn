@@ -11,6 +11,7 @@ class FormulaRefs {
         ~FormulaRefs();
 
         void addTask(std::string /*taskname*/, double& /*reli*/, double& /*freq*/, double& /*cost*/);
+        void addTask(std::string /*taskname*/, double& /*reli*/, double& /*freq*/);
 
         double& getReliabilityRef(std::string /*ref*/) const;
         double& getFrequencyRef(std::string /*ref*/) const;

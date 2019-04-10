@@ -149,38 +149,18 @@ void ControllerNode::setUp() {
         cost_expression = Lepton::Parser::parse(cost_formula).createCompiledExpression();
         reliability_expression = Lepton::Parser::parse(reliability_formula).createCompiledExpression();
 
-        for (Node task : tasks){
+        /*for (Node task : tasks){
             //LeafTask leafTask = LeafTask(task);
-            std::string id = "oi";//leafTask.getID();
+            std::string id = task.getID();//leafTask.getID();
             
-            /*program a direct access table                | taskID | reliabilityRef | costRef | frequencyRef |
-                Could we transform it into objects?
-                e.g.    std::vector<std::map<std::string, std::vector<double&>>> cost_formulae_refs = 
-                                                                                                    {
-                                                                                                        leafTask.getID(), 
-                                                                                                        {
-                                                                                                            cost_expr.getVariableReference(leafTask.getReliability().getID()),
-                                                                                                            cost_expr.getVariableReference(leafTask.getFrequency().getID(),
-                                                                                                            cost_expr.getVariableReference(leafTask.getCost().getID()))
-                                                                                                        }
-                                                                                                    }
+            FormulaRefs cost_formula_refs;
+            FormulaRefs reli_formula_refs;
 
-                        std::vector<std::map<std::string, std::vector<double&>>> reliability_formulae_refs = 
-                                                                                                    {
-                                                                                                        leafTask.getID(), 
-                                                                                                        {
-                                                                                                            reli_expr.getVariableReference(leafTask.getReliability().getID()),
-                                                                                                            reli_expr.getVariableReference(leafTask.getFrequency().getID())
-                                                                                                        }
-                                                                                                    }*/
+            cost_formula_refs.addTask(task.getID(), cost_expression.getVariableReference(task.getReliability().getID()), cost_expression.getVariableReference(task.getFrequency().getID()), cost_expression.getVariableReference(task.getCost().getID()));
 
-            cost_formula_reliabilities          .insert(std::pair<std::string,double&>(id,cost_expression.getVariableReference(id)));
-            cost_formula_frequencies            .insert(std::pair<std::string,double&>(id,cost_expression.getVariableReference(id)));
-            cost_formula_costs                  .insert(std::pair<std::string,double&>(id,cost_expression.getVariableReference(id)));
-            
-            reliability_formula_reliabilities   .insert(std::pair<std::string,double&>(id,reliability_expression.getVariableReference(id)));
-            reliability_formula_frequencies     .insert(std::pair<std::string,double&>(id,reliability_expression.getVariableReference(id)));
-        }
+            reli_formula_refs.addTask(task.getID(), reliability_expression.getVariableReference(task.getReliability().getID()), reliability_expression.getVariableReference(task.getFrequency().getID()));
+ 
+        }*/
 
         /*for (std::pair<std::string,Task> task : tasks){
             cost_formula_reliabilities          .insert(std::pair<std::string,double&>(task.second.getTask(),cost_expression.getVariableReference(task.second.getReliabilitySymbol())));

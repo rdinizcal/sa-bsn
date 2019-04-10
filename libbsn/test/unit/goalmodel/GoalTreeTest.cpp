@@ -243,7 +243,7 @@ TEST_F(GoalTreeTest, GetLeafTasks) {
         goaltree.addRootGoal(goal1);
     
     /*Act*/
-        std::vector<Node> LTvec = goaltree.getLeafTasks();
+        std::vector<LeafTask> LTvec = goaltree.getLeafTasks();
 
     /*Assert*/
         ASSERT_EQ(3 ,LTvec.size());
