@@ -17,10 +17,10 @@ INCLUDE (${CMAKE_CURRENT_SOURCE_DIR}/cmake.Modules/CompileFlags.cmake)
 
 ###########################################################################
 # Find Catkin.
-FIND_PACKAGE ( 
-    catkin REQUIRED
-    std_msgs
-    message_generation
+find_package(catkin REQUIRED COMPONENTS
+  roscpp
+  std_msgs
+  message_generation
 )
 
 ###########################################################################
