@@ -27,9 +27,7 @@ ThermometerModule::~ThermometerModule() {}
 void ThermometerModule::setUp() {
     ros::NodeHandle configHandler;
     srand(time(NULL));
-        
-    Operation op;
-    int i = .2;
+    Operation op;    
     
     std::vector<std::string> t_probs;
     std::array<float, 25> transitions;
