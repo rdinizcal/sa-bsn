@@ -40,14 +40,14 @@ class IntegrationTest : public testing::Test {
                             a2(), s(), transitions(), ranges() {}
 
         virtual void SetUp() {
-            transitions = {
+            transitions = {{
                 0,100,0,0,0,
                 0,0,100,0,0,
                 0,0,0,100,0,
                 0,0,0,0,100,
-                100,0,0,0,0};
+                100,0,0,0,0}};
 
-            ranges = {Range(30.0, 33.0), Range(33.1, 36.4), Range(36.5, 37.5), Range(37.6, 39.0), Range(39.1, 42.0)};        
+            ranges = {{Range(30.0, 33.0), Range(33.1, 36.4), Range(36.5, 37.5), Range(37.6, 39.0), Range(39.1, 42.0)}};        
 
             h1.setLowerBound(30.0);
 		    h1.setUpperBound(33.0);
@@ -64,8 +64,8 @@ class IntegrationTest : public testing::Test {
             h2.setLowerBound(39.1);
 		    h2.setUpperBound(42.0);
 
-            a1 = {m1, m2};
-            a2 = {h1, h2};
+            a1 = {{m1, m2}};
+            a2 = {{h1, h2}};
 
             avg1.setRange(1);
             avg2.setRange(2);
