@@ -39,7 +39,7 @@ namespace bsn {
                 
                 int getSize() const;
 
-                std::vector<Node> getLeafTasks() const;
+                std::vector<LeafTask> getLeafTasks() const;
 
             private:
                 std::string actor;

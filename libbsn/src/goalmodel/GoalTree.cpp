@@ -1,6 +1,7 @@
 #include "goalmodel/GoalTree.hpp"
 
 #include <iostream>
+#include <memory>
 
 namespace bsn {
     namespace goalmodel {
@@ -72,15 +73,29 @@ namespace bsn {
             return this->getNodes().size();
         }
 
-        std::vector<Node> GoalTree::getLeafTasks() const {
-            std::vector<Node> leafTasks;
+        std::vector<LeafTask> GoalTree::getLeafTasks() const {
+            std::vector<Node> tempNodes;
+            std::vector<LeafTask> leafTasks;
 
             for(std::map<std::string, Node>::const_iterator it = nodes.begin();
                     it != nodes.end(); ++it){
 
-                if(!(*it).second.hasChildren()) leafTasks.push_back((*it).second);
-
+                if(!(*it).second.hasChildren()) {
+                    // temp = dynamic_cast<LeafTask*>(((*it).second));
+                    // leafTasks.push_back(*temp);
+                    tempNodes.push_back((*it).second);
+                }
             }
+
+            // for(std::vector<Node>::iterator it = tempNodes.begin();
+            //         it != tempNodes.end(); it++)
+            // {
+            //     leafTasks.push_back(dynamic_cast<LeafTask *>((*it)));    
+            // }
+
+            // for(const Node& n : tempNodes) {
+            //     leafTasks.push_back(dynamic_cast<LeafTask*>(n));
+            // }
 
             return leafTasks;
         }
