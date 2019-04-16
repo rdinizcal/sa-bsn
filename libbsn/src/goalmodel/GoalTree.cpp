@@ -90,7 +90,7 @@ namespace bsn {
             // for(std::vector<Node>::iterator it = tempNodes.begin();
             //         it != tempNodes.end(); it++)
             // {
-            //     leafTasks.push_back(dynamic_cast<LeafTask *>((*it)));    
+            //     leafTasks.push_back(static_cast<LeafTask>((*it)));    
             // }
 
             // for(const Node& n : tempNodes) {
