@@ -1,6 +1,7 @@
 from flask import Flask, request, session, jsonify
 import subprocess
 import os
+import json
 import signal
 from time import sleep
 
@@ -75,9 +76,21 @@ def get_configs():
 
 # Returns all configurations available
 @app.route('/config')
-def config():    
-    # return jsonify(get_configs())
-    return "not implemented yet!"
+def config():
+    with open("json/a.json", 'r') as f:
+        configs_dict = json.load(f)
+    for key in configs_dict:
+        with open("launch1/" + key + ".launch", 'w') as launchfile:
+            launchfile.write(configs_dict[key])
+    with open("launch1/centralhub.launch", 'w') as chlaunch:
+        chlaunch.write(""""<launch> 
+    <node name="centralhub" pkg="centralhub" type="centralhub" output="screen" /> \n
+    <param name="connect" value="false" type="bool" /> \n
+    <!-- Firebase Realtime Database --> \n
+    <param name="db_url" value="https://my-project-1516369881504.firebaseio.com" /> \n
+    <param name="persist" value="false" type="bool" /> \n
+    <param name="path" value="centralhub_output.csv" /> \n </launch>""""")
+    return "ok"
 
 # Show active processes
 @app.route('/status')
@@ -105,7 +118,7 @@ def start():
     except Exception as e:
         return 'execution error, exception: ' + str(e)
 
-# Sop bsn execution
+# Stop bsn execution
 @app.route('/stop')
 def stop():    
     global processes_pids
