@@ -16,7 +16,6 @@ commands = [
 app = Flask(__name__)
 processes_pids = []
 
-
 def stop_execution():
     global processes_pids
     # Send a Sigkill sign for all the processes pids
@@ -75,10 +74,9 @@ def get_configs():
     # return os.path.exists(path)
 
 # Returns all configurations available
-@app.route('/config')
+@app.route('/config', methods=['POST', 'GET'])
 def config():
-    with open("json/a.json", 'r') as f:
-        configs_dict = json.load(f)
+    configs_dict = request.get_json()
     for key in configs_dict:
         with open("launch1/" + key + ".launch", 'w') as launchfile:
             launchfile.write(configs_dict[key])
