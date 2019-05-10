@@ -148,6 +148,7 @@ void OximeterModule::run(){
     double risk;
     bool first_exec = true;
     uint32_t id = 0;
+    bsn::generator::DataGenerator dataGenerator(markov);
 
     bsn::SensorData msg;
     ros::NodeHandle n;
@@ -228,7 +229,7 @@ void OximeterModule::run(){
         if((rand() % 100)+1 < int32_t(params["freq"]*100)){
            
             { // TASK: Collect oximeter data with data_accuracy
-                data = markov.calculate_state();
+                data = dataGenerator.getValue();
                 
                 double offset = (1 - data_accuracy + (double)rand() / RAND_MAX * (1 - data_accuracy)) * data;
 
@@ -237,7 +238,6 @@ void OximeterModule::run(){
                 else
                     data = data - offset;
 
-                markov.next_state();
                 battery.consume(0.1);
 
                 //for debugging
