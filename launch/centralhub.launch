@@ -1,7 +1,7 @@
 <launch> 
     <node name="centralhub" pkg="centralhub" type="centralhub" output="screen" />
 
-    <param name="connect" value="false" type="bool" />
+    <param name="connect" value="true" type="bool" />
 
     <!-- Firebase Realtime Database -->
     <param name="db_url" value="https://my-project-1516369881504.firebaseio.com" />
@@ -9,5 +9,8 @@
     <param name="persist" value="false" type="bool" />
 
     <param name="path" value="centralhub_output.csv" />
+
+    <param name="session" value="10" type="int" />
+
 
 </launch>

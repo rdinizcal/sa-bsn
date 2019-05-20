@@ -58,6 +58,7 @@ class CentralhubModule {
         std::array<double, 5> data;
         std::vector<std::list<double>> data_list;
         double patient_status;
+        int session;
 };
 
 #endif 

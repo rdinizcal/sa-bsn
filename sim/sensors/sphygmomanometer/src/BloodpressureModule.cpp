@@ -1,4 +1,5 @@
 #include "BloodpressureModule.hpp"
+#include "generator/DataGenerator.hpp"
 
 using namespace bsn::range;
 using namespace bsn::resource;
@@ -170,8 +171,8 @@ void BloodpressureModule::run() {
     double risk;
     bool first_exec = true;
     uint32_t id = 0;
-    bsn::generator::DataGenerator dataGeneratorSys(markovSystolic);
-    bsn::generator::DataGenerator dataGeneratorDia(markovDiastolic);
+    DataGenerator dataGeneratorSys(markovSystolic);
+    DataGenerator dataGeneratorDia(markovDiastolic);
 
     bsn::SensorData msgS, msgD;
     ros::NodeHandle n;
