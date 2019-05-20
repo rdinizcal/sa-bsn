@@ -6,6 +6,7 @@
 #include <stdexcept> 
 
 #include "goalmodel/Node.hpp"
+#include <memory>
 #include "goalmodel/Goal.hpp"
 
 namespace bsn {
@@ -19,8 +20,8 @@ namespace bsn {
                 Task();
                 ~Task();
 
-                void addChild(const Task &/*task*/);
-                void addChild(const Goal &/*goal*/);
+                void addChild(std::shared_ptr<Task> /*task*/);
+                void addChild(std::shared_ptr<Goal> /*goal*/);
                 
         };
     }  

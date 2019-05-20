@@ -1,6 +1,6 @@
 #include "model/Formula.hpp"
 
-namespace simpa {
+namespace bsn {
     namespace model {
         
         Formula::Formula(const std::string& text) {

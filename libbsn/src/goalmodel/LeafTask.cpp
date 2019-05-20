@@ -1,4 +1,5 @@
 #include "goalmodel/LeafTask.hpp"
+#include <memory>
 
 namespace bsn {
     namespace goalmodel {
@@ -69,7 +70,7 @@ namespace bsn {
             return frequency;
         }
 
-        void LeafTask::addChild(const Node &node) {
+        void LeafTask::addChild(std::shared_ptr<Node> node) {
             throw std::invalid_argument("Leaf Tasks cannot contain children");
         }
     }

@@ -1,11 +1,12 @@
 #include "goalmodel/Node.hpp"
 
 #include <iostream>
+#include <memory>
 
 namespace bsn {
     namespace goalmodel {
         
-        Node::Node() : id(), description(), children() {}
+        Node::Node() : id(), description() {}
 
         Node::~Node(){};
 
@@ -52,11 +53,11 @@ namespace bsn {
             return !this->children.empty();
         }
 
-        std::vector<Node> Node::getChildren() const {
+        std::vector<std::shared_ptr<Node>> Node::getChildren() const {
             return this->children;
         }
 
-        void Node::addChild(const Node &node) {
+        void Node::addChild(std::shared_ptr<Node> node) {
             this->children.push_back(node);
         }
 
@@ -65,16 +66,16 @@ namespace bsn {
             this->children.erase(this->children.begin()+pos);
         }
 
-        Node Node::getChild(const std::string &id) {
+        std::shared_ptr<Node> Node::getChild(const std::string &id) {
             int pos = findChild(id); 
-            return this->children.at(pos);
+            return children[pos];
         }
 
         int Node::findChild(const std::string &id) {
-            for(std::vector<Node>::const_iterator it = this->children.begin();
+            for(std::vector<std::shared_ptr<Node>>::const_iterator it = this->children.begin();
                     it != this->children.end(); ++it) {
                 
-                if ((*it).getID()==id) return it-this->children.begin();
+                if ((*it)->getID()==id) return it-this->children.begin();
             }
 
             throw std::out_of_range("Child Not Found");

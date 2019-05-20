@@ -40,8 +40,8 @@ GENERATE_MESSAGES(
 ###########################################################################
 # Export catkin package.
 CATKIN_PACKAGE(
-  INCLUDE_DIRS include
-  LIBRARIES ${PROJECT_NAME}
+  INCLUDE_DIRS include 
+  LIBRARIES ${PROJECT_NAME} lepton
   CATKIN_DEPENDS message_runtime
 )
 

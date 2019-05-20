@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <stdexcept> 
+#include <memory>
 
 namespace bsn {
     namespace goalmodel {
@@ -27,11 +28,11 @@ namespace bsn {
                 std::string getDescription() const;
 
                 bool hasChildren() const;
-                std::vector<Node> getChildren() const;
+                std::vector<std::shared_ptr<Node>> getChildren() const;
 
-                void addChild(const Node &/*goal*/);
+                void addChild(std::shared_ptr<Node> /*goal*/);
                 void removeChild(const std::string &/*id*/);
-                Node getChild(const std::string &/*id*/);
+                std::shared_ptr<Node> getChild(const std::string &/*id*/);
 
 
             private:
@@ -40,7 +41,7 @@ namespace bsn {
             protected:
                 std::string id;
                 std::string description;
-                std::vector<Node> children;
+                std::vector<std::shared_ptr<Node>> children;
         };
     }  
 }

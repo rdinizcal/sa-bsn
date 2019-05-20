@@ -6,7 +6,7 @@
 #include <string>
 #include "lepton/Lepton.h"
  
-namespace simpa {
+namespace bsn {
     namespace model {
         class Formula {
         
