@@ -27,8 +27,7 @@ ThermometerModule::~ThermometerModule() {}
 void ThermometerModule::setUp() {
     ros::NodeHandle configHandler;
     srand(time(NULL));
-        
-    Operation op;
+    Operation op;    
     
     std::vector<std::string> t_probs;
     std::array<float, 25> transitions;
@@ -54,7 +53,7 @@ void ThermometerModule::setUp() {
         lrs = op.split(s, ',');
         configHandler.getParam("MidRisk0", s);
         mrs0 = op.split(s, ',');
-        configHandler.getParam("MidRisk0", s);
+        configHandler.getParam("HighRisk0", s);
         hrs0 = op.split(s, ',');
         configHandler.getParam("MidRisk1", s);
         mrs1 = op.split(s, ',');
@@ -155,6 +154,7 @@ void ThermometerModule::run() {
     double risk;
     bool first_exec = true;
     uint32_t id = 0;
+    bsn::generator::DataGenerator dataGenerator(markov);
 
     bsn::SensorData msg;
     ros::NodeHandle n;
@@ -235,7 +235,7 @@ void ThermometerModule::run() {
         if((rand() % 100)+1 < int32_t(params["freq"]*100)){
            
             { // TASK: Collect thermometer data with data_accuracy
-                data = markov.calculate_state();
+                data = dataGenerator.getValue();
                 
                 double offset = (1 - data_accuracy + (double)rand() / RAND_MAX * (1 - data_accuracy)) * data;
 
@@ -244,7 +244,6 @@ void ThermometerModule::run() {
                 else
                     data = data - offset;
 
-                markov.next_state();
                 battery.consume(0.1);
 
                 //for debugging

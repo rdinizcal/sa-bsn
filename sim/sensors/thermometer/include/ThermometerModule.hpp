@@ -11,6 +11,7 @@
 #include "range/Range.hpp"
 #include "resource/Battery.hpp"
 #include "generator/Markov.hpp"
+#include "generator/DataGenerator.hpp"
 #include "filters/MovingAverage.hpp"
 #include "operation/Operation.hpp"
 #include "configuration/SensorConfiguration.hpp"

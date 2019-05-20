@@ -4,6 +4,8 @@
 #include <fstream>
 #include <chrono>
 
+#include<cpprest/http_client.h>
+#include<cpprest/json.h>
 #include "ros/ros.h"
 
 #include "processor/Processor.hpp"
@@ -29,6 +31,11 @@ class CentralhubModule {
 
         void receiveSensorData(const bsn::SensorData::ConstPtr&);
 
+        std::string makePacket();
+
+        void persistData(std::vector<std::string>&);
+
+        std::vector<std::string> getPatientStatus();
 
     public:
         void setUp();
@@ -41,11 +48,10 @@ class CentralhubModule {
         bool active;
 		std::map<std::string,double> params;
 
-        uint32_t connect;
-        uint32_t port;
-        std::string ip;
+        bool connect;
+        std::string database_url;
         
-        uint32_t persist;
+        bool persist;
         std::ofstream fp;
         std::string path;
 
