@@ -74,18 +74,10 @@ namespace bsn {
         }
 
         std::vector<LeafTask> GoalTree::getLeafTasks() const {
-            std::vector<Node> tempNodes;
+            std::shared_ptr<Node> temp;
             std::vector<LeafTask> leafTasks;
 
-            for(std::map<std::string, std::shared_ptr<Node>>::const_iterator it = nodes.begin();
-                    it != nodes.end(); ++it){
-
-                if(!((*it).second->hasChildren())) {
-                    // temp = dynamic_cast<LeafTask*>(((*it).second));
-                    // leafTasks.push_back(*temp);
-                    //tempNodes.push_back((*it).second);
-                }
-            }
+            /*   */
 
             // for(std::vector<Node>::iterator it = tempNodes.begin();
             //         it != tempNodes.end(); it++)

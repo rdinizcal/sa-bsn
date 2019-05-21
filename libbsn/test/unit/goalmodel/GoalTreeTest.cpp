@@ -7,6 +7,7 @@
 
 #include <ostream>
 #include <algorithm> // std::find
+#include <memory>
 
 using namespace bsn::goalmodel;
 
@@ -31,9 +32,9 @@ TEST_F(GoalTreeTest, AddRootGoal) {
     GoalTree goaltree(actor);
     Goal rgoal("G1", "Emergency is detected");
 
-    goaltree.addRootGoal(rgoal);
+    goaltree.addRootGoal(std::shared_ptr<Goal> (&rgoal));
 
-    ASSERT_TRUE(goaltree.getNode("G1")==rgoal);
+    ASSERT_TRUE(*(goaltree.getNode("G1"))==rgoal);
     ASSERT_EQ(goaltree.getSize(), 1);
 }
 
@@ -43,10 +44,10 @@ TEST_F(GoalTreeTest, DoNotAllowMoreThanOneRootGoal) {
     Goal rgoal1("G1", "Emergency is detected");
     Goal rgoal2("G2", "Patient is healthy");
 
-    goaltree.addRootGoal(rgoal1);
+    goaltree.addRootGoal(std::shared_ptr<Goal>(&rgoal1));
 
     try {
-        goaltree.addRootGoal(rgoal2);
+        goaltree.addRootGoal(std::shared_ptr<Goal>(&rgoal2));
         FAIL() << "Expected not to allow more than one root goal";
     }
     catch(std::invalid_argument const & err) {
@@ -58,18 +59,18 @@ TEST_F(GoalTreeTest, GetSpecificNode) {
     std::string actor = "Body Sensor Network";
     GoalTree goaltree(actor);
     Goal rgoal("G1", "Emergency is detected");
-    goaltree.addRootGoal(rgoal);
+    goaltree.addRootGoal(std::shared_ptr<Goal>(&rgoal));
 
-    Node new_goal = goaltree.getNode("G1");
+    std::shared_ptr<Node> new_goal = goaltree.getNode("G1");
 
-    ASSERT_EQ(Node(rgoal), new_goal);
+    ASSERT_EQ(Node(rgoal), *new_goal);
 }
 
 TEST_F(GoalTreeTest, GetTreeSize) {
     std::string actor = "Body Sensor Network";
     GoalTree goaltree(actor);
     Goal rgoal("G1", "Emergency is detected");
-    goaltree.addRootGoal(rgoal);
+    goaltree.addRootGoal(std::shared_ptr<Goal>(&rgoal));
 
     int size = goaltree.getSize();
 
@@ -82,12 +83,12 @@ TEST_F(GoalTreeTest, AddGoalWOneChild) {
     Goal goal1("G1", "Emergency is detected");
     Goal goal2("G2", "Patient status is monitored");
 
-    goal1.addChild(goal2);
-    goaltree.addRootGoal(goal1);
+    goal1.addChild(std::shared_ptr<Goal>(&goal2));
+    goaltree.addRootGoal(std::shared_ptr<Goal>(&goal1));
 
-    ASSERT_EQ(goaltree.getNode("G1"), goal1);
-    ASSERT_EQ(goaltree.getNode("G2"), goal2);
-    ASSERT_EQ(goaltree.getNode("G1").getChild("G2"), goal2);
+    ASSERT_EQ(*(goaltree.getNode("G1")), goal1);
+    ASSERT_EQ(*(goaltree.getNode("G2")), goal2);
+    ASSERT_EQ(*(goaltree.getNode("G1")->getChild("G2")), goal2);
 }
 
 TEST_F(GoalTreeTest, AddGoalWChildren) {
@@ -98,16 +99,16 @@ TEST_F(GoalTreeTest, AddGoalWChildren) {
     Goal goal3("G3", "Vital signs are monitored");
     Goal goal4("G4", "Vital signs are analyzed");
 
-    goal2.addChild(goal3);
-    goal2.addChild(goal4);
-    goal1.addChild(goal2);
-    goaltree.addRootGoal(goal1);
+    goal2.addChild(std::shared_ptr<Goal>(&goal3));
+    goal2.addChild(std::shared_ptr<Goal>(&goal4));
+    goal1.addChild(std::shared_ptr<Goal>(&goal2));
+    goaltree.addRootGoal(std::shared_ptr<Goal>(&goal1));
 
     ASSERT_EQ(goaltree.getSize(),4);
-    ASSERT_TRUE(goaltree.getNode("G2")==goal2);
-    ASSERT_EQ(goaltree.getNode("G2").getChildren().size(),2);
-    ASSERT_TRUE(goaltree.getNode("G2").getChild("G3")==goal3);
-    ASSERT_TRUE(goaltree.getNode("G2").getChild("G4")==goal4);
+    ASSERT_TRUE(*(goaltree.getNode("G2"))==goal2);
+    ASSERT_EQ(goaltree.getNode("G2")->getChildren().size(),2);
+    ASSERT_TRUE(*(goaltree.getNode("G2")->getChild("G3"))==goal3);
+    ASSERT_TRUE(*(goaltree.getNode("G2")->getChild("G4"))==goal4);
 }
 
 TEST_F(GoalTreeTest, AddGoalWMoreChildren) {
@@ -121,19 +122,19 @@ TEST_F(GoalTreeTest, AddGoalWMoreChildren) {
     Goal goal6("G6", "Other another goal");
 
 
-    goal5.addChild(goal6);
-    goal3.addChild(goal5);
-    goal2.addChild(goal4);
-    goal2.addChild(goal3);
-    goal1.addChild(goal2);
+    goal5.addChild(std::shared_ptr<Goal>(&goal6));
+    goal3.addChild(std::shared_ptr<Goal>(&goal5));
+    goal2.addChild(std::shared_ptr<Goal>(&goal4));
+    goal2.addChild(std::shared_ptr<Goal>(&goal3));
+    goal1.addChild(std::shared_ptr<Goal>(&goal2));
 
-    goaltree.addRootGoal(goal1);
+    goaltree.addRootGoal(std::shared_ptr<Goal>(&goal1));
 
     ASSERT_EQ(goaltree.getSize(),6);
-    ASSERT_TRUE(goaltree.getNode("G2").getChild("G3")==goal3);
+    ASSERT_TRUE(*(goaltree.getNode("G2")->getChild("G3"))==goal3);
     //ASSERT_TRUE(goaltree.getNode("G2").getChild("G4")==goal4);
-    ASSERT_TRUE(goaltree.getNode("G3").getChild("G5")==goal5);
-    ASSERT_TRUE(goaltree.getNode("G5").getChild("G6")==goal6);
+    ASSERT_TRUE(*(goaltree.getNode("G3")->getChild("G5"))==goal5);
+    ASSERT_TRUE(*(goaltree.getNode("G5")->getChild("G6"))==goal6);
 
 }
 
@@ -146,20 +147,20 @@ TEST_F(GoalTreeTest, AddTaskWParent) {
     Goal goal4("G4", "Vital signs are analyzed");
 
     Task task1("T1", "Analyze vital signs");
-    goal4.addChild(task1);
-    goal2.addChild(goal4);
-    goal2.addChild(goal3);
-    goal1.addChild(goal2);
-    goaltree.addRootGoal(goal1);
+    goal4.addChild(std::shared_ptr<Task>(&task1));
+    goal2.addChild(std::shared_ptr<Goal>(&goal4));
+    goal2.addChild(std::shared_ptr<Goal>(&goal3));
+    goal1.addChild(std::shared_ptr<Goal>(&goal2));
+    goaltree.addRootGoal(std::shared_ptr<Goal>(&goal1));
 
-    ASSERT_EQ(goaltree.getNode("T1"), task1);
-    ASSERT_EQ(goaltree.getNode("G1"), goal1);
-    ASSERT_EQ(goaltree.getNode("G2"), goal2);
-    ASSERT_EQ(goaltree.getNode("G3"), goal3);
-    ASSERT_EQ(goaltree.getNode("G4"), goal4);
+    ASSERT_EQ(*(goaltree.getNode("T1")), task1);
+    ASSERT_EQ(*(goaltree.getNode("G1")), goal1);
+    ASSERT_EQ(*(goaltree.getNode("G2")), goal2);
+    ASSERT_EQ(*(goaltree.getNode("G3")), goal3);
+    ASSERT_EQ(*(goaltree.getNode("G4")), goal4);
 
-    ASSERT_EQ(goaltree.getNode("G4").getChildren().size(), 1);
-    ASSERT_EQ(goaltree.getNode("G4").getChild("T1"), task1);
+    ASSERT_EQ(goaltree.getNode("G4")->getChildren().size(), 1);
+    ASSERT_EQ(*(goaltree.getNode("G4")->getChild("T1")), task1);
     ASSERT_EQ(5, goaltree.getSize());
 }
 
@@ -174,12 +175,12 @@ TEST_F(GoalTreeTest, AddGoalAsTaskChild) {
     Task task1("T1", "Analyze vital signs");
 
     try {
-        task1.addChild(goal5);
-        goal4.addChild(task1);
-        goal2.addChild(goal4);
-        goal2.addChild(goal3);
-        goal1.addChild(goal2);
-        goaltree.addRootGoal(goal1);
+        task1.addChild(std::shared_ptr<Goal>(&goal5));
+        goal4.addChild(std::shared_ptr<Task>(&task1));
+        goal2.addChild(std::shared_ptr<Goal>(&goal4));
+        goal2.addChild(std::shared_ptr<Goal>(&goal3));
+        goal1.addChild(std::shared_ptr<Goal>(&goal2));
+        goaltree.addRootGoal(std::shared_ptr<Goal>(&goal1));
         FAIL() << "Expected not to allow an insertion of goal as a tasks child";
     }
     catch(std::invalid_argument const & err) {
@@ -201,23 +202,23 @@ TEST_F(GoalTreeTest, AddTaskWChildren) {
     LeafTask task112("T1.12", "Detect patient status", Property("W_G4_T1_12",1), Property("R_G4_T1_12",1), Property("F_G4_T1_12",1));
     LeafTask task113("T1.13", "Persist patient data", Property("W_G4_T1_13",1), Property("R_G4_T1_13",1), Property("F_G4_T1_13",1));
 
-    task1.addChild(task111);
-    task1.addChild(task112);
-    task1.addChild(task113);
-    goal4.addChild(task1);
-    goal2.addChild(goal4);
-    goal2.addChild(goal3);
-    goal1.addChild(goal2);
-    goaltree.addRootGoal(goal1);
+    task1.addChild(std::shared_ptr<Task>(&task111));
+    task1.addChild(std::shared_ptr<Task>(&task112));
+    task1.addChild(std::shared_ptr<Task>(&task113));
+    goal4.addChild(std::shared_ptr<Task>(&task1));
+    goal2.addChild(std::shared_ptr<Goal>(&goal4));
+    goal2.addChild(std::shared_ptr<Goal>(&goal3));
+    goal1.addChild(std::shared_ptr<Goal>(&goal2));
+    goaltree.addRootGoal(std::shared_ptr<Goal>(&goal1));
 
-    ASSERT_EQ(goaltree.getNode("T1.11"), task111);
-    ASSERT_EQ(goaltree.getNode("T1.12"), task112);
-    ASSERT_EQ(goaltree.getNode("T1.13"), task113);
-    ASSERT_EQ(goaltree.getNode("T1"), task1);
-    ASSERT_EQ(goaltree.getNode("G1"), goal1);
-    ASSERT_EQ(goaltree.getNode("G2"), goal2);
-    ASSERT_EQ(goaltree.getNode("G3"), goal3);
-    ASSERT_EQ(goaltree.getNode("G4"), goal4);
+    ASSERT_EQ(*(goaltree.getNode("T1.11")), task111);
+    ASSERT_EQ(*(goaltree.getNode("T1.12")), task112);
+    ASSERT_EQ(*(goaltree.getNode("T1.13")), task113);
+    ASSERT_EQ(*(goaltree.getNode("T1")), task1);
+    ASSERT_EQ(*(goaltree.getNode("G1")), goal1);
+    ASSERT_EQ(*(goaltree.getNode("G2")), goal2);
+    ASSERT_EQ(*(goaltree.getNode("G3")), goal3);
+    ASSERT_EQ(*(goaltree.getNode("G4")), goal4);
 
     ASSERT_EQ(8, goaltree.getSize());
 }
@@ -234,13 +235,13 @@ TEST_F(GoalTreeTest, GetLeafTasks) {
         LeafTask task112("T1.12", "Detect patient status", Property("W_G4_T1_12",1), Property("R_G4_T1_12",1), Property("F_G4_T1_12",1));
         LeafTask task113("T1.13", "Persist patient data", Property("W_G4_T1_13",1), Property("R_G4_T1_13",1), Property("F_G4_T1_13",1));
 
-        task1.addChild(task111);
-        task1.addChild(task112);
-        task1.addChild(task113);
-        goal4.addChild(task1);
-        goal2.addChild(goal4);
-        goal1.addChild(goal2);
-        goaltree.addRootGoal(goal1);
+        task1.addChild(std::shared_ptr<Task>(&task111));
+        task1.addChild(std::shared_ptr<Task>(&task112));
+        task1.addChild(std::shared_ptr<Task>(&task113));
+        goal4.addChild(std::shared_ptr<Task>(&task1));
+        goal2.addChild(std::shared_ptr<Goal>(&goal4));
+        goal1.addChild(std::shared_ptr<Goal>(&goal2));
+        goaltree.addRootGoal(std::shared_ptr<Goal>(&goal1));
     
     /*Act*/
         std::vector<LeafTask> LTvec = goaltree.getLeafTasks();

@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <memory>
 
 #include "goalmodel/Context.hpp"
 #include "goalmodel/Property.hpp"
@@ -30,10 +31,10 @@ TEST_F(GoalTest, AddChild) {
     Goal parentGoal("G3_T1", "Read");
     Goal childGoal("G3_T1.4", "Read ABP");
 
-    parentGoal.addChild(childGoal);
+    parentGoal.addChild(std::shared_ptr<Goal>(&childGoal));
 
     ASSERT_EQ(parentGoal.getChildren().size(), 1);
-    EXPECT_TRUE(parentGoal.getChildren().at(0)==childGoal);
+    EXPECT_TRUE(*(parentGoal.getChildren().at(0))==childGoal);
 
 }
 
@@ -41,7 +42,7 @@ TEST_F(GoalTest, RemoveChild) {
 
     Goal parentGoal("G3_T1", "Read");
     Goal childGoal("G3_T1.4", "Read ABP");
-    parentGoal.addChild(childGoal);
+    parentGoal.addChild(std::shared_ptr<Goal>(&childGoal));
 
     parentGoal.removeChild("G3_T1.4");
 
@@ -52,7 +53,7 @@ TEST_F(GoalTest, RemoveChildNotFound) {
 
     Goal parentGoal("G3_T1", "Read");
     Goal childGoal("G3_T1.4", "Read ABP");
-    parentGoal.addChild(childGoal);
+    parentGoal.addChild(std::shared_ptr<Goal>(&childGoal));
 
     try {
         parentGoal.removeChild("XXX");
@@ -67,21 +68,21 @@ TEST_F(GoalTest, GetChild) {
 
     Goal parentGoal("G3_T1", "Read");
     Goal childGoal("G3_T1.4", "Read ABP");
-    parentGoal.addChild(childGoal);
+    parentGoal.addChild(std::shared_ptr<Goal>(&childGoal));
 
-    Node returnedGoal = parentGoal.getChild("G3_T1.4");
+    std::shared_ptr<Node> returnedGoal = parentGoal.getChild("G3_T1.4");
 
-    ASSERT_EQ(returnedGoal.getID(), "G3_T1.4");
+    ASSERT_EQ(returnedGoal->getID(), "G3_T1.4");
 }
 
 TEST_F(GoalTest, GetChildNotFound) {
 
     Goal parentGoal("G3_T1", "Read");
     Goal childGoal("G3_T1.4", "Read ABP");
-    parentGoal.addChild(childGoal);
+    parentGoal.addChild(std::shared_ptr<Goal>(&childGoal));
 
     try {
-        Node returnedGoal = parentGoal.getChild("XXX");
+        std::shared_ptr<Node> returnedGoal = parentGoal.getChild("XXX");
         FAIL() << "Expected out of range exception";
     }
     catch(std::out_of_range const & err) {

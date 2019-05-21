@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <memory>
 
 #include "goalmodel/Node.hpp"
 
@@ -27,10 +28,10 @@ TEST_F(NodeTest, AddChild) {
     Node parentNode("G3_T1", "Read");
     Node childNode("G3_T1.4", "Read ABP");
 
-    parentNode.addChild(childNode);
+    parentNode.addChild(std::shared_ptr<Node>(&childNode));
 
     ASSERT_EQ(parentNode.getChildren().size(), 1);
-    EXPECT_TRUE(parentNode.getChild("G3_T1.4") == childNode);
+    EXPECT_TRUE(*(parentNode.getChild("G3_T1.4")) == childNode);
 
 }
 
@@ -38,7 +39,7 @@ TEST_F(NodeTest, RemoveChild) {
 
     Node parentNode("G3_T1", "Read");
     Node childNode("G3_T1.4", "Read ABP");
-    parentNode.addChild(childNode);
+    parentNode.addChild(std::shared_ptr<Node>(&childNode));
 
     parentNode.removeChild("G3_T1.4");
 
@@ -49,7 +50,7 @@ TEST_F(NodeTest, RemoveChildNotFound) {
 
     Node parentNode("G3_T1", "Read");
     Node childNode("G3_T1.4", "Read ABP");
-    parentNode.addChild(childNode);
+    parentNode.addChild(std::shared_ptr<Node>(&childNode));
 
     try {
         parentNode.removeChild("XXX");
@@ -64,21 +65,21 @@ TEST_F(NodeTest, GetChild) {
 
     Node parentNode("G3_T1", "Read");
     Node childNode("G3_T1.4", "Read ABP");
-    parentNode.addChild(childNode);
+    parentNode.addChild(std::shared_ptr<Node>(&childNode));
 
-    Node returnedNode = parentNode.getChild("G3_T1.4");
+    std::shared_ptr<Node> returnedNode = parentNode.getChild("G3_T1.4");
 
-    ASSERT_EQ(returnedNode.getID(), "G3_T1.4");
+    ASSERT_EQ(returnedNode->getID(), "G3_T1.4");
 }
 
 TEST_F(NodeTest, GetChildNotFound) {
 
     Node parentNode("G3_T1", "Read");
     Node childNode("G3_T1.4", "Read ABP");
-    parentNode.addChild(childNode);
+    parentNode.addChild(std::shared_ptr<Node>(&childNode));
 
     try {
-        Node returnedNode = parentNode.getChild("XXX");
+        std::shared_ptr<Node> returnedNode = parentNode.getChild("XXX");
         FAIL() << "Expected out of range exception";
     }
     catch(std::out_of_range const & err) {
@@ -92,14 +93,14 @@ TEST_F(NodeTest, AddChildWChild) {
     Node childNode("G3_T1.4", "Read ABP");
     Node grandchildNode("G3_T1.41", "Read Dyastolic");
 
-    childNode.addChild(grandchildNode);
-    parentNode.addChild(childNode);
+    childNode.addChild(std::shared_ptr<Node>(&grandchildNode));
+    parentNode.addChild(std::shared_ptr<Node>(&childNode));
 
     ASSERT_EQ(parentNode.getChildren().size(), 1);
-    EXPECT_TRUE(parentNode.getChild("G3_T1.4")==childNode);
+    EXPECT_TRUE(*(parentNode.getChild("G3_T1.4"))==childNode);
     ASSERT_EQ(childNode.getChildren().size(), 1);
-    EXPECT_TRUE(childNode.getChild("G3_T1.41")==grandchildNode);
-    EXPECT_TRUE(parentNode.getChild("G3_T1.4").getChild("G3_T1.41")==grandchildNode);
+    EXPECT_TRUE(*(childNode.getChild("G3_T1.41"))==grandchildNode);
+    EXPECT_TRUE(*(parentNode.getChild("G3_T1.4")->getChild("G3_T1.41"))==grandchildNode);
 
 }
 
@@ -111,20 +112,20 @@ TEST_F(NodeTest, AddChildWChildrenWChild) {
     Node grandchildNode("Boy GrandChild", "Read Dyastolic 1");
     Node greatgrandchildNode("Boy GreatGrandChild", "Read Dyastolic 1.7");
 
-    grandchildNode.addChild(greatgrandchildNode);
-    boyChildNode.addChild(grandchildNode);
-    parentNode.addChild(girlChildNode);    
-    parentNode.addChild(boyChildNode);
+    grandchildNode.addChild(std::shared_ptr<Node>(&greatgrandchildNode));
+    boyChildNode.addChild(std::shared_ptr<Node>(&grandchildNode));
+    parentNode.addChild(std::shared_ptr<Node>(&girlChildNode));    
+    parentNode.addChild(std::shared_ptr<Node>(&boyChildNode));
 
     ASSERT_EQ(parentNode.getChildren().size(), 2);
-    EXPECT_TRUE(parentNode.getChild("Boy Child")==boyChildNode);
-    EXPECT_TRUE(parentNode.getChild("Girl Child")==girlChildNode);
+    EXPECT_TRUE(*(parentNode.getChild("Boy Child"))==boyChildNode);
+    EXPECT_TRUE(*(parentNode.getChild("Girl Child"))==girlChildNode);
     ASSERT_EQ(boyChildNode.getChildren().size(), 1);
     ASSERT_EQ(girlChildNode.getChildren().size(), 0);
-    EXPECT_TRUE(boyChildNode.getChild("Boy GrandChild")==grandchildNode);
+    EXPECT_TRUE(*(boyChildNode.getChild("Boy GrandChild"))==grandchildNode);
 
 
-    EXPECT_TRUE(parentNode.getChild("Boy Child").getChild("Boy GrandChild")==grandchildNode);
-    EXPECT_TRUE(parentNode.getChild("Boy Child").getChild("Boy GrandChild").getChild("Boy GreatGrandChild")==greatgrandchildNode);
+    EXPECT_TRUE(*(parentNode.getChild("Boy Child")->getChild("Boy GrandChild"))==grandchildNode);
+    EXPECT_TRUE(*(parentNode.getChild("Boy Child")->getChild("Boy GrandChild")->getChild("Boy GreatGrandChild"))==greatgrandchildNode);
 
 }

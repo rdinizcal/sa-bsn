@@ -14,6 +14,8 @@ SET (CMAKE_MODULE_PATH "${CMAKE_INSTALL_PREFIX}/share/cmake-${CMAKE_MAJOR_VERSIO
 ###########################################################################
 # Include flags for compiling.
 INCLUDE (${CMAKE_CURRENT_SOURCE_DIR}/cmake.Modules/CompileFlags.cmake)
+# Set compilation flags
+SET (CMAKE_CXX_FLAGS "-Wall ${CMAKE_CXX_FLAGS}")
 
 ###########################################################################
 # Find Catkin.
@@ -41,7 +43,7 @@ GENERATE_MESSAGES(
 # Export catkin package.
 CATKIN_PACKAGE(
   INCLUDE_DIRS include 
-  LIBRARIES ${PROJECT_NAME} lepton
+  LIBRARIES ${PROJECT_NAME}
   CATKIN_DEPENDS message_runtime
 )
 
@@ -50,14 +52,17 @@ CATKIN_PACKAGE(
 INCLUDE_DIRECTORIES (${catkin_INCLUDE_DIRS})
 # Set include directory.
 INCLUDE_DIRECTORIES(include)
-# Set compilation flags
-SET (CMAKE_CXX_FLAGS "-Wall ${CMAKE_CXX_FLAGS}")
-  
+
+###########################################################################
+# Set external libraries.
+LINK_DIRECTORIES(/usr/local/lib)
+SET(LIBRARIES lepton)
+
 ###########################################################################
 # Build project.
 FILE(GLOB_RECURSE ${PROJECT_NAME}-srcs "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 ADD_LIBRARY(${PROJECT_NAME} ${${PROJECT_NAME}-srcs})
-TARGET_LINK_LIBRARIES (${PROJECT_NAME} ${catkin_LIBRARIES}) 
+TARGET_LINK_LIBRARIES (${PROJECT_NAME} ${catkin_LIBRARIES} ${LIBRARIES}) 
 
 ###########################################################################
 ## Add gtest based cpp test target and link libraries
@@ -66,7 +71,7 @@ FILE(GLOB_RECURSE files "${CMAKE_CURRENT_SOURCE_DIR}/test/*.cpp")
 CATKIN_ADD_GTEST(${PROJECT_NAME}-test ${files})
 
 IF(TARGET ${PROJECT_NAME}-test)
-  TARGET_LINK_LIBRARIES(${PROJECT_NAME}-test ${PROJECT_NAME})
+  TARGET_LINK_LIBRARIES(${PROJECT_NAME}-test ${PROJECT_NAME} ${catkin_LIBRARIES} ${LIBRARIES})
 ENDIF()
 
 ###########################################################################

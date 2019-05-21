@@ -15,7 +15,7 @@
 #include "goalmodel/Context.hpp"
 #include "goalmodel/GoalTree.hpp"
 
-#include "Lepton.h"
+#include "lepton/Lepton.h"
 
 #include "FormulaRefs.hpp"
 
