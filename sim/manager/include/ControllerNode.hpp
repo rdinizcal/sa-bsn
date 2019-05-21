@@ -56,6 +56,10 @@ class ControllerNode {
 	std::map<std::string, double> tasks;
 	std::map<std::string, bsn::goalmodel::Context> contexts;
 
+	// May be redundant... should try to refactor it later
+	std::vector<std::string> props;
+	std::vector<double> values;
+
 	bsn::model::Formula cost_expression;
 	bsn::model::Formula reliability_expression;
 /* 

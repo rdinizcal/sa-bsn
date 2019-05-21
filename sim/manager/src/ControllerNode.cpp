@@ -150,9 +150,6 @@ void ControllerNode::setUp() {
         std::ifstream reliability_file;
         std::string reliability_formula;
 
-        std::vector<std::string> props;
-        std::vector<double> values;
-
         try{
             cost_file.open("../formulae/cost.formula");
             std::getline(cost_file,cost_formula);
@@ -307,11 +304,7 @@ void ControllerNode::receiveTaskInfo(const bsn::TaskInfo::ConstPtr& msg) {
     setTaskValue(costID, msg->cost);
     setTaskValue(reliabilityID, msg->reliability);
     setTaskValue(frequencyID, msg->frequency);
-/*
-    tasks[id].setCost(msg->cost);
-    tasks[id].setReliability(msg->reliability);
-    tasks[id].setFrequency(msg->frequency);
-*/
+    
     analyze();
 }
 
@@ -337,7 +330,29 @@ void ControllerNode::analyze() {
     
     // Should consider refactoring apply method later...
 
-    //expression.apply
+    props.clear();
+    values.clear();
+
+    // bad smells everywhere...
+
+    for(std::map<std::string, double>::const_iterator it = tasks.begin();
+                it != tasks.end(); it++) {
+            props.push_back(it->first);
+            values.push_back(it->second);
+    }
+
+    reliability_expression.apply(props, values);
+    
+    
+    for(std::map<std::string, double>::const_iterator it = tasks.begin();
+                it != tasks.end(); it++) {
+            if(isCost(it->first)) {
+                props.push_back(it->first);
+                values.push_back(it->second);
+            }
+    }
+    
+    cost_expression.apply(props, values);
     
     /*double reliability;
     double cost;
