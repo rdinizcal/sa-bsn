@@ -39,12 +39,16 @@ ControllerNode::ControllerNode(int  &argc, char **argv, std::string name):
     ros::init(argc, argv, name);
 }
 
-void ControllerNode::setTaskValue(std::string &id, double value) {
+void ControllerNode::setTaskValue(std::string id, double value) {
     this->tasks[id] = value;
 }
 
-double ControllerNode::getTaskValue(std::string &id) {
+double ControllerNode::getTaskValue(std::string id) {
     return this->tasks[id];
+}
+
+bool ControllerNode::isCost(std::string id) {
+    return id[0] == ('W');
 }
 
 ControllerNode::~ControllerNode() {}
@@ -166,28 +170,13 @@ void ControllerNode::setUp() {
 
         std::vector<std::shared_ptr<bsn::goalmodel::LeafTask>> leafTasks = goalModel.getLeafTasks();
 
-        //set initial conditions
-        //cost expr
-        for(std::vector<std::shared_ptr<bsn::goalmodel::LeafTask>>::iterator it = leafTasks.begin();
-                it != leafTasks.end(); it++) {
-            tasks[(*it)->getReliability().getID()] = (*it)->getReliability().getValue();
-            tasks[(*it)->getFrequency().getID()] = (*it)->getFrequency().getValue();
-            tasks[(*it)->getCost().getID()] = (*it)->getCost().getValue();
-        }        
-
-        for(std::map<std::string, double>::const_iterator it = tasks.begin();
-                it != tasks.end(); it++) {
-            props.push_back(it->first);
-            values.push_back(it->second);
-        }
-
-        cost_expression.apply(props, values);
+        //set initial conditions: order should be respected
 
         //reli expr
         for(std::vector<std::shared_ptr<bsn::goalmodel::LeafTask>>::iterator it = leafTasks.begin();
                 it != leafTasks.end(); it++) {
-            tasks[(*it)->getReliability().getID()] = (*it)->getReliability().getValue();
-            tasks[(*it)->getFrequency().getID()] = (*it)->getFrequency().getValue();
+            setTaskValue((*it)->getReliability().getID(), (*it)->getReliability().getValue());
+            setTaskValue((*it)->getFrequency().getID(), (*it)->getFrequency().getValue());
         }
 
         for(std::map<std::string, double>::const_iterator it = tasks.begin();
@@ -197,6 +186,25 @@ void ControllerNode::setUp() {
         }
 
         reliability_expression.apply(props, values);
+
+        //cost expr
+        for(std::vector<std::shared_ptr<bsn::goalmodel::LeafTask>>::iterator it = leafTasks.begin();
+                it != leafTasks.end(); it++) {
+            setTaskValue((*it)->getCost().getID(), (*it)->getCost().getValue());
+        }        
+
+        // Checks if given variable is a cost in order to avoid adding extras and
+        // unnecessarily clearing the vector
+
+        for(std::map<std::string, double>::const_iterator it = tasks.begin();
+                it != tasks.end(); it++) {
+            if(isCost(it->first)) {
+                props.push_back(it->first);
+                values.push_back(it->second);
+            }
+        }
+
+        cost_expression.apply(props, values);
 
         /*for (Node task : tasks){
             //LeafTask leafTask = LeafTask(task);
@@ -327,6 +335,8 @@ void ControllerNode::receiveContextInfo(const bsn::ContextInfo::ConstPtr& msg) {
 */ 
 void ControllerNode::analyze() {
     
+    // Should consider refactoring apply method later...
+
     //expression.apply
     
     /*double reliability;

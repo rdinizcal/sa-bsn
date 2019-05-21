@@ -34,8 +34,10 @@ class ControllerNode {
   	public:
       	void setUp();
 
-		void setTaskValue(std::string &, double);
-		double getTaskValue(std::string &);
+		void setTaskValue(std::string, double);
+		double getTaskValue(std::string);
+
+		bool isCost(std::string);
 
     	ControllerNode(int &argc, char **argv, std::string name);
     	virtual ~ControllerNode();
