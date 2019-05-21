@@ -28,7 +28,7 @@ TEST_F(NodeTest, AddChild) {
     Node parentNode("G3_T1", "Read");
     Node childNode("G3_T1.4", "Read ABP");
 
-    parentNode.addChild(std::shared_ptr<Node>(&childNode));
+    parentNode.addChild(std::make_shared<Node>(childNode));
 
     ASSERT_EQ(parentNode.getChildren().size(), 1);
     EXPECT_TRUE(*(parentNode.getChild("G3_T1.4")) == childNode);
@@ -39,7 +39,7 @@ TEST_F(NodeTest, RemoveChild) {
 
     Node parentNode("G3_T1", "Read");
     Node childNode("G3_T1.4", "Read ABP");
-    parentNode.addChild(std::shared_ptr<Node>(&childNode));
+    parentNode.addChild(std::make_shared<Node>(childNode));
 
     parentNode.removeChild("G3_T1.4");
 
@@ -50,7 +50,7 @@ TEST_F(NodeTest, RemoveChildNotFound) {
 
     Node parentNode("G3_T1", "Read");
     Node childNode("G3_T1.4", "Read ABP");
-    parentNode.addChild(std::shared_ptr<Node>(&childNode));
+    parentNode.addChild(std::make_shared<Node>(childNode));
 
     try {
         parentNode.removeChild("XXX");
@@ -65,7 +65,7 @@ TEST_F(NodeTest, GetChild) {
 
     Node parentNode("G3_T1", "Read");
     Node childNode("G3_T1.4", "Read ABP");
-    parentNode.addChild(std::shared_ptr<Node>(&childNode));
+    parentNode.addChild(std::make_shared<Node>(childNode));
 
     std::shared_ptr<Node> returnedNode = parentNode.getChild("G3_T1.4");
 
@@ -76,7 +76,7 @@ TEST_F(NodeTest, GetChildNotFound) {
 
     Node parentNode("G3_T1", "Read");
     Node childNode("G3_T1.4", "Read ABP");
-    parentNode.addChild(std::shared_ptr<Node>(&childNode));
+    parentNode.addChild(std::make_shared<Node>(childNode));
 
     try {
         std::shared_ptr<Node> returnedNode = parentNode.getChild("XXX");
@@ -93,8 +93,8 @@ TEST_F(NodeTest, AddChildWChild) {
     Node childNode("G3_T1.4", "Read ABP");
     Node grandchildNode("G3_T1.41", "Read Dyastolic");
 
-    childNode.addChild(std::shared_ptr<Node>(&grandchildNode));
-    parentNode.addChild(std::shared_ptr<Node>(&childNode));
+    childNode.addChild(std::make_shared<Node>(grandchildNode));
+    parentNode.addChild(std::make_shared<Node>(childNode));
 
     ASSERT_EQ(parentNode.getChildren().size(), 1);
     EXPECT_TRUE(*(parentNode.getChild("G3_T1.4"))==childNode);
@@ -112,10 +112,10 @@ TEST_F(NodeTest, AddChildWChildrenWChild) {
     Node grandchildNode("Boy GrandChild", "Read Dyastolic 1");
     Node greatgrandchildNode("Boy GreatGrandChild", "Read Dyastolic 1.7");
 
-    grandchildNode.addChild(std::shared_ptr<Node>(&greatgrandchildNode));
-    boyChildNode.addChild(std::shared_ptr<Node>(&grandchildNode));
-    parentNode.addChild(std::shared_ptr<Node>(&girlChildNode));    
-    parentNode.addChild(std::shared_ptr<Node>(&boyChildNode));
+    grandchildNode.addChild(std::make_shared<Node>(greatgrandchildNode));
+    boyChildNode.addChild(std::make_shared<Node>(grandchildNode));
+    parentNode.addChild(std::make_shared<Node>(girlChildNode));    
+    parentNode.addChild(std::make_shared<Node>(boyChildNode));
 
     ASSERT_EQ(parentNode.getChildren().size(), 2);
     EXPECT_TRUE(*(parentNode.getChild("Boy Child"))==boyChildNode);

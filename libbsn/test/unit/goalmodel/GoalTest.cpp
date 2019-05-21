@@ -30,8 +30,11 @@ TEST_F(GoalTest, AddChild) {
 
     Goal parentGoal("G3_T1", "Read");
     Goal childGoal("G3_T1.4", "Read ABP");
+    
+    //childGoal->setID("G3_T1.4");
+    //childGoal->setDescription("Read ABP");
 
-    parentGoal.addChild(std::shared_ptr<Goal>(&childGoal));
+    parentGoal.addChild(std::make_shared<Goal>(childGoal));
 
     ASSERT_EQ(parentGoal.getChildren().size(), 1);
     EXPECT_TRUE(*(parentGoal.getChildren().at(0))==childGoal);
@@ -42,7 +45,7 @@ TEST_F(GoalTest, RemoveChild) {
 
     Goal parentGoal("G3_T1", "Read");
     Goal childGoal("G3_T1.4", "Read ABP");
-    parentGoal.addChild(std::shared_ptr<Goal>(&childGoal));
+    parentGoal.addChild(std::make_shared<Goal>(childGoal));
 
     parentGoal.removeChild("G3_T1.4");
 
@@ -53,7 +56,7 @@ TEST_F(GoalTest, RemoveChildNotFound) {
 
     Goal parentGoal("G3_T1", "Read");
     Goal childGoal("G3_T1.4", "Read ABP");
-    parentGoal.addChild(std::shared_ptr<Goal>(&childGoal));
+    parentGoal.addChild(std::make_shared<Goal>(childGoal));
 
     try {
         parentGoal.removeChild("XXX");
@@ -68,7 +71,7 @@ TEST_F(GoalTest, GetChild) {
 
     Goal parentGoal("G3_T1", "Read");
     Goal childGoal("G3_T1.4", "Read ABP");
-    parentGoal.addChild(std::shared_ptr<Goal>(&childGoal));
+    parentGoal.addChild(std::make_shared<Goal>(childGoal));
 
     std::shared_ptr<Node> returnedGoal = parentGoal.getChild("G3_T1.4");
 
@@ -79,7 +82,7 @@ TEST_F(GoalTest, GetChildNotFound) {
 
     Goal parentGoal("G3_T1", "Read");
     Goal childGoal("G3_T1.4", "Read ABP");
-    parentGoal.addChild(std::shared_ptr<Goal>(&childGoal));
+    parentGoal.addChild(std::make_shared<Goal>(childGoal));
 
     try {
         std::shared_ptr<Node> returnedGoal = parentGoal.getChild("XXX");
