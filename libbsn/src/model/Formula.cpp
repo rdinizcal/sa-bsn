@@ -3,11 +3,25 @@
 namespace bsn {
     namespace model {
         
-        Formula::Formula(const std::string& text) {
+        Formula::Formula(): expression() {};
+        Formula::Formula(const std::string& text) :expression() {
             expression = Lepton::Parser::parse(text).createCompiledExpression();
         }
 
         Formula::~Formula() {};
+
+        Formula& Formula::operator=(const Formula &obj) {
+            expression = obj.getExpression();
+            return (*this);
+        }
+
+        Lepton::CompiledExpression Formula::getExpression() const {
+            return this->expression;    
+        }
+
+        void Formula::setExpression(const Lepton::CompiledExpression &newExpression) {
+            this->expression = newExpression;
+        }
 
         double Formula::apply(const std::vector<std::string> parameters, const std::vector<double> values) {
             if (parameters.size() != values.size()) throw std::length_error("ERROR: Parameters and values size do not correspond to each other.");

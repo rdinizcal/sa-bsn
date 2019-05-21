@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 #include <fstream>
+#include <map>
 
 #include "ros/ros.h"
 
@@ -18,6 +19,8 @@
 #include "lepton/Lepton.h"
 
 #include "FormulaRefs.hpp"
+#include "model/Formula.hpp"
+
 
 #include "bsn/TaskInfo.h"
 #include "bsn/ContextInfo.h"
@@ -45,12 +48,12 @@ class ControllerNode {
 
   	private:
 
-	std::vector<std::shared_ptr<bsn::goalmodel::LeafTask>> tasks;
+	std::map<std::string, double> tasks;
 	std::map<std::string, bsn::goalmodel::Context> contexts;
 
-	Lepton::CompiledExpression cost_expression;
-	Lepton::CompiledExpression reliability_expression;
-
+	bsn::model::Formula cost_expression;
+	bsn::model::Formula reliability_expression;
+/* 
 	std::map<std::string,double&> cost_formula_reliabilities;
 	std::map<std::string,double&> cost_formula_frequencies;
 	std::map<std::string,double&> cost_formula_costs;
@@ -64,6 +67,7 @@ class ControllerNode {
 
 	double cost_setpoint;
 	double reliability_setpoint;
+ */
 };
 
 #endif 
