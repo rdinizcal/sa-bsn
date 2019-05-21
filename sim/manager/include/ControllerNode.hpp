@@ -31,8 +31,11 @@ class ControllerNode {
       	ControllerNode(const ControllerNode &);
     	ControllerNode &operator=(const ControllerNode &);
 
-  public:
+  	public:
       	void setUp();
+
+		void setTaskValue(std::string &, double);
+		double getTaskValue(std::string &);
 
     	ControllerNode(int &argc, char **argv, std::string name);
     	virtual ~ControllerNode();

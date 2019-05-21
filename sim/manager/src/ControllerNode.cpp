@@ -39,6 +39,14 @@ ControllerNode::ControllerNode(int  &argc, char **argv, std::string name):
     ros::init(argc, argv, name);
 }
 
+void ControllerNode::setTaskValue(std::string &id, double value) {
+    this->tasks[id] = value;
+}
+
+double ControllerNode::getTaskValue(std::string &id) {
+    return this->tasks[id];
+}
+
 ControllerNode::~ControllerNode() {}
 
 void ControllerNode::setUp() {
@@ -153,9 +161,6 @@ void ControllerNode::setUp() {
             reliability_file.close();
         } catch (std::ifstream::failure e) { std::cerr << "Exception opening/reading/closing file (reliability.formula)\n"; }
     
-/*         cost_expression = Lepton::Parser::parse(cost_formula).createCompiledExpression();
-        reliability_expression = Lepton::Parser::parse(reliability_formula).createCompiledExpression();
- */     
         cost_expression = bsn::model::Formula(cost_formula);
         reliability_expression = bsn::model::Formula(reliability_formula);
 
@@ -287,11 +292,18 @@ void ControllerNode::receiveTaskInfo(const bsn::TaskInfo::ConstPtr& msg) {
     ROS_INFO("I heard: [%s]", msg->task_id.c_str());
 
     std::string id = msg->task_id;
+    std::string costID = "W_" + id;
+    std::string reliabilityID = "R_" + id;
+    std::string frequencyID = "F_" + id;
 
-    //tasks[id].setCost(msg->cost);
-    //tasks[id].setReliability(msg->reliability);
-    //tasks[id].setFrequency(msg->frequency);
-
+    setTaskValue(costID, msg->cost);
+    setTaskValue(reliabilityID, msg->reliability);
+    setTaskValue(frequencyID, msg->frequency);
+/*
+    tasks[id].setCost(msg->cost);
+    tasks[id].setReliability(msg->reliability);
+    tasks[id].setFrequency(msg->frequency);
+*/
     analyze();
 }
 
