@@ -11,7 +11,7 @@
 #include "goalmodel/Goal.hpp"
 #include "goalmodel/Task.hpp"
 #include "goalmodel/LeafTask.hpp"
-
+ 
 namespace bsn {
     namespace goalmodel {
 
@@ -40,7 +40,7 @@ namespace bsn {
                 
                 int getSize() const;
 
-                std::vector<LeafTask> getLeafTasks() const;
+                std::vector<std::shared_ptr<LeafTask>> getLeafTasks() const;
 
             private:
                 std::string actor;

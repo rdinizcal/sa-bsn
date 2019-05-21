@@ -14,7 +14,7 @@ namespace bsn {
             public:
                 Node(const std::string &/*id*/, const std::string &/*description*/);
                 Node();
-                ~Node();
+                virtual ~Node();
 
                 Node(const Node &);
                 Node &operator=(const Node &);

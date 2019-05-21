@@ -73,21 +73,16 @@ namespace bsn {
             return this->getNodes().size();
         }
 
-        std::vector<LeafTask> GoalTree::getLeafTasks() const {
+        std::vector<std::shared_ptr<LeafTask>> GoalTree::getLeafTasks() const {
             std::shared_ptr<Node> temp;
-            std::vector<LeafTask> leafTasks;
+            std::vector<std::shared_ptr<LeafTask>> leafTasks;
 
-            /*   */
-
-            // for(std::vector<Node>::iterator it = tempNodes.begin();
-            //         it != tempNodes.end(); it++)
-            // {
-            //     leafTasks.push_back(static_cast<LeafTask>((*it)));    
-            // }
-
-            // for(const Node& n : tempNodes) {
-            //     leafTasks.push_back(dynamic_cast<LeafTask*>(n));
-            // }
+             for(std::map<std::string, std::shared_ptr<Node>>::const_iterator it = nodes.begin();
+                     it != nodes.end(); it++)
+             {
+                if(!(it->second->hasChildren()))
+                    leafTasks.push_back(std::dynamic_pointer_cast<LeafTask>(it->second));    
+             }
 
             return leafTasks;
         }

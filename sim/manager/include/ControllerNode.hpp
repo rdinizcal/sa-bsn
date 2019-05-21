@@ -45,7 +45,7 @@ class ControllerNode {
 
   	private:
 
-	std::vector<bsn::goalmodel::LeafTask> tasks;
+	std::vector<std::shared_ptr<bsn::goalmodel::LeafTask>> tasks;
 	std::map<std::string, bsn::goalmodel::Context> contexts;
 
 	Lepton::CompiledExpression cost_expression;
