@@ -45,9 +45,9 @@ class ControllerNode {
 		void receiveTaskInfo(const bsn::TaskInfo::ConstPtr& /*msg*/);
 		void receiveContextInfo(const bsn::ContextInfo::ConstPtr& /*msg*/);
 
-    	void analyze();
-    	void plan();
-    	void execute();
+    	void analyze(std::string);
+    	void plan(std::string);
+    	void execute(std::string);
 
 		void run();
 
@@ -59,6 +59,11 @@ class ControllerNode {
 	// May be redundant... should try to refactor it later
 	std::vector<std::string> props;
 	std::vector<double> values;
+
+	double reli_value;
+	double cost_value;
+	double reli_error;
+	double cost_error;
 
 	bsn::model::Formula cost_expression;
 	bsn::model::Formula reliability_expression;

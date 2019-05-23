@@ -1,4 +1,5 @@
 #include "ControllerNode.hpp"
+#include "operation/Operation.hpp"
 
 #include <memory>
 #include <map>
@@ -182,7 +183,7 @@ void ControllerNode::setUp() {
             values.push_back(it->second);
         }
 
-        reliability_expression.apply(props, values);
+        this->reli_value = reliability_expression.apply(props, values);
 
         //cost expr
         for(std::vector<std::shared_ptr<bsn::goalmodel::LeafTask>>::iterator it = leafTasks.begin();
@@ -201,7 +202,7 @@ void ControllerNode::setUp() {
             }
         }
 
-        cost_expression.apply(props, values);
+        this->cost_value = cost_expression.apply(props, values);
 
         /*for (Node task : tasks){
             //LeafTask leafTask = LeafTask(task);
@@ -297,6 +298,7 @@ void ControllerNode::receiveTaskInfo(const bsn::TaskInfo::ConstPtr& msg) {
     ROS_INFO("I heard: [%s]", msg->task_id.c_str());
 
     std::string id = msg->task_id;
+    std::replace(id.begin(), id.end(), '.', '_');
     std::string costID = "W_" + id;
     std::string reliabilityID = "R_" + id;
     std::string frequencyID = "F_" + id;
@@ -305,7 +307,7 @@ void ControllerNode::receiveTaskInfo(const bsn::TaskInfo::ConstPtr& msg) {
     setTaskValue(reliabilityID, msg->reliability);
     setTaskValue(frequencyID, msg->frequency);
     
-    analyze();
+    analyze(id);
 }
 
 void ControllerNode::receiveContextInfo(const bsn::ContextInfo::ConstPtr& msg) {
@@ -315,7 +317,7 @@ void ControllerNode::receiveContextInfo(const bsn::ContextInfo::ConstPtr& msg) {
 
     //contexts[id].setValue(msg->status.data);
 
-    analyze();
+//    analyze();
 }
 
 /** **************************************************************
@@ -326,9 +328,12 @@ void ControllerNode::receiveContextInfo(const bsn::ContextInfo::ConstPtr& msg) {
  *      -compare current values with tresholds
  * ***************************************************************
 */ 
-void ControllerNode::analyze() {
+void ControllerNode::analyze(std::string id) {
     
     // Should consider refactoring apply method later...
+
+    double reli_current;
+    double cost_current;
 
     props.clear();
     values.clear();
@@ -341,7 +346,7 @@ void ControllerNode::analyze() {
             values.push_back(it->second);
     }
 
-    reliability_expression.apply(props, values);
+    reli_current = reliability_expression.apply(props, values);
     
     
     for(std::map<std::string, double>::const_iterator it = tasks.begin();
@@ -352,8 +357,13 @@ void ControllerNode::analyze() {
             }
     }
     
-    cost_expression.apply(props, values);
+    cost_current = cost_expression.apply(props, values);
     
+    this->reli_error = this->reli_value - reli_current;
+    this->cost_error = this->cost_value - cost_current; 
+
+    plan(id);
+
     /*double reliability;
     double cost;
 
@@ -412,67 +422,27 @@ void ControllerNode::analyze() {
  * exhaustively analyze whether an action fits the setpoints
  * ***************************************************************
 */
-void ControllerNode::plan() {
-    /*std::map<std::vector<double>, std::vector<double>> policies;
-    double cost;
-    double reliability;
+void ControllerNode::plan(std::string id) {
+    double action;
 
-    for (std::vector<double> action : actions ) { // substitutues each action the formulas and calculates cost and reliability
-        { // in cost formula
-            for (std::pair<std::string,double&> cost_formula_frequency : cost_formula_frequencies) {
-
-                if (cost_formula_frequency.first.find("G3_T1.1") != std::string::npos) {
-                    cost_formula_frequency.second = action[0];
-                } else if (cost_formula_frequency.first.find("G3_T1.2") != std::string::npos) {
-                    cost_formula_frequency.second = action[1];
-                } else if (cost_formula_frequency.first.find("G3_T1.3") != std::string::npos) {
-                    cost_formula_frequency.second = action[2];
-                } else if (cost_formula_frequency.first.find("G3_T1.4") != std::string::npos) {
-                    cost_formula_frequency.second = action[3];
-                } else if (cost_formula_frequency.first.find("G4_T1") != std::string::npos) {
-                    cost_formula_frequency.second = action[0];
-                }
-                
-            }
-
-            cost = cost_expression.evaluate();
+    if (this->reli_error > 0) {
+        if(this->reli_error < 0.05) {
+            action = 0.01;
+        } else if (this->reli_error < 0.1){
+            action = 0.05;
+        } else {
+            action = 0.1;
         }
-
-        { // in reliability formula
-            for (std::pair<std::string,double&> reliability_formula_frequency : reliability_formula_frequencies) {
-                if (reliability_formula_frequency.first.find("G3_T1.1") != std::string::npos) {
-                    reliability_formula_frequency.second = action[0];
-                } else if (reliability_formula_frequency.first.find("G3_T1.2") != std::string::npos) {
-                    reliability_formula_frequency.second = action[1];
-                } else if (reliability_formula_frequency.first.find("G3_T1.3") != std::string::npos) {
-                    reliability_formula_frequency.second = action[2];
-                } else if (reliability_formula_frequency.first.find("G3_T1.4") != std::string::npos) {
-                    reliability_formula_frequency.second = action[3];
-                } else  if (reliability_formula_frequency.first.find("G4_T1") != std::string::npos) {
-                    reliability_formula_frequency.second = action[0];
-                }
-            }
-
-            reliability = reliability_expression.evaluate();
+    } else {
+        if(this->reli_error < -0.05) {
+            action = -0.01;
+        } else if (this->reli_error < -0.1){
+            action = -0.05;
+        } else {
+            action = -0.1;
         }
-        
-        policies[action] = {reliability,cost};
     }
-
-    for (std::pair<std::vector<double>,std::vector<double>> policy : policies) {
-
-        std::cout << "[" << policy.first[0] /*<< "," << policy.first[1] << "," << policy.first[2] << "," << policy.first[3] << ", " << policy.first[4] << << "] ";
-        std::cout << "--> reliability: " << policy.second[0] << " cost: " << policy.second[1] << std::endl;
-
-        if(policy.second[0] >= reliability_setpoint*0.98 && policy.second[0] <= reliability_setpoint*1.05 &&
-            policy.second[1] >= cost_setpoint*0.98 && policy.second[1] <= cost_setpoint*1.05 ) {
-            std::cout << "Adaptation triggered!" << std::endl;
-            
-            execute();
-
-            break;
-        }
-    }*/
+    execute(id);
 }
 
 /** **************************************************************
@@ -481,33 +451,33 @@ void ControllerNode::plan() {
  * if so, send messages containing the actions to the modules
  * ***************************************************************
 */
-void ControllerNode::execute() {
-    
-    /**
-     * NodeHandle is the main access point to communications with the ROS system.
-     * The first NodeHandle constructed will fully initialize this node, and the last
-     * NodeHandle destructed will close down the node.
-     */
-    //ros::NodeHandle publisher_handler;
+void ControllerNode::execute(std::string id) {
 
-    /**
-     * The advertise() function is how you tell ROS that you want to
-     * publish on a given topic name. This invokes a call to the ROS
-     * master node, which keeps a registry of who is publishing and who
-     * is subscribing. After this advertise() call is made, the master
-     * node will notify anyone who is trying to subscribe to this topic name,
-     * and they will in turn negotiate a peer-to-peer connection with this
-     * node.  advertise() returns a Publisher object which allows you to
-     * publish messages on that topic through a call to publish().  Once
-     * all copies of the returned Publisher object are destroyed, the topic
-     * will be automatically unadvertised.
-     *
-     * The second parameter to advertise() is the size of the message queue
-     * used for publishing messages.  If messages are published more quickly
-     * than we can send them, the number here specifies how many messages to
-     * buffer up before throwing some away.
-     */
-	//ros::Publisher actuator_pub = publisher_handler.advertise<bsn::String>("manager_actuator", 1000);
+    bsn::operation::Operation op = bsn::operation::Operation();
+
+    int sensor_id = stoi((op.split(id, '.'))[0]);
+    std::string current_sensor;
+
+    switch(sensor_id) {
+        case 1:
+            current_sensor = "oximeter";
+            break;
+        case 2:
+            current_sensor = "ecg";
+            break;
+        case 3:
+            current_sensor = "thermometer";
+            break;
+        case 4:
+            current_sensor = "abp";
+            break;
+        case 5: 
+            current_sensor = "acc";
+            break;
+    }
+
+    ros::NodeHandle publisher_handler;
+//	ros::Publisher actuator_pub = publisher_handler.advertise<bsn::Sensor>("controller_command", 1000);
 }
 
 void ControllerNode::run(){
