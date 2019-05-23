@@ -16,6 +16,9 @@
 #include "configuration/SensorConfiguration.hpp"
 
 #include "bsn/SensorData.h"
+#include "bsn/TaskInfo.h"
+#include "bsn/ContextInfo.h"
+#include "bsn/ControlCommand.h"
 
 class ThermometerModule {
     
@@ -39,6 +42,8 @@ class ThermometerModule {
     	void run();
 
   	private:
+	  	void receiveControlCommand(const bsn::ControlCommand::ConstPtr& msg);
+		
 		std::string type;
 		bsn::resource::Battery battery;
 		bool available;
@@ -47,7 +52,7 @@ class ThermometerModule {
 		double comm_accuracy;
 
 		bool active;
-		std::map<std::string,double> params;
+		std::map<std::string, double> params;
 
 		bsn::generator::Markov markov;
 		bsn::filters::MovingAverage filter;
@@ -56,6 +61,8 @@ class ThermometerModule {
 		int persist;
 		std::string path;
 		std::ofstream fp;
+
+		ros::Publisher taskPub, contextPub, dataPub;
 };
 
 #endif 

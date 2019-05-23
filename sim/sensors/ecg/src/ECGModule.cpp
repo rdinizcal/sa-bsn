@@ -7,23 +7,21 @@ using namespace bsn::configuration;
 
 ECGModule::ECGModule(const int32_t &argc, char **argv) :
     type("ecg"),
-    battery("ecg_batt",100,100,1),
+    battery("ecg_batt", 100, 100, 1),
     available(true),
     data_accuracy(1),
     comm_accuracy(1),
     active(true),
     params({{"freq",0.9},{"m_avg",5}}),
-    markov(),
     filter(5),
     sensorConfig(),
     persist(1),
-    path("ecg_output.csv"),
-    fp() {}
+    path("ecg_output.csv") {}
 
 ECGModule::~ECGModule() {}
 
 void ECGModule::setUp() {
-    ros::NodeHandle configHandler;
+    ros::NodeHandle configHandler, n;
     srand(time(NULL));
         
     Operation op;
@@ -115,6 +113,9 @@ void ECGModule::setUp() {
             fp << "ID,DATA,RISK,TIME_MS" << std::endl;
         }
     }
+
+    taskPub =  n.advertise<bsn::TaskInfo>("task_info", 10);
+    contextPub =  n.advertise<bsn::ContextInfo>("context_info", 10);
 }
 
 void ECGModule::tearDown() {
@@ -123,77 +124,58 @@ void ECGModule::tearDown() {
 }
 
 void ECGModule::sendTaskInfo(const std::string &task_id, const double &cost, const double &reliability, const double &frequency) {
-    // TaskInfo task(task_id, cost, reliability, frequency);
-    // Container taskContainer(task);
-    // getConference().send(taskContainer);
+    bsn::TaskInfo msg;
+
+    msg.task_id = task_id;
+    msg.cost = cost;
+    msg.reliability = reliability;
+    msg.frequency = frequency;
+    taskPub.publish(msg);
 }
 
-void ECGModule::sendContextInfo(const std::string &context_id, const bool &value) {
-    // ContextInfo context(context_id, value, 0, 0, "");
-    // Container contextContainer(context);
-    // getConference().send(contextContainer);
+void ECGModule::sendContextInfo(const std::string &context_id, const bool &status) {
+    bsn::ContextInfo msg;
+
+    msg.context_id = context_id;
+    msg.status = status;
+    contextPub.publish(msg);
 }
 
-void ECGModule::sendMonitorTaskInfo(const std::string &task_id, const double &cost, const double &reliability, const double &frequency) {
-    // MonitorTaskInfo task(task_id, cost, reliability, frequency);
-    // Container taskContainer(task);
-    // getConference().send(taskContainer);
-}
-
-void ECGModule::sendMonitorContextInfo(const std::string &context_id, const bool &value) {
-    // MonitorContextInfo context(context_id, value, 0, 0, "");
-    // Container contextContainer(context);
-    // getConference().send(contextContainer);
+void ECGModule::receiveControlCommand(const bsn::ControlCommand::ConstPtr& msg)  {
+    active = msg->active;
+    params["freq"] = msg->frequency;
 }
 
 void ECGModule::run() {
-        // Container container;
     double data;
     double risk;
     bool first_exec = true;
     uint32_t id = 0;
 
     bsn::SensorData msg;
+    msg.type = "ecg";
+
     ros::NodeHandle n;
 
-    ros::Publisher sensor_pub = n.advertise<bsn::SensorData>("ecg_data", 10);
+    dataPub = n.advertise<bsn::SensorData>("ecg_data", 10);
+    ros::Subscriber ecgSub = n.subscribe("ecg_control_command", 10, &ECGModule::receiveControlCommand, this);
 
-    ros::Rate loop_rate(1);
+    ros::Rate loop_rate(params["freq"]);
+
+    sendContextInfo("ECG_available",true);    
 
     while (ros::ok()) {
-        
-        // if(first_exec){ // Send context info warning controller that this sensor is available  
-        //     sendContextInfo("ECG_available",true);
-        //     sendMonitorContextInfo("ECG_available",true);
-        //     first_exec = false; 
-        // }
-        
-        { // update controller with task info 
-        /*           
+        { // update controller with task info            
             sendContextInfo("ECG_available",true);
             sendTaskInfo("G3_T1.31",0.1,data_accuracy,params["freq"]);
             sendTaskInfo("G3_T1.32",0.1*params["m_avg"],1,params["freq"]);
             sendTaskInfo("G3_T1.33",0.1,comm_accuracy,params["freq"]);
-          // and the monitor..
-            sendMonitorContextInfo("ECG_available",true);
-            sendMonitorTaskInfo("G3_T1.31",0.1,data_accuracy,params["freq"]);
-            sendMonitorTaskInfo("G3_T1.32",0.1*params["m_avg"],1,params["freq"]);
-            sendMonitorTaskInfo("G3_T1.33",0.1,comm_accuracy,params["freq"]);
-        */
-        //     sendContextInfo("ECG_available",true);
-        //     sendTaskInfo("G3_T1.31",0.076,1,1);
-        //     sendTaskInfo("G3_T1.32",0.076*params["m_avg"],1,1);
-        //     sendTaskInfo("G3_T1.33",0.076,1,1);
-        //   // and the monitor..
-        //     sendMonitorContextInfo("ECG_available",true);
-        //     sendMonitorTaskInfo("G3_T1.31",0.076,1,1);
-        //     sendMonitorTaskInfo("G3_T1.32",0.076*params["m_avg"],1,1);
-        //     sendMonitorTaskInfo("G3_T1.33",0.076,1,1);
         }
 
-        /*{ // recharge routine
+        { // recharge routine
             //for debugging
-            cout << "Battery level: " << battery.getCurrentLevel() << "%" << endl;
+            std::cout << "Battery level: " << battery.getCurrentLevel() << "%" << std::endl;
+          
             if(!active && battery.getCurrentLevel() > 90){
                 active = true;
             }
@@ -205,27 +187,14 @@ void ECGModule::run() {
                     bool x_active = (rand()%2==0)?active:!active;
                     sendContextInfo("ECG_available", x_active);
             }
-            //sendContextInfo("ECG_available", active);
-            sendMonitorContextInfo("ECG_available",active);
+            sendContextInfo("ECG_available", active);
+        }
 
-        }*/
-
-        /*
-         * Receive control command and module update
-         */
-        // while(!buffer.isEmpty()){
-        //     container = buffer.leave();
-
-        //     active = container.getData<ThermometerControlCommand>().getActive();
-        //     params["freq"] = container.getData<ThermometerControlCommand>().getFrequency();
-        // }
-
-        /*if(!active){ 
+        if(!active){ 
             if(battery.getCurrentLevel() <= 100) battery.generate(2.5);
             continue; 
-        }*/
+        }
 
-        msg.type = "ecg";
         /*
          * Module execution
          */
@@ -265,7 +234,7 @@ void ECGModule::run() {
                 msg.risk = risk;
 
                 if ((rand() % 100) <= comm_accuracy * 100)
-                    sensor_pub.publish(msg);
+                    dataPub.publish(msg);
 
                 battery.consume(0.1);
 

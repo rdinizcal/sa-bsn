@@ -30,6 +30,7 @@ ADD_MESSAGE_FILES(
   info/ContextInfo.msg
   info/TaskInfo.msg
   data/SensorData.msg
+  command/ControlCommand.msg
 )
 
 GENERATE_MESSAGES(

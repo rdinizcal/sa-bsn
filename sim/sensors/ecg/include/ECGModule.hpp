@@ -16,6 +16,9 @@
 #include "configuration/SensorConfiguration.hpp"
 
 #include "bsn/SensorData.h"
+#include "bsn/TaskInfo.h"
+#include "bsn/ContextInfo.h"
+#include "bsn/ControlCommand.h"
 
 class ECGModule {
     
@@ -40,6 +43,8 @@ class ECGModule {
     	void run();
 
   	private:
+		void receiveControlCommand(const bsn::ControlCommand::ConstPtr& msg);
+
 		std::string type;
 		bsn::resource::Battery battery;
 		bool available;
@@ -58,6 +63,8 @@ class ECGModule {
 		int persist;
 		std::string path;
 		std::ofstream fp;
+
+		ros::Publisher taskPub, contextPub, dataPub;
 };
 
 #endif 
