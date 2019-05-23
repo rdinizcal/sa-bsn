@@ -298,6 +298,7 @@ void ControllerNode::receiveTaskInfo(const bsn::TaskInfo::ConstPtr& msg) {
     ROS_INFO("I heard: [%s]", msg->task_id.c_str());
 
     std::string id = msg->task_id;
+    std::string id_aux = id;
     std::replace(id.begin(), id.end(), '.', '_');
     std::string costID = "W_" + id;
     std::string reliabilityID = "R_" + id;
@@ -307,7 +308,7 @@ void ControllerNode::receiveTaskInfo(const bsn::TaskInfo::ConstPtr& msg) {
     setTaskValue(reliabilityID, msg->reliability);
     setTaskValue(frequencyID, msg->frequency);
     
-    analyze(id);
+    analyze(id_aux);
 }
 
 void ControllerNode::receiveContextInfo(const bsn::ContextInfo::ConstPtr& msg) {
@@ -442,7 +443,7 @@ void ControllerNode::plan(std::string id) {
             action = -0.1;
         }
     }
-    execute(id);
+    execute(id, action);
 }
 
 /** **************************************************************
@@ -451,7 +452,7 @@ void ControllerNode::plan(std::string id) {
  * if so, send messages containing the actions to the modules
  * ***************************************************************
 */
-void ControllerNode::execute(std::string id) {
+void ControllerNode::execute(std::string id, double action) {
 
     bsn::operation::Operation op = bsn::operation::Operation();
 
@@ -477,7 +478,19 @@ void ControllerNode::execute(std::string id) {
     }
 
     ros::NodeHandle publisher_handler;
-//	ros::Publisher actuator_pub = publisher_handler.advertise<bsn::Sensor>("controller_command", 1000);
+	ros::Publisher actuator_pub = publisher_handler.advertise<bsn::ControlCommand>("controller_command", 1000);
+
+    bsn::ControlCommand msg;
+
+//    while(ros::ok()) {
+//        cc.active = 
+    msg.active = true;
+    msg.frequency = action;
+
+    actuator_pub.publish(&msg);
+
+//    }
+
 }
 
 void ControllerNode::run(){

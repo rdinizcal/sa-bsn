@@ -47,7 +47,7 @@ class ControllerNode {
 
     	void analyze(std::string);
     	void plan(std::string);
-    	void execute(std::string);
+    	void execute(std::string, double);
 
 		void run();
 
