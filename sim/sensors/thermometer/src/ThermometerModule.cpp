@@ -9,25 +9,24 @@ using namespace bsn::configuration;
 
 ThermometerModule::ThermometerModule(const int32_t &argc, char **argv/*, std::string name*/) :
     type("thermometer"),
-    battery("therm_batt",100,100,1),
+    battery("therm_batt", 100, 100, 1),
     available(true),
     data_accuracy(1),
     comm_accuracy(1),
     active(true),
-    params({{"freq",0.9},{"m_avg",5}}),
-    markov(),
+    params({{"freq",0.9}, {"m_avg",5}}),
     filter(5),
     sensorConfig(),
     persist(1),
-    path("thermometer_output.csv"),
-    fp() {}
+    path("thermometer_output.csv") {}
 
 ThermometerModule::~ThermometerModule() {}
 
 void ThermometerModule::setUp() {
-    ros::NodeHandle configHandler;
+    ros::NodeHandle configHandler, n;
     srand(time(NULL));
-    Operation op;    
+        
+    Operation op;
     
     std::vector<std::string> t_probs;
     std::array<float, 25> transitions;
@@ -53,7 +52,7 @@ void ThermometerModule::setUp() {
         lrs = op.split(s, ',');
         configHandler.getParam("MidRisk0", s);
         mrs0 = op.split(s, ',');
-        configHandler.getParam("HighRisk0", s);
+        configHandler.getParam("MidRisk0", s);
         hrs0 = op.split(s, ',');
         configHandler.getParam("MidRisk1", s);
         mrs1 = op.split(s, ',');
@@ -117,6 +116,8 @@ void ThermometerModule::setUp() {
         }
     }
 
+    taskPub =  n.advertise<bsn::TaskInfo>("task_info", 10);
+    contextPub =  n.advertise<bsn::ContextInfo>("context_info", 10);
 }
 
 void ThermometerModule::tearDown() {
@@ -125,27 +126,26 @@ void ThermometerModule::tearDown() {
 }
 
 void ThermometerModule::sendTaskInfo(const std::string &task_id, const double &cost, const double &reliability, const double &frequency) {
-    // TaskInfo task(task_id, cost, reliability, frequency);
-    // Container taskContainer(task);
-    // getConference().send(taskContainer);
+    bsn::TaskInfo msg;
+
+    msg.task_id = task_id;
+    msg.cost = cost;
+    msg.reliability = reliability;
+    msg.frequency = frequency;
+    taskPub.publish(msg);
 }
 
-void ThermometerModule::sendContextInfo(const std::string &context_id, const bool &value) {
-    // ContextInfo context(context_id, value, 0, 0, "");
-    // Container contextContainer(context);
-    // getConference().send(contextContainer);
+void ThermometerModule::sendContextInfo(const std::string &context_id, const bool &status) {
+    bsn::ContextInfo msg;
+
+    msg.context_id = context_id;
+    msg.status = status;
+    contextPub.publish(msg);
 }
 
-void ThermometerModule::sendMonitorTaskInfo(const std::string &task_id, const double &cost, const double &reliability, const double &frequency) {
-    // MonitorTaskInfo task(task_id, cost, reliability, frequency);
-    // Container taskContainer(task);
-    // getConference().send(taskContainer);
-}
-
-void ThermometerModule::sendMonitorContextInfo(const std::string &context_id, const bool &value) {
-    // MonitorContextInfo context(context_id, value, 0, 0, "");
-    // Container contextContainer(context);
-    // getConference().send(contextContainer);
+void ThermometerModule::receiveControlCommand(const bsn::ControlCommand::ConstPtr& msg)  {
+    active = msg->active;
+    params["freq"] = msg->frequency;
 }
 
 void ThermometerModule::run() {
@@ -154,49 +154,31 @@ void ThermometerModule::run() {
     double risk;
     bool first_exec = true;
     uint32_t id = 0;
-    bsn::generator::DataGenerator dataGenerator(markov);
 
     bsn::SensorData msg;
     ros::NodeHandle n;
 
-    ros::Publisher sensor_pub = n.advertise<bsn::SensorData>("thermometer_data", 10);
+    dataPub = n.advertise<bsn::SensorData>("thermometer_data", 10);
+    ros::Subscriber thermometerSub = n.subscribe("thermometer_control_command", 10, &ThermometerModule::receiveControlCommand, this);
 
-    ros::Rate loop_rate(1);
+    ros::Rate loop_rate(params["freq"]);
+    msg.type = "thermometer";
 
+    sendContextInfo("TEMP_available", true);
+    
     while (ros::ok()) {
+        loop_rate = ros::Rate(params["freq"]);
         
-        // if(first_exec){ // Send context info warning controller that this sensor is available  
-        //     sendContextInfo("TEMP_available",true);
-        //     sendMonitorContextInfo("TEMP_available",true);
-        //     first_exec = false; 
-        // }
-        
-        { // update controller with task info 
-        /*           
+        { // update controller with task info        
             sendContextInfo("TEMP_available",true);
-            sendTaskInfo("G3_T1.31",0.1,data_accuracy,params["freq"]);
-            sendTaskInfo("G3_T1.32",0.1*params["m_avg"],1,params["freq"]);
-            sendTaskInfo("G3_T1.33",0.1,comm_accuracy,params["freq"]);
-          // and the monitor..
-            sendMonitorContextInfo("TEMP_available",true);
-            sendMonitorTaskInfo("G3_T1.31",0.1,data_accuracy,params["freq"]);
-            sendMonitorTaskInfo("G3_T1.32",0.1*params["m_avg"],1,params["freq"]);
-            sendMonitorTaskInfo("G3_T1.33",0.1,comm_accuracy,params["freq"]);
-        */
-        //     sendContextInfo("TEMP_available",true);
-        //     sendTaskInfo("G3_T1.31",0.076,1,1);
-        //     sendTaskInfo("G3_T1.32",0.076*params["m_avg"],1,1);
-        //     sendTaskInfo("G3_T1.33",0.076,1,1);
-        //   // and the monitor..
-        //     sendMonitorContextInfo("TEMP_available",true);
-        //     sendMonitorTaskInfo("G3_T1.31",0.076,1,1);
-        //     sendMonitorTaskInfo("G3_T1.32",0.076*params["m_avg"],1,1);
-        //     sendMonitorTaskInfo("G3_T1.33",0.076,1,1);
+            sendTaskInfo("G3_T1.31", 0.1, data_accuracy, params["freq"]);
+            sendTaskInfo("G3_T1.32", 0.1*params["m_avg"], 1, params["freq"]);
+            sendTaskInfo("G3_T1.33", 0.1, comm_accuracy, params["freq"]);
         }
 
-        /*{ // recharge routine
+        { // recharge routine
             //for debugging
-            cout << "Battery level: " << battery.getCurrentLevel() << "%" << endl;
+            std::cout << "Battery level: " << battery.getCurrentLevel() << "%" << std::endl;
             if(!active && battery.getCurrentLevel() > 90){
                 active = true;
             }
@@ -208,73 +190,61 @@ void ThermometerModule::run() {
                     bool x_active = (rand()%2==0)?active:!active;
                     sendContextInfo("TEMP_available", x_active);
             }
-            //sendContextInfo("TEMP_available", active);
-            sendMonitorContextInfo("TEMP_available",active);
-
-        }*/
+            sendContextInfo("TEMP_available", active);
+        }
 
         /*
-         * Receive control command and module update
-         */
-        // while(!buffer.isEmpty()){
-        //     container = buffer.leave();
-
-        //     active = container.getData<ThermometerControlCommand>().getActive();
-        //     params["freq"] = container.getData<ThermometerControlCommand>().getFrequency();
-        // }
-
-        /*if(!active){ 
+        * Receive control command and module update
+        */
+        if(!active){ 
             if(battery.getCurrentLevel() <= 100) battery.generate(2.5);
             continue; 
-        }*/
+        }
 
-        msg.type = "thermometer";
         /*
          * Module execution
          */
-        if((rand() % 100)+1 < int32_t(params["freq"]*100)){
            
-            { // TASK: Collect thermometer data with data_accuracy
-                data = dataGenerator.getValue();
-                
-                double offset = (1 - data_accuracy + (double)rand() / RAND_MAX * (1 - data_accuracy)) * data;
-
-                if (rand() % 2 == 0)
-                    data = data + offset;
-                else
-                    data = data - offset;
-
-                battery.consume(0.1);
-
-                //for debugging
-                std::cout << "New data: " << data << std::endl << std::endl;
-            }
-
-            { // TASK: Filter data with moving average
-                filter.setRange(params["m_avg"]);
-                filter.insert(data, type);
-                data = filter.getValue(type);
-                battery.consume(0.1*params["m_avg"]);
-
-                msg.data = data;
-                //for debugging
-                std::cout << "Filtered data: " << data << std::endl;
-            }
+        { // TASK: Collect thermometer data with data_accuracy
+            data = markov.calculate_state();
             
-            { // TASK: Transfer information to CentralHub
-                risk = sensorConfig.evaluateNumber(data);
+            double offset = (1 - data_accuracy + (double)rand() / RAND_MAX * (1 - data_accuracy)) * data;
 
-                msg.risk = risk;
+            if (rand() % 2 == 0)
+                data = data + offset;
+            else
+                data = data - offset;
 
-                if ((rand() % 100) <= comm_accuracy * 100)
-                    sensor_pub.publish(msg);
-                
-                battery.consume(0.1);
+            markov.next_state();
+            battery.consume(0.1);
 
-                // for debugging
-                std::cout << "Risk: " << risk << "%" << std::endl;
-            }
+            //for debugging
+            std::cout << "New data: " << data << std::endl << std::endl;
+        }
+
+        { // TASK: Filter data with moving average
+            filter.setRange(params["m_avg"]);
+            filter.insert(data, type);
+            data = filter.getValue(type);
+            battery.consume(0.1*params["m_avg"]);
+
+            msg.data = data;
+            //for debugging
+            std::cout << "Filtered data: " << data << std::endl;
+        }
+        
+        { // TASK: Transfer information to CentralHub
+            risk = sensorConfig.evaluateNumber(data);
+
+            msg.risk = risk;
+
+            if ((rand() % 100) <= comm_accuracy * 100)
+                dataPub.publish(msg);
             
+            battery.consume(0.1);
+
+            // for debugging
+            std::cout << "Risk: " << risk << "%" << std::endl;
         }
 
         { // Persist sensor data

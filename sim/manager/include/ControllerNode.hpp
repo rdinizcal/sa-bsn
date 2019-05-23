@@ -23,6 +23,7 @@
 
 
 #include "bsn/TaskInfo.h"
+#include "bsn/ControlCommand.h"
 #include "bsn/ContextInfo.h"
 
 class ControllerNode {

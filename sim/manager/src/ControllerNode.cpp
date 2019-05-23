@@ -479,6 +479,7 @@ void ControllerNode::execute(std::string id, double action) {
 
     ros::NodeHandle publisher_handler;
 	ros::Publisher actuator_pub = publisher_handler.advertise<bsn::ControlCommand>("controller_command", 1000);
+//    ros::Publisher centralhub_pub = publisher_handler.advertise<?>
 
     bsn::ControlCommand msg;
 
@@ -487,7 +488,7 @@ void ControllerNode::execute(std::string id, double action) {
     msg.active = true;
     msg.frequency = action;
 
-    actuator_pub.publish(&msg);
+    actuator_pub.publish(msg);
 
 //    }
 
