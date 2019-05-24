@@ -324,9 +324,9 @@ void ControllerNode::execute(std::string id, double action, double ccurrent, dou
 
     actuator_pub.publish(command_msg);
 
-    ros::Publisher centralhub_pub = publisher_handler.advertise<bsn::ControlCentralhub>("system_info", 1000);
+    ros::Publisher centralhub_pub = publisher_handler.advertise<bsn::SystemInfo>("system_info", 1000);
 
-    bsn::ControlCentralhub centralhub_msg;
+    bsn::SystemInfo centralhub_msg;
 
     centralhub_msg.cost = ccurrent;
     centralhub_msg.reliability = rcurrent;
