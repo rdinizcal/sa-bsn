@@ -10,10 +10,12 @@ ControllerNode::ControllerNode(int  &argc, char **argv, std::string name):
     contexts(),
 
     cost_expression(),
-    reliability_expression()
+    reliability_expression() 
+    {
 
     ros::init(argc, argv, name);
-}
+    
+    }
 
 void ControllerNode::setTaskValue(std::string id, double value) {
     this->tasks[id] = value;
@@ -103,14 +105,14 @@ void ControllerNode::setUp() {
         goalModel.addRootGoal(std::make_shared<Goal>(g1));
     }
 
-    /*
+    
     { // Set up map {id,object} of context from goal goalModel
-        contexts.insert(std::pair<std::string,Context>("SaO2_available",Context("SaO2_available",false,"CTX_G3_T1_1")));
-        contexts.insert(std::pair<std::string,Context>("ECG_available",Context("ECG_available",false,"CTX_G3_T1_2")));
-        contexts.insert(std::pair<std::string,Context>("TEMP_available",Context("TEMP_available",false,"CTX_G3_T1_3")));
-        contexts.insert(std::pair<std::string,Context>("ABP_available",Context("ABP_available",false,"CTX_G3_T1_4")));
+        contexts.insert(std::pair<std::string,bsn::goalmodel::Context>("SaO2_available", bsn::goalmodel::Context("CTX_G3_T1_1","SaO2_available", false)));
+        contexts.insert(std::pair<std::string,bsn::goalmodel::Context>("ECG_available", bsn::goalmodel::Context("CTX_G3_T1_2","ECG_available", false)));
+        contexts.insert(std::pair<std::string,bsn::goalmodel::Context>("TEMP_available", bsn::goalmodel::Context("CTX_G3_T1_3","TEMP_available", false)));
+        contexts.insert(std::pair<std::string,bsn::goalmodel::Context>("ABP_available", bsn::goalmodel::Context("CTX_G3_T1_4","ABP_available", false)));
     }
-    */
+   
 
     { // Set up cost and reliability expressions
         std::ifstream cost_file;
@@ -172,8 +174,8 @@ void ControllerNode::setUp() {
 
         this->cost_value = cost_expression.apply(props, values);
 
+        }
 }
-
 
 /** **************************************************************
  *                          MONITOR 
@@ -203,6 +205,8 @@ void ControllerNode::receiveContextInfo(const bsn::ContextInfo::ConstPtr& msg) {
     ROS_INFO("I heard: [%s]", msg->context_id.c_str());
 
     std::string id = msg->context_id;
+    std::string id_aux = id;
+    std::replace()
 
     //contexts[id].setValue(msg->status.data);
 
