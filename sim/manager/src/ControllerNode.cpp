@@ -11,11 +11,7 @@ ControllerNode::ControllerNode(int  &argc, char **argv, std::string name):
 
     cost_expression(),
     reliability_expression() 
-    {
-
-    ros::init(argc, argv, name);
-    
-    }
+    {}
 
 void ControllerNode::setTaskValue(std::string id, double value) {
     this->tasks[id] = value;
@@ -143,13 +139,13 @@ void ControllerNode::setUp() {
         std::string reliability_formula;
 
         try{
-            cost_file.open("../formulae/cost.formula");
+            cost_file.open("formulae/cost.formula");
             std::getline(cost_file,cost_formula);
             cost_file.close();
         } catch (std::ifstream::failure e) { std::cerr << "Exception opening/reading/closing file (cost.formula)\n"; }
 
         try{
-            reliability_file.open("../formulae/reliability.formula");
+            reliability_file.open("formulae/reliability.formula");
             std::getline(reliability_file,reliability_formula);
             reliability_file.close();
         } catch (std::ifstream::failure e) { std::cerr << "Exception opening/reading/closing file (reliability.formula)\n"; }

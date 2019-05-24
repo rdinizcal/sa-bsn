@@ -7,6 +7,8 @@ int main(int argc, char **argv) {
     
     ControllerNode controllerNode(argc, argv, "controller");
 
+    ros::init(argc, argv, "controller");
+
     controllerNode.setUp();
     controllerNode.run();
 
