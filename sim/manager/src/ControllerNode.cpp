@@ -1,6 +1,7 @@
 #include "ControllerNode.hpp"
 #include "operation/Operation.hpp"
 
+#include <ros/package.h>
 #include <memory>
 #include <map>
 using namespace bsn::goalmodel;
@@ -30,6 +31,7 @@ ControllerNode::~ControllerNode() {}
 void ControllerNode::setUp() {
 
     GoalTree goalModel("Body Sensor Network");
+    std::string path = ros::package::getPath("manager");
 
     { // Set up the goal tree goalModel        
         LeafTask g3_t1_11("G3_T1.11","Read data", Property("W_G3_T1_11", 1),Property("R_G3_T1_11", 1),Property("F_G3_T1_11",1));
@@ -137,15 +139,15 @@ void ControllerNode::setUp() {
 
         std::ifstream reliability_file;
         std::string reliability_formula;
-
-        try{
-            cost_file.open("formulae/cost.formula");
+        std::cout << path << std::endl;
+        try {
+            cost_file.open(path + "/formulae/cost.formula");
             std::getline(cost_file,cost_formula);
             cost_file.close();
         } catch (std::ifstream::failure e) { std::cerr << "Exception opening/reading/closing file (cost.formula)\n"; }
 
-        try{
-            reliability_file.open("formulae/reliability.formula");
+        try {
+            reliability_file.open(path + "/formulae/reliability.formula");
             std::getline(reliability_file,reliability_formula);
             reliability_file.close();
         } catch (std::ifstream::failure e) { std::cerr << "Exception opening/reading/closing file (reliability.formula)\n"; }
