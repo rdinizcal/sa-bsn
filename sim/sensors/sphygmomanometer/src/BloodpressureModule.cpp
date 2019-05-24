@@ -293,7 +293,7 @@ void BloodpressureModule::run() {
             msgD.data = dataD;
             msgD.risk = risk;
             battery.consume(0.1);
-            msgS.batt = battery.getCurrentLevel();
+            msgD.batt = battery.getCurrentLevel();
 
             if ((rand() % 100) <= diascomm_accuracy * 100)
                 diastolic_pub.publish(msgD);

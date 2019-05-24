@@ -42,6 +42,7 @@ void CentralhubModule::tearDown() {
 std::string CentralhubModule::makePacket() {
     //std::string packet = "88,97#10,20,30,40,50&";
     std::string packet = "";
+
     packet.append(cost).append(",");
     packet.append(reliability).append("#");
     packet.append(trm_batt).append(",");
@@ -87,7 +88,7 @@ void CentralhubModule::persistData(std::vector<std::string>& risks) {
             (std::chrono::high_resolution_clock::now()).time_since_epoch()).count() << std::endl;
 }
 
-std::vector<std::string> CentralhubModule::getPatientStatus(double batt) {
+std::vector<std::string> CentralhubModule::getPatientStatus() {
     std::string sensor_risk_str;
     std::string bpr;
     std::string oxi;
@@ -112,23 +113,18 @@ std::vector<std::string> CentralhubModule::getPatientStatus(double batt) {
         if (i==0) {
             trm = sensor_risk_str;
             trm_risk = std::to_string(sensor_risk);
-            trm_batt = std::to_string(batt);
         } else if (i == 1){
             ecg = sensor_risk_str;
             ecg_risk = std::to_string(sensor_risk);
-            ecg_batt = std::to_string(batt);
         } else if (i == 2) {
             oxi = sensor_risk_str;
             oxi_risk = std::to_string(sensor_risk);
-            oxi_batt = std::to_string(batt);
         } else if (i == 3) {
             bpr = sensor_risk_str;
             bpr_risk = std::to_string(sensor_risk);
-            bpr_batt = std::to_string(batt);
         } else {
             acc = sensor_risk_str;
             acc_risk = std::to_string(sensor_risk);
-            acc_batt = std::to_string(batt);
         }
     }
 
@@ -146,6 +142,16 @@ void CentralhubModule::receiveSensorData(const bsn::SensorData::ConstPtr& msg) {
 
     std::cout << "Received data from " + type << std::endl; 
 
+    if (type=="thermometer"){
+        trm_batt = std::to_string(batt);
+    } else if (type=="ecg") {
+        ecg_batt = std::to_string(batt);
+    } else if (type=="oximeter") {
+        oxi_batt = std::to_string(batt);
+    } else if (type=="bpms" || type=="bpmd") {
+        bpr_batt = std::to_string(batt);
+    } 
+
     if(type != "null" && int32_t(risk) != -1) {  
         int32_t sensor_id = get_sensor_id(type);
         data[sensor_id] = msg->data;
@@ -160,13 +166,14 @@ void CentralhubModule::receiveSensorData(const bsn::SensorData::ConstPtr& msg) {
         }
     }
 
-    risks = getPatientStatus(batt);
+    
+    risks = getPatientStatus();
     trm_risk = risks[0];
     ecg_risk = risks[1];
     oxi_risk = risks[2];
     bpr_risk = risks[3];
     acc_risk = risks[4]; 
-    
+
     if (persist)
         this->persistData(risks);
 

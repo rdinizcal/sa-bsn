@@ -28,7 +28,7 @@ class CentralhubModule {
 
         std::string makePacket();
         void persistData(std::vector<std::string>&);
-        std::vector<std::string> getPatientStatus(double batt);
+        std::vector<std::string> getPatientStatus();
 
     public:
         void setUp();
