@@ -25,10 +25,11 @@ INCLUDE_DIRECTORIES(include ${catkin_INCLUDE_DIRS})
 
 # Set include directory.
 INCLUDE_DIRECTORIES(include)
+SET (${LIBRARIES} lepton)
 
 ###########################################################################
 # Build this project.
 FILE(GLOB_RECURSE ${PROJECT_NAME}-srcs "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
-ADD_EXECUTABLE (${PROJECT_NAME} "${CMAKE_CURRENT_SOURCE_DIR}/apps/centralhub.cpp" ${${PROJECT_NAME}-srcs})
+ADD_EXECUTABLE (${PROJECT_NAME} "${CMAKE_CURRENT_SOURCE_DIR}/apps/centralhub.cpp" ${${PROJECT_NAME}-srcs} ${LIBRARIES})
 # TARGET_LINK_LIBRARIES (${PROJECT_NAME} ${catkin_LIBRARIES}) 
 target_link_libraries(${PROJECT_NAME} PRIVATE cpprestsdk::cpprest ${catkin_LIBRARIES})

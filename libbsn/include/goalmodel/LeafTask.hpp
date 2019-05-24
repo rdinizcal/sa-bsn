@@ -35,7 +35,7 @@ namespace bsn {
                 void setFrequency(const goalmodel::Property &/*frequency*/);
                 goalmodel::Property getFrequency() const;
 
-                void addChild(const Node &/*node*/);
+                void addChild(std::shared_ptr<Node> /*node*/);
 
             private:
                 goalmodel::Context context;

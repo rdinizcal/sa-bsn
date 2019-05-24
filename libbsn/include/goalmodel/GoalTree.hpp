@@ -5,12 +5,13 @@
 #include <map>
 #include <stdexcept> 
 #include <vector>
+#include <memory>
 
 #include "goalmodel/Node.hpp"
 #include "goalmodel/Goal.hpp"
 #include "goalmodel/Task.hpp"
 #include "goalmodel/LeafTask.hpp"
-
+ 
 namespace bsn {
     namespace goalmodel {
 
@@ -26,24 +27,24 @@ namespace bsn {
                 bool operator==(const GoalTree &rhs);
 
             private:
-                std::map<std::string, Node> getNodes() const;
-                void addChildren(const std::vector<Node> &/*child*/);
-                void addNode(const Node &/*node*/);
+                std::map<std::string, std::shared_ptr<Node>> getNodes() const;
+                void addChildren(const std::vector<std::shared_ptr<Node>> /*child*/);
+                void addNode(std::shared_ptr<Node> /*node*/);
             
             public:
                 void setActor(const std::string &/*actor*/);
                 std::string getActor() const;
 
-                void addRootGoal(Goal &/*goal*/);
-                Node getNode(const std::string &/*node*/) const;
+                void addRootGoal(std::shared_ptr<Goal> /*goal*/);
+                std::shared_ptr<Node> getNode(const std::string &/*node*/) const;
                 
                 int getSize() const;
 
-                std::vector<LeafTask> getLeafTasks() const;
+                std::vector<std::shared_ptr<LeafTask>> getLeafTasks() const;
 
             private:
                 std::string actor;
-                std::map<std::string, Node> nodes;
+                std::map<std::string, std::shared_ptr<Node>> nodes;
         };
     }  
 }

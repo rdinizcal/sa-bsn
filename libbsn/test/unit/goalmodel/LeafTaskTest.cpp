@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <memory>
 
 #include "goalmodel/Context.hpp"
 #include "goalmodel/Property.hpp"
@@ -54,7 +55,7 @@ TEST_F(LeafTaskTest, PreventAddChild) {
     LeafTask childTask(std::string("G3_T1.412"), std::string("Read systolic"), Property("W_G3_T1_412",1), Property("R_G3_T1_412",1), Property("F_G3_T1_412",1));
 
     try {
-        parentTask.addChild(childTask);
+        parentTask.addChild(std::make_shared<LeafTask>(childTask));
         FAIL() << "Expected not to be able to add a child to a leaf task";
     }
     catch(std::exception const & err) {

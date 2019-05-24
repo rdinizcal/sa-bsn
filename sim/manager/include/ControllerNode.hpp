@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 #include <fstream>
+#include <map>
 
 #include "ros/ros.h"
 
@@ -15,11 +16,15 @@
 #include "goalmodel/Context.hpp"
 #include "goalmodel/GoalTree.hpp"
 
-#include "Lepton.h"
+#include "lepton/Lepton.h"
 
 #include "FormulaRefs.hpp"
+#include "model/Formula.hpp"
+
 
 #include "bsn/TaskInfo.h"
+#include "bsn/ControlCommand.h"
+#include "bsn/ControlCentralhub.h"
 #include "bsn/ContextInfo.h"
 
 class ControllerNode {
@@ -28,8 +33,13 @@ class ControllerNode {
       	ControllerNode(const ControllerNode &);
     	ControllerNode &operator=(const ControllerNode &);
 
-  public:
+  	public:
       	void setUp();
+
+		void setTaskValue(std::string, double);
+		double getTaskValue(std::string);
+
+		bool isCost(std::string);
 
     	ControllerNode(int &argc, char **argv, std::string name);
     	virtual ~ControllerNode();
@@ -37,20 +47,29 @@ class ControllerNode {
 		void receiveTaskInfo(const bsn::TaskInfo::ConstPtr& /*msg*/);
 		void receiveContextInfo(const bsn::ContextInfo::ConstPtr& /*msg*/);
 
-    	void analyze();
-    	void plan();
-    	void execute();
+    	void analyze(std::string);
+    	void plan(std::string, double, double);
+    	void execute(std::string, double, double, double);
 
 		void run();
 
   	private:
 
-	std::vector<bsn::goalmodel::LeafTask> tasks;
+	std::map<std::string, double> tasks;
 	std::map<std::string, bsn::goalmodel::Context> contexts;
 
-	Lepton::CompiledExpression cost_expression;
-	Lepton::CompiledExpression reliability_expression;
+	// May be redundant... should try to refactor it later
+	std::vector<std::string> props;
+	std::vector<double> values;
 
+	double reli_value;
+	double cost_value;
+	double reli_error;
+	double cost_error;
+
+	bsn::model::Formula cost_expression;
+	bsn::model::Formula reliability_expression;
+/* 
 	std::map<std::string,double&> cost_formula_reliabilities;
 	std::map<std::string,double&> cost_formula_frequencies;
 	std::map<std::string,double&> cost_formula_costs;
@@ -64,6 +83,7 @@ class ControllerNode {
 
 	double cost_setpoint;
 	double reliability_setpoint;
+ */
 };
 
 #endif 

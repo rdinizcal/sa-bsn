@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <memory>
 
 #include "goalmodel/Context.hpp"
 #include "goalmodel/Property.hpp"
@@ -32,10 +33,10 @@ TEST_F(TaskTest, AddChild) {
     Task parentTask("G3_T1.41", "Read ABP");
     LeafTask childTask(std::string("G3_T1.412"), std::string("Read systolic"), Property("W_G3_T1_412",1), Property("R_G3_T1_412",1), Property("F_G3_T1_412",1));
 
-    parentTask.addChild(childTask);
+    parentTask.addChild(std::make_shared<LeafTask>(childTask));
 
     ASSERT_EQ(parentTask.getChildren().size(), 1);
-    EXPECT_TRUE(parentTask.getChildren().at(0)==childTask);
+    EXPECT_TRUE(*(parentTask.getChildren().at(0))==childTask);
 
 }
 
@@ -45,7 +46,7 @@ TEST_F(TaskTest, AddGoalAsChild) {
     Goal childGoal("G3_T1", "Read Sensor Info");
 
     try {
-        parentTask.addChild(childGoal);
+        parentTask.addChild(std::make_shared<Goal>(childGoal));
         FAIL() << "Expected not to be able to add a goal as child of a task";
     }
     catch(std::exception const & err) {
@@ -58,7 +59,7 @@ TEST_F(TaskTest, RemoveChild) {
 
     Task parentTask("G3_T1.41", "Read ABP");
     LeafTask childTask(std::string("G3_T1.412"), std::string("Read systolic"), Property("W_G3_T1_412",1), Property("R_G3_T1_412",1), Property("F_G3_T1_412",1));
-    parentTask.addChild(childTask);
+    parentTask.addChild(std::make_shared<LeafTask>(childTask));
 
     parentTask.removeChild("G3_T1.412");
 
@@ -69,7 +70,7 @@ TEST_F(TaskTest, RemoveChildNotFound) {
 
     Task parentTask("G3_T1.41", "Read ABP");
     LeafTask childTask(std::string("G3_T1.412"), std::string("Read systolic"), Property("W_G3_T1_412",1), Property("R_G3_T1_412",1), Property("F_G3_T1_412",1));
-    parentTask.addChild(childTask);
+    parentTask.addChild(std::make_shared<LeafTask>(childTask));
 
     try {
         parentTask.removeChild("XXX");
@@ -84,21 +85,21 @@ TEST_F(TaskTest, GetChild) {
 
     Task parentTask("G3_T1.41", "Read ABP");
     LeafTask childTask(std::string("G3_T1.412"), std::string("Read systolic"), Property("W_G3_T1_412",1), Property("R_G3_T1_412",1), Property("F_G3_T1_412",1));
-    parentTask.addChild(childTask);
+    parentTask.addChild(std::make_shared<LeafTask>(childTask));
 
-    Node returnedTask = parentTask.getChild("G3_T1.412");
+    std::shared_ptr<Node> returnedTask = parentTask.getChild("G3_T1.412");
 
-    ASSERT_EQ(returnedTask.getID(), "G3_T1.412");
+    ASSERT_EQ(returnedTask->getID(), "G3_T1.412");
 }
 
 TEST_F(TaskTest, GetChildNotFound) {
 
     Task parentTask("G3_T1.41", "Read ABP");
     LeafTask childTask(std::string("G3_T1.412"), std::string("Read systolic"), Property("W_G3_T1_412",1), Property("R_G3_T1_412",1), Property("F_G3_T1_412",1));
-    parentTask.addChild(childTask);
+    parentTask.addChild(std::make_shared<LeafTask>(childTask));
 
     try {
-         Node returnedTask = parentTask.getChild("XXX");
+        std::shared_ptr<Node> returnedTask = parentTask.getChild("XXX");
         FAIL() << "Expected out of range exception";
     }
     catch(std::out_of_range const & err) {
