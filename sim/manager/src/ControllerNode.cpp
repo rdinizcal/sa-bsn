@@ -9,12 +9,8 @@ ControllerNode::ControllerNode(int  &argc, char **argv, std::string name):
     tasks(),
     contexts(),
     cost_expression(),
-<<<<<<< HEAD
     reliability_expression() 
     {}
-=======
-    reliability_expression() { ros::init(argc, argv, name); }
->>>>>>> temp
 
 void ControllerNode::setTaskValue(std::string id, double value) {
     this->tasks[id] = value;
