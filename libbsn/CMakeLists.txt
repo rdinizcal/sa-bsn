@@ -34,7 +34,6 @@ ADD_MESSAGE_FILES(
   info/SystemInfo.msg
   data/SensorData.msg
   command/ControlCommand.msg
-  command/ControlCentralhub.msg
 )
 
 GENERATE_MESSAGES(
@@ -58,8 +57,8 @@ INCLUDE_DIRECTORIES(include)
 
 ###########################################################################
 # Set external libraries.
-LINK_DIRECTORIES(/usr/local/lib)
-SET(LIBRARIES lepton)
+FIND_LIBRARY(LEPTON_LIBRARY lepton)
+SET (LIBRARIES ${LEPTON_LIBRARY})
 
 ###########################################################################
 # Build project.

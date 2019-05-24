@@ -11,32 +11,7 @@ ControllerNode::ControllerNode(int  &argc, char **argv, std::string name):
 
     cost_expression(),
     reliability_expression()
-/* 
-    cost_formula_reliabilities(),
-    cost_formula_frequencies(),
-    cost_formula_costs(),
-    cost_formula_contexts(),
 
-    reliability_formula_reliabilities(),
-    reliability_formula_frequencies(),
-    reliability_formula_contexts(),
-
-    actions(),
-
-    cost_setpoint(0.53),
-    reliability_setpoint(0.90) 
-  */   
- {
-    /**
-     * The ros::init() function needs to see argc and argv so that it can perform
-     * any ROS arguments and name remapping that were provided at the command line.
-     * For programmatic remappings you can use a different version of init() which takes
-     * remappings directly, but for most command-line programs, passing argc and argv is
-     * the easiest way to do it.  The third argument to init() is the name of the node.
-     *
-     * You must call one of the versions of ros::init() before using any other
-     * part of the ROS system.
-     */
     ros::init(argc, argv, name);
 }
 
@@ -128,13 +103,6 @@ void ControllerNode::setUp() {
         goalModel.addRootGoal(std::make_shared<Goal>(g1));
     }
 
-    
-    { // Set up map {id,object} of leaf task from goal goalModel
-
-        /*Implement a method in goaltree .getLeafTasks() that returns a leaftasks vector*/
-        
-    }
-
     /*
     { // Set up map {id,object} of context from goal goalModel
         contexts.insert(std::pair<std::string,Context>("SaO2_available",Context("SaO2_available",false,"CTX_G3_T1_1")));
@@ -204,80 +172,6 @@ void ControllerNode::setUp() {
 
         this->cost_value = cost_expression.apply(props, values);
 
-        /*for (Node task : tasks){
-            //LeafTask leafTask = LeafTask(task);
-            std::string id = task.getID();//leafTask.getID();
-            
-            FormulaRefs cost_formula_refs;
-            FormulaRefs reli_formula_refs;
-
-            cost_formula_refs.addTask(task.getID(), cost_expression.getVariableReference(task.getReliability().getID()), cost_expression.getVariableReference(task.getFrequency().getID()), cost_expression.getVariableReference(task.getCost().getID()));
-
-            reli_formula_refs.addTask(task.getID(), reliability_expression.getVariableReference(task.getReliability().getID()), reliability_expression.getVariableReference(task.getFrequency().getID()));
- 
-        }*/
-
-        /*for (std::pair<std::string,Task> task : tasks){
-            cost_formula_reliabilities          .insert(std::pair<std::string,double&>(task.second.getTask(),cost_expression.getVariableReference(task.second.getReliabilitySymbol())));
-            cost_formula_frequencies            .insert(std::pair<std::string,double&>(task.second.getTask(),cost_expression.getVariableReference(task.second.getFrequencySymbol())));
-            cost_formula_costs                  .insert(std::pair<std::string,double&>(task.second.getTask(),cost_expression.getVariableReference(task.second.getCostSymbol())));
-            
-            reliability_formula_reliabilities   .insert(std::pair<std::string,double&>(task.second.getTask(),reliability_expression.getVariableReference(task.second.getReliabilitySymbol())));
-            reliability_formula_frequencies     .insert(std::pair<std::string,double&>(task.second.getTask(),reliability_expression.getVariableReference(task.second.getFrequencySymbol())));
-        }
-
-        
-        for (std::pair<std::string,Context> context : contexts) {
-            cost_formula_contexts               .insert(std::pair<std::string,double&>(context.second.getContext(),cost_expression.getVariableReference(context.second.getContextSymbol())));
-            reliability_formula_contexts        .insert(std::pair<std::string,double&>(context.second.getContext(),reliability_expression.getVariableReference(context.second.getContextSymbol())));
-        }*/
-    }
-
-    /*
-    { // Set up actions
-        
-        actions = std::vector<std::vector<double>> {
-                                        {0.8,0.85,0.9,0.95,1},
-                                        {0.8,0.85,0.9,0.95,1},
-                                        {0.8,0.85,0.9,0.95,1},
-                                        {0.8,0.85,0.9,0.95,1}};
-        
-        
-        
-        for (int idx = 0, v = 0, w = 0, x = 0, y = 0, z = 0; idx < std::pow(5,7); ++idx){
-            actions.push_back({(double)v, (double)w, (double)x, (double)y, (double)z});
-
-            if(++z == 8) { 
-                z = 0;
-                if(++y == 8) { 
-                    y = 0;
-                    if(++x == 8) { 
-                        x = 0;
-                        if(++w == 8) { 
-                            w = 0;
-                            if(++v == 8) { 
-                                v = 0;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        for (std::vector<std::vector<double>>::iterator it = actions.begin(); it != actions.end(); ++it) {
-            for (std::vector<double>::iterator itt = (*it).begin(); itt != (*it).end(); ++itt) {
-                if ((int)*itt == 0) *itt = 0.775;
-                else if ((int)*itt == 1) *itt = 0.8125;
-                else if ((int)*itt == 2) *itt = 0.85;
-                else if ((int)*itt == 3) *itt = 0.8875;
-                else if ((int)*itt == 4) *itt = 0.925;
-                else if ((int)*itt == 5) *itt = 0.9625;
-                else if ((int)*itt == 6) *itt = 1;
-            }
-        }
-
-        for (double idx = 0; idx <= 1; idx += 0.0009765625) actions.push_back({idx});
-    }*/
 }
 
 
@@ -288,12 +182,6 @@ void ControllerNode::setUp() {
  * receive context (id, bool) reset setpoints (cost and reliability)
  * ***************************************************************
 */ 
-/**
- * This tutorial demonstrates simple receipt of messages over the 
- * ROS system. I suppose one can declare several chatterCallbacks, 
- * each one for each type of message. Cool isn't it ? It should be
- * especially util for receiving distinct tasks and contexts.
-*/
 void ControllerNode::receiveTaskInfo(const bsn::TaskInfo::ConstPtr& msg) {
     ROS_INFO("I heard: [%s]", msg->task_id.c_str());
 
@@ -364,57 +252,6 @@ void ControllerNode::analyze(std::string id) {
     this->cost_error = this->cost_value - cost_current; 
 
     plan(id, cost_current, reli_current);
-
-    /*double reliability;
-    double cost;
-
-    { // plug in costs, reliabilities, frequencies and contexts and evaluate formulas
-        { // in cost formula
-            for (std::pair<std::string,double&> cost_formula_reliability : cost_formula_reliabilities) {
-                cost_formula_reliability.second = tasks[cost_formula_reliability.first].getReliability();
-                //std::cout << tasks[cost_formula_reliability.first].getReliabilitySymbol() << ": " << cost_formula_reliability.second << std::endl;
-            }
-
-            for (std::pair<std::string,double&> cost_formula_frequency : cost_formula_frequencies) {
-                cost_formula_frequency.second = tasks[cost_formula_frequency.first].getFrequency();
-                //std::cout << tasks[cost_formula_frequency.first].getFrequencySymbol() << ": " << cost_formula_frequency.second << std::endl;
-            }
-
-            for (std::pair<std::string,double&> cost_formula_cost : cost_formula_costs) {
-                cost_formula_cost.second = tasks[cost_formula_cost.first].getCost();
-                //std::cout << tasks[cost_formula_cost.first].getCostSymbol() << ": " << cost_formula_cost.second << std::endl;
-            }
-
-            for (std::pair<std::string,double&> cost_formula_context : cost_formula_contexts) {
-                cost_formula_context.second = contexts[cost_formula_context.first].getValue() ? 1:0;
-                //std::cout << contexts[cost_formula_context.first].getContextSymbol() << ": " << cost_formula_context.second << std::endl;
-            }
-
-            cost = cost_expression.evaluate();
-        }
-
-        { // in reliability formula
-            for (std::pair<std::string,double&> reliability_formula_reliability : reliability_formula_reliabilities) {
-                reliability_formula_reliability.second = tasks[reliability_formula_reliability.first].getReliability();
-            }
-
-            for (std::pair<std::string,double&> reliability_formula_frequency : reliability_formula_frequencies) {
-                reliability_formula_frequency.second = tasks[reliability_formula_frequency.first].getFrequency();
-            }
-
-            for (std::pair<std::string,double&> reliability_formula_context : reliability_formula_contexts) {
-                reliability_formula_context.second = contexts[reliability_formula_context.first].getValue() ? 1:0;
-            }
-
-            reliability = reliability_expression.evaluate();
-        }
-    }
-    if (reliability < reliability_setpoint*0.95 || reliability > reliability_setpoint*1.05 || 
-        cost < cost_setpoint*0.95 || cost > cost_setpoint*1.05) {
-        
-        plan();
-
-    }*/
 }
 
 /** **************************************************************
