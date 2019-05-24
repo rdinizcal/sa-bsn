@@ -44,12 +44,12 @@ std::string CentralhubModule::makePacket() {
     std::string packet = "";
     packet.append(cost).append(",");
     packet.append(reliability).append("#");
-    packet.append("10").append(",");
-    packet.append("20").append(",");
-    packet.append("30").append(",");
-    packet.append("40").append(",");
-    packet.append("50").append(",");
-    packet.append("60").append("&");
+    packet.append(trm_batt).append(",");
+    packet.append(ecg_batt).append(",");
+    packet.append(oxi_batt).append(",");
+    packet.append(bpr_batt).append(",");
+    packet.append(bpr_batt).append(",");
+    packet.append(acc_batt).append("&");
 
     int i = 0;
     for (std::list<double> li : data_list) {
@@ -87,12 +87,13 @@ void CentralhubModule::persistData(std::vector<std::string>& risks) {
             (std::chrono::high_resolution_clock::now()).time_since_epoch()).count() << std::endl;
 }
 
-std::vector<std::string> CentralhubModule::getPatientStatus() {
+std::vector<std::string> CentralhubModule::getPatientStatus(double batt) {
     std::string sensor_risk_str;
     std::string bpr;
     std::string oxi;
     std::string ecg;
     std::string trm;
+    std::string acc;
 
     for (int i = 0; i < 4; i++) {
         double sensor_risk = data_list[i].back();
@@ -111,25 +112,34 @@ std::vector<std::string> CentralhubModule::getPatientStatus() {
         if (i==0) {
             trm = sensor_risk_str;
             trm_risk = std::to_string(sensor_risk);
+            trm_batt = std::to_string(batt);
         } else if (i == 1){
             ecg = sensor_risk_str;
             ecg_risk = std::to_string(sensor_risk);
+            ecg_batt = std::to_string(batt);
         } else if (i == 2) {
             oxi = sensor_risk_str;
             oxi_risk = std::to_string(sensor_risk);
-        } else {
+            oxi_batt = std::to_string(batt);
+        } else if (i == 3) {
             bpr = sensor_risk_str;
             bpr_risk = std::to_string(sensor_risk);
+            bpr_batt = std::to_string(batt);
+        } else {
+            acc = sensor_risk_str;
+            acc_risk = std::to_string(sensor_risk);
+            acc_batt = std::to_string(batt);
         }
     }
 
-    std::vector<std::string> v = {trm, ecg, oxi, bpr};  
+    std::vector<std::string> v = {trm, ecg, oxi, bpr, acc};  
     return v;
 }
 
 void CentralhubModule::receiveSensorData(const bsn::SensorData::ConstPtr& msg) {
     std::string type = msg->type;
     double risk = msg->risk;
+    double batt = msg->batt;
     std::vector<std::string> risks;
     web::http::client::http_client client(U(database_url));
     web::json::value json_obj; 
@@ -150,12 +160,12 @@ void CentralhubModule::receiveSensorData(const bsn::SensorData::ConstPtr& msg) {
         }
     }
 
-    risks = getPatientStatus();
+    risks = getPatientStatus(batt);
     trm_risk = risks[0];
     ecg_risk = risks[1];
     oxi_risk = risks[2];
     bpr_risk = risks[3];
-    acc_risk = "10"; 
+    acc_risk = risks[4]; 
     
     if (persist)
         this->persistData(risks);
