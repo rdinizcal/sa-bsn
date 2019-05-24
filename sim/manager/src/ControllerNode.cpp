@@ -106,13 +106,13 @@ void ControllerNode::setUp() {
     }
 
     
-    { // Set up map {id,object} of context from goal goalModel
+/*     { // Set up map {id,object} of context from goal goalModel
         contexts.insert(std::pair<std::string,bsn::goalmodel::Context>("SaO2_available", bsn::goalmodel::Context("CTX_G3_T1_1","SaO2_available", false)));
         contexts.insert(std::pair<std::string,bsn::goalmodel::Context>("ECG_available", bsn::goalmodel::Context("CTX_G3_T1_2","ECG_available", false)));
         contexts.insert(std::pair<std::string,bsn::goalmodel::Context>("TEMP_available", bsn::goalmodel::Context("CTX_G3_T1_3","TEMP_available", false)));
         contexts.insert(std::pair<std::string,bsn::goalmodel::Context>("ABP_available", bsn::goalmodel::Context("CTX_G3_T1_4","ABP_available", false)));
     }
-   
+    */
 
     { // Set up cost and reliability expressions
         std::ifstream cost_file;
@@ -140,6 +140,19 @@ void ControllerNode::setUp() {
 
         //set initial conditions: order should be respected
 
+        // Get context information from leafTasks
+
+        bsn::goalmodel::Context aux_context;
+
+        for(std::vector<std::shared_ptr<bsn::goalmodel::LeafTask>>::iterator it = leafTasks.begin();
+                it != leafTasks.end(); it++) 
+        {
+            aux_context.setDescription((*it)->getContext().getDescription());
+            aux_context.setValue((*it)->getContext().getValue());
+            contexts[(*it)->getContext().getID()] = aux_context;
+        }        
+
+
         //reli expr
         for(std::vector<std::shared_ptr<bsn::goalmodel::LeafTask>>::iterator it = leafTasks.begin();
                 it != leafTasks.end(); it++) {
@@ -147,34 +160,39 @@ void ControllerNode::setUp() {
             setTaskValue((*it)->getFrequency().getID(), (*it)->getFrequency().getValue());
         }
 
-        for(std::map<std::string, double>::const_iterator it = tasks.begin();
-                it != tasks.end(); it++) {
-            props.push_back(it->first);
-            values.push_back(it->second);
+        std::map<std::string, double>::const_iterator it1;
+        std::map<std::string, bsn::goalmodel::Context>::const_iterator it2;
+
+        for(it1 = tasks.begin(), it2 = contexts.begin(); it1 != tasks.end(), it2 != contexts.end();
+            it1++, it2++) {
+            props.push_back(it1->first);
+            values.push_back(it1->second);
+            props.push_back(it2->second.getID());
+            values.push_back((double)(it2->second.getValue()));
         }
 
         this->reli_value = reliability_expression.apply(props, values);
 
+        props.clear(); values.clear();
+        
         //cost expr
         for(std::vector<std::shared_ptr<bsn::goalmodel::LeafTask>>::iterator it = leafTasks.begin();
                 it != leafTasks.end(); it++) {
+            setTaskValue((*it)->getReliability().getID(), (*it)->getReliability().getValue());
+            setTaskValue((*it)->getFrequency().getID(), (*it)->getFrequency().getValue());
             setTaskValue((*it)->getCost().getID(), (*it)->getCost().getValue());
         }        
 
-        // Checks if given variable is a cost in order to avoid adding extras and
-        // unnecessarily clearing the vector
-
-        for(std::map<std::string, double>::const_iterator it = tasks.begin();
-                it != tasks.end(); it++) {
-            if(isCost(it->first)) {
-                props.push_back(it->first);
-                values.push_back(it->second);
-            }
+        for(it1 = tasks.begin(), it2 = contexts.begin(); it1 != tasks.end(), it2 != contexts.end();
+            it1++, it2++) {
+            props.push_back(it1->first);
+            values.push_back(it1->second);
+            props.push_back(it2->second.getID());
+            values.push_back((double)(it2->second.getValue()));
         }
 
         this->cost_value = cost_expression.apply(props, values);
-
-        }
+    }
 }
 
 /** **************************************************************
@@ -206,11 +224,14 @@ void ControllerNode::receiveContextInfo(const bsn::ContextInfo::ConstPtr& msg) {
 
     std::string id = msg->context_id;
     std::string id_aux = id;
-    std::replace()
+    std::replace(id.begin(), id.end(), '.', '_');
+    std::string ctxID = "CTX_" + id;
 
-    //contexts[id].setValue(msg->status.data);
+    bool status = msg->status;
 
-//    analyze();
+    contexts[ctxID].setValue(msg->status);
+
+    analyze(id_aux);
 }
 
 /** **************************************************************
@@ -228,26 +249,32 @@ void ControllerNode::analyze(std::string id) {
     double reli_current;
     double cost_current;
 
-    props.clear();
-    values.clear();
+    std::map<std::string, double>::const_iterator it1;
+    std::map<std::string, bsn::goalmodel::Context>::const_iterator it2;
+
+    // clear previous values and props
+    props.clear(); values.clear();
 
     // bad smells everywhere...
 
-    for(std::map<std::string, double>::const_iterator it = tasks.begin();
-                it != tasks.end(); it++) {
-            props.push_back(it->first);
-            values.push_back(it->second);
-    }
+    for(it1 = tasks.begin(), it2 = contexts.begin(); it1 != tasks.end(), it2 != contexts.end();
+        it1++, it2++) {
+            props.push_back(it1->first);
+            values.push_back(it1->second);
+            props.push_back(it2->second.getID());
+            values.push_back((double)(it2->second.getValue()));
+        }
 
     reli_current = reliability_expression.apply(props, values);
     
-    
-    for(std::map<std::string, double>::const_iterator it = tasks.begin();
-                it != tasks.end(); it++) {
-            if(isCost(it->first)) {
-                props.push_back(it->first);
-                values.push_back(it->second);
-            }
+    props.clear(); values.clear();
+
+    for(it1 = tasks.begin(), it2 = contexts.begin(); it1 != tasks.end(), it2 != contexts.end();
+        it1++, it2++) {
+            props.push_back(it1->first);
+            values.push_back(it1->second);
+            props.push_back(it2->second.getID());
+            values.push_back((double)(it2->second.getValue()));
     }
     
     cost_current = cost_expression.apply(props, values);
