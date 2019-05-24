@@ -2,18 +2,13 @@
 #include "operation/Operation.hpp"
 
 #include <memory>
-#include <map>
 using namespace bsn::goalmodel;
 
 ControllerNode::ControllerNode(int  &argc, char **argv, std::string name):
     tasks(),
     contexts(),
-
     cost_expression(),
-    reliability_expression()
-
-    ros::init(argc, argv, name);
-}
+    reliability_expression() { ros::init(argc, argv, name); }
 
 void ControllerNode::setTaskValue(std::string id, double value) {
     this->tasks[id] = value;
@@ -171,7 +166,7 @@ void ControllerNode::setUp() {
         }
 
         this->cost_value = cost_expression.apply(props, values);
-
+    }
 }
 
 
