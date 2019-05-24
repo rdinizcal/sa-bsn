@@ -3,16 +3,18 @@
 
 #include <ros/package.h>
 #include <memory>
-#include <map>
 using namespace bsn::goalmodel;
 
 ControllerNode::ControllerNode(int  &argc, char **argv, std::string name):
     tasks(),
     contexts(),
-
     cost_expression(),
+<<<<<<< HEAD
     reliability_expression() 
     {}
+=======
+    reliability_expression() { ros::init(argc, argv, name); }
+>>>>>>> temp
 
 void ControllerNode::setTaskValue(std::string id, double value) {
     this->tasks[id] = value;

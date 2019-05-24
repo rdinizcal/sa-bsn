@@ -216,6 +216,7 @@ void ThermometerModule::run() {
 
             battery.consume(0.1);
 
+
             //for debugging
             std::cout << "New data: " << data << std::endl << std::endl;
         }
@@ -233,14 +234,13 @@ void ThermometerModule::run() {
         
         { // TASK: Transfer information to CentralHub
             risk = sensorConfig.evaluateNumber(data);
-
             msg.risk = risk;
+            battery.consume(0.1);
+            msg.batt = battery.getCurrentLevel();
 
             if ((rand() % 100) <= comm_accuracy * 100)
                 dataPub.publish(msg);
             
-            battery.consume(0.1);
-
             // for debugging
             std::cout << "Risk: " << risk << "%" << std::endl;
         }
