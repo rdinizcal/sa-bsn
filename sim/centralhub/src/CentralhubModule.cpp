@@ -22,6 +22,7 @@ void CentralhubModule::setUp() {
     configHandler.getParam("db_url", database_url);
     configHandler.getParam("persist", persist);
     configHandler.getParam("path", path);
+    configHandler.getParam("session", session);
 
     if (persist) {
         fp.open(path);
@@ -51,7 +52,7 @@ void CentralhubModule::sendMonitorTaskInfo(const std::string &task_id, const dou
 }
 
 std::string CentralhubModule::makePacket() {
-    std::string packet = "";
+    std::string packet = "88,97#10,20,30,40,50&";
     int i = 0;
     for (std::list<double> li : data_list) {
         if (!li.empty()) {
@@ -125,7 +126,6 @@ std::vector<std::string> CentralhubModule::getPatientStatus() {
 void CentralhubModule::receiveSensorData(const bsn::SensorData::ConstPtr& msg) {
     std::string type = msg->type;
     double risk = msg->risk;
-    int session = 0;
     std::string bpr_risk, oxi_risk, ecg_risk, trm_risk;
     std::vector<std::string> risks;
     web::http::client::http_client client(U(database_url));

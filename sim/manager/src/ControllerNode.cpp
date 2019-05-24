@@ -363,7 +363,7 @@ void ControllerNode::analyze(std::string id) {
     this->reli_error = this->reli_value - reli_current;
     this->cost_error = this->cost_value - cost_current; 
 
-    plan(id);
+    plan(id, cost_current, reli_current);
 
     /*double reliability;
     double cost;
@@ -423,7 +423,7 @@ void ControllerNode::analyze(std::string id) {
  * exhaustively analyze whether an action fits the setpoints
  * ***************************************************************
 */
-void ControllerNode::plan(std::string id) {
+void ControllerNode::plan(std::string id, double ccurrent, double rcurrent) {
     double action;
 
     if (this->reli_error > 0) {
@@ -443,7 +443,7 @@ void ControllerNode::plan(std::string id) {
             action = -0.1;
         }
     }
-    execute(id, action);
+    execute(id, action, ccurrent, rcurrent);
 }
 
 /** **************************************************************
@@ -452,7 +452,7 @@ void ControllerNode::plan(std::string id) {
  * if so, send messages containing the actions to the modules
  * ***************************************************************
 */
-void ControllerNode::execute(std::string id, double action) {
+void ControllerNode::execute(std::string id, double action, double ccurrent, double rcurrent) {
 
     bsn::operation::Operation op = bsn::operation::Operation();
 
@@ -479,18 +479,22 @@ void ControllerNode::execute(std::string id, double action) {
 
     ros::NodeHandle publisher_handler;
 	ros::Publisher actuator_pub = publisher_handler.advertise<bsn::ControlCommand>("controller_command", 1000);
-//    ros::Publisher centralhub_pub = publisher_handler.advertise<?>
 
-    bsn::ControlCommand msg;
+    bsn::ControlCommand command_msg;
 
-//    while(ros::ok()) {
-//        cc.active = 
-    msg.active = true;
-    msg.frequency = action;
+    command_msg.active = true;
+    command_msg.frequency = action;
 
-    actuator_pub.publish(msg);
+    actuator_pub.publish(command_msg);
 
-//    }
+    ros::Publisher centralhub_pub = publisher_handler.advertise<bsn::ControlCentralhub>("system_info", 1000);
+
+    bsn::ControlCentralhub centralhub_msg;
+
+    centralhub_msg.cost = ccurrent;
+    centralhub_msg.reliability = rcurrent;
+
+    centralhub_pub.publish(centralhub_msg);
 
 }
 

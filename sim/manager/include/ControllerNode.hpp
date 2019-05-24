@@ -24,6 +24,7 @@
 
 #include "bsn/TaskInfo.h"
 #include "bsn/ControlCommand.h"
+#include "bsn/ControlCentralhub.h"
 #include "bsn/ContextInfo.h"
 
 class ControllerNode {
@@ -47,8 +48,8 @@ class ControllerNode {
 		void receiveContextInfo(const bsn::ContextInfo::ConstPtr& /*msg*/);
 
     	void analyze(std::string);
-    	void plan(std::string);
-    	void execute(std::string, double);
+    	void plan(std::string, double, double);
+    	void execute(std::string, double, double, double);
 
 		void run();
 

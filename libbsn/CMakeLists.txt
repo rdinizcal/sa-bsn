@@ -33,6 +33,7 @@ ADD_MESSAGE_FILES(
   info/TaskInfo.msg
   data/SensorData.msg
   command/ControlCommand.msg
+  command/ControlCentralhub.msg
 )
 
 GENERATE_MESSAGES(
