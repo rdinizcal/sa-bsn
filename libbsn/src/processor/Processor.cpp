@@ -16,6 +16,8 @@ namespace bsn {
                 return 3;
             else if (type == "bpmd")		
                 return 4;
+            else if (type == "acc")		
+                return 5;
             else {
                 cout << "UNKNOWN TYPE " + type + '\n';
                 return -1;

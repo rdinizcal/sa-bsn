@@ -44,10 +44,12 @@ std::string CentralhubModule::makePacket() {
     std::string packet = "";
     packet.append(cost).append(",");
     packet.append(reliability).append("#");
-    packet.append(bpr_risk).append(",");
-    packet.append(oxi_risk).append(",");
-    packet.append(ecg_risk).append(",");
-    packet.append(trm_risk).append("&");
+    packet.append("10").append(",");
+    packet.append("20").append(",");
+    packet.append("30").append(",");
+    packet.append("40").append(",");
+    packet.append("50").append(",");
+    packet.append("60").append("&");
 
     int i = 0;
     for (std::list<double> li : data_list) {
@@ -58,7 +60,9 @@ std::string CentralhubModule::makePacket() {
         }
         i++;                    
     }
+    packet += acc_risk + "=" + "10/";
     packet += std::to_string(patient_status);
+    std::cout << packet << std::endl;
     return packet;
 }
 
@@ -126,13 +130,12 @@ std::vector<std::string> CentralhubModule::getPatientStatus() {
 void CentralhubModule::receiveSensorData(const bsn::SensorData::ConstPtr& msg) {
     std::string type = msg->type;
     double risk = msg->risk;
-    std::string bpr_risk, oxi_risk, ecg_risk, trm_risk;
     std::vector<std::string> risks;
     web::http::client::http_client client(U(database_url));
     web::json::value json_obj; 
 
     std::cout << "Received data from " + type << std::endl; 
-    
+
     if(type != "null" && int32_t(risk) != -1) {  
         int32_t sensor_id = get_sensor_id(type);
         data[sensor_id] = msg->data;
@@ -152,6 +155,7 @@ void CentralhubModule::receiveSensorData(const bsn::SensorData::ConstPtr& msg) {
     ecg_risk = risks[1];
     oxi_risk = risks[2];
     bpr_risk = risks[3];
+    acc_risk = "10"; 
     
     if (persist)
         this->persistData(risks);

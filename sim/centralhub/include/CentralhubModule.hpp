@@ -59,6 +59,7 @@ class CentralhubModule {
         std::string trm_risk;
         std::string reliability;
         std::string cost;
+        std::string acc_risk;
 
 };
 
