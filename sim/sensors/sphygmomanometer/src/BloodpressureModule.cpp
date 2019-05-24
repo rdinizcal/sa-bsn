@@ -17,20 +17,17 @@ BloodpressureModule::BloodpressureModule(const int32_t &argc, char **argv) :
     systcomm_accuracy(1),
     active(true),
     params({{"freq",0.90},{"m_avg",5}}),
-    markovSystolic(),
-    markovDiastolic(),
     filterSystolic(5),
     filterDiastolic(5),
     sensorConfigSystolic(),
     sensorConfigDiastolic(),
     persist(1),
-    path("bloodpressure_output.csv"),
-    fp() {}
+    path("bloodpressure_output.csv") {}
 
 BloodpressureModule::~BloodpressureModule() {}
 
 void BloodpressureModule::setUp() {
-    ros::NodeHandle configHandler;
+    ros::NodeHandle configHandler, n;
     srand(time(NULL));
     std::string s;
     bool b;
@@ -133,6 +130,9 @@ void BloodpressureModule::setUp() {
             fp << "ID,DATA,RISK,TIME_MS" << std::endl;
         }
     }
+    
+    taskPub =  n.advertise<bsn::TaskInfo>("task_info", 10);
+    contextPub =  n.advertise<bsn::ContextInfo>("context_info", 10);
 }
 
 void BloodpressureModule::tearDown() {
@@ -141,27 +141,26 @@ void BloodpressureModule::tearDown() {
 }
 
 void BloodpressureModule::sendTaskInfo(const std::string &task_id, const double &cost, const double &reliability, const double &frequency) {
-    // TaskInfo task(task_id, cost, reliability, frequency);
-    // Container taskContainer(task);
-    // getConference().send(taskContainer);
+    bsn::TaskInfo msg;
+
+    msg.task_id = task_id;
+    msg.cost = cost;
+    msg.reliability = reliability;
+    msg.frequency = frequency;
+    taskPub.publish(msg);
 }
 
-void BloodpressureModule::sendContextInfo(const std::string &context_id, const bool &value) {
-    // ContextInfo context(context_id, value, 0, 0, "");
-    // Container contextContainer(context);
-    // getConference().send(contextContainer);
+void BloodpressureModule::sendContextInfo(const std::string &context_id, const bool &status) {
+    bsn::ContextInfo msg;
+
+    msg.context_id = context_id;
+    msg.status = status;
+    contextPub.publish(msg);
 }
 
-void BloodpressureModule::sendMonitorTaskInfo(const std::string &task_id, const double &cost, const double &reliability, const double &frequency) {
-    // MonitorTaskInfo task(task_id, cost, reliability, frequency);
-    // Container taskContainer(task);
-    // getConference().send(taskContainer);
-}
-
-void BloodpressureModule::sendMonitorContextInfo(const std::string &context_id, const bool &value) {
-    // MonitorContextInfo context(context_id, value, 0, 0, "");
-    // Container contextContainer(context);
-    // getConference().send(contextContainer);
+void BloodpressureModule::receiveControlCommand(const bsn::ControlCommand::ConstPtr& msg)  {
+    active = msg->active;
+    params["freq"] = msg->frequency;
 }
 
 void BloodpressureModule::run() {
@@ -172,49 +171,35 @@ void BloodpressureModule::run() {
     uint32_t id = 0;
 
     bsn::SensorData msgS, msgD;
+    msgS.type = "bpms";
+    msgD.type = "bpmd";
+
     ros::NodeHandle n;
 
     ros::Publisher systolic_pub = n.advertise<bsn::SensorData>("systolic_data", 10);
     ros::Publisher diastolic_pub = n.advertise<bsn::SensorData>("diastolic_data", 10);
+    ros::Subscriber ecgSub = n.subscribe("abp_control_command", 10, &BloodpressureModule::receiveControlCommand, this);
 
-    ros::Rate loop_rate(1);
+    ros::Rate loop_rate(params["freq"]);
 
     while (ros::ok()) {
-        
-        // if(first_exec){ // Send context info warning controller that this sensor is available
-        //     sendContextInfo("ABP_available",true);
-        //     sendMonitorContextInfo("ABP_available",true);
-        //     first_exec = false; 
-        // }
+        loop_rate = ros::Rate(params["freq"]);        
 
         {  // update controller with task info
-            /*
             sendContextInfo("ABP_available",true);
-            sendTaskInfo("G3_T1.411",0.1,systdata_accuracy,params["freq"]);
-            sendTaskInfo("G3_T1.412",0.1,diasdata_accuracy,params["freq"]);
-            sendTaskInfo("G3_T1.42",0.1*params["m_avg"]*2,1,params["freq"]);
-            sendTaskInfo("G3_T1.43",0.1*2,(systcomm_accuracy+diascomm_accuracy)/2,params["freq"]);
-           // and the monitor..
-            sendMonitorContextInfo("ABP_available",true);
-            sendMonitorTaskInfo("G3_T1.411",0.1,systdata_accuracy,params["freq"]);
-            sendMonitorTaskInfo("G3_T1.412",0.1,diasdata_accuracy,params["freq"]);
-            sendMonitorTaskInfo("G3_T1.42",0.1*params["m_avg"]*2,1,params["freq"]);
-            sendMonitorTaskInfo("G3_T1.43",0.1*2,(systcomm_accuracy+diascomm_accuracy)/2,params["freq"]);
-            */
-            // sendContextInfo("ABP_available",true);
-            // sendTaskInfo("G3_T1.411",0.076,1,1);
-            // sendTaskInfo("G3_T1.412",0.076,1,1);
-            // sendTaskInfo("G3_T1.42",0.076*params["m_avg"]*2,1,1);
-            // sendTaskInfo("G3_T1.43",0.076*2,(1+1)/2,1);
-           // and the monitor..
-            // sendMonitorContextInfo("ABP_available",true);
-            // sendMonitorTaskInfo("G3_T1.411",0.076,1,1);
-            // sendMonitorTaskInfo("G3_T1.412",0.076,1,1);
-            // sendMonitorTaskInfo("G3_T1.42",0.076*params["m_avg"]*2,1,1);
-            // sendMonitorTaskInfo("G3_T1.43",0.076*2,(1+1)/2,1);
+            sendTaskInfo("G3_T1.411", 0.1,systdata_accuracy, params["freq"]);
+            sendTaskInfo("G3_T1.412", 0.1,diasdata_accuracy, params["freq"]);
+            sendTaskInfo("G3_T1.42", 0.1*params["m_avg"]*2,1, params["freq"]);
+            sendTaskInfo("G3_T1.43", 0.1*2, (systcomm_accuracy+diascomm_accuracy)/2, params["freq"]);
+
+            sendContextInfo("ABP_available",true);
+            sendTaskInfo("G3_T1.411", 0.076, 1, 1);
+            sendTaskInfo("G3_T1.412", 0.076, 1, 1);
+            sendTaskInfo("G3_T1.42", 0.076*params["m_avg"]*2, 1, 1);
+            sendTaskInfo("G3_T1.43", 0.076*2, (1+1)/2, 1);
         }
 
-        /*{ // recharge routine
+        { // recharge routine
             //for debugging
            std::cout << "Battery level: " << battery.getCurrentLevel() << "%" <<std::endl;
             if(!active && battery.getCurrentLevel() > 90){
@@ -229,102 +214,88 @@ void BloodpressureModule::run() {
                 sendContextInfo("ABP_available", x_active);
             }
 
-            //sendContextInfo("ABP_available", active);
-            sendMonitorContextInfo("ABP_available", active);
-        }*/
+            sendContextInfo("ABP_available", active);
+        }
 
-        // while(!buffer.isEmpty()){ // Receive control command and module update
-        //     container = buffer.leave();
-
-        //     active = container.getData<BloodpressureControlCommand>().getActive();
-        //     params["freq"] = container.getData<BloodpressureControlCommand>().getFrequency();
-        // }
-
-        /*if(!active){ 
+        if (!active) { 
             if(battery.getCurrentLevel() <= 100) battery.generate(2.5);
             continue; 
-        }*/
-
-        msgS.type = "bpms";
-        msgD.type = "bpmd";
+        }
 
         /*
          * Module execution
          */
-        if((rand() % 100)+1 < int32_t(params["freq"]*100)){
             
-            { // TASK: Collect bloodpressure data            
-                dataS = markovSystolic.calculate_state();      
-    
-                double offset = (1 - systdata_accuracy + (double)rand() / RAND_MAX * (1 - systdata_accuracy)) * dataS;
+        { // TASK: Collect bloodpressure data            
+            dataS = markovSystolic.calculate_state();      
 
-                if (rand() % 2 == 0)
-                    dataS = dataS + offset;
-                else
-                    dataS = dataS - offset;
+            double offset = (1 - systdata_accuracy + (double)rand() / RAND_MAX * (1 - systdata_accuracy)) * dataS;
 
-                markovSystolic.next_state();
-                battery.consume(0.1);
+            if (rand() % 2 == 0)
+                dataS = dataS + offset;
+            else
+                dataS = dataS - offset;
 
-                dataD = markovDiastolic.calculate_state();
+            markovSystolic.next_state();
+            battery.consume(0.1);
 
-                offset = (1 - diasdata_accuracy + (double)rand() / RAND_MAX * (1 - diasdata_accuracy)) * dataD;
+            dataD = markovDiastolic.calculate_state();
 
-                if (rand() % 2 == 0)
-                    dataD = dataD + offset;
-                else
-                    dataD = dataD - offset;
+            offset = (1 - diasdata_accuracy + (double)rand() / RAND_MAX * (1 - diasdata_accuracy)) * dataD;
 
-                markovDiastolic.next_state();
-                battery.consume(0.1);
-                
+            if (rand() % 2 == 0)
+                dataD = dataD + offset;
+            else
+                dataD = dataD - offset;
 
-                //for debugging 
-               std::cout << std::endl << "New data (systolic): " << dataS <<std::endl;
-               std::cout << "New data (diastolic): " << dataD <<std::endl;
-            }
-
-            { // TASK: Filter data with moving average
-                filterSystolic.setRange(params["m_avg"]);
-                filterSystolic.insert(dataS, "bpms");
-                dataS = filterSystolic.getValue("bpms");
-                battery.consume(0.1*params["m_avg"]);
-
-                filterDiastolic.setRange(params["m_avg"]);
-                filterDiastolic.insert(dataD, "bpmd");
-                dataD = filterDiastolic.getValue("bpmd");
-                battery.consume(0.1*params["m_avg"]);
-
-                
-                //for debugging 
-                //cout << "Filtered data (systolic): " << dataS <<std::endl;
-                //cout << "Filtered data (diastolic): " << dataD <<std::endl;
-            }
+            markovDiastolic.next_state();
+            battery.consume(0.1);
             
-            { //TASK: Transfer information to CentralHub
-                risk = sensorConfigSystolic.evaluateNumber(dataS);
-                msgS.data = dataS;
-                msgS.risk = risk;
-                
-                if ((rand() % 100) <= systcomm_accuracy * 100)
-                    systolic_pub.publish(msgS);
-                battery.consume(0.1);
 
-                // for debugging
-                std::cout << "Risk: " << risk << "%"  <<std::endl;
+            //for debugging 
+            std::cout << std::endl << "New data (systolic): " << dataS <<std::endl;
+            std::cout << "New data (diastolic): " << dataD <<std::endl;
+        }
 
-                risk = sensorConfigDiastolic.evaluateNumber(dataD);
-                msgD.data = dataD;
-                msgD.risk = risk;
+        { // TASK: Filter data with moving average
+            filterSystolic.setRange(params["m_avg"]);
+            filterSystolic.insert(dataS, "bpms");
+            dataS = filterSystolic.getValue("bpms");
+            battery.consume(0.1*params["m_avg"]);
 
-                if ((rand() % 100) <= diascomm_accuracy * 100)
-                    diastolic_pub.publish(msgD);
-                battery.consume(0.1);
+            filterDiastolic.setRange(params["m_avg"]);
+            filterDiastolic.insert(dataD, "bpmd");
+            dataD = filterDiastolic.getValue("bpmd");
+            battery.consume(0.1*params["m_avg"]);
 
-                // for debugging
-                std::cout << "Risk: " << risk << "%"  <<std::endl;
-            }
+            
+            //for debugging 
+            //cout << "Filtered data (systolic): " << dataS <<std::endl;
+            //cout << "Filtered data (diastolic): " << dataD <<std::endl;
+        }
+        
+        { //TASK: Transfer information to CentralHub
+            risk = sensorConfigSystolic.evaluateNumber(dataS);
+            msgS.data = dataS;
+            msgS.risk = risk;
+            
+            if ((rand() % 100) <= systcomm_accuracy * 100)
+                systolic_pub.publish(msgS);
+            battery.consume(0.1);
 
+            // for debugging
+            std::cout << "Risk: " << risk << "%"  <<std::endl;
+
+            risk = sensorConfigDiastolic.evaluateNumber(dataD);
+            msgD.data = dataD;
+            msgD.risk = risk;
+
+            if ((rand() % 100) <= diascomm_accuracy * 100)
+                diastolic_pub.publish(msgD);
+            battery.consume(0.1);
+
+            // for debugging
+            std::cout << "Risk: " << risk << "%"  <<std::endl;
         }
 
         { // Persist sensor data

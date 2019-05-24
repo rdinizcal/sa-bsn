@@ -16,9 +16,11 @@
 #include "configuration/SensorConfiguration.hpp"
 
 #include "bsn/SensorData.h"
+#include "bsn/TaskInfo.h"
+#include "bsn/ContextInfo.h"
+#include "bsn/ControlCommand.h"
 
 class OximeterModule {
-    
 	private:
       	OximeterModule(const OximeterModule &);
     	OximeterModule &operator=(const OximeterModule &);
@@ -40,6 +42,8 @@ class OximeterModule {
 		void run();
 
 	  private:
+		void receiveControlCommand(const bsn::ControlCommand::ConstPtr& msg);
+
 		std::string type;
 		bsn::resource::Battery battery;
 		bool available;
@@ -57,6 +61,8 @@ class OximeterModule {
 		int persist;
 		std::string path;
 		std::ofstream fp;
+
+		ros::Publisher taskPub, contextPub, dataPub;
 };
 
 #endif 
