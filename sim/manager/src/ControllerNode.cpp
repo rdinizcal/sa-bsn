@@ -45,6 +45,10 @@ void ControllerNode::setUp() {
         g3_t1_1.addChild(std::make_shared<LeafTask>(g3_t1_12));
         g3_t1_1.addChild(std::make_shared<LeafTask>(g3_t1_13));
 
+        g3_t1_11.setContext(bsn::goalmodel::Context("CTX_G3_T1_11","SaO2_available", true));
+        g3_t1_12.setContext(bsn::goalmodel::Context("CTX_G3_T1_12","SaO2_available", true));
+        g3_t1_13.setContext(bsn::goalmodel::Context("CTX_G3_T1_13","SaO2_available", true));
+
         LeafTask g3_t1_21("G3_T1.21","Read data", Property("W_G3_T1_21", 1),Property("R_G3_T1_21", 1),Property("F_G3_T1_21",1));
         LeafTask g3_t1_22("G3_T1.22","Filter data", Property("W_G3_T1_22", 1),Property("R_G3_T1_22", 1),Property("F_G3_T1_22",1));
         LeafTask g3_t1_23("G3_T1.23","Transfer data", Property("W_G3_T1_23", 1),Property("R_G3_T1_23", 1),Property("F_G3_T1_23",1));
@@ -54,6 +58,10 @@ void ControllerNode::setUp() {
         g3_t1_2.addChild(std::make_shared<LeafTask>(g3_t1_22));
         g3_t1_2.addChild(std::make_shared<LeafTask>(g3_t1_23));
 
+        g3_t1_21.setContext(bsn::goalmodel::Context("CTX_G3_T1_21","ECG_available", true));
+        g3_t1_22.setContext(bsn::goalmodel::Context("CTX_G3_T1_22","ECG_available", true));
+        g3_t1_23.setContext(bsn::goalmodel::Context("CTX_G3_T1_23","ECG_available", true));
+
         LeafTask g3_t1_31("G3_T1.31","Read data", Property("W_G3_T1_31", 1),Property("R_G3_T1_31", 1),Property("F_G3_T1_31",1));
         LeafTask g3_t1_32("G3_T1.32","Filter data", Property("W_G3_T1_32", 1),Property("R_G3_T1_32", 1),Property("F_G3_T1_32",1));
         LeafTask g3_t1_33("G3_T1.33","Transfer data", Property("W_G3_T1_33", 1),Property("R_G3_T1_33", 1),Property("F_G3_T1_33",1));
@@ -62,6 +70,10 @@ void ControllerNode::setUp() {
         g3_t1_3.addChild(std::make_shared<LeafTask>(g3_t1_31));
         g3_t1_3.addChild(std::make_shared<LeafTask>(g3_t1_32));
         g3_t1_3.addChild(std::make_shared<LeafTask>(g3_t1_33));
+
+        g3_t1_31.setContext(bsn::goalmodel::Context("CTX_G3_T1_31","TEMP_available", true));
+        g3_t1_32.setContext(bsn::goalmodel::Context("CTX_G3_T1_32","TEMP_available", true));
+        g3_t1_33.setContext(bsn::goalmodel::Context("CTX_G3_T1_33","TEMP_available", true));
 
         LeafTask g3_t1_411("G3_T1.411","Read diastolic", Property("W_G3_T1_411", 1),Property("R_G3_T1_411", 1),Property("F_G3_T1_411",1));
         LeafTask g3_t1_412("G3_T1.412","Read systolic", Property("W_G3_T1_412", 1),Property("R_G3_T1_412", 1),Property("F_G3_T1_412",1));
@@ -74,6 +86,11 @@ void ControllerNode::setUp() {
         g3_t1_4.addChild(std::make_shared<LeafTask>(g3_t1_42));
         g3_t1_4.addChild(std::make_shared<LeafTask>(g3_t1_43));
  
+        g3_t1_411.setContext(bsn::goalmodel::Context("CTX_G3_T1_411","ABP_available", true));
+        g3_t1_412.setContext(bsn::goalmodel::Context("CTX_G3_T1_412","ABP_available", true));
+        g3_t1_42.setContext(bsn::goalmodel::Context("CTX_G3_T1_42","ABP_available", true));
+        g3_t1_43.setContext(bsn::goalmodel::Context("CTX_G3_T1_43","ABP_available", true));
+
         Task g3_t1("G3_T1", "Monitor vital signs");
         g3_t1.addChild(std::make_shared<Task>(g3_t1_1));
  
@@ -87,6 +104,10 @@ void ControllerNode::setUp() {
         LeafTask g4_t1_1("G4_T1.1","Read data", Property("W_G4_T1_1", 1),Property("R_G4_T1_1", 1),Property("F_G4_T1_1",1));
         LeafTask g4_t1_2("G4_T1.2","Filter data", Property("W_G4_T1_2", 1),Property("R_G4_T1_2", 1),Property("F_G4_T1_3",1));
         LeafTask g4_t1_3("G4_T1.3","Transfer data", Property("W_G4_T1_3", 1),Property("R_G4_T1_3", 1),Property("F_G4_T1_3",1));
+
+        g3_t1_411.setContext(bsn::goalmodel::Context("CTX_G3_T1_1","Monitor vital signs", true));
+        g3_t1_412.setContext(bsn::goalmodel::Context("CTX_G4_T1_2","Monitor vital signs", true));
+        g3_t1_42.setContext(bsn::goalmodel::Context("CTX_G4_T1_3","Monitor vital signs ", true));
 
         Task g4_t1("G4_T1", "Analyze vital signs");
         g4_t1.addChild(std::make_shared<LeafTask> (g4_t1_1));
@@ -108,9 +129,9 @@ void ControllerNode::setUp() {
     
 /*     { // Set up map {id,object} of context from goal goalModel
         contexts.insert(std::pair<std::string,bsn::goalmodel::Context>("SaO2_available", bsn::goalmodel::Context("CTX_G3_T1_1","SaO2_available", false)));
-        contexts.insert(std::pair<std::string,bsn::goalmodel::Context>("ECG_available", bsn::goalmodel::Context("CTX_G3_T1_2","ECG_available", false)));
+        contexts.insert(std::pair<std::string,bsn::goalmodel::Context>("ECG_available", bsn::goalmodel::Context("CTX_G3_T1_2","ECG_available", false  )));
         contexts.insert(std::pair<std::string,bsn::goalmodel::Context>("TEMP_available", bsn::goalmodel::Context("CTX_G3_T1_3","TEMP_available", false)));
-        contexts.insert(std::pair<std::string,bsn::goalmodel::Context>("ABP_available", bsn::goalmodel::Context("CTX_G3_T1_4","ABP_available", false)));
+        contexts.insert(std::pair<std::string,bsn::goalmodel::Context>("ABP_available", bsn::goalmodel::Context("CTX_G3_T1_4","ABP_available", false  )));
     }
     */
 
@@ -155,7 +176,8 @@ void ControllerNode::setUp() {
 
         //reli expr
         for(std::vector<std::shared_ptr<bsn::goalmodel::LeafTask>>::iterator it = leafTasks.begin();
-                it != leafTasks.end(); it++) {
+                it != leafTasks.end(); it++) 
+        {
             setTaskValue((*it)->getReliability().getID(), (*it)->getReliability().getValue());
             setTaskValue((*it)->getFrequency().getID(), (*it)->getFrequency().getValue());
         }
@@ -163,10 +185,14 @@ void ControllerNode::setUp() {
         std::map<std::string, double>::const_iterator it1;
         std::map<std::string, bsn::goalmodel::Context>::const_iterator it2;
 
-        for(it1 = tasks.begin(), it2 = contexts.begin(); it1 != tasks.end(), it2 != contexts.end();
-            it1++, it2++) {
-            props.push_back(it1->first);
-            values.push_back(it1->second);
+        for(it1 = tasks.begin(), it2 = contexts.begin(); it1 != tasks.end() || it2 != contexts.end();
+            it1++, it2++)
+        {
+            if(it1 != tasks.end())
+            {
+                props.push_back(it1->first);
+                values.push_back(it1->second);
+            }            
             props.push_back(it2->second.getID());
             values.push_back((double)(it2->second.getValue()));
         }
@@ -183,10 +209,14 @@ void ControllerNode::setUp() {
             setTaskValue((*it)->getCost().getID(), (*it)->getCost().getValue());
         }        
 
-        for(it1 = tasks.begin(), it2 = contexts.begin(); it1 != tasks.end(), it2 != contexts.end();
-            it1++, it2++) {
-            props.push_back(it1->first);
-            values.push_back(it1->second);
+        for(it1 = tasks.begin(), it2 = contexts.begin(); it1 != tasks.end() || it2 != contexts.end();
+            it1++, it2++) 
+        {
+            if(it1 != tasks.end())
+            {
+                props.push_back(it1->first);
+                values.push_back(it1->second);
+            }  
             props.push_back(it2->second.getID());
             values.push_back((double)(it2->second.getValue()));
         }
@@ -257,24 +287,32 @@ void ControllerNode::analyze(std::string id) {
 
     // bad smells everywhere...
 
-    for(it1 = tasks.begin(), it2 = contexts.begin(); it1 != tasks.end(), it2 != contexts.end();
-        it1++, it2++) {
+    for(it1 = tasks.begin(), it2 = contexts.begin(); it1 != tasks.end() || it2 != contexts.end();
+        it1++, it2++) 
+    {
+        if(it1 != tasks.end())
+        {
             props.push_back(it1->first);
             values.push_back(it1->second);
-            props.push_back(it2->second.getID());
-            values.push_back((double)(it2->second.getValue()));
-        }
+        }  
+        props.push_back(it2->second.getID());
+        values.push_back((double)(it2->second.getValue()));
+    }
 
     reli_current = reliability_expression.apply(props, values);
     
     props.clear(); values.clear();
 
-    for(it1 = tasks.begin(), it2 = contexts.begin(); it1 != tasks.end(), it2 != contexts.end();
-        it1++, it2++) {
+    for(it1 = tasks.begin(), it2 = contexts.begin(); it1 != tasks.end() || it2 != contexts.end();
+        it1++, it2++) 
+    {
+        if(it1 != tasks.end())
+        {
             props.push_back(it1->first);
             values.push_back(it1->second);
-            props.push_back(it2->second.getID());
-            values.push_back((double)(it2->second.getValue()));
+        }  
+        props.push_back(it2->second.getID());
+        values.push_back((double)(it2->second.getValue()));
     }
     
     cost_current = cost_expression.apply(props, values);
