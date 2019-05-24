@@ -1,4 +1,5 @@
 #include "BloodpressureModule.hpp"
+#include "generator/DataGenerator.hpp"
 
 using namespace bsn::range;
 using namespace bsn::resource;
@@ -169,6 +170,8 @@ void BloodpressureModule::run() {
     double risk;
     bool first_exec = true;
     uint32_t id = 0;
+    DataGenerator dataGeneratorSys(markovSystolic);
+    DataGenerator dataGeneratorDia(markovDiastolic);
 
     bsn::SensorData msgS, msgD;
     msgS.type = "bpms";
@@ -225,9 +228,10 @@ void BloodpressureModule::run() {
         /*
          * Module execution
          */
-            
+                
+
         { // TASK: Collect bloodpressure data            
-            dataS = markovSystolic.calculate_state();      
+            dataS = dataGeneratorSys.getValue();      
 
             double offset = (1 - systdata_accuracy + (double)rand() / RAND_MAX * (1 - systdata_accuracy)) * dataS;
 
@@ -236,22 +240,19 @@ void BloodpressureModule::run() {
             else
                 dataS = dataS - offset;
 
-            markovSystolic.next_state();
             battery.consume(0.1);
 
-            dataD = markovDiastolic.calculate_state();
+            dataD = dataGeneratorDia.getValue();
+
 
             offset = (1 - diasdata_accuracy + (double)rand() / RAND_MAX * (1 - diasdata_accuracy)) * dataD;
-
             if (rand() % 2 == 0)
                 dataD = dataD + offset;
             else
                 dataD = dataD - offset;
 
-            markovDiastolic.next_state();
             battery.consume(0.1);
             
-
             //for debugging 
             std::cout << std::endl << "New data (systolic): " << dataS <<std::endl;
             std::cout << "New data (diastolic): " << dataD <<std::endl;

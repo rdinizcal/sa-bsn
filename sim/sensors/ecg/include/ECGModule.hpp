@@ -8,6 +8,7 @@
 
 #include "ros/ros.h"
 
+#include "generator/DataGenerator.hpp"
 #include "range/Range.hpp"
 #include "resource/Battery.hpp"
 #include "generator/Markov.hpp"

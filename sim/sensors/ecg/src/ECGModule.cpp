@@ -150,6 +150,7 @@ void ECGModule::run() {
     double risk;
     bool first_exec = true;
     uint32_t id = 0;
+    bsn::generator::DataGenerator dataGenerator(markov);
 
     bsn::SensorData msg;
     msg.type = "ecg";
@@ -199,9 +200,8 @@ void ECGModule::run() {
         /*
          * Module execution
          */
-           
         { // TASK: Collect thermometer data with data_accuracy
-            data = markov.calculate_state();
+            data = dataGenerator.getValue();
             
             double offset = (1 - data_accuracy + (double)rand() / RAND_MAX * (1 - data_accuracy)) * data;
 
@@ -210,7 +210,6 @@ void ECGModule::run() {
             else
                 data = data - offset;
 
-            markov.next_state();
             battery.consume(0.1);
 
             //for debugging
