@@ -216,6 +216,7 @@ void ThermometerModule::run() {
 
             battery.consume(0.1);
 
+
             //for debugging
             std::cout << "New data: " << data << std::endl << std::endl;
         }
