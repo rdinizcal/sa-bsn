@@ -1,6 +1,6 @@
 #include "ControllerNode.hpp"
 #include "operation/Operation.hpp"
-
+#include <ros/package.h>
 #include <memory>
 #include <map>
 using namespace bsn::goalmodel;
@@ -30,66 +30,90 @@ ControllerNode::~ControllerNode() {}
 void ControllerNode::setUp() {
 
     GoalTree goalModel("Body Sensor Network");
-
-    { // Set up the goal tree goalModel        
+    std::string path = ros::package::getPath("manager");
+     // Set up the goal tree goalModel        
         LeafTask g3_t1_11("G3_T1.11","Read data", Property("W_G3_T1_11", 1),Property("R_G3_T1_11", 1),Property("F_G3_T1_11",1));
         LeafTask g3_t1_12("G3_T1.12","Filter data", Property("W_G3_T1_12", 1),Property("R_G3_T1_12", 1),Property("F_G3_T1_12",1));
         LeafTask g3_t1_13("G3_T1.13","Transfer data", Property("W_G3_T1_13", 1),Property("R_G3_T1_13", 1),Property("F_G3_T1_13",1));
 
-        Task g3_t1_1("G3_T1.1", "Collect SaO2 data");
-        g3_t1_1.addChild(std::make_shared<LeafTask>(g3_t1_11));
-        g3_t1_1.addChild(std::make_shared<LeafTask>(g3_t1_12));
-        g3_t1_1.addChild(std::make_shared<LeafTask>(g3_t1_13));
+        std::shared_ptr<LeafTask> p_g3_t1_11, p_g3_t1_12, p_g3_t1_13;
+        std::shared_ptr<LeafTask> p_g3_t1_21, p_g3_t1_22, p_g3_t1_23;
+        std::shared_ptr<LeafTask> p_g3_t1_31, p_g3_t1_32, p_g3_t1_33;
+        std::shared_ptr<LeafTask> p_g3_t1_411, p_g3_t1_412, p_g3_t1_42,p_g3_t1_43;
+        std::shared_ptr<LeafTask> p_g4_t1_1, p_g4_t1_2, p_g4_t1_3;
 
         g3_t1_11.setContext(bsn::goalmodel::Context("CTX_G3_T1_11","SaO2_available", true));
         g3_t1_12.setContext(bsn::goalmodel::Context("CTX_G3_T1_12","SaO2_available", true));
         g3_t1_13.setContext(bsn::goalmodel::Context("CTX_G3_T1_13","SaO2_available", true));
 
+        p_g3_t1_11 = std::make_shared<LeafTask>(g3_t1_11);
+        p_g3_t1_12 = std::make_shared<LeafTask>(g3_t1_12);
+        p_g3_t1_13 = std::make_shared<LeafTask>(g3_t1_13);
+
+
+        Task g3_t1_1("G3_T1.1", "Collect SaO2 data");
+        g3_t1_1.addChild(p_g3_t1_11);
+        g3_t1_1.addChild(p_g3_t1_12);
+        g3_t1_1.addChild(p_g3_t1_13);
+
         LeafTask g3_t1_21("G3_T1.21","Read data", Property("W_G3_T1_21", 1),Property("R_G3_T1_21", 1),Property("F_G3_T1_21",1));
         LeafTask g3_t1_22("G3_T1.22","Filter data", Property("W_G3_T1_22", 1),Property("R_G3_T1_22", 1),Property("F_G3_T1_22",1));
         LeafTask g3_t1_23("G3_T1.23","Transfer data", Property("W_G3_T1_23", 1),Property("R_G3_T1_23", 1),Property("F_G3_T1_23",1));
-
-        Task g3_t1_2("G3_T1.2", "Collect ECG data");
-        g3_t1_2.addChild(std::make_shared<LeafTask>(g3_t1_21));
-        g3_t1_2.addChild(std::make_shared<LeafTask>(g3_t1_22));
-        g3_t1_2.addChild(std::make_shared<LeafTask>(g3_t1_23));
 
         g3_t1_21.setContext(bsn::goalmodel::Context("CTX_G3_T1_21","ECG_available", true));
         g3_t1_22.setContext(bsn::goalmodel::Context("CTX_G3_T1_22","ECG_available", true));
         g3_t1_23.setContext(bsn::goalmodel::Context("CTX_G3_T1_23","ECG_available", true));
 
+        p_g3_t1_21 = std::make_shared<LeafTask>(g3_t1_21);
+        p_g3_t1_22 = std::make_shared<LeafTask>(g3_t1_22);
+        p_g3_t1_23 = std::make_shared<LeafTask>(g3_t1_23);
+
+        Task g3_t1_2("G3_T1.2", "Collect ECG data");
+        g3_t1_2.addChild(p_g3_t1_21);
+        g3_t1_2.addChild(p_g3_t1_22);
+        g3_t1_2.addChild(p_g3_t1_23);
+
         LeafTask g3_t1_31("G3_T1.31","Read data", Property("W_G3_T1_31", 1),Property("R_G3_T1_31", 1),Property("F_G3_T1_31",1));
         LeafTask g3_t1_32("G3_T1.32","Filter data", Property("W_G3_T1_32", 1),Property("R_G3_T1_32", 1),Property("F_G3_T1_32",1));
         LeafTask g3_t1_33("G3_T1.33","Transfer data", Property("W_G3_T1_33", 1),Property("R_G3_T1_33", 1),Property("F_G3_T1_33",1));
-
-        Task g3_t1_3("G3_T1.3", "Collect TEMP data");
-        g3_t1_3.addChild(std::make_shared<LeafTask>(g3_t1_31));
-        g3_t1_3.addChild(std::make_shared<LeafTask>(g3_t1_32));
-        g3_t1_3.addChild(std::make_shared<LeafTask>(g3_t1_33));
 
         g3_t1_31.setContext(bsn::goalmodel::Context("CTX_G3_T1_31","TEMP_available", true));
         g3_t1_32.setContext(bsn::goalmodel::Context("CTX_G3_T1_32","TEMP_available", true));
         g3_t1_33.setContext(bsn::goalmodel::Context("CTX_G3_T1_33","TEMP_available", true));
 
+        p_g3_t1_31 = std::make_shared<LeafTask>(g3_t1_31);
+        p_g3_t1_32 = std::make_shared<LeafTask>(g3_t1_32);
+        p_g3_t1_33 = std::make_shared<LeafTask>(g3_t1_33);
+
+        Task g3_t1_3("G3_T1.3", "Collect TEMP data");
+        g3_t1_3.addChild(p_g3_t1_31);
+        g3_t1_3.addChild(p_g3_t1_32);
+        g3_t1_3.addChild(p_g3_t1_33);
+
+
         LeafTask g3_t1_411("G3_T1.411","Read diastolic", Property("W_G3_T1_411", 1),Property("R_G3_T1_411", 1),Property("F_G3_T1_411",1));
         LeafTask g3_t1_412("G3_T1.412","Read systolic", Property("W_G3_T1_412", 1),Property("R_G3_T1_412", 1),Property("F_G3_T1_412",1));
         LeafTask g3_t1_42("G3_T1.42","Filter data", Property("W_G3_T1_42", 1),Property("R_G3_T1_42", 1),Property("F_G3_T1_42",1));
         LeafTask g3_t1_43("G3_T1.43","Transfer data", Property("W_G3_T1_43", 1),Property("R_G3_T1_43", 1),Property("F_G3_T1_43",1));
-
-        Task g3_t1_4("G3_T1.4", "Collect ABP data");
-        g3_t1_4.addChild(std::make_shared<LeafTask>(g3_t1_411));
-        g3_t1_4.addChild(std::make_shared<LeafTask>(g3_t1_412));
-        g3_t1_4.addChild(std::make_shared<LeafTask>(g3_t1_42));
-        g3_t1_4.addChild(std::make_shared<LeafTask>(g3_t1_43));
- 
+        
         g3_t1_411.setContext(bsn::goalmodel::Context("CTX_G3_T1_411","ABP_available", true));
         g3_t1_412.setContext(bsn::goalmodel::Context("CTX_G3_T1_412","ABP_available", true));
         g3_t1_42.setContext(bsn::goalmodel::Context("CTX_G3_T1_42","ABP_available", true));
         g3_t1_43.setContext(bsn::goalmodel::Context("CTX_G3_T1_43","ABP_available", true));
+        
+        p_g3_t1_411 = std::make_shared<LeafTask>(g3_t1_411);
+        p_g3_t1_412 = std::make_shared<LeafTask>(g3_t1_412);
+        p_g3_t1_42 = std::make_shared<LeafTask>(g3_t1_42);
+        p_g3_t1_43 = std::make_shared<LeafTask>(g3_t1_43);
+
+        Task g3_t1_4("G3_T1.4", "Collect ABP data");
+        g3_t1_4.addChild(p_g3_t1_411);
+        g3_t1_4.addChild(p_g3_t1_412);
+        g3_t1_4.addChild(p_g3_t1_42 );
+        g3_t1_4.addChild(p_g3_t1_43 );
 
         Task g3_t1("G3_T1", "Monitor vital signs");
         g3_t1.addChild(std::make_shared<Task>(g3_t1_1));
- 
         g3_t1.addChild(std::make_shared<Task>(g3_t1_2));
         g3_t1.addChild(std::make_shared<Task>(g3_t1_3));
         g3_t1.addChild(std::make_shared<Task>(g3_t1_4));
@@ -98,17 +122,21 @@ void ControllerNode::setUp() {
         g3.addChild(std::make_shared<Task>(g3_t1));
 
         LeafTask g4_t1_1("G4_T1.1","Read data", Property("W_G4_T1_1", 1),Property("R_G4_T1_1", 1),Property("F_G4_T1_1",1));
-        LeafTask g4_t1_2("G4_T1.2","Filter data", Property("W_G4_T1_2", 1),Property("R_G4_T1_2", 1),Property("F_G4_T1_3",1));
+        LeafTask g4_t1_2("G4_T1.2","Filter data", Property("W_G4_T1_2", 1),Property("R_G4_T1_2", 1),Property("F_G4_T1_2",1));
         LeafTask g4_t1_3("G4_T1.3","Transfer data", Property("W_G4_T1_3", 1),Property("R_G4_T1_3", 1),Property("F_G4_T1_3",1));
 
-        g3_t1_411.setContext(bsn::goalmodel::Context("CTX_G3_T1_1","Monitor vital signs", true));
-        g3_t1_412.setContext(bsn::goalmodel::Context("CTX_G4_T1_2","Monitor vital signs", true));
-        g3_t1_42.setContext(bsn::goalmodel::Context("CTX_G4_T1_3","Monitor vital signs ", true));
+        g4_t1_1.setContext(bsn::goalmodel::Context("CTX_G1_T1_1","Monitor vital signs", true));
+        g4_t1_2.setContext(bsn::goalmodel::Context("CTX_G2_T1_2","Monitor vital signs", true));
+        g4_t1_3.setContext(bsn::goalmodel::Context("CTX_G3_T1_3","Monitor vital signs ", true));
+
+        p_g4_t1_1 = std::make_shared<LeafTask>(g4_t1_1); 
+        p_g4_t1_2 = std::make_shared<LeafTask>(g4_t1_2);
+        p_g4_t1_3 = std::make_shared<LeafTask>(g4_t1_3);
 
         Task g4_t1("G4_T1", "Analyze vital signs");
-        g4_t1.addChild(std::make_shared<LeafTask> (g4_t1_1));
-        g4_t1.addChild(std::make_shared<LeafTask> (g4_t1_2));
-        g4_t1.addChild(std::make_shared<LeafTask> (g4_t1_3));
+        g4_t1.addChild(p_g4_t1_1);
+        g4_t1.addChild(p_g4_t1_2);
+        g4_t1.addChild(p_g4_t1_3);
 
         Goal g4("G4", "Vital signs are analyzed");
         g4.addChild(std::make_shared<Task>(g4_t1));
@@ -120,7 +148,7 @@ void ControllerNode::setUp() {
         g1.addChild(std::make_shared<Goal>(g2));
 
         goalModel.addRootGoal(std::make_shared<Goal>(g1));
-    }
+    
 
     
 /*     { // Set up map {id,object} of context from goal goalModel
@@ -131,7 +159,7 @@ void ControllerNode::setUp() {
     }
     */
 
-    { // Set up cost and reliability expressions
+     // Set up cost and reliability expressions
         std::ifstream cost_file;
         std::string cost_formula;
 
@@ -139,13 +167,13 @@ void ControllerNode::setUp() {
         std::string reliability_formula;
 
         try{
-            cost_file.open("formulae/cost.formula");
+            cost_file.open(path + "/formulae/cost.formula");
             std::getline(cost_file,cost_formula);
             cost_file.close();
         } catch (std::ifstream::failure e) { std::cerr << "Exception opening/reading/closing file (cost.formula)\n"; }
 
         try{
-            reliability_file.open("formulae/reliability.formula");
+            reliability_file.open(path + "/formulae/reliability.formula");
             std::getline(reliability_file,reliability_formula);
             reliability_file.close();
         } catch (std::ifstream::failure e) { std::cerr << "Exception opening/reading/closing file (reliability.formula)\n"; }
@@ -153,47 +181,71 @@ void ControllerNode::setUp() {
         cost_expression = bsn::model::Formula(cost_formula);
         reliability_expression = bsn::model::Formula(reliability_formula);
 
-        std::vector<std::shared_ptr<bsn::goalmodel::LeafTask>> leafTasks = goalModel.getLeafTasks();
+        std::vector<std::shared_ptr<bsn::goalmodel::LeafTask>> leafTasks; // = goalModel.getLeafTasks();
+        leafTasks.push_back(p_g3_t1_11);
+        leafTasks.push_back(p_g3_t1_12);
+        leafTasks.push_back(p_g3_t1_13);
+        leafTasks.push_back(p_g3_t1_21);
+        leafTasks.push_back(p_g3_t1_22);
+        leafTasks.push_back(p_g3_t1_23);
+        leafTasks.push_back(p_g3_t1_31);
+        leafTasks.push_back(p_g3_t1_32);
+        leafTasks.push_back(p_g3_t1_33);
+        leafTasks.push_back(p_g3_t1_411);
+        leafTasks.push_back(p_g3_t1_412);
+        leafTasks.push_back(p_g3_t1_42);
+        leafTasks.push_back(p_g3_t1_43);
+        leafTasks.push_back(p_g4_t1_1);
+        leafTasks.push_back(p_g4_t1_2);
+        leafTasks.push_back(p_g4_t1_3);
+//       std::cout << leafTasks.size() << std::endl;
 
         //set initial conditions: order should be respected
 
         // Get context information from leafTasks
 
         bsn::goalmodel::Context aux_context;
+        std::string newName;
 
-        for(std::vector<std::shared_ptr<bsn::goalmodel::LeafTask>>::iterator it = leafTasks.begin();
-                it != leafTasks.end(); it++) 
+        for(std::shared_ptr<bsn::goalmodel::LeafTask> it : leafTasks) 
         {
-            aux_context.setDescription((*it)->getContext().getDescription());
-            aux_context.setValue((*it)->getContext().getValue());
-            contexts[(*it)->getContext().getID()] = aux_context;
+            newName = it->getID();
+            std::replace(newName.begin(),newName.end(),  '.', '_');
+            aux_context.setDescription(it->getContext().getDescription());
+            aux_context.setValue(it->getContext().getValue());
+            aux_context.setID(newName);
+            contexts[it->getContext().getID()] = aux_context;
         }        
 
 
         //reli expr
-        for(std::vector<std::shared_ptr<bsn::goalmodel::LeafTask>>::iterator it = leafTasks.begin();
-                it != leafTasks.end(); it++) 
+        for(std::shared_ptr<bsn::goalmodel::LeafTask> it : leafTasks) 
         {
-            setTaskValue((*it)->getReliability().getID(), (*it)->getReliability().getValue());
-            setTaskValue((*it)->getFrequency().getID(), (*it)->getFrequency().getValue());
+            std::cout << it->getFrequency().getID() << std::endl;
+            setTaskValue(it->getReliability().getID(), it->getReliability().getValue());
+            setTaskValue(it->getFrequency().getID(), it->getFrequency().getValue());
         }
 
         std::map<std::string, double>::const_iterator it1;
         std::map<std::string, bsn::goalmodel::Context>::const_iterator it2;
 
-        for(it1 = tasks.begin(), it2 = contexts.begin(); it1 != tasks.end() || it2 != contexts.end();
-            it1++, it2++)
+        for(it1 = tasks.begin(); it1 != tasks.end(); it1++)
         {
-            if(it1 != tasks.end())
-            {
-                props.push_back(it1->first);
-                values.push_back(it1->second);
-            }            
+            props.push_back(it1->first);
+            values.push_back(it1->second);
+        }
+
+        std::cout << aux_context.getID() << std::endl;
+
+        for(it2 = contexts.begin(); it2 != contexts.end(); it2++)
+        {
             props.push_back(it2->second.getID());
             values.push_back((double)(it2->second.getValue()));
         }
 
+        std::cout << "antes" << std::endl;
         this->reli_value = reliability_expression.apply(props, values);
+        std::cout << "depois" << std::endl;
 
         props.clear(); values.clear();
         
@@ -218,7 +270,7 @@ void ControllerNode::setUp() {
         }
 
         this->cost_value = cost_expression.apply(props, values);
-    }
+    
 }
 
 /** **************************************************************

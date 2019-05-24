@@ -54,6 +54,7 @@
   <build_depend>message_generation</build_depend>
   <build_depend>lepton</build_depend>
   <build_depend>bsn</build_depend>
+  <build_depend>roslib</build_depend>
 
   <exec_depend>bsn</exec_depend>
   <exec_depend>lepton</exec_depend>
