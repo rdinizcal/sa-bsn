@@ -39,20 +39,16 @@ void CentralhubModule::tearDown() {
         fp.close();
 }
 
-void CentralhubModule::sendTaskInfo(const std::string &task_id, const double &cost, const double &reliability, const double &frequency) {
-    // TaskInfo task(task_id, cost, reliability, frequency);
-    // Container taskContainer(task);
-    // getConference().send(taskContainer);
-}
-
-void CentralhubModule::sendMonitorTaskInfo(const std::string &task_id, const double &cost, const double &reliability, const double &frequency) {
-    // MonitorTaskInfo task(task_id, cost, reliability, frequency);
-    // Container taskContainer(task);
-    // getConference().send(taskContainer);
-}
-
 std::string CentralhubModule::makePacket() {
-    std::string packet = "88,97#10,20,30,40,50&";
+    //std::string packet = "88,97#10,20,30,40,50&";
+    std::string packet = "";
+    packet.append(cost).append(",");
+    packet.append(reliability).append("#");
+    packet.append(bpr_risk).append(",");
+    packet.append(oxi_risk).append(",");
+    packet.append(ecg_risk).append(",");
+    packet.append(trm_risk).append("&");
+
     int i = 0;
     for (std::list<double> li : data_list) {
         if (!li.empty()) {
@@ -89,10 +85,10 @@ void CentralhubModule::persistData(std::vector<std::string>& risks) {
 
 std::vector<std::string> CentralhubModule::getPatientStatus() {
     std::string sensor_risk_str;
-    std::string bpr_risk;
-    std::string oxi_risk;
-    std::string ecg_risk;
-    std::string trm_risk;
+    std::string bpr;
+    std::string oxi;
+    std::string ecg;
+    std::string trm;
 
     for (int i = 0; i < 4; i++) {
         double sensor_risk = data_list[i].back();
@@ -109,17 +105,21 @@ std::vector<std::string> CentralhubModule::getPatientStatus() {
         }
 
         if (i==0) {
-            trm_risk = sensor_risk_str;
+            trm = sensor_risk_str;
+            trm_risk = std::to_string(sensor_risk);
         } else if (i == 1){
-            ecg_risk = sensor_risk_str;
+            ecg = sensor_risk_str;
+            ecg_risk = std::to_string(sensor_risk);
         } else if (i == 2) {
-            oxi_risk = sensor_risk_str;
+            oxi = sensor_risk_str;
+            oxi_risk = std::to_string(sensor_risk);
         } else {
-            bpr_risk = sensor_risk_str;
+            bpr = sensor_risk_str;
+            bpr_risk = std::to_string(sensor_risk);
         }
     }
 
-    std::vector<std::string> v = {trm_risk, ecg_risk, oxi_risk, bpr_risk};  
+    std::vector<std::string> v = {trm, ecg, oxi, bpr};  
     return v;
 }
 
@@ -166,12 +166,12 @@ void CentralhubModule::receiveSensorData(const bsn::SensorData::ConstPtr& msg) {
     std::cout << "*****************************************" << std::endl;
 }
 
+void CentralhubModule::receiveSystemInfo(const bsn::SystemInfo::ConstPtr& msg) {
+    reliability = msg->reliability;
+    cost = msg->cost;
+}
+
 void CentralhubModule::run() {   
-    bool received = false;
-    std::string packet;
-    // std::array<double, 5> data;
-    int id = 0;
-    double reli = 1;
     ros::NodeHandle nh;
     
     ros::Subscriber thermometerSub = nh.subscribe("thermometer_data", 10, &CentralhubModule::receiveSensorData, this);
@@ -180,66 +180,9 @@ void CentralhubModule::run() {
     ros::Subscriber diastolicSub = nh.subscribe("diastolic_data", 10, &CentralhubModule::receiveSensorData, this);
     ros::Subscriber systolicSub = nh.subscribe("systolic_data", 10, &CentralhubModule::receiveSensorData, this);
 
+    ros::Subscriber systemSub = nh.subscribe("system_info", 10, &CentralhubModule::receiveSystemInfo, this);
+
     ros::spin();
-    // while (ros::ok()) {
-        
-    //     received = false;
-    //     cout << "operating frequency: " << params["freq"] << endl;
-
-        // while(!buffer.isEmpty()){
-            
-        //     container = buffer.leave();
-
-        //     if(container.getDataType()==904){
-        //         active = container.getData<CentralHubControlCommand>().getActive();
-        //         params["freq"] = container.getData<CentralHubControlCommand>().getFrequency(); 
-        //     }
-        //     if(container.getDataType()==873){
-        //         Container ncont(container.getData<SensorData>());
-        //         localQueue.add(ncont);
-        //     }
-        // }
-        
-        /*sets the centralhub reliability based on the number of messages to process (fibonacci)*/
-        // if(!localQueue.isEmpty()){
-        //     std::cout << "localQueue size:" << localQueue.getSize() << std::endl;
-
-        //     if (localQueue.getSize()>8) {
-        //         reli = 0.95 - 0.03*13;
-        //     } else if (localQueue.getSize()>6) {
-        //         reli = 0.95 - 0.03*5;
-        //     } else if (localQueue.getSize()>4) {
-        //         reli = 0.95 - 0.03*3;
-        //     } else if (localQueue.getSize()>2) {
-        //         reli = 0.95 - 0.03*2;
-        //     } else {
-        //         reli = 0.95;
-        //     }
-
-            // { // update controller with task info
-            //     sendTaskInfo("G4_T1.1",0,1,params["freq"]);
-            //     sendTaskInfo("G4_T1.2",0,1,params["freq"]);
-            //     sendTaskInfo("G4_T1.3",0,1,params["freq"]);
-            // // and the monitor..
-            //     sendMonitorTaskInfo("G4_T1.1",0,1,params["freq"]);
-            //     sendMonitorTaskInfo("G4_T1.2",0,reli,params["freq"]);
-            //     sendMonitorTaskInfo("G4_T1.3",0,1,params["freq"]);
-            // }
-        // }
-
-        // if((rand() % 100)+1 < int32_t(params["freq"]*100)){
-            
-        //  
-
-        //     { // Persist and send data to controller
-                     
-                 // ContextInfo contextInfo("patient health status", false, 0, 0, (patient_status>=66)?"CRITICAL STATE":"NORMAL STATE");
-        //         // Container contextInfoContainer(contextInfo);
-        //         // getConference().send(contextInfoContainer);
-                // }
-    
-
-    // }
 
     return;
 }

@@ -29,6 +29,7 @@ ADD_MESSAGE_FILES(
   FILES
   info/ContextInfo.msg
   info/TaskInfo.msg
+  info/SystemInfo.msg
   data/SensorData.msg
   command/ControlCommand.msg
 )

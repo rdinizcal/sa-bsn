@@ -4,20 +4,14 @@
 #include <fstream>
 #include <chrono>
 
-#include<cpprest/http_client.h>
-#include<cpprest/json.h>
+#include <cpprest/http_client.h>
+#include <cpprest/json.h>
 #include "ros/ros.h"
 
 #include "processor/Processor.hpp"
 
-// #include "bsn/msg/info/TaskInfo.h"
-// #include "bsn/msg/data/SensorData.h"
-// #include "bsn/msg/info/ContextInfo.hpp"
-// #include "bsn/msg/info/MonitorTaskInfo.hpp"
 #include "bsn/SensorData.h"
-// #include "bsn/msg/control/CentralHubControlCommand.hpp"
-
-
+#include "bsn/SystemInfo.h"
 
 class CentralhubModule {
     private:
@@ -30,11 +24,10 @@ class CentralhubModule {
         void sendMonitorTaskInfo(const std::string &/*task_id*/, const double &/*cost*/, const double &/*reliability*/, const double &/*frequency*/);
 
         void receiveSensorData(const bsn::SensorData::ConstPtr&);
+        void receiveSystemInfo(const bsn::SystemInfo::ConstPtr&); 
 
         std::string makePacket();
-
         void persistData(std::vector<std::string>&);
-
         std::vector<std::string> getPatientStatus();
 
     public:
@@ -59,6 +52,14 @@ class CentralhubModule {
         std::vector<std::list<double>> data_list;
         double patient_status;
         int session;
+
+        std::string bpr_risk;
+        std::string oxi_risk;
+        std::string ecg_risk;
+        std::string trm_risk;
+        std::string reliability;
+        std::string cost;
+
 };
 
 #endif 
