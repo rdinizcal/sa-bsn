@@ -204,15 +204,14 @@ void ControllerNode::setUp() {
             aux_context.setValue(it->getContext().getValue());
             aux_context.setID(newName);
             contexts[it->getContext().getID()] = aux_context;
-            std::cout << "it->getContext().getID(): " << it->getContext().getID() << std::endl;
-        } else std::cout << "opa" << std::endl;
+        }
     }        
 
 
     //reli expr
     for(std::shared_ptr<bsn::goalmodel::LeafTask> it : leafTasks) 
     {
-        std::cout << it->getFrequency().getID() << std::endl;
+//        std::cout << it->getFrequency().getID() << std::endl;
         setTaskValue(it->getReliability().getID(), it->getReliability().getValue());
         setTaskValue(it->getFrequency().getID(), it->getFrequency().getValue());
     }
@@ -233,16 +232,15 @@ void ControllerNode::setUp() {
         values.push_back((double)(it2->second.getValue()));
     }
 
-    std::cout << "antes" << std::endl;
+//    std::cout << "antes" << std::endl;
     this->reli_value = reliability_expression.apply(props, values);
-    std::cout << "depois" << std::endl;
+//    std::cout << "depois" << std::endl;
 
     props.clear(); values.clear();
     
     //cost expr
     for(std::shared_ptr<bsn::goalmodel::LeafTask> it : leafTasks) 
     {
-        std::cout << it->getFrequency().getID() << std::endl;
         setTaskValue(it->getReliability().getID(), it->getReliability().getValue());
         setTaskValue(it->getFrequency().getID(), it->getFrequency().getValue());
         setTaskValue(it->getCost().getID(), it->getCost().getValue());
@@ -435,6 +433,7 @@ void ControllerNode::execute(std::string id, double action, double ccurrent, dou
     command_msg.frequency = action;
 
     actuator_pub.publish(command_msg);
+    std::cout << "Received message from: " << current_sensor << std::endl;
 
     ros::Publisher centralhub_pub = publisher_handler.advertise<bsn::SystemInfo>("system_info", 1000);
 
@@ -452,7 +451,7 @@ void ControllerNode::run(){
     ros::NodeHandle n;
    
     ros::Subscriber t_sub = n.subscribe("manager_sensor", 1000, &ControllerNode::receiveTaskInfo, this);
-    ros::Subscriber c_sub = n.subscribe("manager_sensor", 1000, &ControllerNode::receiveContextInfo, this);
+//    ros::Subscriber c_sub = n.subscribe("manager_sensor", 1000, &ControllerNode::receiveContextInfo, this);
 
     ros::spin();
 
