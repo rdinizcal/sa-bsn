@@ -197,7 +197,7 @@ void ControllerNode::setUp() {
     for(std::shared_ptr<bsn::goalmodel::LeafTask> it : leafTasks) 
     {
         newName = it->getID();
-        
+
         if (newName == " ") {
             std::replace(newName.begin(),newName.end(),  '.', '_');
             aux_context.setDescription(it->getContext().getDescription());
@@ -327,8 +327,10 @@ void ControllerNode::analyze(std::string id) {
 
     for(it1 = tasks.begin(); it1 != tasks.end(); it1++)
     {
-        props.push_back(it1->first);
-        values.push_back(it1->second);
+        if(!isCost(it1->first)) {
+            props.push_back(it1->first);
+            values.push_back(it1->second);
+        }
     }
 
     for(it2 = contexts.begin(); it2 != contexts.end(); it2++)
@@ -338,8 +340,11 @@ void ControllerNode::analyze(std::string id) {
         values.push_back((double)(it2->second.getValue()));
     }      
 
+
+    std::cout << "antes de reli..." << std::endl;
     reli_current = reliability_expression.apply(props, values);
-    
+    std::cout << "depois de reli..." << std::endl;
+
     props.clear(); values.clear();
 
 
@@ -356,8 +361,10 @@ void ControllerNode::analyze(std::string id) {
         values.push_back((double)(it2->second.getValue()));
     }      
     
+    std::cout << "antes de cost..." << std::endl;
     cost_current = cost_expression.apply(props, values);
-    
+    std::cout << "depois de cost..." << std::endl;
+
     this->reli_error = this->reli_value - reli_current;
     this->cost_error = this->cost_value - cost_current; 
 
@@ -403,7 +410,11 @@ void ControllerNode::execute(std::string id, double action, double ccurrent, dou
 
     bsn::operation::Operation op = bsn::operation::Operation();
 
-    int sensor_id = stoi((op.split(id, '.'))[0]);
+    std::string sensorID = (op.split(id, '.'))[1];
+
+    std::cout << id << ": " << sensorID << std::endl;
+
+    int sensor_id = std::stoi(sensorID) / 10;
     std::string current_sensor;
 
     switch(sensor_id) {
@@ -424,8 +435,10 @@ void ControllerNode::execute(std::string id, double action, double ccurrent, dou
             break;
     }
 
+    std::string actuator_name = current_sensor + "_control_command";
+
     ros::NodeHandle publisher_handler;
-	ros::Publisher actuator_pub = publisher_handler.advertise<bsn::ControlCommand>("controller_command", 1000);
+	ros::Publisher actuator_pub = publisher_handler.advertise<bsn::ControlCommand>(actuator_name, 1000);
 
     bsn::ControlCommand command_msg;
 
@@ -450,7 +463,8 @@ void ControllerNode::run(){
 
     ros::NodeHandle n;
    
-    ros::Subscriber t_sub = n.subscribe("manager_sensor", 1000, &ControllerNode::receiveTaskInfo, this);
+    ros::Subscriber t_sub = n.subscribe("task_info", 1000, &ControllerNode::receiveTaskInfo, this);
+//    ros::Subscriber t_sub = n.subscribe("manager_sensor", 1000, &ControllerNode::receiveTaskInfo, this);
 //    ros::Subscriber c_sub = n.subscribe("manager_sensor", 1000, &ControllerNode::receiveContextInfo, this);
 
     ros::spin();

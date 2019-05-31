@@ -143,7 +143,9 @@ void ECGModule::sendContextInfo(const std::string &context_id, const bool &statu
 
 void ECGModule::receiveControlCommand(const bsn::ControlCommand::ConstPtr& msg)  {
     active = msg->active;
-    params["freq"] = msg->frequency;
+    double newFreq = msg->frequency;
+    std::cout << "Frequency changed from " << params["freq"] << " to " <<newFreq << std::endl;
+    params["freq"] = newFreq;
 }
 
 void ECGModule::run() {
@@ -168,9 +170,9 @@ void ECGModule::run() {
     while (ros::ok()) {
         { // update controller with task info            
             sendContextInfo("ECG_available",true);
-            sendTaskInfo("G3_T1.31",0.1,data_accuracy,params["freq"]);
-            sendTaskInfo("G3_T1.32",0.1*params["m_avg"],1,params["freq"]);
-            sendTaskInfo("G3_T1.33",0.1,comm_accuracy,params["freq"]);
+            sendTaskInfo("G3_T1.21",0.1,data_accuracy,params["freq"]);
+            sendTaskInfo("G3_T1.22",0.1*params["m_avg"],1,params["freq"]);
+            sendTaskInfo("G3_T1.23",0.1,comm_accuracy,params["freq"]);
         }
 
         { // recharge routine
