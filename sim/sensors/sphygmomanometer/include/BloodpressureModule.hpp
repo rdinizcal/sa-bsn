@@ -8,15 +8,18 @@
 
 #include "ros/ros.h"
 
-#include "range/Range.hpp"
-#include "resource/Battery.hpp"
-#include "generator/Markov.hpp"
-#include "generator/DataGenerator.hpp"
-#include "filters/MovingAverage.hpp"
-#include "operation/Operation.hpp"
-#include "configuration/SensorConfiguration.hpp"
+#include "bsn/range/Range.hpp"
+#include "bsn/resource/Battery.hpp"
+#include "bsn/generator/Markov.hpp"
+#include "bsn/generator/DataGenerator.hpp"
+#include "bsn/filters/MovingAverage.hpp"
+#include "bsn/operation/Operation.hpp"
+#include "bsn/configuration/SensorConfiguration.hpp"
 
-#include "bsn/SensorData.h"
+#include "messages/SensorData.h"
+#include "messages/TaskInfo.h"
+#include "messages/ContextInfo.h"
+#include "messages/ControlCommand.h"
 
 class BloodpressureModule {
     

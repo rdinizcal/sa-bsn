@@ -115,8 +115,8 @@ void ThermometerModule::setUp() {
         }
     }
 
-    taskPub =  n.advertise<bsn::TaskInfo>("task_info", 10);
-    contextPub =  n.advertise<bsn::ContextInfo>("context_info", 10);
+    taskPub =  n.advertise<messages::TaskInfo>("task_info", 10);
+    contextPub =  n.advertise<messages::ContextInfo>("context_info", 10);
 }
 
 void ThermometerModule::tearDown() {
@@ -125,7 +125,7 @@ void ThermometerModule::tearDown() {
 }
 
 void ThermometerModule::sendTaskInfo(const std::string &task_id, const double &cost, const double &reliability, const double &frequency) {
-    bsn::TaskInfo msg;
+    messages::TaskInfo msg;
 
     msg.task_id = task_id;
     msg.cost = cost;
@@ -135,14 +135,14 @@ void ThermometerModule::sendTaskInfo(const std::string &task_id, const double &c
 }
 
 void ThermometerModule::sendContextInfo(const std::string &context_id, const bool &status) {
-    bsn::ContextInfo msg;
+    messages::ContextInfo msg;
 
     msg.context_id = context_id;
     msg.status = status;
     contextPub.publish(msg);
 }
 
-void ThermometerModule::receiveControlCommand(const bsn::ControlCommand::ConstPtr& msg)  {
+void ThermometerModule::receiveControlCommand(const messages:::ControlCommand::ConstPtr& msg)  {
     active = msg->active;
     params["freq"] = msg->frequency;
 }
@@ -155,10 +155,10 @@ void ThermometerModule::run() {
     uint32_t id = 0;
     bsn::generator::DataGenerator dataGenerator(markov);
 
-    bsn::SensorData msg;
+    messages::SensorData msg;
     ros::NodeHandle n;
 
-    dataPub = n.advertise<bsn::SensorData>("thermometer_data", 10);
+    dataPub = n.advertise<messages::SensorData>("thermometer_data", 10);
     ros::Subscriber thermometerSub = n.subscribe("thermometer_control_command", 10, &ThermometerModule::receiveControlCommand, this);
 
     ros::Rate loop_rate(params["freq"]);

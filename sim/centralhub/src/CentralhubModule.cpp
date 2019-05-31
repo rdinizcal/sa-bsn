@@ -123,7 +123,7 @@ std::vector<std::string> CentralhubModule::getPatientStatus() {
     return v;
 }
 
-void CentralhubModule::receiveSensorData(const bsn::SensorData::ConstPtr& msg) {
+void CentralhubModule::receiveSensorData(const messages::SensorData::ConstPtr& msg) {
     std::string type = msg->type;
     double risk = msg->risk;
     std::string bpr_risk, oxi_risk, ecg_risk, trm_risk;
@@ -166,7 +166,7 @@ void CentralhubModule::receiveSensorData(const bsn::SensorData::ConstPtr& msg) {
     std::cout << "*****************************************" << std::endl;
 }
 
-void CentralhubModule::receiveSystemInfo(const bsn::SystemInfo::ConstPtr& msg) {
+void CentralhubModule::receiveSystemInfo(const messages::SystemInfo::ConstPtr& msg) {
     reliability = msg->reliability;
     cost = msg->cost;
 }

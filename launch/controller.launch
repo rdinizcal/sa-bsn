@@ -1,3 +1,3 @@
 <launch> 
-    <node name="manager" pkg="manager" type="manager" output="screen" />
+    <node name="controller" pkg="controller" type="controller" output="screen" />
 </launch>

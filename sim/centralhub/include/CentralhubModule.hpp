@@ -3,15 +3,20 @@
 
 #include <fstream>
 #include <chrono>
+#include <memory>
+#include <map>
 
 #include <cpprest/http_client.h>
 #include <cpprest/json.h>
+#include <ros/package.h>
 #include "ros/ros.h"
 
-#include "processor/Processor.hpp"
+#include "bsn/processor/Processor.hpp"
+#include "bsn/operation/Operation.hpp"
 
-#include "bsn/SensorData.h"
-#include "bsn/SystemInfo.h"
+#include "messages/SensorData.h"
+#include "messages/SystemInfo.h"
+
 
 class CentralhubModule {
     private:
@@ -23,8 +28,8 @@ class CentralhubModule {
 		
         void sendMonitorTaskInfo(const std::string &/*task_id*/, const double &/*cost*/, const double &/*reliability*/, const double &/*frequency*/);
 
-        void receiveSensorData(const bsn::SensorData::ConstPtr&);
-        void receiveSystemInfo(const bsn::SystemInfo::ConstPtr&); 
+        void receiveSensorData(const messages::SensorData::ConstPtr&);
+        void receiveSystemInfo(const messages::SystemInfo::ConstPtr&); 
 
         std::string makePacket();
         void persistData(std::vector<std::string>&);

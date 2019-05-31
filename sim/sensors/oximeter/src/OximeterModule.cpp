@@ -150,10 +150,10 @@ void OximeterModule::run(){
     uint32_t id = 0;
     bsn::generator::DataGenerator dataGenerator(markov);
 
-    bsn::SensorData msg;
+    messages::SensorData msg;
     ros::NodeHandle n;
 
-    ros::Publisher sensor_pub = n.advertise<bsn::SensorData>("oximeter_data", 10);
+    ros::Publisher sensor_pub = n.advertise<messages::SensorData>("oximeter_data", 10);
 
     ros::Rate loop_rate(1);
 

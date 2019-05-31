@@ -8,18 +8,18 @@
 
 #include "ros/ros.h"
 
-#include "range/Range.hpp"
-#include "resource/Battery.hpp"
-#include "generator/Markov.hpp"
-#include "generator/DataGenerator.hpp"
-#include "filters/MovingAverage.hpp"
-#include "operation/Operation.hpp"
-#include "configuration/SensorConfiguration.hpp"
+#include "bsn/range/Range.hpp"
+#include "bsn/resource/Battery.hpp"
+#include "bsn/generator/Markov.hpp"
+#include "bsn/generator/DataGenerator.hpp"
+#include "bsn/filters/MovingAverage.hpp"
+#include "bsn/operation/Operation.hpp"
+#include "bsn/configuration/SensorConfiguration.hpp"
 
-#include "bsn/SensorData.h"
-#include "bsn/TaskInfo.h"
-#include "bsn/ContextInfo.h"
-#include "bsn/ControlCommand.h"
+#include "messages/SensorData.h"
+#include "messages/TaskInfo.h"
+#include "messages/ContextInfo.h"
+#include "messages/ControlCommand.h"
 
 class ThermometerModule {
     
@@ -43,7 +43,7 @@ class ThermometerModule {
     	void run();
 
   	private:
-	  	void receiveControlCommand(const bsn::ControlCommand::ConstPtr& msg);
+	  	void receiveControlCommand(const messages:::ControlCommand::ConstPtr& msg);
 		
 		std::string type;
 		bsn::resource::Battery battery;

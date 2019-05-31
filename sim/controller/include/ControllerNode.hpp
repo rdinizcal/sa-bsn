@@ -8,24 +8,21 @@
 
 #include "ros/ros.h"
 
-#include "goalmodel/Node.hpp"
-#include "goalmodel/Goal.hpp"
-#include "goalmodel/Task.hpp"
-#include "goalmodel/Property.hpp"
-#include "goalmodel/LeafTask.hpp"
-#include "goalmodel/Context.hpp"
-#include "goalmodel/GoalTree.hpp"
+#include "bsn/goalmodel/Node.hpp"
+#include "bsn/goalmodel/Goal.hpp"
+#include "bsn/goalmodel/Task.hpp"
+#include "bsn/goalmodel/Property.hpp"
+#include "bsn/goalmodel/LeafTask.hpp"
+#include "bsn/goalmodel/Context.hpp"
+#include "bsn/goalmodel/GoalTree.hpp"
+#include "bsn/model/Formula.hpp"
 
 #include "lepton/Lepton.h"
 
-#include "FormulaRefs.hpp"
-#include "model/Formula.hpp"
-
-
-#include "bsn/TaskInfo.h"
-#include "bsn/ControlCommand.h"
-#include "bsn/SystemInfo.h"
-#include "bsn/ContextInfo.h"
+#include "messages/ControlCommand.h"
+#include "messages/SystemInfo.h"
+#include "messages/TaskInfo.h"
+#include "messages/ContextInfo.h"
 
 class ControllerNode {
 
@@ -44,8 +41,8 @@ class ControllerNode {
     	ControllerNode(int &argc, char **argv, std::string name);
     	virtual ~ControllerNode();
 
-		void receiveTaskInfo(const bsn::TaskInfo::ConstPtr& /*msg*/);
-		void receiveContextInfo(const bsn::ContextInfo::ConstPtr& /*msg*/);
+		void receiveTaskInfo(const messages::TaskInfo::ConstPtr& /*msg*/);
+		void receiveContextInfo(const messages::ContextInfo::ConstPtr& /*msg*/);
 
     	void analyze(std::string);
     	void plan(std::string, double, double);

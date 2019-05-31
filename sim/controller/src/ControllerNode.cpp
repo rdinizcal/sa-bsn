@@ -1,8 +1,5 @@
 #include "ControllerNode.hpp"
-#include "operation/Operation.hpp"
-#include <ros/package.h>
-#include <memory>
-#include <map>
+
 using namespace bsn::goalmodel;
 
 ControllerNode::ControllerNode(int  &argc, char **argv, std::string name):
@@ -272,7 +269,7 @@ void ControllerNode::setUp() {
  * receive context (id, bool) reset setpoints (cost and reliability)
  * ***************************************************************
 */ 
-void ControllerNode::receiveTaskInfo(const bsn::TaskInfo::ConstPtr& msg) {
+void ControllerNode::receiveTaskInfo(const messages::TaskInfo::ConstPtr& msg) {
     ROS_INFO("I heard: [%s]", msg->task_id.c_str());
 
     std::string id = msg->task_id;
@@ -289,7 +286,7 @@ void ControllerNode::receiveTaskInfo(const bsn::TaskInfo::ConstPtr& msg) {
     analyze(id_aux);
 }
 
-void ControllerNode::receiveContextInfo(const bsn::ContextInfo::ConstPtr& msg) {
+void ControllerNode::receiveContextInfo(const messages::ContextInfo::ConstPtr& msg) {
     ROS_INFO("I heard: [%s]", msg->context_id.c_str());
 
     std::string id = msg->context_id;
@@ -427,18 +424,18 @@ void ControllerNode::execute(std::string id, double action, double ccurrent, dou
     }
 
     ros::NodeHandle publisher_handler;
-	ros::Publisher actuator_pub = publisher_handler.advertise<bsn::ControlCommand>("controller_command", 1000);
+	ros::Publisher actuator_pub = publisher_handler.advertise<messages:::ControlCommand>("controller_command", 1000);
 
-    bsn::ControlCommand command_msg;
+    messages:::ControlCommand command_msg;
 
     command_msg.active = true;
     command_msg.frequency = action;
 
     actuator_pub.publish(command_msg);
 
-    ros::Publisher centralhub_pub = publisher_handler.advertise<bsn::SystemInfo>("system_info", 1000);
+    ros::Publisher centralhub_pub = publisher_handler.advertise<messages::SystemInfo>("system_info", 1000);
 
-    bsn::SystemInfo centralhub_msg;
+    messages::SystemInfo centralhub_msg;
 
     centralhub_msg.cost = ccurrent;
     centralhub_msg.reliability = rcurrent;

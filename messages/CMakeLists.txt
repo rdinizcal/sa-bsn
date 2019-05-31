@@ -19,7 +19,7 @@ SET (CMAKE_CXX_FLAGS "-Wall ${CMAKE_CXX_FLAGS}")
 
 ###########################################################################
 # Find Catkin.
-find_package(catkin REQUIRED COMPONENTS std_msgs message_generation)
+FIND_PACKAGE(catkin REQUIRED COMPONENTS std_msgs message_generation)
 
 ###########################################################################
 # Set message generation.
