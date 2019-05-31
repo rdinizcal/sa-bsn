@@ -17,6 +17,10 @@ CATKIN_PACKAGE(
 # Set catkin directory.
 INCLUDE_DIRECTORIES(include ${catkin_INCLUDE_DIRS})
 
+# Set header files from BSN.
+SET (BSN_INCLUDE_DIRS /usr/local/include/bsn)
+INCLUDE_DIRECTORIES (${BSN_INCLUDE_DIRS})
+
 # Set include directory.
 INCLUDE_DIRECTORIES(include)
 
