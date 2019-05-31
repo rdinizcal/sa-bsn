@@ -27,7 +27,7 @@ ControllerNode::~ControllerNode() {}
 void ControllerNode::setUp() {
 
     GoalTree goalModel("Body Sensor Network");
-    std::string path = ros::package::getPath("manager");
+    std::string path = ros::package::getPath("controller");
      // Set up the goal tree goalModel        
     LeafTask g3_t1_11("G3_T1.11","Read data", Property("W_G3_T1_11", 1),Property("R_G3_T1_11", 1),Property("F_G3_T1_11",1));
     LeafTask g3_t1_12("G3_T1.12","Filter data", Property("W_G3_T1_12", 1),Property("R_G3_T1_12", 1),Property("F_G3_T1_12",1));
@@ -424,9 +424,9 @@ void ControllerNode::execute(std::string id, double action, double ccurrent, dou
     }
 
     ros::NodeHandle publisher_handler;
-	ros::Publisher actuator_pub = publisher_handler.advertise<messages:::ControlCommand>("controller_command", 1000);
+	ros::Publisher actuator_pub = publisher_handler.advertise<messages::ControlCommand>("controller_command", 1000);
 
-    messages:::ControlCommand command_msg;
+    messages::ControlCommand command_msg;
 
     command_msg.active = true;
     command_msg.frequency = action;

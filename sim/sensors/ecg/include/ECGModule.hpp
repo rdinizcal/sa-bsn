@@ -44,7 +44,7 @@ class ECGModule {
     	void run();
 
   	private:
-		void receiveControlCommand(const messages:::ControlCommand::ConstPtr& msg);
+		void receiveControlCommand(const messages::ControlCommand::ConstPtr& msg);
 
 		std::string type;
 		bsn::resource::Battery battery;

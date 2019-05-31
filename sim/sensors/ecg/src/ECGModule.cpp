@@ -141,7 +141,7 @@ void ECGModule::sendContextInfo(const std::string &context_id, const bool &statu
     contextPub.publish(msg);
 }
 
-void ECGModule::receiveControlCommand(const messages:::ControlCommand::ConstPtr& msg)  {
+void ECGModule::receiveControlCommand(const messages::ControlCommand::ConstPtr& msg)  {
     active = msg->active;
     params["freq"] = msg->frequency;
 }

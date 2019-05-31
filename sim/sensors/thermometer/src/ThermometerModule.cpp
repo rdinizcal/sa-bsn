@@ -142,7 +142,7 @@ void ThermometerModule::sendContextInfo(const std::string &context_id, const boo
     contextPub.publish(msg);
 }
 
-void ThermometerModule::receiveControlCommand(const messages:::ControlCommand::ConstPtr& msg)  {
+void ThermometerModule::receiveControlCommand(const messages::ControlCommand::ConstPtr& msg)  {
     active = msg->active;
     params["freq"] = msg->frequency;
 }

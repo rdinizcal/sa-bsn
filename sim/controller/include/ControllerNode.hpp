@@ -4,9 +4,11 @@
 #include <sstream>
 #include <string>
 #include <fstream>
+#include <memory>
 #include <map>
 
 #include "ros/ros.h"
+#include "ros/package.h"
 
 #include "bsn/goalmodel/Node.hpp"
 #include "bsn/goalmodel/Goal.hpp"
@@ -16,6 +18,7 @@
 #include "bsn/goalmodel/Context.hpp"
 #include "bsn/goalmodel/GoalTree.hpp"
 #include "bsn/model/Formula.hpp"
+#include "bsn/operation/Operation.hpp"
 
 #include "lepton/Lepton.h"
 
