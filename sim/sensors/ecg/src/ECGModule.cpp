@@ -189,9 +189,9 @@ void ECGModule::run() {
             
             if (rand()%10 > 6) {
                 bool x_active = (rand()%2==0)?active:!active;
-                sendContextInfo("ECG_available", x_active);
+                sendContextInfo("CTX_G3_T1_2", x_active);
             }
-            sendContextInfo("ECG_available", active);
+            sendContextInfo("CTX_G3_T1_2", active);
         }
 
         if(!active){ 

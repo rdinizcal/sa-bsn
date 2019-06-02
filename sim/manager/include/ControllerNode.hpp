@@ -39,6 +39,10 @@ class ControllerNode {
 
 		bool isCost(std::string);
 
+		std::string getSensorName(const int);
+		std::string getTaskActuator(std::string);
+		std::string getContextActuator(std::string); 
+
     	ControllerNode(int &argc, char **argv, std::string name);
     	virtual ~ControllerNode();
 

@@ -183,9 +183,9 @@ void OximeterModule::run(){
             
             if (rand()%10 > 6) {
                     bool x_active = (rand()%2==0)?active:!active;
-                    sendContextInfo("OXI_available", x_active);
+                    sendContextInfo("CTX_G3_T1_1", x_active);
             }
-            sendContextInfo("OXI_available", active);
+            sendContextInfo("CTX_G3_T1_1", active);
         }
 
         if (!active) { 

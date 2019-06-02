@@ -12,6 +12,8 @@ ControllerNode::ControllerNode(int  &argc, char **argv, std::string name):
     reliability_expression() 
     {}
 
+ControllerNode::~ControllerNode() {}
+
 void ControllerNode::setTaskValue(std::string id, double value) {
     this->tasks[id] = value;
 }
@@ -24,7 +26,72 @@ bool ControllerNode::isCost(std::string id) {
     return id[0] == ('W');
 }
 
-ControllerNode::~ControllerNode() {}
+std::string ControllerNode::getSensorName(const int sensor_id) {
+    std::string current_sensor;
+
+    switch(sensor_id) {
+        case 1:
+            current_sensor = "oximeter";
+            break;
+        case 2:
+            current_sensor = "ecg";
+            break;
+        case 3:
+            current_sensor = "thermometer";
+            break;
+        case 4:
+            current_sensor = "abp";
+            break;
+        case 41:
+            current_sensor = "abp";
+            break;
+        case 42:
+            current_sensor = "abp";
+            break;
+        case 5: 
+            current_sensor = "acc";
+            break;
+    }
+
+    return current_sensor;
+}
+
+std::string ControllerNode::getTaskActuator(std::string id) {
+    bsn::operation::Operation op = bsn::operation::Operation();
+
+    std::string sensor_name;
+    std::string current_sensor;
+    std::string actuator_name;
+    int sensor_id;
+    
+    sensor_name = (op.split(id, '.'))[1];
+    sensor_id = std::stoi(sensor_name);
+
+    current_sensor = getSensorName(sensor_id);
+
+    actuator_name = current_sensor + "control_command";
+
+    return actuator_name;
+}
+
+std::string ControllerNode::getContextActuator(std::string id) {
+    bsn::operation::Operation op = bsn::operation::Operation();
+
+    std::string sensor_name;
+    std::string current_sensor;
+    std::string actuator_name;
+    int sensor_id;
+    
+    sensor_name = (op.split(id, '_'))[3];
+    sensor_id = std::stoi(sensor_name) / 10;
+
+    current_sensor = getSensorName(sensor_id);
+
+    actuator_name = current_sensor + "control_command";
+
+    return actuator_name;
+}
+
 
 void ControllerNode::setUp() {
 
@@ -413,36 +480,9 @@ void ControllerNode::execute(std::string id, double action, double ccurrent, dou
 
     bsn::operation::Operation op = bsn::operation::Operation();
 
-    std::string sensorID = (op.split(id, '.'))[1];
+    std::string message_type = op.split(id, '_')[0];
 
-    int sensor_id = std::stoi(sensorID) / 10;
-    std::string current_sensor;
-
-    switch(sensor_id) {
-        case 1:
-            current_sensor = "oximeter";
-            break;
-        case 2:
-            current_sensor = "ecg";
-            break;
-        case 3:
-            current_sensor = "thermometer";
-            break;
-        case 4:
-            current_sensor = "abp";
-            break;
-        case 41:
-            current_sensor = "abp";
-            break;
-        case 42:
-            current_sensor = "abp";
-            break;
-        case 5: 
-            current_sensor = "acc";
-            break;
-    }
-
-    std::string actuator_name = current_sensor + "_control_command";
+    std::string actuator_name = message_type == "CTX" ? getContextActuator(id) : getTaskActuator(id);
 
     ros::NodeHandle publisher_handler;
     std::cout << "sending action: " << action << " to "  << actuator_name << std::endl;
@@ -454,7 +494,6 @@ void ControllerNode::execute(std::string id, double action, double ccurrent, dou
     command_msg.frequency = action;
 
     actuator_pub.publish(command_msg);
-    std::cout << "Received message from: " << current_sensor << std::endl;
 
     ros::Publisher centralhub_pub = publisher_handler.advertise<bsn::SystemInfo>("system_info", 1000);
 
@@ -472,7 +511,7 @@ void ControllerNode::run(){
     ros::NodeHandle n;
    
     ros::Subscriber t_sub = n.subscribe("task_info", 1000, &ControllerNode::receiveTaskInfo, this);
-//    ros::Subscriber c_sub = n.subscribe("context_info", 1000, &ControllerNode::receiveContextInfo, this);
+    ros::Subscriber c_sub = n.subscribe("context_info", 1000, &ControllerNode::receiveContextInfo, this);
 
 //    ros::Subscriber t_sub = n.subscribe("manager_sensor", 1000, &ControllerNode::receiveTaskInfo, this);
 
