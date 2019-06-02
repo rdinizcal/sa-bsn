@@ -238,9 +238,6 @@ void ControllerNode::setUp() {
     }
 
     this->reli_value = reliability_expression.apply(props, values);
- 
-    std::cout << "size of vector is: " << props.size() << std::endl;
-    std::cout << "value of reli: " << reli_value << std::endl;
 
     props.clear(); values.clear();
     
@@ -257,20 +254,15 @@ void ControllerNode::setUp() {
         props.push_back(it1->first);
         values.push_back(it1->second);
     }
-/* 
+
     for(it2 = contexts.begin(); it2 != contexts.end(); it2++)
     {
         props.push_back(it2->first);
-//            std::cout << "it2->second.getID(): " << it2->first << std::endl;
         values.push_back((double)(it2->second.getValue()));
     }        
-*/
-/* 
-    for(std::string it : props) {
-        std::cout << it << std::endl;
-    }
- */
+
     this->cost_value = this->cost_expression.apply(props, values);
+
 }
 
 /** **************************************************************
@@ -287,13 +279,19 @@ void ControllerNode::receiveTaskInfo(const bsn::TaskInfo::ConstPtr& msg) {
     std::string id_aux = id;
     std::replace(id.begin(), id.end(), '.', '_');
     std::string costID = "W_" + id;
-    std::string reliabilityID = "R_" + id;
-    std::string frequencyID = "F_" + id;
+    std::string reliID = "R_" + id;
+    std::string freqID = "F_" + id;
+
+/*     
+    std::cout << "costID = " << costID << std::endl;
+    std::cout << "reliID = " << reliID << std::endl;
+    std::cout << "freqID = " << freqID << std::endl;
+*/ 
 
     setTaskValue(costID, msg->cost);
-    setTaskValue(reliabilityID, msg->reliability);
-    setTaskValue(frequencyID, msg->frequency);
-    
+    setTaskValue(reliID, msg->reliability);
+    setTaskValue(freqID, msg->frequency);
+
     analyze(id_aux);
 }
 
@@ -303,7 +301,6 @@ void ControllerNode::receiveContextInfo(const bsn::ContextInfo::ConstPtr& msg) {
     std::string id = msg->context_id;
     std::string id_aux = id;
     std::replace(id.begin(), id.end(), '.', '_');
-//    std::string ctxID = "CTX_" + id;
 
     bool status = msg->status;
 
@@ -342,18 +339,14 @@ void ControllerNode::analyze(std::string id) {
             values.push_back(it1->second);
         }
     }
-/* 
+
     for(it2 = contexts.begin(); it2 != contexts.end(); it2++)
     {
         props.push_back(it2->first);
-//            std::cout << "it2->second.getID(): " << it2->first << std::endl;
         values.push_back((double)(it2->second.getValue()));
     }      
- */
 
-//    std::cout << "antes de reli..." << std::endl;
     reli_current = reliability_expression.apply(props, values);
-//    std::cout << "depois de reli..." << std::endl;
 
     props.clear(); values.clear();
 
@@ -363,23 +356,20 @@ void ControllerNode::analyze(std::string id) {
         props.push_back(it1->first);
         values.push_back(it1->second);
     }
-/* 
+
     for(it2 = contexts.begin(); it2 != contexts.end(); it2++)
     {
         props.push_back(it2->first);
-//        std::cout << "it2->second.getID(): " << it2->first << std::endl;
         values.push_back((double)(it2->second.getValue()));
     }      
- */    
-//    std::cout << "antes de cost..." << std::endl;
-    cost_current = cost_expression.apply(props, values);
-//    std::cout << "depois de cost..." << std::endl;
 
-//    std::cout << "cost_current: " << cost_current << std::endl;
-//    std::cout << "reli_current: " << reli_current << std::endl;
+    cost_current = cost_expression.apply(props, values);
 
     this->reli_error = this->reli_value - reli_current;
     this->cost_error = this->cost_value - cost_current;
+
+    std::cout << "cost_current: " << cost_current << std::endl;
+    std::cout << "reli_current: " << reli_current << std::endl;
 
     plan(id, cost_current, reli_current);
 }
@@ -401,7 +391,7 @@ void ControllerNode::plan(std::string id, double ccurrent, double rcurrent) {
         } else {
             action = 0.1;
         }
-    } else {
+    } else if (this->reli_error < 0) {
         if(this->reli_error < -0.05) {
             action = -0.01;
         } else if (this->reli_error < -0.1){
@@ -409,7 +399,7 @@ void ControllerNode::plan(std::string id, double ccurrent, double rcurrent) {
         } else {
             action = -0.1;
         }
-    }
+    } else action = 0.0;
     execute(id, action, ccurrent, rcurrent);
 }
 
@@ -424,8 +414,6 @@ void ControllerNode::execute(std::string id, double action, double ccurrent, dou
     bsn::operation::Operation op = bsn::operation::Operation();
 
     std::string sensorID = (op.split(id, '.'))[1];
-
-//    std::cout << id << ": " << sensorID << std::endl;
 
     int sensor_id = std::stoi(sensorID) / 10;
     std::string current_sensor;
@@ -457,7 +445,7 @@ void ControllerNode::execute(std::string id, double action, double ccurrent, dou
     std::string actuator_name = current_sensor + "_control_command";
 
     ros::NodeHandle publisher_handler;
-    std::cout << "sending action: " << action << " to"  << actuator_name << std::endl;
+    std::cout << "sending action: " << action << " to "  << actuator_name << std::endl;
 	ros::Publisher actuator_pub = publisher_handler.advertise<bsn::ControlCommand>(actuator_name, 1000);
 
     bsn::ControlCommand command_msg;
