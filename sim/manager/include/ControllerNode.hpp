@@ -18,9 +18,7 @@
 
 #include "lepton/Lepton.h"
 
-#include "FormulaRefs.hpp"
 #include "model/Formula.hpp"
-
 
 #include "bsn/TaskInfo.h"
 #include "bsn/ControlCommand.h"
@@ -69,21 +67,7 @@ class ControllerNode {
 
 	bsn::model::Formula cost_expression;
 	bsn::model::Formula reliability_expression;
-/* 
-	std::map<std::string,double&> cost_formula_reliabilities;
-	std::map<std::string,double&> cost_formula_frequencies;
-	std::map<std::string,double&> cost_formula_costs;
-	std::map<std::string,double&> cost_formula_contexts;
 
-	std::map<std::string,double&> reliability_formula_reliabilities;
-	std::map<std::string,double&> reliability_formula_frequencies;
-	std::map<std::string,double&> reliability_formula_contexts;
-
-	std::vector<std::vector<double>> actions;
-
-	double cost_setpoint;
-	double reliability_setpoint;
- */
 };
 
 #endif 

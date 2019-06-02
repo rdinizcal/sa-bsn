@@ -144,7 +144,9 @@ void ThermometerModule::sendContextInfo(const std::string &context_id, const boo
 
 void ThermometerModule::receiveControlCommand(const bsn::ControlCommand::ConstPtr& msg)  {
     active = msg->active;
-    params["freq"] = msg->frequency;
+    double newFreq = msg->frequency;
+    std::cout << "Frequency changed from " << params["freq"] << " to " << newFreq << std::endl;
+    params["freq"] += newFreq;
 }
 
 void ThermometerModule::run() {
@@ -164,13 +166,13 @@ void ThermometerModule::run() {
     ros::Rate loop_rate(params["freq"]);
     msg.type = "thermometer";
 
-    sendContextInfo("TEMP_available", true);
+    sendContextInfo("CTX_G3_T1_3", true);
     
     while (ros::ok()) {
         loop_rate = ros::Rate(params["freq"]);
         
         { // update controller with task info        
-            sendContextInfo("TEMP_available",true);
+            sendContextInfo("CTX_G3_T1_3",true);
             sendTaskInfo("G3_T1.31", 0.1, data_accuracy, params["freq"]);
             sendTaskInfo("G3_T1.32", 0.1*params["m_avg"], 1, params["freq"]);
             sendTaskInfo("G3_T1.33", 0.1, comm_accuracy, params["freq"]);
@@ -216,6 +218,7 @@ void ThermometerModule::run() {
 
             battery.consume(0.1);
 
+
             //for debugging
             std::cout << "New data: " << data << std::endl << std::endl;
         }
@@ -233,14 +236,13 @@ void ThermometerModule::run() {
         
         { // TASK: Transfer information to CentralHub
             risk = sensorConfig.evaluateNumber(data);
-
             msg.risk = risk;
+            battery.consume(0.1);
+            msg.batt = battery.getCurrentLevel();
 
             if ((rand() % 100) <= comm_accuracy * 100)
                 dataPub.publish(msg);
             
-            battery.consume(0.1);
-
             // for debugging
             std::cout << "Risk: " << risk << "%" << std::endl;
         }
