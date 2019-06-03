@@ -72,6 +72,12 @@ class ControllerNode {
 	bsn::model::Formula cost_expression;
 	bsn::model::Formula reliability_expression;
 
+//	ros::Publisher actuator_pub;
+	ros::Publisher centralhub_pub;
+	ros::Publisher ecg_pub;
+	ros::Publisher therm_pub;
+	ros::Publisher oxi_pub;
+	ros::Publisher abp_pub;
 };
 
 #endif 

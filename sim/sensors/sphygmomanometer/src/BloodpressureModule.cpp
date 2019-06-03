@@ -161,9 +161,10 @@ void BloodpressureModule::sendContextInfo(const std::string &context_id, const b
 
 void BloodpressureModule::receiveControlCommand(const bsn::ControlCommand::ConstPtr& msg)  {
     active = msg->active;
-    double newFreq = msg->frequency;
+    double newFreq;
+    newFreq = params["freq"] + msg->frequency;
     std::cout << "Frequency changed from " << params["freq"] << " to " << newFreq << std::endl;
-    params["freq"] += newFreq;
+    params["freq"] = newFreq;
 }
 
 void BloodpressureModule::run() {

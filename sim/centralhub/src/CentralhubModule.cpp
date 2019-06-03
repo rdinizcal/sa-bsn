@@ -63,7 +63,7 @@ std::string CentralhubModule::makePacket() {
     }
     packet += acc_risk + "=" + "10/";
     packet += std::to_string(patient_status);
-    std::cout << packet << std::endl;
+//    std::cout << packet << std::endl;
     return packet;
 }
 
@@ -188,6 +188,8 @@ void CentralhubModule::receiveSensorData(const bsn::SensorData::ConstPtr& msg) {
 }
 
 void CentralhubModule::receiveSystemInfo(const bsn::SystemInfo::ConstPtr& msg) {
+//    std::cout << "reli: " << msg->reliability << std::endl;
+//    std::cout << "cost: " << msg->cost << std::endl;
     reliability = msg->reliability;
     cost = msg->cost;
 }

@@ -65,11 +65,11 @@ std::string ControllerNode::getTaskActuator(std::string id) {
     int sensor_id;
     
     sensor_name = (op.split(id, '.'))[1];
-    sensor_id = std::stoi(sensor_name);
+    sensor_id = std::stoi(sensor_name) / 10;
 
     current_sensor = getSensorName(sensor_id);
 
-    actuator_name = current_sensor + "control_command";
+    actuator_name = current_sensor + "_control_command";
 
     return actuator_name;
 }
@@ -83,15 +83,14 @@ std::string ControllerNode::getContextActuator(std::string id) {
     int sensor_id;
     
     sensor_name = (op.split(id, '_'))[3];
-    sensor_id = std::stoi(sensor_name) / 10;
+    sensor_id = std::stoi(sensor_name);
 
     current_sensor = getSensorName(sensor_id);
 
-    actuator_name = current_sensor + "control_command";
+    actuator_name = current_sensor + "_control_command";
 
     return actuator_name;
 }
-
 
 void ControllerNode::setUp() {
 
@@ -209,8 +208,6 @@ void ControllerNode::setUp() {
 
     goalModel.addRootGoal(std::make_shared<Goal>(g1));
 
-
-
 /*     { // Set up map {id,object} of context from goal goalModel
     contexts.insert(std::pair<std::string,bsn::goalmodel::Context>("SaO2_available", bsn::goalmodel::Context("CTX_G3_T1_1","SaO2_available", false)));
     contexts.insert(std::pair<std::string,bsn::goalmodel::Context>("ECG_availaebl", bsn::goalmodel::Context("CTX_G3_T1_2","ECG_available", false  )));
@@ -281,7 +278,6 @@ void ControllerNode::setUp() {
         }
     }        
 
-
     //reli expr
     for(std::shared_ptr<bsn::goalmodel::LeafTask> it : leafTasks) 
     {
@@ -329,6 +325,14 @@ void ControllerNode::setUp() {
     }        
 
     this->cost_value = this->cost_expression.apply(props, values);
+
+    ros::NodeHandle publisher_handler;
+
+    centralhub_pub = publisher_handler.advertise<bsn::SystemInfo>("system_info", 1000);
+    ecg_pub = publisher_handler.advertise<bsn::ControlCommand>("ecg_control_command", 1000);
+    oxi_pub = publisher_handler.advertise<bsn::ControlCommand>("oximeter_control_command", 1000);
+    abp_pub = publisher_handler.advertise<bsn::ControlCommand>("abp_control_command", 1000);
+    therm_pub = publisher_handler.advertise<bsn::ControlCommand>("thermometer_control_command", 1000);
 
 }
 
@@ -435,9 +439,6 @@ void ControllerNode::analyze(std::string id) {
     this->reli_error = this->reli_value - reli_current;
     this->cost_error = this->cost_value - cost_current;
 
-    std::cout << "cost_current: " << cost_current << std::endl;
-    std::cout << "reli_current: " << reli_current << std::endl;
-
     plan(id, cost_current, reli_current);
 }
 
@@ -467,6 +468,7 @@ void ControllerNode::plan(std::string id, double ccurrent, double rcurrent) {
             action = -0.1;
         }
     } else action = 0.0;
+
     execute(id, action, ccurrent, rcurrent);
 }
 
@@ -486,16 +488,21 @@ void ControllerNode::execute(std::string id, double action, double ccurrent, dou
 
     ros::NodeHandle publisher_handler;
     std::cout << "sending action: " << action << " to "  << actuator_name << std::endl;
-	ros::Publisher actuator_pub = publisher_handler.advertise<bsn::ControlCommand>(actuator_name, 1000);
 
     bsn::ControlCommand command_msg;
 
     command_msg.active = true;
     command_msg.frequency = action;
 
-    actuator_pub.publish(command_msg);
-
-    ros::Publisher centralhub_pub = publisher_handler.advertise<bsn::SystemInfo>("system_info", 1000);
+    if(actuator_name == "ecg_control_command") {
+        ecg_pub.publish(command_msg);
+    } else  if(actuator_name == "abp_control_command"){
+        abp_pub.publish(command_msg);
+    } else  if(actuator_name == "oximeter_control_command"){
+        oxi_pub.publish(command_msg);
+    } else  if(actuator_name == "thermometer_control_command"){
+        therm_pub.publish(command_msg);
+    }
 
     bsn::SystemInfo centralhub_msg;
 
@@ -504,6 +511,7 @@ void ControllerNode::execute(std::string id, double action, double ccurrent, dou
 
     centralhub_pub.publish(centralhub_msg);
 
+    return;
 }
 
 void ControllerNode::run(){
