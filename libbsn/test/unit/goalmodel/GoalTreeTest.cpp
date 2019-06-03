@@ -234,14 +234,17 @@ TEST_F(GoalTreeTest, GetLeafTasks) {
         LeafTask task111("T1.11", "Fuse sensors data", Property("W_G4_T1_11",1), Property("R_G4_T1_11",1), Property("F_G4_T1_11",1));
         LeafTask task112("T1.12", "Detect patient status", Property("W_G4_T1_12",1), Property("R_G4_T1_12",1), Property("F_G4_T1_12",1));
         LeafTask task113("T1.13", "Persist patient data", Property("W_G4_T1_13",1), Property("R_G4_T1_13",1), Property("F_G4_T1_13",1));
+        LeafTask task114("T1.14", "Persist patient data", Property("W_G4_T1_14",1), Property("R_G4_T1_14",1), Property("F_G4_T1_14",1));     
 
         std::shared_ptr<LeafTask> pLeafTask111 = std::make_shared<LeafTask>(task111);
         std::shared_ptr<LeafTask> pLeafTask112 = std::make_shared<LeafTask>(task112);
         std::shared_ptr<LeafTask> pLeafTask113 = std::make_shared<LeafTask>(task113);
+        std::shared_ptr<LeafTask> pLeafTask114 = std::make_shared<LeafTask>(task114);
 
         task1.addChild(pLeafTask111);
         task1.addChild(pLeafTask112);
         task1.addChild(pLeafTask113);
+        task1.addChild(pLeafTask114);
         goal4.addChild(std::make_shared<Task>(task1));
         goal2.addChild(std::make_shared<Goal>(goal4));
         goal1.addChild(std::make_shared<Goal>(goal2));

@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 
-#include "FormulaRefs.hpp"
+//#include "FormulaRefs.hpp"
 
 using namespace std;
-
+/* 
 class FormulaRefsTest : public testing::Test {
     protected:
         FormulaRefsTest() {}
@@ -69,4 +69,4 @@ TEST_F(FormulaRefsTest, AddThreeTaskRefs) {
     ASSERT_EQ(&costFormulaRefs.getReliabilityRef("Task3"), &reli3);
     ASSERT_EQ(&costFormulaRefs.getFrequencyRef("Task3"), &freq3);
     ASSERT_EQ(&costFormulaRefs.getCostRef("Task3"), &cost3);
-}
+} */
