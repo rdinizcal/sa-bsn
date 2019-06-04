@@ -49,9 +49,9 @@ class ControllerNode {
 		void receiveTaskInfo(const bsn::TaskInfo::ConstPtr& /*msg*/);
 		void receiveContextInfo(const bsn::ContextInfo::ConstPtr& /*msg*/);
 
-    	void analyze(std::string);
-    	void plan(std::string, double, double);
-    	void execute(std::string, double, double, double);
+    	void analyze();
+    	void plan();
+    	void execute(double);
 
 		void run();
 
@@ -64,8 +64,12 @@ class ControllerNode {
 	std::vector<std::string> props;
 	std::vector<double> values;
 
-	double reli_value;
-	double cost_value;
+	double desired_reli;
+	double desired_cost;
+
+	double current_reli;
+	double current_cost;
+	
 	double reli_error;
 	double cost_error;
 
@@ -73,6 +77,8 @@ class ControllerNode {
 	bsn::model::Formula reliability_expression;
 
 //	ros::Publisher actuator_pub;
+	std::string message_id;
+
 	ros::Publisher centralhub_pub;
 	ros::Publisher ecg_pub;
 	ros::Publisher therm_pub;
