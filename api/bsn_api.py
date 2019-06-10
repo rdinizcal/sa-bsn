@@ -78,16 +78,9 @@ def get_configs():
 def config():
     configs_dict = request.get_json()
     for key in configs_dict:
-        with open("launch1/" + key + ".launch", 'w') as launchfile:
+        with open("launch/" + key + ".launch", 'w') as launchfile:
             launchfile.write(configs_dict[key])
-    with open("launch1/centralhub.launch", 'w') as chlaunch:
-        chlaunch.write(""""<launch> 
-    <node name="centralhub" pkg="centralhub" type="centralhub" output="screen" /> \n
-    <param name="connect" value="false" type="bool" /> \n
-    <!-- Firebase Realtime Database --> \n
-    <param name="db_url" value="https://my-project-1516369881504.firebaseio.com" /> \n
-    <param name="persist" value="false" type="bool" /> \n
-    <param name="path" value="centralhub_output.csv" /> \n </launch>""""")
+    launchfile.close()
     return "ok"
 
 # Show active processes
@@ -131,4 +124,4 @@ def stop():
 def hello_world():
     return '<h1>Welcome to bsn</h1>'
     
-app.run(debug=True)
+app.run(host='0.0.0.0', debug=True)
