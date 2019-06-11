@@ -45,6 +45,7 @@ void BloodpressureModule::setUp() {
 
         for(uint32_t i = 0; i < transitions.size(); i++){
             for(uint32_t j = 0; j < 5; j++){
+                std::cout << "end of setup" << std::endl;
                 configHandler.getParam(x + "state" + std::to_string(j), s);
                 t_probs = op.split(s, ',');
                 for(uint32_t k = 0; k < 5; k++){
@@ -131,7 +132,6 @@ void BloodpressureModule::setUp() {
             fp << "ID,DATA,RISK,TIME_MS" << std::endl;
         }
     }
-    
     taskPub =  n.advertise<bsn::TaskInfo>("task_info", 10);
     contextPub =  n.advertise<bsn::ContextInfo>("context_info", 10);
 }

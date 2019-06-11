@@ -7,18 +7,18 @@
     <param name="highrisk" value="66,100" />
 
     <!-- markov chain -->
-    <param name="state0" value="10,10,10,20,40" />
-    <param name="state1" value="10,10,10,20,40" />
-    <param name="state2" value="10,10,10,20,40" />
-    <param name="state3" value="10,10,10,20,40" />
-    <param name="state4" value="10,10,10,20,40" />
+    <param name="state0" value="11,16,57,16,0" />
+    <param name="state1" value="0,69,31,0,0" />
+    <param name="state2" value="0,3,93,4,0" />
+    <param name="state3" value="0,1,19,80,0" />
+    <param name="state4" value="0,0,0,0,0" />
 
     <!-- risk values -->
     <param name="HighRisk0" value="0,31.99" />
     <param name="MidRisk0" value="32,35.99" />
     <param name="LowRisk" value="36,37.99" />
     <param name="MidRisk1" value="38,40.99" />
-    <param name="HighRisk1" value="41,50" />
+    <param name="HighRisk1" value="41,100" />
 
     <!-- accuracy in percentage -->
     <param name="data_accuracy" value="90" type="double" />

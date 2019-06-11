@@ -7,15 +7,15 @@
     <param name="highrisk" value="66,100" />
 
     <!-- markov chain for diastolic -->
-    <param name="diasstate0" value="0,0,0,0,0" />
-    <param name="diasstate1" value="0,0,0,0,0" />
-    <param name="diasstate2" value="0,0,20,20,60" />
-    <param name="diasstate3" value="0,0,20,20,60" />
-    <param name="diasstate4" value="0,0,20,20,60" />
+    <param name="diasstate0" value="96,3,1,0,0" />
+    <param name="diasstate1" value="67,25,8,0,0" />
+    <param name="diasstate2" value="53,23,24,0,0" />
+    <param name="diasstate3" value="0,0,0,0,0" />
+    <param name="diasstate4" value="0,0,0,0,0" />
 
     <!-- risk values for diastolic -->
-    <param name="diasLowRisk" value="0,80" />
-    <param name="diasMidRisk" value="80,90" />
+    <param name="diasLowRisk" value="0,79.99" />
+    <param name="diasMidRisk" value="80,89.99" />
     <param name="diasHighRisk" value="90,300" />
 
     <!-- accuracy in percentage for diastolic -->
@@ -23,15 +23,15 @@
     <param name="diascomm_accuracy" value="100" type="double" />
 
     <!-- markov chain for systolic -->
-    <param name="syststate0" value="0,0,0,0,0" />
-    <param name="syststate1" value="0,0,0,0,0" />
-    <param name="syststate2" value="0,0,20,20,60" />
-    <param name="syststate3" value="0,0,20,20,60" />
-    <param name="syststate4" value="0,0,20,20,60" />
+    <param name="syststate0" value="85,13,2,0,0" />
+    <param name="syststate1" value="34,51,15,0,0" />
+    <param name="syststate2" value="10,28,62,0,0" />
+    <param name="syststate3" value="0,0,0,0,0" />
+    <param name="syststate4" value="0,0,0,0,0" />
 
     <!-- risk values for systolic -->
-    <param name="systLowRisk" value="0,120" />
-    <param name="systMidRisk" value="120,140" />
+    <param name="systLowRisk" value="0,119.99" />
+    <param name="systMidRisk" value="120,139.99" />
     <param name="systHighRisk" value="140,300" />
 
     <!-- accuracy in percentage for systolic -->

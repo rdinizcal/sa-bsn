@@ -21,22 +21,26 @@ def stop_execution():
     # Send a Sigkill sign for all the processes pids
     for pid in processes_pids:
         os.kill(pid, signal.SIGINT)
-    processes_pids = []        
+        os.wait()
+    processes_pids = []
 
-def start_execution(path):
+def start_execution():
     global processes_pids
 
     # Initialize odsupercomponent
     # configuration_path = os.getcwd()  + '/odv/sim/configs/' + path
     od_process = subprocess.Popen(['roscore'], stdout=subprocess.PIPE, cwd=os.getcwd())
-    sleep(1)
+    print(od_process.pid)
+    sleep(5)
     processes_pids.append(od_process.pid)
+    print("inicia a execucao")
 
     # Initialize sensors
     for command in commands:
         process = subprocess.Popen(command, stdout=subprocess.PIPE)
         processes_pids.append(process.pid)
 
+    print(processes_pids)
     # Returns all the pids started
     return processes_pids
 
@@ -44,7 +48,6 @@ def check_status(pid):
     p = os.popen(' '.join(['ps','-p', str(pid), '-o', 'cmd'])).read()
     if ( p == "CMD\n" ):
         return('inexistent')
-
     else:        
         if 'defunct' in p:            
             return('zombie')
@@ -98,13 +101,12 @@ def status():
     return response
 
 # Start bsn execution
-@app.route('/start')
+@app.route('/start', methods=['POST', 'GET'])
 def start():
     global processes_pids
-    path = request.args.get('path')    
-    try:        
-        processes_pids = start_execution(path)
-        print(processes_pids)
+    try:
+        processes_pids = start_execution()
+        print(request.remote_addr)
         return 'ok'    
     except Exception as e:
         return 'execution error, exception: ' + str(e)
@@ -116,9 +118,9 @@ def stop():
     try:
         stop_execution()
         return 'ok'
-    except:
+    except Exception as e:
         processes_pids = []
-        return 'error'
+        return 'error: ' + str(e)
 
 @app.route('/')
 def hello_world():
