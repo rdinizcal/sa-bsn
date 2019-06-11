@@ -136,8 +136,8 @@ void AnalyticsNode::setUp() {
         reliability_file.close();
     } catch (std::ifstream::failure e) { std::cerr << "Exception opening/reading/closing file (reliability.formula)\n"; }
 
-    this->cost_expression = bsn::model::Formula(cost_formula);
-    this->reliability_expression = bsn::model::Formula(reliability_formula);
+    cost_expression = bsn::model::Formula(cost_formula);
+    reliability_expression = bsn::model::Formula(reliability_formula);
 
     std::vector<std::shared_ptr<bsn::goalmodel::LeafTask>> leafTasks; 
 
@@ -145,11 +145,9 @@ void AnalyticsNode::setUp() {
 
     bsn::goalmodel::Context aux_context;
     std::string newName;
-    std::string contextName;
 
     for(std::shared_ptr<bsn::goalmodel::LeafTask> it : leafTasks) 
     {
-        
         newName = it->getContext().getID();
 
         if(newName != ""){
@@ -205,7 +203,7 @@ void AnalyticsNode::setUp() {
     {
         props.push_back(it2->first);
         values.push_back((double)(it2->second.getValue()));
-    }        
+    }
 
     desired_cost = cost_expression.apply(props, values);
 
@@ -316,28 +314,17 @@ void AnalyticsNode::analyze() {
 void AnalyticsNode::sendToServer() {
  
     std::string packet = "";
+
     web::http::client::http_client client(U(database_url));
     web::json::value json_obj; 
 
     packet.append(std::to_string(current_cost)).append(",");
     packet.append(std::to_string(current_reli));
-    int i = 0;
 
-/*
-    for (std::list<double> li : data_list) {
-        if (!li.empty()) {
-            double element = li.front();
-            packet += std::to_string(element) += "=";
-            packet += std::to_string(data[i]) + "/";
-        }
-        i++;           
-    }
-*/
-
-    std::cout << "packet: " << packet << std::endl;
+//   std::cout << "packet: " << packet << std::endl;
 
     if (connect) {
-        json_obj["data"] = web::json::value::string(packet);
+        json_obj["RelCos"] = web::json::value::string(packet);
         client.request(web::http::methods::PUT, U("/sessions/" + std::to_string(session) + ".json") ,json_obj);
     }
 

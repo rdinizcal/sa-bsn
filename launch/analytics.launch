@@ -3,7 +3,7 @@
 
     <param name="connect" value="true" type="bool" />
 
-    <param name="db_url" value="https://my-project-1516369881504.firebaseio.com/RelCos/" />
+    <param name="database_url" value="https://my-project-1516369881504.firebaseio.com" />
 
     <param name="session" value="25" type="int" />
 

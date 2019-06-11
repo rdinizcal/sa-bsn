@@ -43,8 +43,6 @@ std::string CentralhubModule::makePacket() {
     //std::string packet = "88,97#10,20,30,40,50&";
     std::string packet = "";
 
-    packet.append(cost).append(",");
-    packet.append(reliability).append("#");
     packet.append(trm_batt).append(",");
     packet.append(ecg_batt).append(",");
     packet.append(oxi_batt).append(",");
@@ -161,7 +159,7 @@ void CentralhubModule::receiveSensorData(const bsn::SensorData::ConstPtr& msg) {
         patient_status = data_fuse(data_list);
 
         if (connect) {
-            json_obj["data"] = web::json::value::string(makePacket());
+            json_obj["VitalData"] = web::json::value::string(makePacket());
             client.request(web::http::methods::PUT, U("/sessions/" + std::to_string(session) + ".json") ,json_obj);
         }
     }
