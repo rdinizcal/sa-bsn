@@ -188,8 +188,6 @@ void CentralhubModule::receiveSensorData(const bsn::SensorData::ConstPtr& msg) {
 }
 
 void CentralhubModule::receiveSystemInfo(const bsn::SystemInfo::ConstPtr& msg) {
-//    std::cout << "reli: " << msg->reliability << std::endl;
-//    std::cout << "cost: " << msg->cost << std::endl;
     reliability = msg->reliability;
     cost = msg->cost;
 }
