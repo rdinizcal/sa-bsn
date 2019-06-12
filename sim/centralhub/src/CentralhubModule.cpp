@@ -185,11 +185,6 @@ void CentralhubModule::receiveSensorData(const bsn::SensorData::ConstPtr& msg) {
     std::cout << "*****************************************" << std::endl;
 }
 
-void CentralhubModule::receiveSystemInfo(const bsn::SystemInfo::ConstPtr& msg) {
-    reliability = msg->reliability;
-    cost = msg->cost;
-}
-
 void CentralhubModule::run() {   
     ros::NodeHandle nh;
     
@@ -198,8 +193,6 @@ void CentralhubModule::run() {
     ros::Subscriber ecgSub = nh.subscribe("ecg_data", 10, &CentralhubModule::receiveSensorData, this);
     ros::Subscriber diastolicSub = nh.subscribe("diastolic_data", 10, &CentralhubModule::receiveSensorData, this);
     ros::Subscriber systolicSub = nh.subscribe("systolic_data", 10, &CentralhubModule::receiveSensorData, this);
-
-    ros::Subscriber systemSub = nh.subscribe("system_info", 10, &CentralhubModule::receiveSystemInfo, this);
 
     ros::spin();
 

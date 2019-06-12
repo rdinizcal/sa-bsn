@@ -271,8 +271,6 @@ void AnalyticsNode::analyze() {
     // clear previous values and props
     props.clear(); values.clear();
 
-    // bad smells everywhere...
-
     for(it1 = tasks.begin(); it1 != tasks.end(); it1++)
     {
         if(!isCost(it1->first)) {

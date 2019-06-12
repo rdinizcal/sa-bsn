@@ -209,8 +209,6 @@ void ControllerNode::setUp() {
 
     leafTasks = goalModel.getLeafTasks();
 
-    //set initial conditions: order should be respected
-
     // Get context information from leafTasks
 
     bsn::goalmodel::Context aux_context;
@@ -282,9 +280,6 @@ void ControllerNode::setUp() {
     ros::NodeHandle publisher_handler;
 
     // Publishes the same messages to both topics to avoid loss of information
-
-    centralhub_pub = publisher_handler.advertise<bsn::SystemInfo>("system_info", 1000);
-    monitor_pub = publisher_handler.advertise<bsn::SystemInfo>("monitor_info", 1000);
 
     ecg_pub = publisher_handler.advertise<bsn::ControlCommand>("ecg_control_command", 1000);
     oxi_pub = publisher_handler.advertise<bsn::ControlCommand>("oximeter_control_command", 1000);
@@ -438,7 +433,6 @@ void ControllerNode::execute(double action) {
     std::string message_type;
 
     bsn::ControlCommand command_msg;
-    bsn::SystemInfo centralhub_msg;
 
     message_type = op.split(message_id, '_')[0];
     actuator_name = message_type == "CTX" ? getContextActuator(message_id) : getTaskActuator(message_id);
@@ -460,12 +454,6 @@ void ControllerNode::execute(double action) {
             therm_pub.publish(command_msg);
         }
     }
-
-    centralhub_msg.cost = current_cost;
-    centralhub_msg.reliability = current_reli;
-
-    centralhub_pub.publish(centralhub_msg);
-    monitor_pub.publish(centralhub_msg);
 
     return;
 }

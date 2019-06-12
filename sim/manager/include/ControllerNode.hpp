@@ -78,9 +78,6 @@ class ControllerNode {
 
 	std::string message_id;
 
-	ros::Publisher centralhub_pub;
-	ros::Publisher monitor_pub;
-
 	// Ros publishers for the sensors
 	ros::Publisher ecg_pub;
 	ros::Publisher therm_pub;

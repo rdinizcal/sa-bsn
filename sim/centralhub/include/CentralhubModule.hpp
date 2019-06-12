@@ -53,9 +53,6 @@ class CentralhubModule {
         double patient_status;
         int session;
 
-        std::string reliability;
-        std::string cost;
-
         std::string bpr_risk;
         std::string oxi_risk;
         std::string ecg_risk;
@@ -67,8 +64,6 @@ class CentralhubModule {
         std::string ecg_batt;
         std::string trm_batt;
         std::string acc_batt;
-
-
 };
 
 #endif 
