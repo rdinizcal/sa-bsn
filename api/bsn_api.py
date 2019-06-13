@@ -14,25 +14,30 @@ commands = [
 ]
 
 app = Flask(__name__)
-processes_pids = []
+roscore_port = 11311
+bsn_dict = {}
 
-def stop_execution():
-    global processes_pids
+def stop_execution(ip):
+    pids = bsn_dict[ip]
+    print(pids)
     # Send a Sigkill sign for all the processes pids
-    for pid in processes_pids:
+    for pid in pids:
         os.kill(pid, signal.SIGINT)
         os.wait()
-    processes_pids = []
+    bsn_dict.pop(ip, None)
+    print(bsn_dict)
 
 def start_execution():
-    global processes_pids
-
+    global roscore_port
+    processes_pids = []
     # Initialize odsupercomponent
     # configuration_path = os.getcwd()  + '/odv/sim/configs/' + path
-    od_process = subprocess.Popen(['roscore'], stdout=subprocess.PIPE, cwd=os.getcwd())
-    print(od_process.pid)
+    os.environ["ROS_MASTER_URI"] = "http://localhost:" + str(roscore_port)
+    ros_process = subprocess.Popen(['roscore', "-p", str(roscore_port)], stdout=subprocess.PIPE, cwd=os.getcwd())
+    print("ok")
+    roscore_port += 1
     sleep(5)
-    processes_pids.append(od_process.pid)
+    processes_pids.append(ros_process.pid)
     print("inicia a execucao")
 
     # Initialize sensors
@@ -40,7 +45,6 @@ def start_execution():
         process = subprocess.Popen(command, stdout=subprocess.PIPE)
         processes_pids.append(process.pid)
 
-    print(processes_pids)
     # Returns all the pids started
     return processes_pids
 
@@ -89,37 +93,45 @@ def config():
 # Show active processes
 @app.route('/status')
 def status():
-    global processes_pids
-
-    if processes_pids == []:
+    if bsn_dict == {}:
         return 'Inactive'
 
     response = ''
-    for pid in processes_pids:
-        response += str(pid)  + check_status(pid) + '<br>'
+    for ips in bsn_dict: 
+        for pid in bsn_dict[ips]:
+            response += str(pid)  + " " + check_status(pid) + '<br>'
+        response += "<br>"
+        print(response)
 
     return response
 
 # Start bsn execution
 @app.route('/start', methods=['POST', 'GET'])
 def start():
-    global processes_pids
+    ip = request.remote_addr
+    print(ip)
     try:
-        processes_pids = start_execution()
-        print(request.remote_addr)
-        return 'ok'    
+        if ip in bsn_dict.keys():
+            if len(bsn_dict[ip]) > 0: 
+                return "error, multiple start"
+        bsn_dict[ip] = start_execution()
+        print(bsn_dict)
+        return 'ok'
     except Exception as e:
         return 'execution error, exception: ' + str(e)
 
 # Stop bsn execution
 @app.route('/stop')
 def stop():    
-    global processes_pids
+    ip = request.remote_addr
     try:
-        stop_execution()
-        return 'ok'
+        if ip in bsn_dict.keys():
+            stop_execution(ip)
+            return 'ok'
+        else:
+            return "nothing to stop"
     except Exception as e:
-        processes_pids = []
+        bsn_dict[ip] = []
         return 'error: ' + str(e)
 
 @app.route('/')
