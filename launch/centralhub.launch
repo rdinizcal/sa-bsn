@@ -10,7 +10,7 @@
 
     <param name="path" value="centralhub_output.csv" />
 
-    <param name="session" value="10" type="int" />
+    <param name="session" value="25" type="int" />
 
 
 </launch>

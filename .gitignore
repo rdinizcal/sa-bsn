@@ -56,7 +56,7 @@ CATKIN_IGNORE
 .vscode/*
 
 # Personal TODO list
-TODO
-
-venv
+launch1
 test.py
+json
+venv

@@ -1,99 +1,37 @@
-#include "ControllerNode.hpp"
+#include "AnalyticsNode.hpp"
 
 using namespace bsn::goalmodel;
 
-ControllerNode::ControllerNode(int  &argc, char **argv, std::string name):
+AnalyticsNode::AnalyticsNode(int  &argc, char **argv, std::string name):
     tasks(),
     contexts(),
     cost_expression(),
-    reliability_expression() 
+    reliability_expression(),
+    connect(true),
+    database_url(),
+    session()
     {}
 
-ControllerNode::~ControllerNode() {}
+AnalyticsNode::~AnalyticsNode() {}
 
-void ControllerNode::setTaskValue(std::string id, double value) {
+void AnalyticsNode::setTaskValue(std::string id, double value) {
     this->tasks[id] = value;
 }
 
-double ControllerNode::getTaskValue(std::string id) {
+double AnalyticsNode::getTaskValue(std::string id) {
     return this->tasks[id];
 }
 
-bool ControllerNode::isCost(std::string id) {
+bool AnalyticsNode::isCost(std::string id) {
     return id[0] == ('W');
 }
 
-std::string ControllerNode::getSensorName(const int sensor_id) {
-    std::string current_sensor;
-
-    switch(sensor_id) {
-        case 1:
-            current_sensor = "oximeter";
-            break;
-        case 2:
-            current_sensor = "ecg";
-            break;
-        case 3:
-            current_sensor = "thermometer";
-            break;
-        case 4:
-            current_sensor = "abp";
-            break;
-        case 41:
-            current_sensor = "abp";
-            break;
-        case 42:
-            current_sensor = "abp";
-            break;
-        case 5: 
-            current_sensor = "acc";
-            break;
-    }
-
-    return current_sensor;
-}
-
-std::string ControllerNode::getTaskActuator(std::string id) {
-    bsn::operation::Operation op = bsn::operation::Operation();
-
-    std::string sensor_name;
-    std::string current_sensor;
-    std::string actuator_name;
-    int sensor_id;
-    
-    sensor_name = (op.split(id, '.'))[1];
-    sensor_id = std::stoi(sensor_name) / 10;
-
-    current_sensor = getSensorName(sensor_id);
-
-    actuator_name = current_sensor + "_control_command";
-
-    return actuator_name;
-}
-
-std::string ControllerNode::getContextActuator(std::string id) {
-    bsn::operation::Operation op = bsn::operation::Operation();
-
-    std::string sensor_name;
-    std::string current_sensor;
-    std::string actuator_name;
-    int sensor_id;
-    
-    sensor_name = (op.split(id, '_'))[3];
-    sensor_id = std::stoi(sensor_name);
-
-    current_sensor = getSensorName(sensor_id);
-
-    actuator_name = current_sensor + "_control_command";
-
-    return actuator_name;
-}
-
-void ControllerNode::setUp() {
+void AnalyticsNode::setUp() {
 
     GoalTree goalModel("Body Sensor Network");
-    std::string path = ros::package::getPath("controller");
-     // Set up the goal tree goalModel        
+    std::string path = ros::package::getPath("manager");
+
+    // Set up the goal tree goalModel        
     LeafTask g3_t1_11("G3_T1.11","Read data", Property("W_G3_T1_11", 1),Property("R_G3_T1_11", 1),Property("F_G3_T1_11",1));
     LeafTask g3_t1_12("G3_T1.12","Filter data", Property("W_G3_T1_12", 1),Property("R_G3_T1_12", 1),Property("F_G3_T1_12",1));
     LeafTask g3_t1_13("G3_T1.13","Transfer data", Property("W_G3_T1_13", 1),Property("R_G3_T1_13", 1),Property("F_G3_T1_13",1));
@@ -198,22 +136,18 @@ void ControllerNode::setUp() {
         reliability_file.close();
     } catch (std::ifstream::failure e) { std::cerr << "Exception opening/reading/closing file (reliability.formula)\n"; }
 
-    this->cost_expression = bsn::model::Formula(cost_formula);
-    this->reliability_expression = bsn::model::Formula(reliability_formula);
+    cost_expression = bsn::model::Formula(cost_formula);
+    reliability_expression = bsn::model::Formula(reliability_formula);
 
     std::vector<std::shared_ptr<bsn::goalmodel::LeafTask>> leafTasks; 
 
     leafTasks = goalModel.getLeafTasks();
 
-    // Get context information from leafTasks
-
     bsn::goalmodel::Context aux_context;
     std::string newName;
-    std::string contextName;
 
     for(std::shared_ptr<bsn::goalmodel::LeafTask> it : leafTasks) 
     {
-        
         newName = it->getContext().getID();
 
         if(newName != ""){
@@ -225,7 +159,7 @@ void ControllerNode::setUp() {
         }
     }        
 
-    //reli expr
+    //reliability expression
     for(std::shared_ptr<bsn::goalmodel::LeafTask> it : leafTasks) 
     {
         setTaskValue(it->getReliability().getID(), it->getReliability().getValue());
@@ -251,7 +185,7 @@ void ControllerNode::setUp() {
 
     props.clear(); values.clear();
     
-    //cost expr
+    //cost expression
     for(std::shared_ptr<bsn::goalmodel::LeafTask> it : leafTasks) 
     {
         setTaskValue(it->getReliability().getID(), it->getReliability().getValue());
@@ -269,28 +203,28 @@ void ControllerNode::setUp() {
     {
         props.push_back(it2->first);
         values.push_back((double)(it2->second.getValue()));
-    }        
+    }
 
     desired_cost = cost_expression.apply(props, values);
 
-    ros::NodeHandle publisher_handler;
+    // Sets up connection parameters
+ 
+    ros::NodeHandle config_handler;
 
-    // Publishes the same messages to both topics to avoid loss of information
-
-    ecg_pub = publisher_handler.advertise<messages::ControlCommand>("ecg_control_command", 1000);
-    oxi_pub = publisher_handler.advertise<messages::ControlCommand>("oximeter_control_command", 1000);
-    abp_pub = publisher_handler.advertise<messages::ControlCommand>("abp_control_command", 1000);
-    therm_pub = publisher_handler.advertise<messages::ControlCommand>("thermometer_control_command", 1000); 
+    config_handler.getParam("connect", connect);
+    config_handler.getParam("db_url", database_url);
+    config_handler.getParam("session", session);
+    
+/*
+    for(std::vector<std::list<double>>::iterator it = data_list.begin();
+        it != data_list.end(); ++it) {
+            (*it).push_back(0.0);
+    }
+*/
+    return;
 }
 
-/** **************************************************************
- *                          MONITOR 
-/* ***************************************************************
- * receive task (id, cost, reliability) update list of tasks
- * receive context (id, bool) reset setpoints (cost and reliability)
- * ***************************************************************
-*/ 
-void ControllerNode::receiveTaskInfo(const messages::TaskInfo::ConstPtr& msg) {
+void AnalyticsNode::receiveTaskInfo(const messages::TaskInfo::ConstPtr& msg) {
     ROS_INFO("I heard: [%s]", msg->task_id.c_str());
 
     message_id = msg->task_id;
@@ -313,7 +247,7 @@ void ControllerNode::receiveTaskInfo(const messages::TaskInfo::ConstPtr& msg) {
     analyze();
 }
 
-void ControllerNode::receiveContextInfo(const messages::ContextInfo::ConstPtr& msg) {
+void AnalyticsNode::receiveContextInfo(const messages::ContextInfo::ConstPtr& msg) {
     ROS_INFO("I heard: [%s]", msg->context_id.c_str());
 
     message_id = msg->context_id;
@@ -327,15 +261,7 @@ void ControllerNode::receiveContextInfo(const messages::ContextInfo::ConstPtr& m
     analyze();
 }
 
-/** **************************************************************
- *                         ANALYZE
-/* ***************************************************************
- * analyze whether the setpoints have been violated
- *      -plug in formulae and evaluate current cost and reliabiliy   
- *      -compare current values with tresholds
- * ***************************************************************
-*/ 
-void ControllerNode::analyze() {
+void AnalyticsNode::analyze() {
     
     // Should consider refactoring apply method later...
 
@@ -344,8 +270,6 @@ void ControllerNode::analyze() {
 
     // clear previous values and props
     props.clear(); values.clear();
-
-    // bad smells everywhere...
 
     for(it1 = tasks.begin(); it1 != tasks.end(); it1++)
     {
@@ -365,7 +289,6 @@ void ControllerNode::analyze() {
 
     props.clear(); values.clear();
 
-
     for(it1 = tasks.begin(); it1 != tasks.end(); it1++)
     {
         props.push_back(it1->first);
@@ -383,83 +306,37 @@ void ControllerNode::analyze() {
     reli_error = desired_reli - current_reli;
     cost_error = desired_cost - current_cost;
 
-    plan();
+    sendToServer();
 }
 
-/** **************************************************************
- *                          PLAN
-/* ***************************************************************
- * exhaustively analyze whether an action fits the setpoints
- * ***************************************************************
-*/
-void ControllerNode::plan() {
-    double action;
+void AnalyticsNode::sendToServer() {
+ 
+    std::string packet = "";
 
-    if (reli_error > 0) {
-        if(reli_error < 0.05) {
-            action = 0.01;
-        } else if (reli_error < 0.1){
-            action = 0.05;
-        } else {
-            action = 0.1;
-        }
-    } else if (reli_error < 0) {
-        if(reli_error < -0.05) {
-            action = -0.01;
-        } else if (reli_error < -0.1){
-            action = -0.05;
-        } else {
-            action = -0.1;
-        }
-    } else action = 0.0;
+    web::http::client::http_client client(U(database_url));
+    web::json::value json_obj; 
 
-    execute(action);
-}
+    packet.append(std::to_string(current_cost)).append(",");
+    packet.append(std::to_string(current_reli));
 
-/** **************************************************************
- *                         EXECUTE
-/* ***************************************************************
- * if so, send messages containing the actions to the modules
- * ***************************************************************
-*/
-void ControllerNode::execute(double action) {
+//   std::cout << "packet: " << packet << std::endl;
 
-    bsn::operation::Operation op = bsn::operation::Operation();
-    std::string actuator_name;
-    std::string message_type;
-
-    messages::ControlCommand command_msg;
-
-    message_type = op.split(message_id, '_')[0];
-    actuator_name = message_type == "CTX" ? getContextActuator(message_id) : getTaskActuator(message_id);
-
-    if (action != 0) 
-    {
-        std::cout << "sending action: " << action << " to "  << actuator_name << std::endl;
-
-        command_msg.active = true;
-        command_msg.frequency = action;
-
-        if(actuator_name == "ecg_control_command") {
-            ecg_pub.publish(command_msg);
-        } else  if(actuator_name == "abp_control_command"){
-            abp_pub.publish(command_msg);
-        } else  if(actuator_name == "oximeter_control_command"){
-            oxi_pub.publish(command_msg);
-        } else  if(actuator_name == "thermometer_control_command"){
-            therm_pub.publish(command_msg);
-        }
+    if (connect) {
+        json_obj["RelCos"] = web::json::value::string(packet);
+        client.request(web::http::methods::PUT, U("/sessions/" + std::to_string(session) + ".json") ,json_obj);
     }
 
     return;
 }
 
-void ControllerNode::run(){
+// Analytics receives information from both tasks and contexts of sensors
+
+void AnalyticsNode::run(){
 
     ros::NodeHandle n;
    
-    ros::Subscriber t_sub = n.subscribe("task_info", 1000, &ControllerNode::receiveTaskInfo, this);
-    ros::Subscriber c_sub = n.subscribe("context_info", 1000, &ControllerNode::receiveContextInfo, this);
+    ros::Subscriber t_sub = n.subscribe("task_info", 1000, &AnalyticsNode::receiveTaskInfo, this);
+    ros::Subscriber c_sub = n.subscribe("context_info", 1000, &AnalyticsNode::receiveContextInfo, this);
 
     ros::spin();
 

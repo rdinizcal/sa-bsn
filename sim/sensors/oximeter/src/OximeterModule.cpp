@@ -7,23 +7,20 @@ using namespace bsn::configuration;
 
 OximeterModule::OximeterModule(const int32_t &argc, char **argv) :
     type("oximeter"),
-    battery("oxi_batt",100,100,1),
+    battery("oxi_batt", 100, 100, 1),
     available(true),
     data_accuracy(1),
     comm_accuracy(1),
     active(true),
     params({{"freq",0.90},{"m_avg",5}}),
-    markov(),
     filter(5),
-    sensorConfig(),
     persist(1),
-    path("oximeter_output.csv"),
-    fp() {}
+    path("oximeter_output.csv") {}
 
 OximeterModule::~OximeterModule() {}
 
 void OximeterModule::setUp() {
-    ros::NodeHandle configHandler;
+    ros::NodeHandle configHandler, n;
     srand(time(NULL));
         
     Operation op;
@@ -111,6 +108,9 @@ void OximeterModule::setUp() {
             fp << "ID,DATA,RISK,TIME_MS" << std::endl;
         }
     }
+
+    taskPub =  n.advertise<messages::TaskInfo>("task_info", 10);
+    contextPub =  n.advertise<messages::ContextInfo>("context_info", 10);
 }
 
 void OximeterModule::tearDown() {
@@ -119,29 +119,30 @@ void OximeterModule::tearDown() {
 }
 
 void OximeterModule::sendTaskInfo(const std::string &task_id, const double &cost, const double &reliability, const double &frequency) {
-    // TaskInfo task(task_id, cost, reliability, frequency);
-    // Container taskContainer(task);
-    // getConference().send(taskContainer);
+    messages::TaskInfo msg;
+
+    msg.task_id = task_id;
+    msg.cost = cost;
+    msg.reliability = reliability;
+    msg.frequency = frequency;
+    taskPub.publish(msg);
 }
 
-void OximeterModule::sendContextInfo(const std::string &context_id, const bool &value) {
-    // ContextInfo context(context_id, value, 0, 0, "");
-    // Container contextContainer(context);
-    // getConference().send(contextContainer);
+void OximeterModule::sendContextInfo(const std::string &context_id, const bool &status) {
+    messages::ContextInfo msg;
+
+    msg.context_id = context_id;
+    msg.status = status;
+    contextPub.publish(msg);
 }
 
-void OximeterModule::sendMonitorTaskInfo(const std::string &task_id, const double &cost, const double &reliability, const double &frequency) {
-    // MonitorTaskInfo task(task_id, cost, reliability, frequency);
-    // Container taskContainer(task);
-    // getConference().send(taskContainer);
+void OximeterModule::receiveControlCommand(const messages::ControlCommand::ConstPtr& msg)  {
+    active = msg->active;
+    double newFreq;
+    newFreq = params["freq"] + msg->frequency;
+    std::cout << "Frequency changed from " << params["freq"] << " to " << newFreq << std::endl;
+    params["freq"] = newFreq;
 }
-
-void OximeterModule::sendMonitorContextInfo(const std::string &context_id, const bool &value) {
-    // MonitorContextInfo context(context_id, value, 0, 0, "");
-    // Container contextContainer(context);
-    // getConference().send(contextContainer);
-}
-
 
 void OximeterModule::run(){
     double data;
@@ -151,46 +152,29 @@ void OximeterModule::run(){
     bsn::generator::DataGenerator dataGenerator(markov);
 
     messages::SensorData msg;
+    msg.type = "oximeter";
     ros::NodeHandle n;
 
-    ros::Publisher sensor_pub = n.advertise<messages::SensorData>("oximeter_data", 10);
+    dataPub = n.advertise<messages::SensorData>("oximeter_data", 10);
+    ros::Subscriber ecgSub = n.subscribe("oximeter_control_command", 10, &OximeterModule::receiveControlCommand, this);
 
-    ros::Rate loop_rate(1);
+    ros::Rate loop_rate(params["freq"]);
+
+    sendContextInfo("CTX_G3_T1_1",true);
 
     while (ros::ok()) {
-        
-        // if(first_exec){ // Send context info warning controller that this sensor is available  
-        //     sendContextInfo("TEMP_available",true);
-        //     sendMonitorContextInfo("TEMP_available",true);
-        //     first_exec = false; 
-        // }
-        
-        { // update controller with task info 
-        /*           
-            sendContextInfo("TEMP_available",true);
-            sendTaskInfo("G3_T1.31",0.1,data_accuracy,params["freq"]);
-            sendTaskInfo("G3_T1.32",0.1*params["m_avg"],1,params["freq"]);
-            sendTaskInfo("G3_T1.33",0.1,comm_accuracy,params["freq"]);
-          // and the monitor..
-            sendMonitorContextInfo("TEMP_available",true);
-            sendMonitorTaskInfo("G3_T1.31",0.1,data_accuracy,params["freq"]);
-            sendMonitorTaskInfo("G3_T1.32",0.1*params["m_avg"],1,params["freq"]);
-            sendMonitorTaskInfo("G3_T1.33",0.1,comm_accuracy,params["freq"]);
-        */
-        //     sendContextInfo("TEMP_available",true);
-        //     sendTaskInfo("G3_T1.31",0.076,1,1);
-        //     sendTaskInfo("G3_T1.32",0.076*params["m_avg"],1,1);
-        //     sendTaskInfo("G3_T1.33",0.076,1,1);
-        //   // and the monitor..
-        //     sendMonitorContextInfo("TEMP_available",true);
-        //     sendMonitorTaskInfo("G3_T1.31",0.076,1,1);
-        //     sendMonitorTaskInfo("G3_T1.32",0.076*params["m_avg"],1,1);
-        //     sendMonitorTaskInfo("G3_T1.33",0.076,1,1);
+        loop_rate = ros::Rate(params["freq"]);
+
+        { // update controller with task info            
+            sendContextInfo("CTX_G3_T1_1",true);
+            sendTaskInfo("G3_T1.11",0.1,data_accuracy,params["freq"]);
+            sendTaskInfo("G3_T1.12",0.1*params["m_avg"],1,params["freq"]);
+            sendTaskInfo("G3_T1.13",0.1,comm_accuracy,params["freq"]);
         }
 
-        /*{ // recharge routine
+        { // recharge routine
             //for debugging
-            cout << "Battery level: " << battery.getCurrentLevel() << "%" << endl;
+            std::cout << "Battery level: " << battery.getCurrentLevel() << "%" << std::endl;
             if(!active && battery.getCurrentLevel() > 90){
                 active = true;
             }
@@ -200,75 +184,60 @@ void OximeterModule::run(){
             
             if (rand()%10 > 6) {
                     bool x_active = (rand()%2==0)?active:!active;
-                    sendContextInfo("TEMP_available", x_active);
+                    sendContextInfo("CTX_G3_T1_1", x_active);
             }
-            //sendContextInfo("TEMP_available", active);
-            sendMonitorContextInfo("TEMP_available",active);
+            sendContextInfo("CTX_G3_T1_1", active);
+        }
 
-        }*/
-
-        /*
-         * Receive control command and module update
-         */
-        // while(!buffer.isEmpty()){
-        //     container = buffer.leave();
-
-        //     active = container.getData<oximeterControlCommand>().getActive();
-        //     params["freq"] = container.getData<oximeterControlCommand>().getFrequency();
-        // }
-
-        /*if(!active){ 
+        if (!active) { 
             if(battery.getCurrentLevel() <= 100) battery.generate(2.5);
             continue; 
-        }*/
+        }
 
-        msg.type = "oximeter";
         /*
          * Module execution
-         */
-        if((rand() % 100)+1 < int32_t(params["freq"]*100)){
+         */           
            
-            { // TASK: Collect oximeter data with data_accuracy
-                data = dataGenerator.getValue();
+        { // TASK: Collect oximeter data with data_accuracy
+            data = dataGenerator.getValue();
                 
-                double offset = (1 - data_accuracy + (double)rand() / RAND_MAX * (1 - data_accuracy)) * data;
+            double offset = (1 - data_accuracy + (double)rand() / RAND_MAX * (1 - data_accuracy)) * data;
 
-                if (rand() % 2 == 0)
-                    data = data + offset;
-                else
-                    data = data - offset;
+            if (rand() % 2 == 0)
+                data = data + offset;
+            else
+                data = data - offset;
 
-                battery.consume(0.1);
+            battery.consume(0.1);
 
-                //for debugging
-                std::cout << "New data: " << data << std::endl << std::endl;
-            }
+            //for debugging
+            std::cout << "New data: " << data << std::endl << std::endl;
+        }
 
-            { // TASK: Filter data with moving average
-                filter.setRange(params["m_avg"]);
-                filter.insert(data, type);
-                data = filter.getValue(type);
-                battery.consume(0.1*params["m_avg"]);
+        { // TASK: Filter data with moving average
+            filter.setRange(params["m_avg"]);
+            filter.insert(data, type);
+            data = filter.getValue(type);
+            battery.consume(0.1*params["m_avg"]);
 
-                //for debugging
-                msg.data = data;
-                std::cout << "Filtered data: " << data << std::endl;
-            }
+            //for debugging
+            msg.data = data;
+            std::cout << "Filtered data: " << data << std::endl;
+        }
+        
+        { // TASK: Transfer information to CentralHub
+            risk = sensorConfig.evaluateNumber(data);
+            msg.risk = risk;
+            battery.consume(0.1);
+            msg.batt = battery.getCurrentLevel();
+
+            if ((rand() % 100) <= comm_accuracy * 100)
+                dataPub.publish(msg);
             
-            { // TASK: Transfer information to CentralHub
-                risk = sensorConfig.evaluateNumber(data);
+            battery.consume(0.1);
 
-                msg.risk = risk;
-
-                if ((rand() % 100) <= comm_accuracy * 100)
-                    sensor_pub.publish(msg);
-                
-                battery.consume(0.1);
-
-                // for debugging
-                std::cout << "Risk: " << risk << "%" << std::endl;
-            }
-            
+            // for debugging
+            std::cout << "Risk: " << risk << "%" << std::endl;
         }
 
         { // Persist sensor data

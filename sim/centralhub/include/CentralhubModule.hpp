@@ -62,9 +62,13 @@ class CentralhubModule {
         std::string oxi_risk;
         std::string ecg_risk;
         std::string trm_risk;
-        std::string reliability;
-        std::string cost;
+        std::string acc_risk;
 
+        std::string bpr_batt;
+        std::string oxi_batt;
+        std::string ecg_batt;
+        std::string trm_batt;
+        std::string acc_batt;
 };
 
 #endif 

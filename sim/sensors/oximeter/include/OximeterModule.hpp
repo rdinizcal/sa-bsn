@@ -22,7 +22,6 @@
 #include "messages/ControlCommand.h"
 
 class OximeterModule {
-    
 	private:
       	OximeterModule(const OximeterModule &);
     	OximeterModule &operator=(const OximeterModule &);
@@ -44,6 +43,8 @@ class OximeterModule {
 		void run();
 
 	  private:
+		void receiveControlCommand(const messages::ControlCommand::ConstPtr& msg);
+
 		std::string type;
 		bsn::resource::Battery battery;
 		bool available;
@@ -61,6 +62,8 @@ class OximeterModule {
 		int persist;
 		std::string path;
 		std::ofstream fp;
+
+		ros::Publisher taskPub, contextPub, dataPub;
 };
 
 #endif 

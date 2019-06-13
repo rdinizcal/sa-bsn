@@ -8,3 +8,4 @@ gnome-terminal --working-directory=${bsn}/launch -e 'roslaunch thermometer.launc
 gnome-terminal --working-directory=${bsn}/launch -e 'roslaunch ecg.launch'
 gnome-terminal --working-directory=${bsn}/launch -e 'roslaunch oximeter.launch'
 gnome-terminal --working-directory=${bsn}/launch -e 'roslaunch bloodpressure.launch'
+gnome-terminal --working-directory=${bsn}/launch -e 'roslaunch analytics.launch'

@@ -14,7 +14,6 @@ ECGModule::ECGModule(const int32_t &argc, char **argv) :
     active(true),
     params({{"freq",0.9},{"m_avg",5}}),
     filter(5),
-    sensorConfig(),
     persist(1),
     path("ecg_output.csv") {}
 
@@ -143,7 +142,10 @@ void ECGModule::sendContextInfo(const std::string &context_id, const bool &statu
 
 void ECGModule::receiveControlCommand(const messages::ControlCommand::ConstPtr& msg)  {
     active = msg->active;
-    params["freq"] = msg->frequency;
+    double newFreq;
+    newFreq = params["freq"] + msg->frequency;
+    std::cout << "Frequency changed from " << params["freq"] << " to " << newFreq << std::endl;
+    params["freq"] = newFreq;
 }
 
 void ECGModule::run() {
@@ -163,32 +165,34 @@ void ECGModule::run() {
 
     ros::Rate loop_rate(params["freq"]);
 
-    sendContextInfo("ECG_available",true);    
+    sendContextInfo("CTX_G3_T1_2",true);
 
     while (ros::ok()) {
+        loop_rate = ros::Rate(params["freq"]);
+
         { // update controller with task info            
-            sendContextInfo("ECG_available",true);
-            sendTaskInfo("G3_T1.31",0.1,data_accuracy,params["freq"]);
-            sendTaskInfo("G3_T1.32",0.1*params["m_avg"],1,params["freq"]);
-            sendTaskInfo("G3_T1.33",0.1,comm_accuracy,params["freq"]);
+            sendContextInfo("CTX_G3_T1_2",true);
+            sendTaskInfo("G3_T1.21",0.1,data_accuracy,params["freq"]);
+            sendTaskInfo("G3_T1.22",0.1*params["m_avg"],1,params["freq"]);
+            sendTaskInfo("G3_T1.23",0.1,comm_accuracy,params["freq"]);
         }
 
         { // recharge routine
             //for debugging
             std::cout << "Battery level: " << battery.getCurrentLevel() << "%" << std::endl;
           
-            if(!active && battery.getCurrentLevel() > 90){
+            if (!active && battery.getCurrentLevel() > 90) {
                 active = true;
             }
-            if(active && battery.getCurrentLevel() < 2){
+            if (active && battery.getCurrentLevel() < 2) {
                 active = false;
             }
             
             if (rand()%10 > 6) {
-                    bool x_active = (rand()%2==0)?active:!active;
-                    sendContextInfo("ECG_available", x_active);
+                bool x_active = (rand()%2==0)?active:!active;
+                sendContextInfo("CTX_G3_T1_2", x_active);
             }
-            sendContextInfo("ECG_available", active);
+            sendContextInfo("CTX_G3_T1_2", active);
         }
 
         if(!active){ 
@@ -199,49 +203,44 @@ void ECGModule::run() {
         /*
          * Module execution
          */
-        if((rand() % 100)+1 < int32_t(params["freq"]*100)){
-           
-            { // TASK: Collect thermometer data with data_accuracy
-                data = dataGenerator.getValue();
-                
-                double offset = (1 - data_accuracy + (double)rand() / RAND_MAX * (1 - data_accuracy)) * data;
-
-                if (rand() % 2 == 0)
-                    data = data + offset;
-                else
-                    data = data - offset;
-
-                battery.consume(0.1);
-
-                //for debugging
-                std::cout << "New data: " << data << std::endl << std::endl;
-            }
-
-            { // TASK: Filter data with moving average
-                filter.setRange(params["m_avg"]);
-                filter.insert(data, type);
-                data = filter.getValue(type);
-                battery.consume(0.1*params["m_avg"]);
-
-                //for debugging
-                msg.data = data;
-                std::cout << "Filtered data: " << data << std::endl;
-            }
+        { // TASK: Collect thermometer data with data_accuracy
+            data = dataGenerator.getValue();
             
-            { // TASK: Transfer information to CentralHub
-                risk = sensorConfig.evaluateNumber(data);
+            double offset = (1 - data_accuracy + (double)rand() / RAND_MAX * (1 - data_accuracy)) * data;
 
-                msg.risk = risk;
+            if (rand() % 2 == 0)
+                data = data + offset;
+            else
+                data = data - offset;
 
-                if ((rand() % 100) <= comm_accuracy * 100)
-                    dataPub.publish(msg);
+            battery.consume(0.1);
 
-                battery.consume(0.1);
+            //for debugging
+            std::cout << "New data: " << data << std::endl << std::endl;
+        }
 
-                // for debugging
-                std::cout << "Risk: " << risk << "%" << std::endl;
-            }
+        { // TASK: Filter data with moving average
+            filter.setRange(params["m_avg"]);
+            filter.insert(data, type);
+            data = filter.getValue(type);
+            battery.consume(0.1*params["m_avg"]);
             
+            //for debugging
+            msg.data = data;
+            std::cout << "Filtered data: " << data << std::endl;
+        }
+        
+        { // TASK: Transfer information to CentralHub
+            risk = sensorConfig.evaluateNumber(data);
+            msg.risk = risk;
+            battery.consume(0.1);
+            msg.batt = battery.getCurrentLevel();
+
+            if ((rand() % 100) <= comm_accuracy * 100)
+                dataPub.publish(msg);
+
+            // for debugging
+            std::cout << "Risk: " << risk << "%" << std::endl;
         }
 
         { // Persist sensor data

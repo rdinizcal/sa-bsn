@@ -42,12 +42,13 @@ void CentralhubModule::tearDown() {
 std::string CentralhubModule::makePacket() {
     //std::string packet = "88,97#10,20,30,40,50&";
     std::string packet = "";
-    packet.append(cost).append(",");
-    packet.append(reliability).append("#");
-    packet.append(bpr_risk).append(",");
-    packet.append(oxi_risk).append(",");
-    packet.append(ecg_risk).append(",");
-    packet.append(trm_risk).append("&");
+
+    packet.append(trm_batt).append(",");
+    packet.append(ecg_batt).append(",");
+    packet.append(oxi_batt).append(",");
+    packet.append(bpr_batt).append(",");
+    packet.append(bpr_batt).append(",");
+    packet.append(acc_batt).append("&");
 
     int i = 0;
     for (std::list<double> li : data_list) {
@@ -58,7 +59,9 @@ std::string CentralhubModule::makePacket() {
         }
         i++;                    
     }
+    packet += acc_risk + "=" + "10/";
     packet += std::to_string(patient_status);
+//    std::cout << packet << std::endl;
     return packet;
 }
 
@@ -89,6 +92,7 @@ std::vector<std::string> CentralhubModule::getPatientStatus() {
     std::string oxi;
     std::string ecg;
     std::string trm;
+    std::string acc;
 
     for (int i = 0; i < 4; i++) {
         double sensor_risk = data_list[i].back();
@@ -113,26 +117,39 @@ std::vector<std::string> CentralhubModule::getPatientStatus() {
         } else if (i == 2) {
             oxi = sensor_risk_str;
             oxi_risk = std::to_string(sensor_risk);
-        } else {
+        } else if (i == 3) {
             bpr = sensor_risk_str;
             bpr_risk = std::to_string(sensor_risk);
+        } else {
+            acc = sensor_risk_str;
+            acc_risk = std::to_string(sensor_risk);
         }
     }
 
-    std::vector<std::string> v = {trm, ecg, oxi, bpr};  
+    std::vector<std::string> v = {trm, ecg, oxi, bpr, acc};  
     return v;
 }
 
 void CentralhubModule::receiveSensorData(const messages::SensorData::ConstPtr& msg) {
     std::string type = msg->type;
     double risk = msg->risk;
-    std::string bpr_risk, oxi_risk, ecg_risk, trm_risk;
+    double batt = msg->batt;
     std::vector<std::string> risks;
     web::http::client::http_client client(U(database_url));
     web::json::value json_obj; 
 
     std::cout << "Received data from " + type << std::endl; 
-    
+
+    if (type=="thermometer"){
+        trm_batt = std::to_string(batt);
+    } else if (type=="ecg") {
+        ecg_batt = std::to_string(batt);
+    } else if (type=="oximeter") {
+        oxi_batt = std::to_string(batt);
+    } else if (type=="bpms" || type=="bpmd") {
+        bpr_batt = std::to_string(batt);
+    } 
+
     if(type != "null" && int32_t(risk) != -1) {  
         int32_t sensor_id = get_sensor_id(type);
         data[sensor_id] = msg->data;
@@ -142,17 +159,19 @@ void CentralhubModule::receiveSensorData(const messages::SensorData::ConstPtr& m
         patient_status = data_fuse(data_list);
 
         if (connect) {
-            json_obj["data"] = web::json::value::string(makePacket());
+            json_obj["VitalData"] = web::json::value::string(makePacket());
             client.request(web::http::methods::PUT, U("/sessions/" + std::to_string(session) + ".json") ,json_obj);
         }
     }
 
+    
     risks = getPatientStatus();
     trm_risk = risks[0];
     ecg_risk = risks[1];
     oxi_risk = risks[2];
     bpr_risk = risks[3];
-    
+    acc_risk = risks[4]; 
+
     if (persist)
         this->persistData(risks);
 
@@ -166,11 +185,6 @@ void CentralhubModule::receiveSensorData(const messages::SensorData::ConstPtr& m
     std::cout << "*****************************************" << std::endl;
 }
 
-void CentralhubModule::receiveSystemInfo(const messages::SystemInfo::ConstPtr& msg) {
-    reliability = msg->reliability;
-    cost = msg->cost;
-}
-
 void CentralhubModule::run() {   
     ros::NodeHandle nh;
     
@@ -179,8 +193,6 @@ void CentralhubModule::run() {
     ros::Subscriber ecgSub = nh.subscribe("ecg_data", 10, &CentralhubModule::receiveSensorData, this);
     ros::Subscriber diastolicSub = nh.subscribe("diastolic_data", 10, &CentralhubModule::receiveSensorData, this);
     ros::Subscriber systolicSub = nh.subscribe("systolic_data", 10, &CentralhubModule::receiveSensorData, this);
-
-    ros::Subscriber systemSub = nh.subscribe("system_info", 10, &CentralhubModule::receiveSystemInfo, this);
 
     ros::spin();
 

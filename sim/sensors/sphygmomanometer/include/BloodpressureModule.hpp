@@ -44,6 +44,8 @@ class BloodpressureModule {
     	void run();
 
   	private:
+	  	void receiveControlCommand(const messages::ControlCommand::ConstPtr& msg);
+		
 		std::string type;
 		bsn::resource::Battery battery;
 		bool available;
@@ -52,7 +54,6 @@ class BloodpressureModule {
 		double diascomm_accuracy;
 		double systdata_accuracy;
 		double systcomm_accuracy;
-
 
 		bool active;
 		std::map<std::string,double> params;
@@ -67,6 +68,8 @@ class BloodpressureModule {
 		int persist;
 		std::string path;
 		std::ofstream fp;
+
+		ros::Publisher taskPub, contextPub, dataPub;
 };
 
 #endif 

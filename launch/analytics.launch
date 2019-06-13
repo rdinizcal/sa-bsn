@@ -1,0 +1,10 @@
+<launch> 
+    <node name="analytics" pkg="analytics" type="analytics" output="screen" />
+
+    <param name="connect" value="true" type="bool" />
+
+    <param name="database_url" value="https://my-project-1516369881504.firebaseio.com" />
+
+    <param name="session" value="25" type="int" />
+
+</launch>

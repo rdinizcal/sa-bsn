@@ -5,6 +5,7 @@ add_compile_options(-std=c++11)
 
 ## Find catkin and any catkin packages
 FIND_PACKAGE(catkin REQUIRED COMPONENTS roscpp std_msgs genmsg messages)
+FIND_PACKAGE(cpprestsdk REQUIRED NAMES cpprestsdk cpprest)
 
 # Export catkin package.
 CATKIN_PACKAGE(
@@ -26,7 +27,6 @@ INCLUDE_DIRECTORIES(include)
 
 ###########################################################################
 # Add and Set linking libraries to successfully link test suites and binaries.
-FIND_PACKAGE(cpprestsdk REQUIRED NAMES cpprestsdk cpprest)
 FIND_LIBRARY(BSN_LIBRARY bsn)
 FIND_LIBRARY(LEPTON_LIBRARY lepton)
 SET (LIBRARIES ${BSN_LIBRARY} ${LEPTON_LIBRARY})

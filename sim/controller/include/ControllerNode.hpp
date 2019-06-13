@@ -41,15 +41,19 @@ class ControllerNode {
 
 		bool isCost(std::string);
 
+		std::string getSensorName(const int);
+		std::string getTaskActuator(std::string);
+		std::string getContextActuator(std::string); 
+
     	ControllerNode(int &argc, char **argv, std::string name);
     	virtual ~ControllerNode();
 
 		void receiveTaskInfo(const messages::TaskInfo::ConstPtr& /*msg*/);
 		void receiveContextInfo(const messages::ContextInfo::ConstPtr& /*msg*/);
 
-    	void analyze(std::string);
-    	void plan(std::string, double, double);
-    	void execute(std::string, double, double, double);
+    	void analyze();
+    	void plan();
+    	void execute(double);
 
 		void run();
 
@@ -62,28 +66,25 @@ class ControllerNode {
 	std::vector<std::string> props;
 	std::vector<double> values;
 
-	double reli_value;
-	double cost_value;
+	double desired_reli;
+	double desired_cost;
+
+	double current_reli;
+	double current_cost;
+	
 	double reli_error;
 	double cost_error;
 
 	bsn::model::Formula cost_expression;
 	bsn::model::Formula reliability_expression;
-/* 
-	std::map<std::string,double&> cost_formula_reliabilities;
-	std::map<std::string,double&> cost_formula_frequencies;
-	std::map<std::string,double&> cost_formula_costs;
-	std::map<std::string,double&> cost_formula_contexts;
 
-	std::map<std::string,double&> reliability_formula_reliabilities;
-	std::map<std::string,double&> reliability_formula_frequencies;
-	std::map<std::string,double&> reliability_formula_contexts;
+	std::string message_id;
 
-	std::vector<std::vector<double>> actions;
-
-	double cost_setpoint;
-	double reliability_setpoint;
- */
+	// Ros publishers for the sensors
+	ros::Publisher ecg_pub;
+	ros::Publisher therm_pub;
+	ros::Publisher oxi_pub;
+	ros::Publisher abp_pub;
 };
 
 #endif 
