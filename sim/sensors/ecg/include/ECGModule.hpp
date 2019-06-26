@@ -68,24 +68,56 @@ class ECGModule {
 };
 
 class ECGCollect {
-    
-	private:
 
-	int dummy;	
+	private:
+      	ECGCollect(const ECGCollect &);		
+    	ECGCollect &operator=(const ECGCollect &);
+
+	public:
+		ECGCollect(const int32_t &argc, char **argv);
+    	virtual ~ECGCollect();
+
+		double collect(void);
+		
+	private:
+		bsn::generator::Markov markov;
+		bsn::resource::Battery battery;
+	
 }
 
 class ECGFilter {
     
 	private:
+      	ECGFilter(const ECGFilter &);
+    	ECGFilter &operator=(const ECGFilter &);
 
-	int dummy;	
+	public:
+		ECGFilter(const int32_t &argc, char **argv);
+		virtual ~ECGFilter(void);
+
+		double filter(double);
+    
+	private:
+		bsn::resource::Battery battery;
+		bsn::filters::MovingAverage filter;
 }
 
 class ECGTransfer {
-    
-	private:
 
-	int dummy;	
+	private:
+      	ECGTransfer(const ECGTransfer &);
+    	ECGTransfer &operator=(const ECGTransfer &);
+
+	public:
+		ECGTransfer(const int32_t &argc, char **argv);
+		virtual ~ECGTransfer(void);
+
+		void transfer(double);
+
+	private:
+		bsn::resource::Battery battery;
+		ros::Publisher dataPub;
+
 }
 
 

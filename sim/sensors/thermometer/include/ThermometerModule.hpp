@@ -68,6 +68,9 @@ class ThermometerModule {
 
 class ThermometerCollect {
     
+	public:
+		double collect(void);
+
 	private:
 
 	int dummy;	
@@ -75,6 +78,9 @@ class ThermometerCollect {
 
 class ThermometerFilter {
     
+	public:
+		double filter(double);
+
 	private:
 
 	int dummy;	
@@ -82,6 +88,8 @@ class ThermometerFilter {
 
 class ThermometerTransfer {
     
+	public:
+		void transfer(double);
 	private:
 
 	int dummy;	

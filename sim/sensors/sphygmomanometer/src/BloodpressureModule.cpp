@@ -322,3 +322,64 @@ void BloodpressureModule::run() {
 
     return tearDown();
 }
+
+*double BloodpressureCollect::collect(void){
+    double dataS, dataD;
+    double data[2];
+    { // TASK: Collect bloodpressure data            
+            dataS = dataGeneratorSys.getValue();      
+            battery.consume(0.1);
+            dataD = dataGeneratorDia.getValue();
+            battery.consume(0.1);
+            data[0] = dataS;
+            data[1] = dataD;
+            return data;
+    }
+}
+
+*double BloodpressureFilter::filter(*double data){
+    double filteredDataS, filteredDataD;
+    double filteredData[2];
+    double dataS, dataD;
+    dataS = data[0];
+    dataD = data[1];
+    { // TASK: Filter data with moving average
+            filterSystolic.setRange(params["m_avg"]);
+            filterSystolic.insert(dataS, "bpms");
+            filteredDataS = filterSystolic.getValue("bpms");
+            battery.consume(0.1*params["m_avg"]);
+
+            filterDiastolic.setRange(params["m_avg"]);
+            filterDiastolic.insert(dataD, "bpmd");
+            filteredDataD = filterDiastolic.getValue("bpmd");
+            battery.consume(0.1*params["m_avg"]);
+
+            filteredData[0] = filteredDataS;
+            filteredData[1] = filteredDataD;
+            return filteredData;
+    }
+}
+
+void BloodpressureTransfer::transfer(*double filteredData){
+    double riskS, riskD;
+    double filteredDataS, filteredDataD;
+    filteredDataS = filteredData[0];
+    filteredDataD = filteredData[1];
+    { //TASK: Transfer information to CentralHub
+            riskS = sensorConfigSystolic.evaluateNumber(filteredDataS);
+            msgS.data = filteredDataS;
+            msgS.risk = riskS;
+            battery.consume(0.1);
+            msgS.batt = battery.getCurrentLevel();
+            systolic_pub.publish(msgS);
+
+            riskD = sensorConfigDiastolic.evaluateNumber(filteredDataD);
+            msgD.data = filteredDataD;
+            msgD.risk = riskD;
+            battery.consume(0.1);
+            msgD.batt = battery.getCurrentLevel();
+            diastolic_pub.publish(msgD);
+
+            return void;
+    }
+}

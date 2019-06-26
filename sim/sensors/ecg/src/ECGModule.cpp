@@ -14,7 +14,7 @@ ECGModule::ECGModule(const int32_t &argc, char **argv) :
     active(true),
     params({{"freq",0.9},{"m_avg",5}}),
     filter(5),
-    persist(1),
+    persist(1), 
     path("ecg_output.csv") {}
 
 ECGModule::~ECGModule() {}
@@ -187,7 +187,7 @@ void ECGModule::run() {
             if (active && battery.getCurrentLevel() < 2) {
                 active = false;
             }
-            
+          
             if (rand()%10 > 6) {
                 bool x_active = (rand()%2==0)?active:!active;
                 sendContextInfo("CTX_G3_T1_2", x_active);
@@ -259,4 +259,37 @@ void ECGModule::run() {
     }
 
     return tearDown();
+}
+
+double ECGCollect::collect(void){
+    double data;
+    { // TASK: Collect thermometer data with data_accuracy
+            data = dataGenerator.getValue();
+            battery.consume(0.1);
+            return data;
+    }
+}
+
+double ECGFilter::filter(double data){
+    double filteredData;
+    { // TASK: Filter data with moving average
+            filter.setRange(params["m_avg"]);
+            filter.insert(data, type);
+            filteredData = filter.getValue(type);        
+            msg.data = filteredData;
+            battery.consume(0.1*params["m_avg"]);
+            return filteredData;
+    }
+}
+
+void ECGTransfer::transfer(double filteredData){
+    double risk;
+    { // TASK: Transfer information to CentralHub
+            risk = sensorConfig.evaluateNumber(filteredData);
+            msg.risk = risk;            
+            battery.consume(0.1);
+            msg.batt = battery.getCurrentLevel();
+            dataPub.publish(msg);
+            return void;
+    }
 }

@@ -265,3 +265,35 @@ void ThermometerModule::run() {
 
     return tearDown();
 }
+
+double ThermometerCollect::collect(void){
+    double data;
+    { // TASK: Collect thermometer data with data_accuracy
+            data = dataGenerator.getValue();
+            battery.consume(0.1);
+            return data;
+    }
+}
+
+double ThermometerFilter::filter(double data){
+    double filteredData;
+    { // TASK: Filter data with moving average
+            filter.setRange(params["m_avg"]);
+            filter.insert(data, type);
+            filteredData = filter.getValue(type);
+            battery.consume(0.1*params["m_avg"]);
+            msg.data = filteredData;
+            return filteredData;
+    }
+}
+
+void ThermometerTransfer::transfer(double filteredData){
+    double risk;
+    { // TASK: Transfer information to CentralHub
+            risk = sensorConfig.evaluateNumber(filteredData);
+            msg.risk = risk;
+            battery.consume(0.1);           
+            dataPub.publish(msg);
+            return void;
+    }
+}

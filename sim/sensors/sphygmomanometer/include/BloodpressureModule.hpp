@@ -74,6 +74,9 @@ class BloodpressureModule {
 
 class BloodpressureCollect {
     
+	public:
+		*double collect(void);
+
 	private:
 
 	int dummy;	
@@ -81,6 +84,9 @@ class BloodpressureCollect {
 
 class BloodpressureFilter {
     
+	public:
+		*double filter(*double);
+		
 	private:
 
 	int dummy;	
@@ -88,6 +94,9 @@ class BloodpressureFilter {
 
 class BloodpressureTransfer {
     
+	public:
+		void transfer(*double);
+		
 	private:
 
 	int dummy;	

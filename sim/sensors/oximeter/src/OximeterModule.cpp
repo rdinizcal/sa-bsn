@@ -257,3 +257,37 @@ void OximeterModule::run(){
 
     return tearDown();
 }
+
+double OximeterCollect::collect(void){
+    double data;
+    { // TASK: Collect oximeter data with data_accuracy
+            data = dataGenerator.getValue();
+            battery.consume(0.1);
+            return data;
+    }
+}
+
+double OximeterFilter::filter(double data){
+    double filteredData;
+    { // TASK: Filter data with moving average
+            filter.setRange(params["m_avg"]);
+            filter.insert(data, type);
+            filteredData = filter.getValue(type);
+            battery.consume(0.1*params["m_avg"]);
+            msg.data = filteredData;
+            return filteredData;
+    }
+}
+
+void OximeterTransfer::transfer(double filteredData){
+    double risk;
+    { // TASK: Transfer information to CentralHub
+            risk = sensorConfig.evaluateNumber(filteredData);
+            msg.risk = risk;
+            battery.consume(0.1);
+            msg.batt = battery.getCurrentLevel();
+            dataPub.publish(msg);            
+            battery.consume(0.1);
+            return void;
+    }
+}

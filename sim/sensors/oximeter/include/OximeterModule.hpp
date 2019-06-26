@@ -69,13 +69,19 @@ class OximeterModule {
 
 class OximeterCollect {
     
+	public:
+		double collect(void);
+		
+
 	private:
 
 	int dummy;	
 }
 
 class OximeterFilter {
-    
+	public:
+		double filter(double);
+
 	private:
 
 	int dummy;	
@@ -83,6 +89,9 @@ class OximeterFilter {
 
 class OximeterTransfer {
     
+	public:
+		void transfer(double);
+
 	private:
 
 	int dummy;	
