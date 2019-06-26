@@ -67,4 +67,26 @@ class ECGModule {
 		ros::Publisher taskPub, contextPub, dataPub;
 };
 
+class ECGCollect {
+    
+	private:
+
+	int dummy;	
+}
+
+class ECGFilter {
+    
+	private:
+
+	int dummy;	
+}
+
+class ECGTransfer {
+    
+	private:
+
+	int dummy;	
+}
+
+
 #endif 

@@ -66,4 +66,25 @@ class ThermometerModule {
 		ros::Publisher taskPub, contextPub, dataPub;
 };
 
+class ThermometerCollect {
+    
+	private:
+
+	int dummy;	
+}
+
+class ThermometerFilter {
+    
+	private:
+
+	int dummy;	
+}
+
+class ThermometerTransfer {
+    
+	private:
+
+	int dummy;	
+}
+
 #endif 

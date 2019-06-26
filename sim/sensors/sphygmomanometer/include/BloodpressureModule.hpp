@@ -72,4 +72,25 @@ class BloodpressureModule {
 		ros::Publisher taskPub, contextPub, dataPub;
 };
 
+class BloodpressureCollect {
+    
+	private:
+
+	int dummy;	
+}
+
+class BloodpressureFilter {
+    
+	private:
+
+	int dummy;	
+}
+
+class BloodpressureTransfer {
+    
+	private:
+
+	int dummy;	
+}
+
 #endif 

@@ -66,4 +66,25 @@ class OximeterModule {
 		ros::Publisher taskPub, contextPub, dataPub;
 };
 
+
+class OximeterCollect {
+    
+	private:
+
+	int dummy;	
+}
+
+class OximeterFilter {
+    
+	private:
+
+	int dummy;	
+}
+
+class OximeterTransfer {
+    
+	private:
+
+	int dummy;	
+}
 #endif 
