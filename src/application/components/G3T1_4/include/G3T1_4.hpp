@@ -1,5 +1,5 @@
-#ifndef BLOODPRESSURE_MODULE_HPP
-#define BLOODPRESSURE_MODULE_HPP
+#ifndef G3T1_4_HPP
+#define G3T1_4_HPP
 
 #include <fstream>
 #include <chrono>
@@ -21,11 +21,11 @@
 #include "messages/ContextInfo.h"
 #include "messages/ControlCommand.h"
 
-class BloodpressureModule {
+class G3T1_4 {
     
 	private:
-      	BloodpressureModule(const BloodpressureModule &);
-    	BloodpressureModule &operator=(const BloodpressureModule &);
+      	G3T1_4(const G3T1_4 &);
+    	G3T1_4 &operator=(const G3T1_4 &);
     	
     	virtual void tearDown();
 
@@ -38,8 +38,8 @@ class BloodpressureModule {
   	public:
 		virtual void setUp();
 
-    	BloodpressureModule(const int32_t &argc, char **argv);
-    	virtual ~BloodpressureModule();
+    	G3T1_4(const int32_t &argc, char **argv);
+    	virtual ~G3T1_4();
 
     	void run();
 

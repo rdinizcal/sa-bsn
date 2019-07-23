@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>bloodpressure</name>
-  <version>0.0.0</version>
-  <description>The Blood Pressure package</description>
+  <name>g3t1_4</name>
+  <version>1.0.0</version>
+  <description>Automatically generated module to satisfy G3T1.4 task</description>
 
-  <maintainer email="gabriel@todo.todo">gabriel</maintainer>
+  <maintainer email="x@aluno.unb">todo</maintainer>
 
   <license>TODO</license>
 
@@ -20,5 +20,4 @@
 
   <export>
   </export>
-  
 </package>

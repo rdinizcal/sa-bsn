@@ -1,5 +1,5 @@
-#ifndef ECG_MODULE_HPP
-#define ECG_MODULE_HPP
+#ifndef G3T1_2_HPP
+#define G3T1_2_HPP
 
 #include <fstream>
 #include <chrono>
@@ -21,11 +21,11 @@
 #include "messages/ContextInfo.h"
 #include "messages/ControlCommand.h"
 
-class ECGModule {
+class G3T1_2 {
     
 	private:
-      	ECGModule(const ECGModule &);
-    	ECGModule &operator=(const ECGModule &);
+      	G3T1_2(const G3T1_2 &);
+    	G3T1_2 &operator=(const G3T1_2 &);
 
     	virtual void tearDown();
 
@@ -38,8 +38,8 @@ class ECGModule {
   	public:
     	virtual void setUp();
 
-    	ECGModule(const int32_t &argc, char **argv);
-    	virtual ~ECGModule();
+    	G3T1_2(const int32_t &argc, char **argv);
+    	virtual ~G3T1_2();
 
     	void run();
 

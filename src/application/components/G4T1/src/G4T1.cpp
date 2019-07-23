@@ -1,8 +1,8 @@
-#include "CentralhubModule.hpp"
+#include "G4T1.hpp"
 
 using namespace bsn::processor;
 
-CentralhubModule::CentralhubModule(const int32_t &argc, char **argv) :
+G4T1::G4T1(const int32_t &argc, char **argv) :
     active(true),
     params({{"freq",1}}),
     connect(true),
@@ -14,9 +14,9 @@ CentralhubModule::CentralhubModule(const int32_t &argc, char **argv) :
     data_list(5),
     patient_status(0.0) {}
 	
-CentralhubModule::~CentralhubModule() {}
+G4T1::~G4T1() {}
 
-void CentralhubModule::setUp() {
+void G4T1::setUp() {
     ros::NodeHandle configHandler;
     configHandler.getParam("connect", connect);
     configHandler.getParam("db_url", database_url);
@@ -34,12 +34,12 @@ void CentralhubModule::setUp() {
     }
 }
 
-void CentralhubModule::tearDown() {
+void G4T1::tearDown() {
     if (persist)
         fp.close();
 }
 
-std::string CentralhubModule::makePacket() {
+std::string G4T1::makePacket() {
     //std::string packet = "88,97#10,20,30,40,50&";
     std::string packet = "";
 
@@ -65,7 +65,7 @@ std::string CentralhubModule::makePacket() {
     return packet;
 }
 
-void CentralhubModule::persistData(std::vector<std::string>& risks) {
+void G4T1::persistData(std::vector<std::string>& risks) {
     std::string bpr_risk, oxi_risk, ecg_risk, trm_risk;
     int id = 0;
 
@@ -86,7 +86,7 @@ void CentralhubModule::persistData(std::vector<std::string>& risks) {
             (std::chrono::high_resolution_clock::now()).time_since_epoch()).count() << std::endl;
 }
 
-std::vector<std::string> CentralhubModule::getPatientStatus() {
+std::vector<std::string> G4T1::getPatientStatus() {
     std::string sensor_risk_str;
     std::string bpr;
     std::string oxi;
@@ -130,7 +130,7 @@ std::vector<std::string> CentralhubModule::getPatientStatus() {
     return v;
 }
 
-void CentralhubModule::receiveSensorData(const messages::SensorData::ConstPtr& msg) {
+void G4T1::receiveSensorData(const messages::SensorData::ConstPtr& msg) {
     std::string type = msg->type;
     double risk = msg->risk;
     double batt = msg->batt;
@@ -185,14 +185,14 @@ void CentralhubModule::receiveSensorData(const messages::SensorData::ConstPtr& m
     std::cout << "*****************************************" << std::endl;
 }
 
-void CentralhubModule::run() {   
+void G4T1::run() {   
     ros::NodeHandle nh;
     
-    ros::Subscriber thermometerSub = nh.subscribe("thermometer_data", 10, &CentralhubModule::receiveSensorData, this);
-    ros::Subscriber oximeterSub = nh.subscribe("oximeter_data", 10, &CentralhubModule::receiveSensorData, this);
-    ros::Subscriber ecgSub = nh.subscribe("ecg_data", 10, &CentralhubModule::receiveSensorData, this);
-    ros::Subscriber diastolicSub = nh.subscribe("diastolic_data", 10, &CentralhubModule::receiveSensorData, this);
-    ros::Subscriber systolicSub = nh.subscribe("systolic_data", 10, &CentralhubModule::receiveSensorData, this);
+    ros::Subscriber thermometerSub = nh.subscribe("thermometer_data", 10, &G4T1::receiveSensorData, this);
+    ros::Subscriber oximeterSub = nh.subscribe("oximeter_data", 10, &G4T1::receiveSensorData, this);
+    ros::Subscriber ecgSub = nh.subscribe("ecg_data", 10, &G4T1::receiveSensorData, this);
+    ros::Subscriber diastolicSub = nh.subscribe("diastolic_data", 10, &G4T1::receiveSensorData, this);
+    ros::Subscriber systolicSub = nh.subscribe("systolic_data", 10, &G4T1::receiveSensorData, this);
 
     ros::spin();
 

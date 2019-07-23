@@ -1,29 +1,31 @@
-#include "ECGModule.hpp"
+#include "G3T1_3.hpp"
 
 using namespace bsn::range;
+using namespace bsn::resource;
 using namespace bsn::generator;
 using namespace bsn::operation;
 using namespace bsn::configuration;
 
-ECGModule::ECGModule(const int32_t &argc, char **argv) :
-    type("ecg"),
-    battery("ecg_batt", 100, 100, 1),
+
+G3T1_3::G3T1_3(const int32_t &argc, char **argv/*, std::string name*/) :
+    type("thermometer"),
+    battery("therm_batt", 100, 100, 1),
     available(true),
     data_accuracy(1),
     comm_accuracy(1),
     active(true),
-    params({{"freq",0.9},{"m_avg",5}}),
+    params({{"freq",0.9}, {"m_avg",5}}),
     filter(5),
+    sensorConfig(),
     persist(1),
-    path("ecg_output.csv") {}
+    path("thermometer_output.csv") {}
 
-ECGModule::~ECGModule() {}
+G3T1_3::~G3T1_3() {}
 
-void ECGModule::setUp() {
+void G3T1_3::setUp() {
     ros::NodeHandle configHandler, n;
     srand(time(NULL));
-        
-    Operation op;
+    Operation op;    
     
     std::vector<std::string> t_probs;
     std::array<float, 25> transitions;
@@ -117,12 +119,12 @@ void ECGModule::setUp() {
     contextPub =  n.advertise<messages::ContextInfo>("context_info", 10);
 }
 
-void ECGModule::tearDown() {
+void G3T1_3::tearDown() {
     if (persist)
         fp.close();
 }
 
-void ECGModule::sendTaskInfo(const std::string &task_id, const double &cost, const double &reliability, const double &frequency) {
+void G3T1_3::sendTaskInfo(const std::string &task_id, const double &cost, const double &reliability, const double &frequency) {
     messages::TaskInfo msg;
 
     msg.task_id = task_id;
@@ -132,7 +134,7 @@ void ECGModule::sendTaskInfo(const std::string &task_id, const double &cost, con
     taskPub.publish(msg);
 }
 
-void ECGModule::sendContextInfo(const std::string &context_id, const bool &status) {
+void G3T1_3::sendContextInfo(const std::string &context_id, const bool &status) {
     messages::ContextInfo msg;
 
     msg.context_id = context_id;
@@ -140,7 +142,7 @@ void ECGModule::sendContextInfo(const std::string &context_id, const bool &statu
     contextPub.publish(msg);
 }
 
-void ECGModule::receiveControlCommand(const messages::ControlCommand::ConstPtr& msg)  {
+void G3T1_3::receiveControlCommand(const messages::ControlCommand::ConstPtr& msg)  {
     active = msg->active;
     double newFreq;
     newFreq = params["freq"] + msg->frequency;
@@ -148,7 +150,8 @@ void ECGModule::receiveControlCommand(const messages::ControlCommand::ConstPtr& 
     params["freq"] = newFreq;
 }
 
-void ECGModule::run() {
+void G3T1_3::run() {
+    // Container container;
     double data;
     double risk;
     bool first_exec = true;
@@ -156,45 +159,46 @@ void ECGModule::run() {
     bsn::generator::DataGenerator dataGenerator(markov);
 
     messages::SensorData msg;
-    msg.type = "ecg";
-
     ros::NodeHandle n;
 
-    dataPub = n.advertise<messages::SensorData>("ecg_data", 10);
-    ros::Subscriber ecgSub = n.subscribe("ecg_control_command", 10, &ECGModule::receiveControlCommand, this);
+    dataPub = n.advertise<messages::SensorData>("thermometer_data", 10);
+    ros::Subscriber thermometerSub = n.subscribe("thermometer_control_command", 10, &G3T1_3::receiveControlCommand, this);
 
     ros::Rate loop_rate(params["freq"]);
+    msg.type = "thermometer";
 
-    sendContextInfo("CTX_G3_T1_2",true);
-
+    sendContextInfo("CTX_G3_T1_3", true);
+    
     while (ros::ok()) {
         loop_rate = ros::Rate(params["freq"]);
-
-        { // update controller with task info            
-            sendContextInfo("CTX_G3_T1_2",true);
-            sendTaskInfo("G3_T1.21",0.1,data_accuracy,params["freq"]);
-            sendTaskInfo("G3_T1.22",0.1*params["m_avg"],1,params["freq"]);
-            sendTaskInfo("G3_T1.23",0.1,comm_accuracy,params["freq"]);
+        
+        { // update controller with task info        
+            sendContextInfo("CTX_G3_T1_3",true);
+            sendTaskInfo("G3_T1.31", 0.1, data_accuracy, params["freq"]);
+            sendTaskInfo("G3_T1.32", 0.1*params["m_avg"], 1, params["freq"]);
+            sendTaskInfo("G3_T1.33", 0.1, comm_accuracy, params["freq"]);
         }
 
         { // recharge routine
             //for debugging
             std::cout << "Battery level: " << battery.getCurrentLevel() << "%" << std::endl;
-          
-            if (!active && battery.getCurrentLevel() > 90) {
+            if(!active && battery.getCurrentLevel() > 90){
                 active = true;
             }
-            if (active && battery.getCurrentLevel() < 2) {
+            if(active && battery.getCurrentLevel() < 2){
                 active = false;
             }
             
             if (rand()%10 > 6) {
-                bool x_active = (rand()%2==0)?active:!active;
-                sendContextInfo("CTX_G3_T1_2", x_active);
+                    bool x_active = (rand()%2==0)?active:!active;
+                    sendContextInfo("CTX_G3_T1_3", x_active);
             }
-            sendContextInfo("CTX_G3_T1_2", active);
+            sendContextInfo("CTX_G3_T1_3", active);
         }
 
+        /*
+        * Receive control command and module update
+        */
         if(!active){ 
             if(battery.getCurrentLevel() <= 100) battery.generate(2.5);
             continue; 
@@ -215,6 +219,7 @@ void ECGModule::run() {
 
             battery.consume(0.1);
 
+
             //for debugging
             std::cout << "New data: " << data << std::endl << std::endl;
         }
@@ -224,9 +229,9 @@ void ECGModule::run() {
             filter.insert(data, type);
             data = filter.getValue(type);
             battery.consume(0.1*params["m_avg"]);
-            
-            //for debugging
+
             msg.data = data;
+            //for debugging
             std::cout << "Filtered data: " << data << std::endl;
         }
         
@@ -238,7 +243,7 @@ void ECGModule::run() {
 
             if ((rand() % 100) <= comm_accuracy * 100)
                 dataPub.publish(msg);
-
+            
             // for debugging
             std::cout << "Risk: " << risk << "%" << std::endl;
         }

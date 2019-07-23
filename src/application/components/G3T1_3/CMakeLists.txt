@@ -1,5 +1,5 @@
 CMAKE_MINIMUM_REQUIRED (VERSION 2.8.3)
-PROJECT(thermometer)
+PROJECT(g3t1_3)
 
 add_compile_options(-std=c++11)
 

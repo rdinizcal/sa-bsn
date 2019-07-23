@@ -1,25 +1,25 @@
-#include "OximeterModule.hpp"
+#include "G3T1_2.hpp"
 
 using namespace bsn::range;
 using namespace bsn::generator;
 using namespace bsn::operation;
 using namespace bsn::configuration;
 
-OximeterModule::OximeterModule(const int32_t &argc, char **argv) :
-    type("oximeter"),
-    battery("oxi_batt", 100, 100, 1),
+G3T1_2::G3T1_2(const int32_t &argc, char **argv) :
+    type("ecg"),
+    battery("ecg_batt", 100, 100, 1),
     available(true),
     data_accuracy(1),
     comm_accuracy(1),
     active(true),
-    params({{"freq",0.90},{"m_avg",5}}),
+    params({{"freq",0.9},{"m_avg",5}}),
     filter(5),
     persist(1),
-    path("oximeter_output.csv") {}
+    path("ecg_output.csv") {}
 
-OximeterModule::~OximeterModule() {}
+G3T1_2::~G3T1_2() {}
 
-void OximeterModule::setUp() {
+void G3T1_2::setUp() {
     ros::NodeHandle configHandler, n;
     srand(time(NULL));
         
@@ -43,20 +43,24 @@ void OximeterModule::setUp() {
     }
     
     { // Configure markov chain
-        std::vector<std::string> lrs, mrs, hrs;
+        std::vector<std::string> lrs,mrs0,hrs0,mrs1,hrs1;
 
         configHandler.getParam("LowRisk", s);
         lrs = op.split(s, ',');
-        configHandler.getParam("MidRisk", s);
-        mrs = op.split(s, ',');
-        configHandler.getParam("HighRisk", s);
-        hrs = op.split(s, ',');
+        configHandler.getParam("MidRisk0", s);
+        mrs0 = op.split(s, ',');
+        configHandler.getParam("HighRisk0", s);
+        hrs0 = op.split(s, ',');
+        configHandler.getParam("MidRisk1", s);
+        mrs1 = op.split(s, ',');
+        configHandler.getParam("HighRisk1", s);
+        hrs1 = op.split(s, ',');
 
-        ranges[0] = Range(-1, -1);
-        ranges[1] = Range(-1, -1);
+        ranges[0] = Range(std::stod(hrs0[0]), std::stod(hrs0[1]));
+        ranges[1] = Range(std::stod(mrs0[0]), std::stod(mrs0[1]));
         ranges[2] = Range(std::stod(lrs[0]), std::stod(lrs[1]));
-        ranges[3] = Range(std::stod(mrs[0]), std::stod(mrs[1]));
-        ranges[4] = Range(std::stod(hrs[0]), std::stod(hrs[1]));
+        ranges[3] = Range(std::stod(mrs1[0]), std::stod(mrs1[1]));
+        ranges[4] = Range(std::stod(hrs1[0]), std::stod(hrs1[1]));
 
         markov = Markov(transitions, ranges, 2);
     }
@@ -113,12 +117,12 @@ void OximeterModule::setUp() {
     contextPub =  n.advertise<messages::ContextInfo>("context_info", 10);
 }
 
-void OximeterModule::tearDown() {
+void G3T1_2::tearDown() {
     if (persist)
         fp.close();
 }
 
-void OximeterModule::sendTaskInfo(const std::string &task_id, const double &cost, const double &reliability, const double &frequency) {
+void G3T1_2::sendTaskInfo(const std::string &task_id, const double &cost, const double &reliability, const double &frequency) {
     messages::TaskInfo msg;
 
     msg.task_id = task_id;
@@ -128,7 +132,7 @@ void OximeterModule::sendTaskInfo(const std::string &task_id, const double &cost
     taskPub.publish(msg);
 }
 
-void OximeterModule::sendContextInfo(const std::string &context_id, const bool &status) {
+void G3T1_2::sendContextInfo(const std::string &context_id, const bool &status) {
     messages::ContextInfo msg;
 
     msg.context_id = context_id;
@@ -136,7 +140,7 @@ void OximeterModule::sendContextInfo(const std::string &context_id, const bool &
     contextPub.publish(msg);
 }
 
-void OximeterModule::receiveControlCommand(const messages::ControlCommand::ConstPtr& msg)  {
+void G3T1_2::receiveControlCommand(const messages::ControlCommand::ConstPtr& msg)  {
     active = msg->active;
     double newFreq;
     newFreq = params["freq"] + msg->frequency;
@@ -144,7 +148,7 @@ void OximeterModule::receiveControlCommand(const messages::ControlCommand::Const
     params["freq"] = newFreq;
 }
 
-void OximeterModule::run(){
+void G3T1_2::run() {
     double data;
     double risk;
     bool first_exec = true;
@@ -152,55 +156,56 @@ void OximeterModule::run(){
     bsn::generator::DataGenerator dataGenerator(markov);
 
     messages::SensorData msg;
-    msg.type = "oximeter";
+    msg.type = "ecg";
+
     ros::NodeHandle n;
 
-    dataPub = n.advertise<messages::SensorData>("oximeter_data", 10);
-    ros::Subscriber ecgSub = n.subscribe("oximeter_control_command", 10, &OximeterModule::receiveControlCommand, this);
+    dataPub = n.advertise<messages::SensorData>("ecg_data", 10);
+    ros::Subscriber ecgSub = n.subscribe("ecg_control_command", 10, &G3T1_2::receiveControlCommand, this);
 
     ros::Rate loop_rate(params["freq"]);
 
-    sendContextInfo("CTX_G3_T1_1",true);
+    sendContextInfo("CTX_G3_T1_2",true);
 
     while (ros::ok()) {
         loop_rate = ros::Rate(params["freq"]);
 
         { // update controller with task info            
-            sendContextInfo("CTX_G3_T1_1",true);
-            sendTaskInfo("G3_T1.11",0.1,data_accuracy,params["freq"]);
-            sendTaskInfo("G3_T1.12",0.1*params["m_avg"],1,params["freq"]);
-            sendTaskInfo("G3_T1.13",0.1,comm_accuracy,params["freq"]);
+            sendContextInfo("CTX_G3_T1_2",true);
+            sendTaskInfo("G3_T1.21",0.1,data_accuracy,params["freq"]);
+            sendTaskInfo("G3_T1.22",0.1*params["m_avg"],1,params["freq"]);
+            sendTaskInfo("G3_T1.23",0.1,comm_accuracy,params["freq"]);
         }
 
         { // recharge routine
             //for debugging
             std::cout << "Battery level: " << battery.getCurrentLevel() << "%" << std::endl;
-            if(!active && battery.getCurrentLevel() > 90){
+          
+            if (!active && battery.getCurrentLevel() > 90) {
                 active = true;
             }
-            if(active && battery.getCurrentLevel() < 2){
+            if (active && battery.getCurrentLevel() < 2) {
                 active = false;
             }
             
             if (rand()%10 > 6) {
-                    bool x_active = (rand()%2==0)?active:!active;
-                    sendContextInfo("CTX_G3_T1_1", x_active);
+                bool x_active = (rand()%2==0)?active:!active;
+                sendContextInfo("CTX_G3_T1_2", x_active);
             }
-            sendContextInfo("CTX_G3_T1_1", active);
+            sendContextInfo("CTX_G3_T1_2", active);
         }
 
-        if (!active) { 
+        if(!active){ 
             if(battery.getCurrentLevel() <= 100) battery.generate(2.5);
             continue; 
         }
 
         /*
          * Module execution
-         */           
-           
-        { // TASK: Collect oximeter data with data_accuracy
+         */
+        { // TASK: Collect thermometer data with data_accuracy
             data = dataGenerator.getValue();
-                
+            
             double offset = (1 - data_accuracy + (double)rand() / RAND_MAX * (1 - data_accuracy)) * data;
 
             if (rand() % 2 == 0)
@@ -219,7 +224,7 @@ void OximeterModule::run(){
             filter.insert(data, type);
             data = filter.getValue(type);
             battery.consume(0.1*params["m_avg"]);
-
+            
             //for debugging
             msg.data = data;
             std::cout << "Filtered data: " << data << std::endl;
@@ -233,8 +238,6 @@ void OximeterModule::run(){
 
             if ((rand() % 100) <= comm_accuracy * 100)
                 dataPub.publish(msg);
-            
-            battery.consume(0.1);
 
             // for debugging
             std::cout << "Risk: " << risk << "%" << std::endl;

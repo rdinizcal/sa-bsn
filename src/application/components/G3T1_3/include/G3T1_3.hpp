@@ -1,5 +1,5 @@
-#ifndef THERMOMETER_MODULE_HPP
-#define THERMOMETER_MODULE_HPP
+#ifndef G3T1_3_HPP
+#define G3T1_3_HPP
 
 #include <fstream>
 #include <chrono>
@@ -21,11 +21,11 @@
 #include "messages/ContextInfo.h"
 #include "messages/ControlCommand.h"
 
-class ThermometerModule {
+class G3T1_3 {
     
 	private:
-      	ThermometerModule(const ThermometerModule &);
-    	ThermometerModule &operator=(const ThermometerModule &);
+      	G3T1_3(const G3T1_3 &);
+    	G3T1_3 &operator=(const G3T1_3 &);
 		
   	public:
     	virtual void setUp();
@@ -37,8 +37,8 @@ class ThermometerModule {
 		void sendMonitorTaskInfo(const std::string &/*task_id*/, const double &/*cost*/, const double &/*reliability*/, const double &/*frequency*/);
 		void sendMonitorContextInfo(const std::string &/*context_id*/, const bool &/*value*/);
 
-    	ThermometerModule(const int32_t &argc, char **argv);
-    	virtual ~ThermometerModule();
+    	G3T1_3(const int32_t &argc, char **argv);
+    	virtual ~G3T1_3();
 
     	void run();
 

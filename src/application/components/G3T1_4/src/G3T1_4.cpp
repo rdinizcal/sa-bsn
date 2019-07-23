@@ -1,4 +1,4 @@
-#include "BloodpressureModule.hpp"
+#include "G3T1_4.hpp"
 
 using namespace bsn::range;
 using namespace bsn::resource;
@@ -7,7 +7,7 @@ using namespace bsn::operation;
 using namespace bsn::configuration;
 
 
-BloodpressureModule::BloodpressureModule(const int32_t &argc, char **argv) :
+G3T1_4::G3T1_4(const int32_t &argc, char **argv) :
     type("bloodpressure"),
     battery("bp_batt",100,100,1),
     available(true),
@@ -24,9 +24,9 @@ BloodpressureModule::BloodpressureModule(const int32_t &argc, char **argv) :
     persist(1),
     path("bloodpressure_output.csv") {}
 
-BloodpressureModule::~BloodpressureModule() {}
+G3T1_4::~G3T1_4() {}
 
-void BloodpressureModule::setUp() {
+void G3T1_4::setUp() {
     ros::NodeHandle configHandler, n;
     srand(time(NULL));
     std::string s;
@@ -135,12 +135,12 @@ void BloodpressureModule::setUp() {
     contextPub =  n.advertise<messages::ContextInfo>("context_info", 10);
 }
 
-void BloodpressureModule::tearDown() {
+void G3T1_4::tearDown() {
     if (persist)
         fp.close();
 }
 
-void BloodpressureModule::sendTaskInfo(const std::string &task_id, const double &cost, const double &reliability, const double &frequency) {
+void G3T1_4::sendTaskInfo(const std::string &task_id, const double &cost, const double &reliability, const double &frequency) {
     messages::TaskInfo msg;
 
     msg.task_id = task_id;
@@ -150,7 +150,7 @@ void BloodpressureModule::sendTaskInfo(const std::string &task_id, const double 
     taskPub.publish(msg);
 }
 
-void BloodpressureModule::sendContextInfo(const std::string &context_id, const bool &status) {
+void G3T1_4::sendContextInfo(const std::string &context_id, const bool &status) {
     messages::ContextInfo msg;
 
     msg.context_id = context_id;
@@ -158,7 +158,7 @@ void BloodpressureModule::sendContextInfo(const std::string &context_id, const b
     contextPub.publish(msg);
 }
 
-void BloodpressureModule::receiveControlCommand(const messages::ControlCommand::ConstPtr& msg)  {
+void G3T1_4::receiveControlCommand(const messages::ControlCommand::ConstPtr& msg)  {
     active = msg->active;
     double newFreq;
     newFreq = params["freq"] + msg->frequency;
@@ -166,7 +166,7 @@ void BloodpressureModule::receiveControlCommand(const messages::ControlCommand::
     params["freq"] = newFreq;
 }
 
-void BloodpressureModule::run() {
+void G3T1_4::run() {
     double dataS;
     double dataD;
     double risk;
@@ -183,7 +183,7 @@ void BloodpressureModule::run() {
 
     ros::Publisher systolic_pub = n.advertise<messages::SensorData>("systolic_data", 10);
     ros::Publisher diastolic_pub = n.advertise<messages::SensorData>("diastolic_data", 10);
-    ros::Subscriber ecgSub = n.subscribe("abp_control_command", 10, &BloodpressureModule::receiveControlCommand, this);
+    ros::Subscriber ecgSub = n.subscribe("abp_control_command", 10, &G3T1_4::receiveControlCommand, this);
 
     ros::Rate loop_rate(params["freq"]);
 

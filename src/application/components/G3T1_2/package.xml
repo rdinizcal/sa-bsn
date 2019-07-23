@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>ecg</name>
-  <version>0.0.0</version>
-  <description>The ECG package</description>
+  <name>g3t1_2</name>
+  <version>1.0.0</version>
+  <description>Automatically generated module to satisfy G3T1.2 task</description>
 
-  <maintainer email="gabriel@todo.todo">gabriel</maintainer>
+  <maintainer email="x@aluno.unb">todo</maintainer>
 
   <license>TODO</license>
 
@@ -14,14 +14,10 @@
   <build_depend>std_msgs</build_depend>
   <build_depend>messages</build_depend>
 
-  <!-- <build_export_depend>roscpp</build_export_depend> -->
-  <!-- <build_export_depend>std_msgs</build_export_depend> -->
-
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>messages</exec_depend>
   <exec_depend>message_runtime</exec_depend>
 
   <export>
   </export>
-  
 </package>

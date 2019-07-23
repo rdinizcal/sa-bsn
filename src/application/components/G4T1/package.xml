@@ -1,17 +1,11 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>centralhub</name>
-  <version>0.0.0</version>
-  <description>The Centrahub package</description>
+  <name>g4t1</name>
+  <version>1.0.0</version>
+  <description>Automatically generated module to satisfy G4T1 task</description>
 
-  <!-- One maintainer tag required, multiple allowed, one person per tag -->
-  <maintainer email="gabriel@todo.todo">gabriel</maintainer>
-  <author email="gabriel@todo.todo">gabriel</author>
+  <maintainer email="x@aluno.unb">todo</maintainer>
 
-
-  <!-- One license tag required, multiple allowed, one license per tag -->
-  <!-- Commonly used license strings: -->
-  <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
   <license>TODO</license>
 
   <buildtool_depend>catkin</buildtool_depend>

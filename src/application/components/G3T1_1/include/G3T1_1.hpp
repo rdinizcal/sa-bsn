@@ -1,5 +1,5 @@
-#ifndef OXIMETER_MODULE_HPP
-#define OXIMETER_MODULE_HPP
+#ifndef G3T1_1_HPP
+#define G3T1_1_HPP
 
 #include <fstream>
 #include <chrono>
@@ -21,10 +21,10 @@
 #include "messages/ContextInfo.h"
 #include "messages/ControlCommand.h"
 
-class OximeterModule {
+class G3T1_1 {
 	private:
-      	OximeterModule(const OximeterModule &);
-    	OximeterModule &operator=(const OximeterModule &);
+      	G3T1_1(const G3T1_1 &);
+    	G3T1_1 &operator=(const G3T1_1 &);
 
     	virtual void tearDown();
 
@@ -37,8 +37,8 @@ class OximeterModule {
   	public:
     	virtual void setUp();
     	
-		OximeterModule(const int32_t &argc, char **argv);
-    	virtual ~OximeterModule();
+		G3T1_1(const int32_t &argc, char **argv);
+    	virtual ~G3T1_1();
 
 		void run();
 

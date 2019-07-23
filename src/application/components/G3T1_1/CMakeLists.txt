@@ -1,5 +1,5 @@
 CMAKE_MINIMUM_REQUIRED (VERSION 2.8.3)
-PROJECT(oximeter)
+PROJECT(g3t1_1)
 
 add_compile_options(-std=c++11)
 

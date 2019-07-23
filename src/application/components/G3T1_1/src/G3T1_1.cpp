@@ -1,31 +1,29 @@
-#include "ThermometerModule.hpp"
+#include "G3T1_1.hpp"
 
 using namespace bsn::range;
-using namespace bsn::resource;
 using namespace bsn::generator;
 using namespace bsn::operation;
 using namespace bsn::configuration;
 
-
-ThermometerModule::ThermometerModule(const int32_t &argc, char **argv/*, std::string name*/) :
-    type("thermometer"),
-    battery("therm_batt", 100, 100, 1),
+G3T1_1::G3T1_1(const int32_t &argc, char **argv) :
+    type("oximeter"),
+    battery("oxi_batt", 100, 100, 1),
     available(true),
     data_accuracy(1),
     comm_accuracy(1),
     active(true),
-    params({{"freq",0.9}, {"m_avg",5}}),
+    params({{"freq",0.90},{"m_avg",5}}),
     filter(5),
-    sensorConfig(),
     persist(1),
-    path("thermometer_output.csv") {}
+    path("oximeter_output.csv") {}
 
-ThermometerModule::~ThermometerModule() {}
+G3T1_1::~G3T1_1() {}
 
-void ThermometerModule::setUp() {
+void G3T1_1::setUp() {
     ros::NodeHandle configHandler, n;
     srand(time(NULL));
-    Operation op;    
+        
+    Operation op;
     
     std::vector<std::string> t_probs;
     std::array<float, 25> transitions;
@@ -45,24 +43,20 @@ void ThermometerModule::setUp() {
     }
     
     { // Configure markov chain
-        std::vector<std::string> lrs,mrs0,hrs0,mrs1,hrs1;
+        std::vector<std::string> lrs, mrs, hrs;
 
         configHandler.getParam("LowRisk", s);
         lrs = op.split(s, ',');
-        configHandler.getParam("MidRisk0", s);
-        mrs0 = op.split(s, ',');
-        configHandler.getParam("HighRisk0", s);
-        hrs0 = op.split(s, ',');
-        configHandler.getParam("MidRisk1", s);
-        mrs1 = op.split(s, ',');
-        configHandler.getParam("HighRisk1", s);
-        hrs1 = op.split(s, ',');
+        configHandler.getParam("MidRisk", s);
+        mrs = op.split(s, ',');
+        configHandler.getParam("HighRisk", s);
+        hrs = op.split(s, ',');
 
-        ranges[0] = Range(std::stod(hrs0[0]), std::stod(hrs0[1]));
-        ranges[1] = Range(std::stod(mrs0[0]), std::stod(mrs0[1]));
+        ranges[0] = Range(-1, -1);
+        ranges[1] = Range(-1, -1);
         ranges[2] = Range(std::stod(lrs[0]), std::stod(lrs[1]));
-        ranges[3] = Range(std::stod(mrs1[0]), std::stod(mrs1[1]));
-        ranges[4] = Range(std::stod(hrs1[0]), std::stod(hrs1[1]));
+        ranges[3] = Range(std::stod(mrs[0]), std::stod(mrs[1]));
+        ranges[4] = Range(std::stod(hrs[0]), std::stod(hrs[1]));
 
         markov = Markov(transitions, ranges, 2);
     }
@@ -119,12 +113,12 @@ void ThermometerModule::setUp() {
     contextPub =  n.advertise<messages::ContextInfo>("context_info", 10);
 }
 
-void ThermometerModule::tearDown() {
+void G3T1_1::tearDown() {
     if (persist)
         fp.close();
 }
 
-void ThermometerModule::sendTaskInfo(const std::string &task_id, const double &cost, const double &reliability, const double &frequency) {
+void G3T1_1::sendTaskInfo(const std::string &task_id, const double &cost, const double &reliability, const double &frequency) {
     messages::TaskInfo msg;
 
     msg.task_id = task_id;
@@ -134,7 +128,7 @@ void ThermometerModule::sendTaskInfo(const std::string &task_id, const double &c
     taskPub.publish(msg);
 }
 
-void ThermometerModule::sendContextInfo(const std::string &context_id, const bool &status) {
+void G3T1_1::sendContextInfo(const std::string &context_id, const bool &status) {
     messages::ContextInfo msg;
 
     msg.context_id = context_id;
@@ -142,7 +136,7 @@ void ThermometerModule::sendContextInfo(const std::string &context_id, const boo
     contextPub.publish(msg);
 }
 
-void ThermometerModule::receiveControlCommand(const messages::ControlCommand::ConstPtr& msg)  {
+void G3T1_1::receiveControlCommand(const messages::ControlCommand::ConstPtr& msg)  {
     active = msg->active;
     double newFreq;
     newFreq = params["freq"] + msg->frequency;
@@ -150,8 +144,7 @@ void ThermometerModule::receiveControlCommand(const messages::ControlCommand::Co
     params["freq"] = newFreq;
 }
 
-void ThermometerModule::run() {
-    // Container container;
+void G3T1_1::run(){
     double data;
     double risk;
     bool first_exec = true;
@@ -159,24 +152,24 @@ void ThermometerModule::run() {
     bsn::generator::DataGenerator dataGenerator(markov);
 
     messages::SensorData msg;
+    msg.type = "oximeter";
     ros::NodeHandle n;
 
-    dataPub = n.advertise<messages::SensorData>("thermometer_data", 10);
-    ros::Subscriber thermometerSub = n.subscribe("thermometer_control_command", 10, &ThermometerModule::receiveControlCommand, this);
+    dataPub = n.advertise<messages::SensorData>("oximeter_data", 10);
+    ros::Subscriber ecgSub = n.subscribe("oximeter_control_command", 10, &G3T1_1::receiveControlCommand, this);
 
     ros::Rate loop_rate(params["freq"]);
-    msg.type = "thermometer";
 
-    sendContextInfo("CTX_G3_T1_3", true);
-    
+    sendContextInfo("CTX_G3_T1_1",true);
+
     while (ros::ok()) {
         loop_rate = ros::Rate(params["freq"]);
-        
-        { // update controller with task info        
-            sendContextInfo("CTX_G3_T1_3",true);
-            sendTaskInfo("G3_T1.31", 0.1, data_accuracy, params["freq"]);
-            sendTaskInfo("G3_T1.32", 0.1*params["m_avg"], 1, params["freq"]);
-            sendTaskInfo("G3_T1.33", 0.1, comm_accuracy, params["freq"]);
+
+        { // update controller with task info            
+            sendContextInfo("CTX_G3_T1_1",true);
+            sendTaskInfo("G3_T1.11",0.1,data_accuracy,params["freq"]);
+            sendTaskInfo("G3_T1.12",0.1*params["m_avg"],1,params["freq"]);
+            sendTaskInfo("G3_T1.13",0.1,comm_accuracy,params["freq"]);
         }
 
         { // recharge routine
@@ -191,25 +184,23 @@ void ThermometerModule::run() {
             
             if (rand()%10 > 6) {
                     bool x_active = (rand()%2==0)?active:!active;
-                    sendContextInfo("CTX_G3_T1_3", x_active);
+                    sendContextInfo("CTX_G3_T1_1", x_active);
             }
-            sendContextInfo("CTX_G3_T1_3", active);
+            sendContextInfo("CTX_G3_T1_1", active);
         }
 
-        /*
-        * Receive control command and module update
-        */
-        if(!active){ 
+        if (!active) { 
             if(battery.getCurrentLevel() <= 100) battery.generate(2.5);
             continue; 
         }
 
         /*
          * Module execution
-         */
-        { // TASK: Collect thermometer data with data_accuracy
+         */           
+           
+        { // TASK: Collect oximeter data with data_accuracy
             data = dataGenerator.getValue();
-            
+                
             double offset = (1 - data_accuracy + (double)rand() / RAND_MAX * (1 - data_accuracy)) * data;
 
             if (rand() % 2 == 0)
@@ -218,7 +209,6 @@ void ThermometerModule::run() {
                 data = data - offset;
 
             battery.consume(0.1);
-
 
             //for debugging
             std::cout << "New data: " << data << std::endl << std::endl;
@@ -230,8 +220,8 @@ void ThermometerModule::run() {
             data = filter.getValue(type);
             battery.consume(0.1*params["m_avg"]);
 
-            msg.data = data;
             //for debugging
+            msg.data = data;
             std::cout << "Filtered data: " << data << std::endl;
         }
         
@@ -244,6 +234,8 @@ void ThermometerModule::run() {
             if ((rand() % 100) <= comm_accuracy * 100)
                 dataPub.publish(msg);
             
+            battery.consume(0.1);
+
             // for debugging
             std::cout << "Risk: " << risk << "%" << std::endl;
         }

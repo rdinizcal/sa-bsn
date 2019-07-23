@@ -1,5 +1,5 @@
-#ifndef CENTRALHUB_MODULE_HPP
-#define CENTRALHUB_MODULE_HPP
+#ifndef G4T1_HPP
+#define G4T1_HPP
 
 #include <fstream>
 #include <chrono>
@@ -18,10 +18,10 @@
 #include "messages/SystemInfo.h"
 
 
-class CentralhubModule {
+class G4T1 {
     private:
-        CentralhubModule(const CentralhubModule & /*obj*/);
-        CentralhubModule &operator=(const CentralhubModule & /*obj*/);
+        G4T1(const G4T1 & /*obj*/);
+        G4T1 &operator=(const G4T1 & /*obj*/);
         virtual void tearDown();   
 
 		void sendTaskInfo(const std::string &/*task_id*/, const double &/*cost*/, const double &/*reliability*/, const double &/*frequency*/);
@@ -37,8 +37,8 @@ class CentralhubModule {
 
     public:
         void setUp();
-        CentralhubModule(const int32_t &argc, char **argv);
-        virtual ~CentralhubModule();
+        G4T1(const int32_t &argc, char **argv);
+        virtual ~G4T1();
 
         void run();
 

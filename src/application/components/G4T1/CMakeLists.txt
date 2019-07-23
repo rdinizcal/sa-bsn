@@ -1,5 +1,5 @@
 CMAKE_MINIMUM_REQUIRED (VERSION 3.5)
-PROJECT(centralhub)
+PROJECT(g4t1)
 
 add_compile_options(-std=c++11)
 
