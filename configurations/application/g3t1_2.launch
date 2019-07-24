@@ -1,5 +1,5 @@
 <launch> 
-    <node name="thermometer" pkg="thermometer" type="thermometer" output="screen" />
+    <node name="g3t1_2" pkg="g3t1_2" type="g3t1_2" output="screen" />
 
     <!-- Defines the percentages to consider low, moderate or high risk -->
     <param name="lowrisk" value="0,20" />
@@ -14,11 +14,11 @@
     <param name="state4" value="10,10,10,20,40" />
 
     <!-- risk values -->
-    <param name="HighRisk0" value="0,31.99" />
-    <param name="MidRisk0" value="32,35.99" />
-    <param name="LowRisk" value="36,37.99" />
-    <param name="MidRisk1" value="38,40.99" />
-    <param name="HighRisk1" value="41,50" />
+    <param name="HighRisk0" value="0,70" />
+    <param name="MidRisk0" value="70,85" />
+    <param name="LowRisk" value="85,97" />
+    <param name="MidRisk1" value="97,115" />
+    <param name="HighRisk1" value="115,300" />
 
     <!-- accuracy in percentage -->
     <param name="data_accuracy" value="90" type="double" />
@@ -26,6 +26,6 @@
 
     <!-- persistence -->
     <param name="persist" value="true" type="bool" />
-    <param name="path" value="thermometer_output.csv" type="str" />
+    <param name="path" value="g3t1_2_output.csv" type="str" />
 
 </launch>

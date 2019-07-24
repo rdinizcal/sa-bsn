@@ -1,5 +1,5 @@
 <launch> 
-    <node name="centralhub" pkg="centralhub" type="centralhub" output="screen" />
+    <node name="g4t1" pkg="g4t1" type="g4t1" output="screen" />
 
     <param name="connect" value="true" type="bool" />
 
@@ -8,7 +8,7 @@
 
     <param name="persist" value="false" type="bool" />
 
-    <param name="path" value="centralhub_output.csv" />
+    <param name="path" value="g4t1_output.csv" />
 
     <param name="session" value="25" type="int" />
 

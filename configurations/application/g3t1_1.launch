@@ -1,5 +1,5 @@
 <launch> 
-    <node name="oximeter" pkg="oximeter" type="oximeter" output="screen" />
+    <node name="g3t1_1" pkg="g3t1_1" type="g3t1_1" output="screen" />
 
     <!-- Defines the percentages to consider low, moderate or high risk -->
     <param name="lowrisk" value="0,20" />
@@ -24,6 +24,6 @@
 
     <!-- persistence -->
     <param name="persist" value="true" type="bool" />
-    <param name="path" value="oximeter_output.csv" type="str" />
+    <param name="path" value="g3t1_1_output.csv" type="str" />
 
 </launch>
