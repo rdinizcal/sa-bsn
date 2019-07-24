@@ -21,21 +21,22 @@ void Logger::setUp() {
 }
 
 void Logger::receiveTaskInfo(const messages::TaskInfo::ConstPtr& msg) {
-    //ROS_INFO("I heard: [%s]", msg->task_id.c_str());
+    ROS_INFO("I heard: [%s]", msg->task_id.c_str());
     ++logical_clock;
 
     // persist
     fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::app);
     fp << logical_clock << ",";
     fp << this->now() << ",";
-    fp <<  msg->task_id << ",";
-    fp <<  msg->cost << ",";
-    fp <<  msg->reliability << ",";
-    fp <<  msg->frequency << "\n";
+    fp << msg->task_id << ",";
+    fp << msg->cost << ",";
+    fp << msg->reliability << ",";
+    fp << msg->frequency << "\n";
 
     fp.close();
 
-    //forward();
+    //forward
+
 }
 
 // Analytics receives information from both tasks and contexts of sensors
@@ -43,7 +44,7 @@ void Logger::receiveTaskInfo(const messages::TaskInfo::ConstPtr& msg) {
 void Logger::run(){
 
     ros::NodeHandle n;
-    ros::Subscriber t_sub = n.subscribe("task_info", 1000, &Logger::receiveTaskInfo, this);
+    ros::Subscriber t_sub = n.subscribe("probe_logger", 1000, &Logger::receiveTaskInfo, this);
     ros::spin();
 
 }
