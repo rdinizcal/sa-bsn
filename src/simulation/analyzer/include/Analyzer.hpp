@@ -1,5 +1,5 @@
-#ifndef CONTROLLER_NODE_HPP
-#define CONTROLLER_NODE_HPP
+#ifndef ANALYZER_HPP
+#define ANALYZER_HPP
 
 #include <sstream>
 #include <string>
@@ -32,11 +32,11 @@
 
 #include "operation/Operation.hpp"
 
-class AnalyticsNode {
+class Analyzer {
 
     private:
-      	AnalyticsNode(const AnalyticsNode &);
-    	AnalyticsNode &operator=(const AnalyticsNode &);
+      	Analyzer(const Analyzer &);
+    	Analyzer &operator=(const Analyzer &);
 
   	public:
       	void setUp();
@@ -55,8 +55,8 @@ class AnalyticsNode {
 		void receiveTaskInfo(const messages::TaskInfo::ConstPtr& /*msg*/);
 		void receiveContextInfo(const messages::ContextInfo::ConstPtr& /*msg*/);
 
-    	AnalyticsNode(int &argc, char **argv, std::string);
-    	virtual ~AnalyticsNode();
+    	Analyzer(int &argc, char **argv, std::string);
+    	virtual ~Analyzer();
 
 		void analyze();
         void sendToServer();

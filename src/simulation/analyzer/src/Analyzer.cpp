@@ -1,8 +1,8 @@
-#include "AnalyticsNode.hpp"
+#include "Analyzer.hpp"
 
 using namespace bsn::goalmodel;
 
-AnalyticsNode::AnalyticsNode(int  &argc, char **argv, std::string name):
+Analyzer::Analyzer(int  &argc, char **argv, std::string name):
     tasks(),
     contexts(),
     cost_expression(),
@@ -12,21 +12,21 @@ AnalyticsNode::AnalyticsNode(int  &argc, char **argv, std::string name):
     session()
     {}
 
-AnalyticsNode::~AnalyticsNode() {}
+Analyzer::~Analyzer() {}
 
-void AnalyticsNode::setTaskValue(std::string id, double value) {
+void Analyzer::setTaskValue(std::string id, double value) {
     this->tasks[id] = value;
 }
 
-double AnalyticsNode::getTaskValue(std::string id) {
+double Analyzer::getTaskValue(std::string id) {
     return this->tasks[id];
 }
 
-bool AnalyticsNode::isCost(std::string id) {
+bool Analyzer::isCost(std::string id) {
     return id[0] == ('W');
 }
 
-void AnalyticsNode::setUp() {
+void Analyzer::setUp() {
 
     GoalTree goalModel("Body Sensor Network");
     std::string path = ros::package::getPath("manager");
@@ -224,7 +224,7 @@ void AnalyticsNode::setUp() {
     return;
 }
 
-void AnalyticsNode::receiveTaskInfo(const messages::TaskInfo::ConstPtr& msg) {
+void Analyzer::receiveTaskInfo(const messages::TaskInfo::ConstPtr& msg) {
     ROS_INFO("I heard: [%s]", msg->task_id.c_str());
 
     message_id = msg->task_id;
@@ -247,7 +247,7 @@ void AnalyticsNode::receiveTaskInfo(const messages::TaskInfo::ConstPtr& msg) {
     analyze();
 }
 
-void AnalyticsNode::receiveContextInfo(const messages::ContextInfo::ConstPtr& msg) {
+void Analyzer::receiveContextInfo(const messages::ContextInfo::ConstPtr& msg) {
     ROS_INFO("I heard: [%s]", msg->context_id.c_str());
 
     message_id = msg->context_id;
@@ -261,7 +261,7 @@ void AnalyticsNode::receiveContextInfo(const messages::ContextInfo::ConstPtr& ms
     analyze();
 }
 
-void AnalyticsNode::analyze() {
+void Analyzer::analyze() {
     
     // Should consider refactoring apply method later...
 
@@ -309,7 +309,7 @@ void AnalyticsNode::analyze() {
     sendToServer();
 }
 
-void AnalyticsNode::sendToServer() {
+void Analyzer::sendToServer() {
  
     std::string packet = "";
 
@@ -331,12 +331,12 @@ void AnalyticsNode::sendToServer() {
 
 // Analytics receives information from both tasks and contexts of sensors
 
-void AnalyticsNode::run(){
+void Analyzer::run(){
 
     ros::NodeHandle n;
    
-    ros::Subscriber t_sub = n.subscribe("task_info", 1000, &AnalyticsNode::receiveTaskInfo, this);
-    ros::Subscriber c_sub = n.subscribe("context_info", 1000, &AnalyticsNode::receiveContextInfo, this);
+    ros::Subscriber t_sub = n.subscribe("task_info", 1000, &Analyzer::receiveTaskInfo, this);
+    ros::Subscriber c_sub = n.subscribe("context_info", 1000, &Analyzer::receiveContextInfo, this);
 
     ros::spin();
 
