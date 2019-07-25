@@ -8,106 +8,148 @@ import csv
 import matplotlib.pyplot as plt
 import numpy as np
 
-CTX_G3_T1_3 = 1
-CTX_G3_T1_4 = 1
-CTX_G3_T1_1 = 1
-CTX_G3_T1_2 = 1
-CTX_G4_T1_1 = 1
-CTX_G4_T1_3 = 1
-CTX_G4_T1_2 = 1
-CTX_G3_T1_X = 0
-R_G3_T1_11 = 1
-F_G3_T1_11 = 1
-R_G3_T1_12 = 1
-F_G3_T1_12 = 1
-R_G3_T1_13 = 1
-F_G3_T1_13 = 1
-R_G3_T1_21 = 1
-F_G3_T1_21 = 1
-R_G3_T1_22 = 1
-F_G3_T1_22 = 1
-R_G3_T1_23 = 1
-F_G3_T1_23 = 1
-R_G3_T1_31 = 1
-F_G3_T1_31 = 1
-R_G3_T1_32 = 1
-F_G3_T1_32 = 1
-R_G3_T1_33 = 1
-F_G3_T1_33 = 1
-R_G3_T1_411 = 1
-F_G3_T1_411 = 1
-R_G3_T1_412 = 1
-F_G3_T1_412 = 1
-R_G3_T1_42 = 1
-F_G3_T1_42 = 1
-R_G3_T1_43 = 1
-F_G3_T1_43 = 1
-R_G3_T1_X = 1
-F_G3_T1_X = 1
-OPT_G3_T1_X = 1
-R_G4_T1_1 = 1
-F_G4_T1_1 = 1
-R_G4_T1_2 = 1
-F_G4_T1_2 = 1
-R_G4_T1_3 = 1
-F_G4_T1_3 = 1
+#for splitting
+import re
 
-def discretize(x,y,resolution):
+#for curve analysis
+from statistics import mean
+
+class Analyzer:
+
+    def __init__(self): pass
+        
+    # computes the average for evey truncated (which dependes on the resolution) x value 
+    # [38.1, 38.5, 38.7]:[5, 10, 15] returns [38,15]
+    def discretize(self, x, y, resolution):
+        carry_on = 0
+        s = 0
+        num = 1
+        pos = 0
+        a = []
+        b = []
+
+        for value in x:
+            value /= resolution
+            if floor(value) == carry_on:
+                s += y[pos]
+                num += 1
+            else:
+                a.append(floor(value))
+                b.append(s/num)
+                carry_on = floor(value)
+                s = y[pos]
+                num = 1
+            pos += 1
+
+        return [a,b]
+
+    def analyze(self, x, y, setpoint, upper_bound, lower_bound):
+
+        # calculate stability point
+        pos = 0
+        flag = False
+        for value in y:
+            if lower_bound <= value and value <= upper_bound:
+                if flag is False:
+                    stability_point = pos
+                    flag = True
+            else:
+                stability_point = 0
+                flag = False
+
+            pos+=1
+
+        print('Stability: %r' % bool(stability_point is not 0))
+
+        #calculate settling time
+        settling_time = x[stability_point] - x[0]
+        print('Settling Time: %s' % settling_time)
+
+        #calculate overshoot
+        overshoot = 100*(max(y) - setpoint)/setpoint
+        print('Overshoot: %.2f%%' % overshoot)
+
+        #calculate steady-state error
+        sse = 100*(abs(setpoint - mean(val for val in y[stability_point:]))/setpoint)
+        print('Steady-State Error: %.2f%%' % sse)
+
+        #controller effort, not engough information yet
+
+        #robustness
+        robustness = 100*(1 - sum([abs(setpoint - val) for val in y])/len(x))
+        print('Robustness: %.2f%%' % robustness)
+
+
+    def run(self): 
+        # load formula
+        formula = Formula("resource/models/reliability.formula")
+
+        # load log
+        with open("resource/logs/1563994960139564028.log", newline='') as log_file:
+            log_csv = csv.reader(log_file, delimiter=',')
+            log = list(log_csv)
+            del log[0] # delete first line
+
+        # compute time serie
+        timeseries = [] 
+        t0 = int(log[0][1])
+        for registry in log:
+            var = registry[2].replace(".","_")
+            formula.compute("C_" + var, registry[3])
+            formula.compute("R_" + var, registry[4])
+            formula.compute("F_" + var, registry[5])
+            instant = int(registry[1]) - t0
+            timeseries.append([instant, formula.eval()])
+        
+        x = [x[0] for x in timeseries]
+        y = [y[1] for y in timeseries]
+
+        # discretizing the curve
+        [x,y] = self.discretize(x,y,10e8)
+
+        # perform the analysis 
+        setpoint = 0.80
+        self.analyze(x,y, setpoint, setpoint*1.05, setpoint*0.95)
+
+        # plot timeseries
+        plt.plot(x, y)
+        plt.ylim(0.8,1)
+        plt.xlim(0,max(x))
+        plt.show()
+
+class Formula:
+
+    def __init__(self, path): 
+        formula_file = open(path, 'r')
+        if formula_file.mode == 'r': 
+            self.expression = formula_file.read()
+            self.mapping = self.initialize_expr()
+        else : 
+            raise Exception('Formula file not found')
     
-    carry_on = 0
-    s = 0
-    num = 1
-    pos = 0
-    a = []
-    b = []
+    def initialize_expr(self):
+        expr = self.expression.replace("*"," ")
+        expr = expr.replace("+"," ")
+        expr = expr.replace("-"," ")
+        expr = expr.replace("/"," ")
+        expr = expr.replace("("," ")
+        expr = expr.replace(")"," ")
+        expr = re.split(' ',expr)
+        arguments = list(filter(None, expr))
 
-    for value in x:
-        value /= resolution
-        if floor(value) == carry_on:
-            s += y[pos]
-            num += 1
-        else:
-            a.append(floor(value))
-            b.append(s/num)
-            carry_on = floor(value)
-            s = y[pos]
-            num = 1
-        pos += 1
+        arg_val = {}
+        for argument in arguments :
+            arg_val[argument] = 1
 
-    return [a,b]
+        return arg_val
 
-def function_creator(): 
-  
-    # expression to be evaluated 
-    reliability_formula_file = open("resource/models/reliability.formula", "r")
-    if reliability_formula_file.mode == 'r': reli_expr = reliability_formula_file.read()
-    else : exit()
+    def compute(self, arg, value):
+        self.mapping[arg] = float(value)
 
-    # variable used in expression
-    with open("resource/logs/1563994960139564028.log", newline='') as log_file:
-        log_csv = csv.reader(log_file, delimiter=',')
-        log = list(log_csv)
-        del log[0]
+    def eval(self):
+        return eval(self.expression, self.mapping)
 
-    timeseries = [] 
-    t0 = int(log[1][1])
-    for registry in log:
-        var = registry[2].replace(".","_")
-        exec("C_"+ var + " = " + registry[3])
-        exec("R_"+ var + " = " + registry[4])
-        exec("F_"+ var + " = " + registry[5])
-        instant = int(registry[1]) - t0
-        timeseries.append([instant, eval(reli_expr)])
+        
+
     
-    #plot timeseries
-    x = [x[0] for x in timeseries]
-    y = [y[1] for y in timeseries]
-    #print(x)
 
-    # discretizing the curve resolution = 1sec
-    [x,y] = discretize(x,y,10e9)
-
-    plt.plot(x, y)
-    plt.ylim(0.8,1)
-    plt.xlim(0,max(x))
-    plt.show()

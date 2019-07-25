@@ -1,7 +1,8 @@
-from src import Analyzer
+from src import Analyzer as stat
 
 def main():
-    Analyzer.function_creator()
+    analyzer = stat.Analyzer()
+    analyzer.run()
 
 if __name__ == "__main__":
     main()
