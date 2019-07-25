@@ -79,7 +79,6 @@ class Analyzer:
         robustness = 100*(1 - sum([abs(setpoint - val) for val in y])/len(x))
         print('Robustness: %.2f%%' % robustness)
 
-
     def run(self): 
         # load formula
         formula = Formula("resource/models/reliability.formula")
@@ -95,6 +94,7 @@ class Analyzer:
         t0 = int(log[0][1])
         for registry in log:
             var = registry[2].replace(".","_")
+            formula.compute("CTX_" + var, registry[3])
             formula.compute("C_" + var, registry[3])
             formula.compute("R_" + var, registry[4])
             formula.compute("F_" + var, registry[5])

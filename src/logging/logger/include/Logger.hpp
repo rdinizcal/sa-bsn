@@ -9,6 +9,7 @@
 #include <ros/package.h>
 
 #include "messages/TaskInfo.h"
+#include "messages/ContextInfo.h"
 
 class Logger {
 
@@ -27,13 +28,17 @@ class Logger {
 
   	public:
 		void receiveTaskInfo(const messages::TaskInfo::ConstPtr& /*msg*/);
+		void receiveContextInfo(const messages::ContextInfo::ConstPtr& /*msg*/);
+
 
   	private:
 		std::fstream fp;
 		std::string filepath;
 		int32_t logical_clock;
 
-		ros::Publisher logger_manager_pub;
+		ros::Publisher task_logger_manager_pub;
+		ros::Publisher context_logger_manager_pub;
+
 };
 
 #endif 

@@ -8,6 +8,7 @@
 #include "ros/ros.h"
 
 #include "messages/TaskInfo.h"
+#include "messages/ContextInfo.h"
 
 class Probe {
 
@@ -24,9 +25,12 @@ class Probe {
 
   	public:
 		void receiveTaskInfo(const messages::TaskInfo::ConstPtr& /*msg*/);
+		void receiveContextInfo(const messages::ContextInfo::ConstPtr& /*msg*/);
+
 
   	private:
 	  ros::Publisher task_pub;
+	  ros::Publisher context_pub;
 };
 
 #endif 

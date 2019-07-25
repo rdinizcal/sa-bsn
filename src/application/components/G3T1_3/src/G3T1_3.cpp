@@ -238,7 +238,7 @@ void G3T1_3::run() {
         { // TASK: Transfer information to CentralHub
             risk = sensorConfig.evaluateNumber(data);
             msg.risk = risk;
-            battery.consume(0.1);
+            battery.consume(2);
             msg.batt = battery.getCurrentLevel();
 
             if ((rand() % 100) <= comm_accuracy * 100)
