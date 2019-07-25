@@ -32,6 +32,8 @@ class Logger {
 		std::fstream fp;
 		std::string filepath;
 		int32_t logical_clock;
+
+		ros::Publisher logger_manager_pub;
 };
 
 #endif 

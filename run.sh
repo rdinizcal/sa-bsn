@@ -13,4 +13,3 @@ gnome-terminal --working-directory=${bsn}/configurations/application -e 'roslaun
 gnome-terminal --working-directory=${bsn}/configurations/application -e 'roslaunch g3t1_2.launch'
 gnome-terminal --working-directory=${bsn}/configurations/application -e 'roslaunch g3t1_3.launch'
 gnome-terminal --working-directory=${bsn}/configurations/application -e 'roslaunch g3t1_4.launch'
-#gnome-terminal --working-directory=${bsn}/configurations -e 'roslaunch bloodpressure.launch'

@@ -18,6 +18,9 @@ void Logger::setUp() {
     fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
     fp << "\n";
     fp.close();
+
+    ros::NodeHandle handler;
+    logger_manager_pub = handler.advertise<messages::TaskInfo>("logger_manager", 10);
 }
 
 void Logger::receiveTaskInfo(const messages::TaskInfo::ConstPtr& msg) {
@@ -36,15 +39,11 @@ void Logger::receiveTaskInfo(const messages::TaskInfo::ConstPtr& msg) {
     fp.close();
 
     //forward
-
+    logger_manager_pub.publish(msg);
 }
 
-// Analytics receives information from both tasks and contexts of sensors
-
 void Logger::run(){
-
     ros::NodeHandle n;
     ros::Subscriber t_sub = n.subscribe("probe_logger", 1000, &Logger::receiveTaskInfo, this);
     ros::spin();
-
 }
