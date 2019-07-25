@@ -84,7 +84,7 @@ class Analyzer:
         formula = Formula("resource/models/reliability.formula")
 
         # load log
-        with open("resource/logs/1563994960139564028.log", newline='') as log_file:
+        with open("resource/logs/1564085006280868817.log", newline='') as log_file:
             log_csv = csv.reader(log_file, delimiter=',')
             log = list(log_csv)
             del log[0] # delete first line
@@ -94,10 +94,7 @@ class Analyzer:
         t0 = int(log[0][1])
         for registry in log:
             var = registry[2].replace(".","_")
-            formula.compute("CTX_" + var, registry[3])
-            formula.compute("C_" + var, registry[3])
-            formula.compute("R_" + var, registry[4])
-            formula.compute("F_" + var, registry[5])
+            formula.compute(var, registry[3])
             instant = int(registry[1]) - t0
             timeseries.append([instant, formula.eval()])
         
@@ -105,7 +102,7 @@ class Analyzer:
         y = [y[1] for y in timeseries]
 
         # discretizing the curve
-        [x,y] = self.discretize(x,y,10e8)
+        [x,y] = self.discretize(x,y,10e7)
 
         # perform the analysis 
         setpoint = 0.80

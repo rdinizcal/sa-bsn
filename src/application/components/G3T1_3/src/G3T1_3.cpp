@@ -7,7 +7,7 @@ using namespace bsn::operation;
 using namespace bsn::configuration;
 
 
-G3T1_3::G3T1_3(const int32_t &argc, char **argv/*, std::string name*/) :
+G3T1_3::G3T1_3(const int32_t &argc, char **argv) :
     type("thermometer"),
     battery("therm_batt", 100, 100, 1),
     available(true),
@@ -115,8 +115,7 @@ void G3T1_3::setUp() {
         }
     }
 
-    taskPub =  n.advertise<messages::TaskInfo>("task_info", 10);
-    contextPub =  n.advertise<messages::ContextInfo>("context_info", 10);
+    status_pub =  n.advertise<messages::Status>("collect_status", 10);
 }
 
 void G3T1_3::tearDown() {
@@ -124,23 +123,15 @@ void G3T1_3::tearDown() {
         fp.close();
 }
 
-void G3T1_3::sendTaskInfo(const std::string &task_id, const double &cost, const double &reliability, const double &frequency) {
-    messages::TaskInfo msg;
+void G3T1_3::sendStatus(const std::string &id, const double &value) {
+    messages::Status msg;
 
-    msg.task_id = task_id;
-    msg.cost = cost;
-    msg.reliability = reliability;
-    msg.frequency = frequency;
-    taskPub.publish(msg);
+    msg.key = id;
+    msg.value = value;
+
+    status_pub.publish(msg);
 }
 
-void G3T1_3::sendContextInfo(const std::string &context_id, const bool &status) {
-    messages::ContextInfo msg;
-
-    msg.context_id = context_id;
-    msg.status = status;
-    contextPub.publish(msg);
-}
 
 void G3T1_3::receiveControlCommand(const messages::ControlCommand::ConstPtr& msg)  {
     active = msg->active;
@@ -167,16 +158,25 @@ void G3T1_3::run() {
     ros::Rate loop_rate(params["freq"]);
     msg.type = "thermometer";
 
-    sendContextInfo("CTX_G3_T1_3", true);
+    sendStatus("CTX_G3_T1_3", true);
     
     while (ros::ok()) {
         loop_rate = ros::Rate(params["freq"]);
         
         { // update controller with task info        
-            sendContextInfo("CTX_G3_T1_3",true);
-            sendTaskInfo("G3_T1.31", 0.1, data_accuracy, params["freq"]);
-            sendTaskInfo("G3_T1.32", 0.1*params["m_avg"], 1, params["freq"]);
-            sendTaskInfo("G3_T1.33", 0.1, comm_accuracy, params["freq"]);
+            sendStatus("CTX_G3_T1_3",1);
+
+            sendStatus("C_G3_T1.31", 0.1);
+            sendStatus("R_G3_T1.31", data_accuracy);
+            sendStatus("F_G3_T1.31", params["freq"]);
+
+            sendStatus("C_G3_T1.32", 0.1*params["m_avg"]);
+            sendStatus("R_G3_T1.32", 1);
+            sendStatus("F_G3_T1.32", params["freq"]);
+
+            sendStatus("C_G3_T1.33", 0.1);
+            sendStatus("R_G3_T1.33", comm_accuracy);
+            sendStatus("F_G3_T1.33", params["freq"]);
         }
 
         { // recharge routine
@@ -189,11 +189,7 @@ void G3T1_3::run() {
                 active = false;
             }
             
-            if (rand()%10 > 6) {
-                    bool x_active = (rand()%2==0)?active:!active;
-                    sendContextInfo("CTX_G3_T1_3", x_active);
-            }
-            sendContextInfo("CTX_G3_T1_3", active);
+            sendStatus("CTX_G3_T1_3", active?1:0);
         }
 
         /*

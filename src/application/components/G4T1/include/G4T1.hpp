@@ -17,16 +17,12 @@
 #include "messages/SensorData.h"
 #include "messages/SystemInfo.h"
 
-
 class G4T1 {
+    
     private:
         G4T1(const G4T1 & /*obj*/);
         G4T1 &operator=(const G4T1 & /*obj*/);
         virtual void tearDown();   
-
-		void sendTaskInfo(const std::string &/*task_id*/, const double &/*cost*/, const double &/*reliability*/, const double &/*frequency*/);
-		
-        void sendMonitorTaskInfo(const std::string &/*task_id*/, const double &/*cost*/, const double &/*reliability*/, const double &/*frequency*/);
 
         void receiveSensorData(const messages::SensorData::ConstPtr&);
         void receiveSystemInfo(const messages::SystemInfo::ConstPtr&); 

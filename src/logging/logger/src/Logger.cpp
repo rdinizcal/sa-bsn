@@ -1,6 +1,6 @@
 #include "Logger.hpp"
 
-Logger::Logger(int  &argc, char **argv, std::string name) : fp(), filepath(), logical_clock(0), task_logger_manager_pub(), context_logger_manager_pub() {}
+Logger::Logger(int  &argc, char **argv, std::string name) : fp(), filepath(), logical_clock(0) {}
 Logger::~Logger() {}
 
 std::string Logger::now() const{
@@ -19,12 +19,10 @@ void Logger::setUp() {
     fp.close();
 
     ros::NodeHandle handler;
-    task_logger_manager_pub = handler.advertise<messages::TaskInfo>("logger_manager", 10);
-    context_logger_manager_pub = handler.advertise<messages::ContextInfo>("logger_manager", 10);
-
+    logger2manager_pub = handler.advertise<messages::Status>("status", 10);
 }
 
-void Logger::receiveTaskInfo(const messages::TaskInfo::ConstPtr& msg) {
+void Logger::receiveStatus(const messages::Status::ConstPtr& msg) {
     //ROS_INFO("I heard: [%s]", msg->task_id.c_str());
     ++logical_clock;
 
@@ -32,37 +30,17 @@ void Logger::receiveTaskInfo(const messages::TaskInfo::ConstPtr& msg) {
     fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::app);
     fp << logical_clock << ",";
     fp << this->now() << ",";
-    fp << msg->task_id << ",";
-    fp << msg->cost << ",";
-    fp << msg->reliability << ",";
-    fp << msg->frequency << "\n";
+    fp << msg->key << ",";
+    fp << msg->value << "\n";
 
     fp.close();
 
     //forward
-    task_logger_manager_pub.publish(msg);
-}
-
-void Logger::receiveContextInfo(const messages::ContextInfo::ConstPtr& msg) {
-    //ROS_INFO("I heard: [%s]", msg->context_id.c_str());
-    ++logical_clock;
-
-    // persist
-    fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::app);
-    fp << logical_clock << ",";
-    fp << this->now() << ",";
-    fp << msg->context_id << ",";
-    fp << msg->status << "\n";
-
-    fp.close();
-
-    //forward
-    context_logger_manager_pub.publish(msg);
+    logger2manager_pub.publish(msg);
 }
 
 void Logger::run(){
     ros::NodeHandle n;
-    ros::Subscriber t_sub = n.subscribe("probe_logger", 1000, &Logger::receiveTaskInfo, this);
-    ros::Subscriber c_sub = n.subscribe("probe_logger", 1000, &Logger::receiveContextInfo, this);
+    ros::Subscriber sub = n.subscribe("log_status", 1000, &Logger::receiveStatus, this);
     ros::spin();
 }

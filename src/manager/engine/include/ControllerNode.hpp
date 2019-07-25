@@ -23,9 +23,9 @@
 #include "lepton/Lepton.h"
 
 #include "messages/ControlCommand.h"
-#include "messages/SystemInfo.h"
-#include "messages/TaskInfo.h"
-#include "messages/ContextInfo.h"
+//#include "messages/SystemInfo.h"
+//#include "messages/TaskInfo.h"
+//#include "messages/ContextInfo.h"
 
 class ControllerNode {
 
@@ -48,8 +48,8 @@ class ControllerNode {
     	ControllerNode(int &argc, char **argv, std::string name);
     	virtual ~ControllerNode();
 
-		void receiveTaskInfo(const messages::TaskInfo::ConstPtr& /*msg*/);
-		void receiveContextInfo(const messages::ContextInfo::ConstPtr& /*msg*/);
+		//void receiveTaskInfo(const messages::TaskInfo::ConstPtr& /*msg*/);
+		//void receiveContextInfo(const messages::ContextInfo::ConstPtr& /*msg*/);
 
     	void analyze();
     	void plan();

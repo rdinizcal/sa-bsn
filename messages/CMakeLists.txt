@@ -24,11 +24,9 @@ FIND_PACKAGE(catkin REQUIRED COMPONENTS std_msgs message_generation)
 ###########################################################################
 # Set message generation.
 ADD_MESSAGE_FILES( FILES
-  info/ContextInfo.msg
-  info/TaskInfo.msg
-  info/SystemInfo.msg
-  data/SensorData.msg
-  command/ControlCommand.msg
+  application/internal/SensorData.msg
+  application/external/Status.msg
+  manager/external/CommandControl.msg
 )
 
 GENERATE_MESSAGES(DEPENDENCIES std_msgs)

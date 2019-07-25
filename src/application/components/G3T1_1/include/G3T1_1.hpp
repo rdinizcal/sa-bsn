@@ -17,25 +17,20 @@
 #include "bsn/configuration/SensorConfiguration.hpp"
 
 #include "messages/SensorData.h"
-#include "messages/TaskInfo.h"
-#include "messages/ContextInfo.h"
+#include "messages/Status.h"
 #include "messages/ControlCommand.h"
 
 class G3T1_1 {
+
 	private:
       	G3T1_1(const G3T1_1 &);
     	G3T1_1 &operator=(const G3T1_1 &);
 
-    	virtual void tearDown();
-
-		void sendTaskInfo(const std::string &/*task_id*/, const double &/*cost*/, const double &/*reliability*/, const double &/*frequency*/);
-		void sendContextInfo(const std::string &/*context_id*/, const bool &/*value*/);
-
-		void sendMonitorTaskInfo(const std::string &/*task_id*/, const double &/*cost*/, const double &/*reliability*/, const double &/*frequency*/);
-		void sendMonitorContextInfo(const std::string &/*context_id*/, const bool &/*value*/);
+		void sendStatus(const std::string &/*id*/, const double &/*value*/);
 
   	public:
     	virtual void setUp();
+    	virtual void tearDown();
     	
 		G3T1_1(const int32_t &argc, char **argv);
     	virtual ~G3T1_1();
@@ -63,7 +58,7 @@ class G3T1_1 {
 		std::string path;
 		std::ofstream fp;
 
-		ros::Publisher taskPub, contextPub, dataPub;
+		ros::Publisher status_pub, dataPub;
 };
 
 #endif 

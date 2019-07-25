@@ -131,8 +131,7 @@ void G3T1_4::setUp() {
         }
     }
     
-    taskPub =  n.advertise<messages::TaskInfo>("task_info", 10);
-    contextPub =  n.advertise<messages::ContextInfo>("context_info", 10);
+    status_pub =  n.advertise<messages::Status>("collect_status", 10);
 }
 
 void G3T1_4::tearDown() {
@@ -140,23 +139,15 @@ void G3T1_4::tearDown() {
         fp.close();
 }
 
-void G3T1_4::sendTaskInfo(const std::string &task_id, const double &cost, const double &reliability, const double &frequency) {
-    messages::TaskInfo msg;
+void G3T1_4::sendStatus(const std::string &id, const double &value) {
+    messages::Status msg;
 
-    msg.task_id = task_id;
-    msg.cost = cost;
-    msg.reliability = reliability;
-    msg.frequency = frequency;
-    taskPub.publish(msg);
+    msg.key = id;
+    msg.value = value;
+
+    status_pub.publish(msg);
 }
 
-void G3T1_4::sendContextInfo(const std::string &context_id, const bool &status) {
-    messages::ContextInfo msg;
-
-    msg.context_id = context_id;
-    msg.status = status;
-    contextPub.publish(msg);
-}
 
 void G3T1_4::receiveControlCommand(const messages::ControlCommand::ConstPtr& msg)  {
     active = msg->active;
@@ -191,17 +182,24 @@ void G3T1_4::run() {
         loop_rate = ros::Rate(params["freq"]);        
 
         {  // update controller with task info
-            sendContextInfo("CTX_G3_T1_4",true);
-            sendTaskInfo("G3_T1.411", 0.1,systdata_accuracy, params["freq"]);
-            sendTaskInfo("G3_T1.412", 0.1,diasdata_accuracy, params["freq"]);
-            sendTaskInfo("G3_T1.42", 0.1*params["m_avg"]*2,1, params["freq"]);
-            sendTaskInfo("G3_T1.43", 0.1*2, (systcomm_accuracy+diascomm_accuracy)/2, params["freq"]);
+            sendStatus("CTX_G3_T1_4",1);
 
-            sendContextInfo("CTX_G3_T1_4",true);
-            sendTaskInfo("G3_T1.411", 0.076, 1, 1);
-            sendTaskInfo("G3_T1.412", 0.076, 1, 1);
-            sendTaskInfo("G3_T1.42", 0.076*params["m_avg"]*2, 1, 1);
-            sendTaskInfo("G3_T1.43", 0.076*2, (1+1)/2, 1);
+            sendStatus("C_G3_T1.411", 0.1);
+            sendStatus("R_G3_T1.411", systdata_accuracy);
+            sendStatus("F_G3_T1.411", params["freq"]);
+
+            sendStatus("C_G3_T1.412", 0.1);
+            sendStatus("R_G3_T1.412", diasdata_accuracy);
+            sendStatus("F_G3_T1.412", params["freq"]);
+
+            sendStatus("C_G3_T1.42", 0.1*params["m_avg"]*2);
+            sendStatus("R_G3_T1.42", 1);
+            sendStatus("F_G3_T1.42", params["freq"]);
+
+            sendStatus("C_G3_T1.43", 0.1*2);
+            sendStatus("R_G3_T1.43", (systcomm_accuracy+diascomm_accuracy)/2);
+            sendStatus("F_G3_T1.43", params["freq"]);
+
         }
 
         { // recharge routine
@@ -214,23 +212,13 @@ void G3T1_4::run() {
                 active = false;
             }
 
-            if (rand()%10 > 6) {
-                bool x_active = (rand()%2==0)?active:!active;
-                sendContextInfo("CTX_G3_T1_4", x_active);
-            }
-
-            sendContextInfo("CTX_G3_T1_4", active);
+            sendStatus("CTX_G3_T1_4", active?1:0);
         }
 
         if (!active) { 
             if(battery.getCurrentLevel() <= 100) battery.generate(2.5);
             continue; 
         }
-
-        /*
-         * Module execution
-         */
-                
 
         { // TASK: Collect bloodpressure data            
             dataS = dataGeneratorSys.getValue();      

@@ -290,7 +290,7 @@ void ControllerNode::setUp() {
  * receive context (id, bool) reset setpoints (cost and reliability)
  * ***************************************************************
 */ 
-void ControllerNode::receiveTaskInfo(const messages::TaskInfo::ConstPtr& msg) {
+/*void ControllerNode::receiveTaskInfo(const messages::TaskInfo::ConstPtr& msg) {
     ROS_INFO("I heard: [%s]", msg->task_id.c_str());
 
     message_id = msg->task_id;
@@ -300,20 +300,14 @@ void ControllerNode::receiveTaskInfo(const messages::TaskInfo::ConstPtr& msg) {
     std::string reliID = "R_" + id_aux;
     std::string freqID = "F_" + id_aux;
 
-/*      
-    std::cout << "costID = " << msg->cost << std::endl;
-    std::cout << "reliID = " << msg->reliability << std::endl;
-    std::cout << "freqID = " << msg->frequency << std::endl;
-*/ 
-
     setTaskValue(costID, msg->cost);
     setTaskValue(reliID, msg->reliability);
     setTaskValue(freqID, msg->frequency);
 
     analyze();
-}
+}*/
 
-void ControllerNode::receiveContextInfo(const messages::ContextInfo::ConstPtr& msg) {
+/*void ControllerNode::receiveContextInfo(const messages::ContextInfo::ConstPtr& msg) {
     ROS_INFO("I heard: [%s]", msg->context_id.c_str());
 
     message_id = msg->context_id;
@@ -325,7 +319,7 @@ void ControllerNode::receiveContextInfo(const messages::ContextInfo::ConstPtr& m
     contexts[id_aux].setValue(msg->status);
 
     analyze();
-}
+}*/
 
 /** **************************************************************
  *                         ANALYZE
@@ -458,8 +452,8 @@ void ControllerNode::run(){
 
     ros::NodeHandle n;
    
-    ros::Subscriber t_sub = n.subscribe("task_info", 1000, &ControllerNode::receiveTaskInfo, this);
-    ros::Subscriber c_sub = n.subscribe("context_info", 1000, &ControllerNode::receiveContextInfo, this);
+    //ros::Subscriber t_sub = n.subscribe("task_info", 1000, &ControllerNode::receiveTaskInfo, this);
+    //ros::Subscriber c_sub = n.subscribe("context_info", 1000, &ControllerNode::receiveContextInfo, this);
 
     ros::spin();
 
