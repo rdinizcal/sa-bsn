@@ -110,6 +110,8 @@ void G3T1_1::setUp() {
     }
 
     status_pub = n.advertise<messages::Status>("collect_status", 10);
+    event_pub = n.advertise<messages::Event>("collect_event", 10);
+
 }
 
 void G3T1_1::tearDown() {
@@ -126,12 +128,13 @@ void G3T1_1::sendStatus(const std::string &id, const double &value) {
     status_pub.publish(msg);
 }
 
-void G3T1_1::receiveControlCommand(const messages::ControlCommand::ConstPtr& msg)  {
-    active = msg->active;
-    double newFreq;
-    newFreq = params["freq"] + msg->frequency;
-    std::cout << "Frequency changed from " << params["freq"] << " to " << newFreq << std::endl;
-    params["freq"] = newFreq;
+void G3T1_1::sendEvent(const std::string &type, const std::string &description) {
+    messages::Event msg;
+
+    msg.type = type;
+    msg.description = description;
+
+    event_pub.publish(msg);
 }
 
 void G3T1_1::run(){
@@ -146,11 +149,10 @@ void G3T1_1::run(){
     ros::NodeHandle n;
 
     dataPub = n.advertise<messages::SensorData>("oximeter_data", 10);
-    ros::Subscriber ecgSub = n.subscribe("oximeter_control_command", 10, &G3T1_1::receiveControlCommand, this);
 
     ros::Rate loop_rate(params["freq"]);
 
-    //sendStatus("CTX_G3_T1_1",1);
+    sendStatus("CTX_G3_T1_1",1);
 
     while (ros::ok()) {
         loop_rate = ros::Rate(params["freq"]);
@@ -186,7 +188,7 @@ void G3T1_1::run(){
                 active = false;
             }
             
-            //sendStatus("CTX_G3_T1_1", active?1:0);
+            sendStatus("CTX_G3_T1_1", active?1:0);
         }
 
         if (!active) { 

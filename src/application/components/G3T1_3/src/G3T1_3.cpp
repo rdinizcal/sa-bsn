@@ -116,6 +116,8 @@ void G3T1_3::setUp() {
     }
 
     status_pub =  n.advertise<messages::Status>("collect_status", 10);
+    event_pub =  n.advertise<messages::Event>("collect_event", 10);
+
 }
 
 void G3T1_3::tearDown() {
@@ -132,13 +134,13 @@ void G3T1_3::sendStatus(const std::string &id, const double &value) {
     status_pub.publish(msg);
 }
 
+void G3T1_3::sendEvent(const std::string &type, const std::string &description) {
+    messages::Event msg;
 
-void G3T1_3::receiveControlCommand(const messages::ControlCommand::ConstPtr& msg)  {
-    active = msg->active;
-    double newFreq;
-    newFreq = params["freq"] + msg->frequency;
-    std::cout << "Frequency changed from " << params["freq"] << " to " << newFreq << std::endl;
-    params["freq"] = newFreq;
+    msg.type = type;
+    msg.description = description;
+
+    event_pub.publish(msg);
 }
 
 void G3T1_3::run() {
@@ -153,12 +155,11 @@ void G3T1_3::run() {
     ros::NodeHandle n;
 
     dataPub = n.advertise<messages::SensorData>("thermometer_data", 10);
-    ros::Subscriber thermometerSub = n.subscribe("thermometer_control_command", 10, &G3T1_3::receiveControlCommand, this);
 
     ros::Rate loop_rate(params["freq"]);
     msg.type = "thermometer";
 
-    sendStatus("CTX_G3_T1_3", true);
+    sendStatus("CTX_G3_T1_3", 1);
     
     while (ros::ok()) {
         loop_rate = ros::Rate(params["freq"]);

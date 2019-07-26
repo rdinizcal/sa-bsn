@@ -18,7 +18,7 @@
 
 #include "messages/SensorData.h"
 #include "messages/Status.h"
-#include "messages/ControlCommand.h"
+#include "messages/Event.h"
 
 class G3T1_3 {
     
@@ -27,6 +27,7 @@ class G3T1_3 {
     	G3T1_3 &operator=(const G3T1_3 &);
 		
 		void sendStatus(const std::string &/*id*/, const double &/*value*/);
+		void sendEvent(const std::string &/*type*/, const std::string &/*description*/);
 
   	public:
     	virtual void setUp();
@@ -38,8 +39,6 @@ class G3T1_3 {
     	void run();
 
   	private:
-	  	void receiveControlCommand(const messages::ControlCommand::ConstPtr& msg);
-		
 		std::string type;
 		bsn::resource::Battery battery;
 		bool available;
@@ -58,7 +57,7 @@ class G3T1_3 {
 		std::string path;
 		std::ofstream fp;
 
-		ros::Publisher status_pub, dataPub;
+		ros::Publisher status_pub, event_pub, dataPub;
 };
 
 #endif 

@@ -6,14 +6,20 @@ Probe::~Probe() {}
 void Probe::setUp() {
     ros::NodeHandle handler;
     status_pub = handler.advertise<messages::Status>("log_status", 10);
+    event_pub = handler.advertise<messages::Event>("log_event", 10);
 }
 
 void Probe::receiveStatus(const messages::Status::ConstPtr& msg) {
     status_pub.publish(msg);
 }
 
+void Probe::receiveEvent(const messages::Event::ConstPtr& msg) {
+    event_pub.publish(msg);
+}
+
 void Probe::run(){
     ros::NodeHandle n;
-    ros::Subscriber sub = n.subscribe("collect_status", 1000, &Probe::receiveStatus, this);
+    ros::Subscriber status_sub = n.subscribe("collect_status", 1000, &Probe::receiveStatus, this);
+    ros::Subscriber event_sub = n.subscribe("collect_event", 1000, &Probe::receiveEvent, this);
     ros::spin();
 }

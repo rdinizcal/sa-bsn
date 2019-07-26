@@ -19,7 +19,8 @@ void Logger::setUp() {
     fp.close();
 
     ros::NodeHandle handler;
-    logger2manager_pub = handler.advertise<messages::Status>("status", 10);
+    status_logger2manager_pub = handler.advertise<messages::Status>("status", 10);
+    event_logger2manager_pub = handler.advertise<messages::Event>("event", 10);
 }
 
 void Logger::receiveStatus(const messages::Status::ConstPtr& msg) {
@@ -36,11 +37,30 @@ void Logger::receiveStatus(const messages::Status::ConstPtr& msg) {
     fp.close();
 
     //forward
-    logger2manager_pub.publish(msg);
+    status_logger2manager_pub.publish(msg);
+}
+
+void Logger::receiveEvent(const messages::Event::ConstPtr& msg) {
+    //ROS_INFO("I heard: [%s]", msg->task_id.c_str());
+    ++logical_clock;
+
+    // persist
+    fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::app);
+    fp << logical_clock << ",";
+    fp << this->now() << ",";
+    fp << msg->type << ",";
+    fp << msg->description << "\n";
+
+    fp.close();
+
+    //forward
+    event_logger2manager_pub.publish(msg);
 }
 
 void Logger::run(){
     ros::NodeHandle n;
-    ros::Subscriber sub = n.subscribe("log_status", 1000, &Logger::receiveStatus, this);
+    ros::Subscriber status_sub = n.subscribe("log_status", 1000, &Logger::receiveStatus, this);
+    ros::Subscriber event_sub = n.subscribe("log_event", 1000, &Logger::receiveEvent, this);
+    
     ros::spin();
 }

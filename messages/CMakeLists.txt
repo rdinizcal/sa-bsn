@@ -26,6 +26,7 @@ FIND_PACKAGE(catkin REQUIRED COMPONENTS std_msgs message_generation)
 ADD_MESSAGE_FILES( FILES
   application/internal/SensorData.msg
   application/external/Status.msg
+  application/external/Event.msg
   manager/external/CommandControl.msg
 )
 

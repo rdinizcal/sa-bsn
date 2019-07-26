@@ -132,6 +132,7 @@ void G3T1_4::setUp() {
     }
     
     status_pub =  n.advertise<messages::Status>("collect_status", 10);
+    event_pub =  n.advertise<messages::Event>("collect_event", 10);
 }
 
 void G3T1_4::tearDown() {
@@ -148,13 +149,13 @@ void G3T1_4::sendStatus(const std::string &id, const double &value) {
     status_pub.publish(msg);
 }
 
+void G3T1_4::sendEvent(const std::string &type, const std::string &description) {
+    messages::Event msg;
 
-void G3T1_4::receiveControlCommand(const messages::ControlCommand::ConstPtr& msg)  {
-    active = msg->active;
-    double newFreq;
-    newFreq = params["freq"] + msg->frequency;
-    std::cout << "Frequency changed from " << params["freq"] << " to " << newFreq << std::endl;
-    params["freq"] = newFreq;
+    msg.type = type;
+    msg.description = description;
+
+    event_pub.publish(msg);
 }
 
 void G3T1_4::run() {
@@ -174,9 +175,10 @@ void G3T1_4::run() {
 
     ros::Publisher systolic_pub = n.advertise<messages::SensorData>("systolic_data", 10);
     ros::Publisher diastolic_pub = n.advertise<messages::SensorData>("diastolic_data", 10);
-    ros::Subscriber ecgSub = n.subscribe("abp_control_command", 10, &G3T1_4::receiveControlCommand, this);
 
     ros::Rate loop_rate(params["freq"]);
+
+    sendStatus("CTX_G3_T1_4", active?1:0);
 
     while (ros::ok()) {
         loop_rate = ros::Rate(params["freq"]);        

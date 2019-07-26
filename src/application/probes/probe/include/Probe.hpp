@@ -8,6 +8,7 @@
 #include "ros/ros.h"
 
 #include "messages/Status.h"
+#include "messages/Event.h"
 
 class Probe {
 
@@ -24,9 +25,10 @@ class Probe {
 
   	public:
 		void receiveStatus(const messages::Status::ConstPtr& /*msg*/);
+		void receiveEvent(const messages::Event::ConstPtr& /*msg*/);
 
   	private:
-	  ros::Publisher status_pub;
+	  ros::Publisher status_pub, event_pub;
 };
 
 #endif 

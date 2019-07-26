@@ -9,6 +9,7 @@
 #include <ros/package.h>
 
 #include "messages/Status.h"
+#include "messages/Event.h"
 
 class Logger {
 
@@ -27,13 +28,15 @@ class Logger {
 
   	public:
 	  	void receiveStatus(const messages::Status::ConstPtr& /*msg*/);
+	  	void receiveEvent(const messages::Event::ConstPtr& /*msg*/);
+
 
   	private:
 		std::fstream fp;
 		std::string filepath;
 		int32_t logical_clock;
 
-		ros::Publisher logger2manager_pub;
+		ros::Publisher status_logger2manager_pub, event_logger2manager_pub;
 };
 
 #endif 
