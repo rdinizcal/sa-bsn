@@ -150,14 +150,16 @@ void G3T1_1::run(){
 
     ros::Rate loop_rate(params["freq"]);
 
-    sendStatus("CTX_G3_T1_1",1);
+    //sendStatus("CTX_G3_T1_1",1);
 
     while (ros::ok()) {
         loop_rate = ros::Rate(params["freq"]);
 
+        /*
         { // update controller with task info            
-            sendStatus("CTX_G3_T1_1",1);
+            //sendStatus("CTX_G3_T1_1",1);
 
+            
             sendStatus("C_G3_T1.11",0.1);
             sendStatus("R_G3_T1.11",data_accuracy);
             sendStatus("F_G3_T1.11",params["freq"]);
@@ -169,8 +171,10 @@ void G3T1_1::run(){
             sendStatus("C_G3_T1.13",0.1);
             sendStatus("R_G3_T1.13",comm_accuracy);
             sendStatus("F_G3_T1.13",params["freq"]);
+            
 
         }
+        */
 
         { // recharge routine
             //for debugging
@@ -182,7 +186,7 @@ void G3T1_1::run(){
                 active = false;
             }
             
-            sendStatus("CTX_G3_T1_1", active?1:0);
+            //sendStatus("CTX_G3_T1_1", active?1:0);
         }
 
         if (!active) { 
@@ -192,8 +196,7 @@ void G3T1_1::run(){
 
         /*
          * Module execution
-         */           
-           
+        **/              
         { // TASK: Collect oximeter data with data_accuracy
             data = dataGenerator.getValue();
                 
@@ -246,6 +249,7 @@ void G3T1_1::run(){
                         (std::chrono::high_resolution_clock::now()).time_since_epoch()).count() << std::endl;
             }
         }
+        
         ros::spinOnce();
 
         loop_rate.sleep();

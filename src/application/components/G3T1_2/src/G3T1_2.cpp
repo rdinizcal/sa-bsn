@@ -160,6 +160,7 @@ void G3T1_2::run() {
     while (ros::ok()) {
         loop_rate = ros::Rate(params["freq"]);
 
+        /*
         { // update controller with task info            
             sendStatus("CTX_G3_T1_2",1);
 
@@ -176,6 +177,7 @@ void G3T1_2::run() {
             sendStatus("F_G3_T1.23",params["freq"]);
 
         }
+        */
 
         { // recharge routine
             //for debugging
