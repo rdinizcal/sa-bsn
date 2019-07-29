@@ -6,6 +6,7 @@ using namespace bsn::operation;
 using namespace bsn::configuration;
 
 G3T1_1::G3T1_1(const int32_t &argc, char **argv) :
+    SchedulableComponent(argc, argv),
     type("oximeter"),
     battery("oxi_batt", 100, 100, 1),
     available(true),
@@ -89,7 +90,6 @@ void G3T1_1::setUp() {
         sensorConfig = SensorConfiguration(0, low_range, midRanges, highRanges, percentages);
     }
 
- 
     { // Configure sensor data_accuracy
         configHandler.getParam("data_accuracy", d);
         data_accuracy = d / 100;
@@ -112,20 +112,32 @@ void G3T1_1::setUp() {
     status_pub = n.advertise<messages::Status>("collect_status", 10);
     event_pub = n.advertise<messages::Event>("collect_event", 10);
 
+    { // Configure module descriptor for scheduling
+        double freq, check_frequency;
+        int32_t deadline, wce;
+
+        moduleDescriptor.setName(ros::this_node::getName());
+
+        configHandler.getParam("frequency", freq);
+        moduleDescriptor.setFreq(freq);
+
+        configHandler.getParam("deadline", deadline);
+        moduleDescriptor.setDeadline(static_cast<int32_t>(deadline));
+
+        configHandler.getParam("wce", wce);
+        moduleDescriptor.setWorstCaseExecutionTime(static_cast<int32_t>(wce));
+
+        configHandler.getParam("check_frequency", check_frequency);
+        setCheckFrequency(check_frequency);
+
+        moduleDescriptor.setConnection(true);
+    }
+
 }
 
 void G3T1_1::tearDown() {
     if (persist)
         fp.close();
-}
-
-void G3T1_1::sendStatus(const std::string &id, const double &value) {
-    messages::Status msg;
-
-    msg.key = id;
-    msg.value = value;
-
-    status_pub.publish(msg);
 }
 
 void G3T1_1::sendEvent(const std::string &type, const std::string &description) {
@@ -137,7 +149,16 @@ void G3T1_1::sendEvent(const std::string &type, const std::string &description) 
     event_pub.publish(msg);
 }
 
-void G3T1_1::run(){
+void G3T1_1::sendStatus(const std::string &id, const double &value) {
+    messages::Status msg;
+
+    msg.key = id;
+    msg.value = value;
+
+    status_pub.publish(msg);
+}
+
+void G3T1_1::body(){
     double data;
     double risk;
     bool first_exec = true;
@@ -150,52 +171,22 @@ void G3T1_1::run(){
 
     dataPub = n.advertise<messages::SensorData>("oximeter_data", 10);
 
-    ros::Rate loop_rate(params["freq"]);
+    //ros::Rate loop_rate(params["freq"]);
 
-    sendStatus("CTX_G3_T1_1",1);
-
-    while (ros::ok()) {
-        loop_rate = ros::Rate(params["freq"]);
-
-        /*
-        { // update controller with task info            
-            //sendStatus("CTX_G3_T1_1",1);
-
-            
-            sendStatus("C_G3_T1.11",0.1);
-            sendStatus("R_G3_T1.11",data_accuracy);
-            sendStatus("F_G3_T1.11",params["freq"]);
-
-            sendStatus("C_G3_T1.12",0.1*params["m_avg"]);
-            sendStatus("R_G3_T1.12",1);
-            sendStatus("F_G3_T1.12",params["freq"]);
-
-            sendStatus("C_G3_T1.13",0.1);
-            sendStatus("R_G3_T1.13",comm_accuracy);
-            sendStatus("F_G3_T1.13",params["freq"]);
-            
-
+    { // recharge routine
+        //for debugging
+        std::cout << "Battery level: " << battery.getCurrentLevel() << "%" << std::endl;
+        if(!active && battery.getCurrentLevel() > 90){
+            active = true;
         }
-        */
-
-        { // recharge routine
-            //for debugging
-            std::cout << "Battery level: " << battery.getCurrentLevel() << "%" << std::endl;
-            if(!active && battery.getCurrentLevel() > 90){
-                active = true;
-            }
-            if(active && battery.getCurrentLevel() < 2){
-                active = false;
-            }
-            
-            sendStatus("CTX_G3_T1_1", active?1:0);
+        if(active && battery.getCurrentLevel() < 2){
+            active = false;
         }
+        
+        sendStatus("CTX_G3_T1_1", active?1:0);
+    }
 
-        if (!active) { 
-            if(battery.getCurrentLevel() <= 100) battery.generate(2.5);
-            continue; 
-        }
-
+    if (active) { 
         /*
          * Module execution
         **/              
@@ -241,21 +232,18 @@ void G3T1_1::run(){
             std::cout << "Risk: " << risk << "%" << std::endl;
         }
 
-        { // Persist sensor data
-            if (persist) {
-                fp << id++ << ",";
-                fp << data << ",";
-                fp << risk << ",";
-                fp << std::chrono::duration_cast<std::chrono::milliseconds>
-                        (std::chrono::time_point_cast<std::chrono::milliseconds>
-                        (std::chrono::high_resolution_clock::now()).time_since_epoch()).count() << std::endl;
-            }
-        }
-        
-        ros::spinOnce();
-
-        loop_rate.sleep();
+    } else {
+        if(battery.getCurrentLevel() <= 100) battery.generate(2.5);            
     }
-
-    return tearDown();
+    
+    { // Persist sensor data
+        if (persist) {
+            fp << id++ << ",";
+            fp << data << ",";
+            fp << risk << ",";
+            fp << std::chrono::duration_cast<std::chrono::milliseconds>
+                    (std::chrono::time_point_cast<std::chrono::milliseconds>
+                    (std::chrono::high_resolution_clock::now()).time_since_epoch()).count() << std::endl;
+        }
+    }
 }

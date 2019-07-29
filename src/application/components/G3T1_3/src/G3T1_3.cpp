@@ -8,6 +8,7 @@ using namespace bsn::configuration;
 
 
 G3T1_3::G3T1_3(const int32_t &argc, char **argv) :
+    SchedulableComponent(argc, argv),
     type("thermometer"),
     battery("therm_batt", 100, 100, 1),
     available(true),
@@ -118,20 +119,32 @@ void G3T1_3::setUp() {
     status_pub =  n.advertise<messages::Status>("collect_status", 10);
     event_pub =  n.advertise<messages::Event>("collect_event", 10);
 
+    { // Configure module descriptor for scheduling
+        double freq, check_frequency;
+        int32_t deadline, wce;
+
+        moduleDescriptor.setName(ros::this_node::getName());
+
+        configHandler.getParam("frequency", freq);
+        moduleDescriptor.setFreq(freq);
+
+        configHandler.getParam("deadline", deadline);
+        moduleDescriptor.setDeadline(static_cast<int32_t>(deadline));
+
+        configHandler.getParam("wce", wce);
+        moduleDescriptor.setWorstCaseExecutionTime(static_cast<int32_t>(wce));
+
+        configHandler.getParam("check_frequency", check_frequency);
+        setCheckFrequency(check_frequency);
+
+        moduleDescriptor.setConnection(true);
+    }
+
 }
 
 void G3T1_3::tearDown() {
     if (persist)
         fp.close();
-}
-
-void G3T1_3::sendStatus(const std::string &id, const double &value) {
-    messages::Status msg;
-
-    msg.key = id;
-    msg.value = value;
-
-    status_pub.publish(msg);
 }
 
 void G3T1_3::sendEvent(const std::string &type, const std::string &description) {
@@ -143,8 +156,16 @@ void G3T1_3::sendEvent(const std::string &type, const std::string &description) 
     event_pub.publish(msg);
 }
 
-void G3T1_3::run() {
-    // Container container;
+void G3T1_3::sendStatus(const std::string &id, const double &value) {
+    messages::Status msg;
+
+    msg.key = id;
+    msg.value = value;
+
+    status_pub.publish(msg);
+}
+
+void G3T1_3::body() {
     double data;
     double risk;
     bool first_exec = true;
@@ -152,115 +173,87 @@ void G3T1_3::run() {
     bsn::generator::DataGenerator dataGenerator(markov);
 
     messages::SensorData msg;
+    msg.type = "thermometer";
     ros::NodeHandle n;
 
     dataPub = n.advertise<messages::SensorData>("thermometer_data", 10);
 
-    ros::Rate loop_rate(params["freq"]);
-    msg.type = "thermometer";
+    //ros::Rate loop_rate(params["freq"]);
 
-    sendStatus("CTX_G3_T1_3", 1);
-    
-    while (ros::ok()) {
-        loop_rate = ros::Rate(params["freq"]);
-        
-        /*
-        { // update controller with task info        
-            sendStatus("CTX_G3_T1_3",1);
-
-            sendStatus("C_G3_T1.31", 0.1);
-            sendStatus("R_G3_T1.31", data_accuracy);
-            sendStatus("F_G3_T1.31", params["freq"]);
-
-            sendStatus("C_G3_T1.32", 0.1*params["m_avg"]);
-            sendStatus("R_G3_T1.32", 1);
-            sendStatus("F_G3_T1.32", params["freq"]);
-
-            sendStatus("C_G3_T1.33", 0.1);
-            sendStatus("R_G3_T1.33", comm_accuracy);
-            sendStatus("F_G3_T1.33", params["freq"]);
+    { // recharge routine
+        //for debugging
+        std::cout << "Battery level: " << battery.getCurrentLevel() << "%" << std::endl;
+        if(!active && battery.getCurrentLevel() > 90){
+            active = true;
         }
-        */
-
-        { // recharge routine
-            //for debugging
-            std::cout << "Battery level: " << battery.getCurrentLevel() << "%" << std::endl;
-            if(!active && battery.getCurrentLevel() > 90){
-                active = true;
-            }
-            if(active && battery.getCurrentLevel() < 2){
-                active = false;
-            }
-            
-            sendStatus("CTX_G3_T1_3", active?1:0);
-        }
-
-        /*
-        * Receive control command and module update
-        */
-        if(!active){ 
-            if(battery.getCurrentLevel() <= 100) battery.generate(2.5);
-            continue; 
-        }
-
-        /*
-         * Module execution
-         */
-        { // TASK: Collect thermometer data with data_accuracy
-            data = dataGenerator.getValue();
-            
-            double offset = (1 - data_accuracy + (double)rand() / RAND_MAX * (1 - data_accuracy)) * data;
-
-            if (rand() % 2 == 0)
-                data = data + offset;
-            else
-                data = data - offset;
-
-            battery.consume(0.1);
-
-
-            //for debugging
-            std::cout << "New data: " << data << std::endl << std::endl;
-        }
-
-        { // TASK: Filter data with moving average
-            filter.setRange(params["m_avg"]);
-            filter.insert(data, type);
-            data = filter.getValue(type);
-            battery.consume(0.1*params["m_avg"]);
-
-            msg.data = data;
-            //for debugging
-            std::cout << "Filtered data: " << data << std::endl;
+        if(active && battery.getCurrentLevel() < 2){
+            active = false;
         }
         
-        { // TASK: Transfer information to CentralHub
-            risk = sensorConfig.evaluateNumber(data);
-            msg.risk = risk;
-            battery.consume(2);
-            msg.batt = battery.getCurrentLevel();
-
-            if ((rand() % 100) <= comm_accuracy * 100)
-                dataPub.publish(msg);
-            
-            // for debugging
-            std::cout << "Risk: " << risk << "%" << std::endl;
-        }
-
-        { // Persist sensor data
-            if (persist) {
-                fp << id++ << ",";
-                fp << data << ",";
-                fp << risk << ",";
-                fp << std::chrono::duration_cast<std::chrono::milliseconds>
-                        (std::chrono::time_point_cast<std::chrono::milliseconds>
-                        (std::chrono::high_resolution_clock::now()).time_since_epoch()).count() << std::endl;
-            }
-        }
-        ros::spinOnce();
-
-        loop_rate.sleep();
+        sendStatus("CTX_G3_T1_3", active?1:0);
     }
 
-    return tearDown();
+    /*
+    * Receive control command and module update
+    */
+    if(active){
+
+    /*
+        * Module execution
+        */
+    { // TASK: Collect thermometer data with data_accuracy
+        data = dataGenerator.getValue();
+        
+        double offset = (1 - data_accuracy + (double)rand() / RAND_MAX * (1 - data_accuracy)) * data;
+
+        if (rand() % 2 == 0)
+            data = data + offset;
+        else
+            data = data - offset;
+
+        battery.consume(0.1);
+
+
+        //for debugging
+        std::cout << "New data: " << data << std::endl << std::endl;
+    }
+
+    { // TASK: Filter data with moving average
+        filter.setRange(params["m_avg"]);
+        filter.insert(data, type);
+        data = filter.getValue(type);
+        battery.consume(0.1*params["m_avg"]);
+
+        msg.data = data;
+        //for debugging
+        std::cout << "Filtered data: " << data << std::endl;
+    }
+    
+    { // TASK: Transfer information to CentralHub
+        risk = sensorConfig.evaluateNumber(data);
+        msg.risk = risk;
+        battery.consume(2);
+        msg.batt = battery.getCurrentLevel();
+
+        if ((rand() % 100) <= comm_accuracy * 100)
+            dataPub.publish(msg);
+        
+        // for debugging
+        std::cout << "Risk: " << risk << "%" << std::endl;
+    }
+
+    } else {
+        if(battery.getCurrentLevel() <= 100) battery.generate(2.5);
+    }
+
+    { // Persist sensor data
+        if (persist) {
+            fp << id++ << ",";
+            fp << data << ",";
+            fp << risk << ",";
+            fp << std::chrono::duration_cast<std::chrono::milliseconds>
+                    (std::chrono::time_point_cast<std::chrono::milliseconds>
+                    (std::chrono::high_resolution_clock::now()).time_since_epoch()).count() << std::endl;
+        }
+    }
 }

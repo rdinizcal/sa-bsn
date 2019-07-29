@@ -3,6 +3,7 @@
 using namespace bsn::processor;
 
 G4T1::G4T1(const int32_t &argc, char **argv) :
+    SchedulableComponent(argc, argv),
     active(true),
     params({{"freq",1}}),
     connect(true),
@@ -31,6 +32,27 @@ void G4T1::setUp() {
     for(std::vector<std::list<double>>::iterator it = data_list.begin();
         it != data_list.end(); ++it) {
             (*it).push_back(0.0);
+    }
+
+    { // Configure module descriptor for scheduling
+        double freq, check_frequency;
+        int32_t deadline, wce;
+
+        moduleDescriptor.setName(ros::this_node::getName());
+
+        configHandler.getParam("frequency", freq);
+        moduleDescriptor.setFreq(freq);
+
+        configHandler.getParam("deadline", deadline);
+        moduleDescriptor.setDeadline(static_cast<int32_t>(deadline));
+
+        configHandler.getParam("wce", wce);
+        moduleDescriptor.setWorstCaseExecutionTime(static_cast<int32_t>(wce));
+
+        configHandler.getParam("check_frequency", check_frequency);
+        setCheckFrequency(check_frequency);
+
+        moduleDescriptor.setConnection(true);
     }
 }
 
@@ -185,7 +207,11 @@ void G4T1::receiveSensorData(const messages::SensorData::ConstPtr& msg) {
     std::cout << "*****************************************" << std::endl;
 }
 
-void G4T1::run() {   
+void G4T1::sendEvent(const std::string &type, const std::string &description) {}
+
+void G4T1::sendStatus(const std::string &id, const double &value) {}
+
+void G4T1::body() {   
     ros::NodeHandle nh;
     
     ros::Subscriber thermometerSub = nh.subscribe("thermometer_data", 10, &G4T1::receiveSensorData, this);
@@ -194,7 +220,5 @@ void G4T1::run() {
     ros::Subscriber diastolicSub = nh.subscribe("diastolic_data", 10, &G4T1::receiveSensorData, this);
     ros::Subscriber systolicSub = nh.subscribe("systolic_data", 10, &G4T1::receiveSensorData, this);
 
-    ros::spin();
-
-    return;
+    //ros::spin();
 }

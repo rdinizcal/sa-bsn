@@ -1,6 +1,11 @@
 <launch> 
     <node name="g4t1" pkg="g4t1" type="g4t1" output="screen" />
 
+    <param name="frequency" value="1" />
+    <param name="deadline" value="1000000" />
+    <param name="wce" value="10" />
+    <param name="check_frequency" value="3" />
+
     <param name="connect" value="true" type="bool" />
 
     <!-- Firebase Realtime Database -->

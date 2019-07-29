@@ -4,13 +4,13 @@ PROJECT(g3t1_2)
 add_compile_options(-std=c++11)
 
 ## Find catkin and any catkin packages
-FIND_PACKAGE(catkin REQUIRED COMPONENTS roscpp std_msgs genmsg messages)
+FIND_PACKAGE(catkin REQUIRED COMPONENTS roscpp std_msgs genmsg messages component)
 
 # Export catkin package.
 CATKIN_PACKAGE(
     INCLUDE_DIRS include
     LIBRARIES ${PROJECT_NAME}
-    CATKIN_DEPENDS messages message_runtime
+    CATKIN_DEPENDS messages message_runtime component
 )
 
 ###########################################################################
@@ -21,13 +21,18 @@ INCLUDE_DIRECTORIES(include ${catkin_INCLUDE_DIRS})
 SET (BSN_INCLUDE_DIRS /usr/local/include/bsn)
 INCLUDE_DIRECTORIES (${BSN_INCLUDE_DIRS})
 
+# Set header files from component package.
+SET (COMPONENT_INCLUDE_DIRS component)
+INCLUDE_DIRECTORIES (${COMPONENT_INCLUDE_DIRS})
+
 # Set include directory.
 INCLUDE_DIRECTORIES(include)
 
 ###########################################################################
 # Add and Set linking libraries to successfully link test suites and binaries.
 FIND_LIBRARY(BSN_LIBRARY bsn)
-SET (LIBRARIES ${BSN_LIBRARY})
+FIND_LIBRARY(COMPONENT_LIBRARY component)
+SET (LIBRARIES ${BSN_LIBRARY} ${COMPONENT_LIBRARY})
 
 ###########################################################################
 # Build this project.

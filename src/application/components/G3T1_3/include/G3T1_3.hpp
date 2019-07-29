@@ -16,27 +16,29 @@
 #include "bsn/operation/Operation.hpp"
 #include "bsn/configuration/SensorConfiguration.hpp"
 
+#include "component/SchedulableComponent.hpp"
+
 #include "messages/SensorData.h"
 #include "messages/Status.h"
 #include "messages/Event.h"
 
-class G3T1_3 {
+class G3T1_3 : public SchedulableComponent {
     
 	private:
       	G3T1_3(const G3T1_3 &);
     	G3T1_3 &operator=(const G3T1_3 &);
 		
+  	public:
+    	G3T1_3(const int32_t &argc, char **argv);
+    	virtual ~G3T1_3();
+    	
+		virtual void setUp();
+    	virtual void tearDown();
+		void body();
+
 		void sendStatus(const std::string &/*id*/, const double &/*value*/);
 		void sendEvent(const std::string &/*type*/, const std::string &/*description*/);
 
-  	public:
-    	virtual void setUp();
-    	virtual void tearDown();
-
-    	G3T1_3(const int32_t &argc, char **argv);
-    	virtual ~G3T1_3();
-
-    	void run();
 
   	private:
 		std::string type;

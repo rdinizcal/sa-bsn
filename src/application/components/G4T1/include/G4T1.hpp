@@ -14,15 +14,16 @@
 #include "bsn/processor/Processor.hpp"
 #include "bsn/operation/Operation.hpp"
 
+#include "component/SchedulableComponent.hpp"
+
 #include "messages/SensorData.h"
 #include "messages/SystemInfo.h"
 
-class G4T1 {
+class G4T1 : public SchedulableComponent {
     
     private:
         G4T1(const G4T1 & /*obj*/);
         G4T1 &operator=(const G4T1 & /*obj*/);
-        virtual void tearDown();   
 
         void receiveSensorData(const messages::SensorData::ConstPtr&);
         void receiveSystemInfo(const messages::SystemInfo::ConstPtr&); 
@@ -32,11 +33,15 @@ class G4T1 {
         std::vector<std::string> getPatientStatus();
 
     public:
-        void setUp();
         G4T1(const int32_t &argc, char **argv);
         virtual ~G4T1();
 
-        void run();
+        void setUp();
+        void tearDown();   
+        void body();
+
+        void sendEvent(const std::string &/*type*/, const std::string &/*description*/);
+		void sendStatus(const std::string &/*key*/, const double &/*value*/);
 
     private:
         bool active;

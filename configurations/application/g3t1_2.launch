@@ -1,6 +1,11 @@
 <launch> 
     <node name="g3t1_2" pkg="g3t1_2" type="g3t1_2" output="screen" />
 
+    <param name="frequency" value="1" />
+    <param name="deadline" value="1000000" />
+    <param name="wce" value="10" />
+    <param name="check_frequency" value="3" />
+    
     <!-- Defines the percentages to consider low, moderate or high risk -->
     <param name="lowrisk" value="0,20" />
     <param name="midrisk" value="21,65" />

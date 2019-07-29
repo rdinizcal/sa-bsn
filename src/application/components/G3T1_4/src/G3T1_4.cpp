@@ -8,6 +8,7 @@ using namespace bsn::configuration;
 
 
 G3T1_4::G3T1_4(const int32_t &argc, char **argv) :
+    SchedulableComponent(argc, argv),
     type("bloodpressure"),
     battery("bp_batt",100,100,1),
     available(true),
@@ -133,20 +134,33 @@ void G3T1_4::setUp() {
     
     status_pub =  n.advertise<messages::Status>("collect_status", 10);
     event_pub =  n.advertise<messages::Event>("collect_event", 10);
+
+    { // Configure module descriptor for scheduling
+        double freq, check_frequency;
+        int32_t deadline, wce;
+
+        moduleDescriptor.setName(ros::this_node::getName());
+
+        configHandler.getParam("frequency", freq);
+        moduleDescriptor.setFreq(freq);
+
+        configHandler.getParam("deadline", deadline);
+        moduleDescriptor.setDeadline(static_cast<int32_t>(deadline));
+
+        configHandler.getParam("wce", wce);
+        moduleDescriptor.setWorstCaseExecutionTime(static_cast<int32_t>(wce));
+
+        configHandler.getParam("check_frequency", check_frequency);
+        setCheckFrequency(check_frequency);
+
+        moduleDescriptor.setConnection(true);
+    }
+
 }
 
 void G3T1_4::tearDown() {
     if (persist)
         fp.close();
-}
-
-void G3T1_4::sendStatus(const std::string &id, const double &value) {
-    messages::Status msg;
-
-    msg.key = id;
-    msg.value = value;
-
-    status_pub.publish(msg);
 }
 
 void G3T1_4::sendEvent(const std::string &type, const std::string &description) {
@@ -158,7 +172,16 @@ void G3T1_4::sendEvent(const std::string &type, const std::string &description) 
     event_pub.publish(msg);
 }
 
-void G3T1_4::run() {
+void G3T1_4::sendStatus(const std::string &id, const double &value) {
+    messages::Status msg;
+
+    msg.key = id;
+    msg.value = value;
+
+    status_pub.publish(msg);
+}
+
+void G3T1_4::body() {
     double dataS;
     double dataD;
     double risk;
@@ -170,59 +193,27 @@ void G3T1_4::run() {
     messages::SensorData msgS, msgD;
     msgS.type = "bpms";
     msgD.type = "bpmd";
-
     ros::NodeHandle n;
 
     ros::Publisher systolic_pub = n.advertise<messages::SensorData>("systolic_data", 10);
     ros::Publisher diastolic_pub = n.advertise<messages::SensorData>("diastolic_data", 10);
 
-    ros::Rate loop_rate(params["freq"]);
+    //ros::Rate loop_rate(params["freq"]);
 
-    sendStatus("CTX_G3_T1_4", active?1:0);
-
-    while (ros::ok()) {
-        loop_rate = ros::Rate(params["freq"]);        
-
-        /*
-        {  // update controller with task info
-            sendStatus("CTX_G3_T1_4",1);
-
-            sendStatus("C_G3_T1.411", 0.1);
-            sendStatus("R_G3_T1.411", systdata_accuracy);
-            sendStatus("F_G3_T1.411", params["freq"]);
-
-            sendStatus("C_G3_T1.412", 0.1);
-            sendStatus("R_G3_T1.412", diasdata_accuracy);
-            sendStatus("F_G3_T1.412", params["freq"]);
-
-            sendStatus("C_G3_T1.42", 0.1*params["m_avg"]*2);
-            sendStatus("R_G3_T1.42", 1);
-            sendStatus("F_G3_T1.42", params["freq"]);
-
-            sendStatus("C_G3_T1.43", 0.1*2);
-            sendStatus("R_G3_T1.43", (systcomm_accuracy+diascomm_accuracy)/2);
-            sendStatus("F_G3_T1.43", params["freq"]);
+    { // recharge routine
+        //for debugging
+        std::cout << "Battery level: " << battery.getCurrentLevel() << "%" <<std::endl;
+        if(!active && battery.getCurrentLevel() > 90){
+            active = true;
         }
-        */
-
-        { // recharge routine
-            //for debugging
-           std::cout << "Battery level: " << battery.getCurrentLevel() << "%" <<std::endl;
-            if(!active && battery.getCurrentLevel() > 90){
-                active = true;
-            }
-            if(active && battery.getCurrentLevel() < 2){
-                active = false;
-            }
-
-            sendStatus("CTX_G3_T1_4", active?1:0);
+        if(active && battery.getCurrentLevel() < 2){
+            active = false;
         }
 
-        if (!active) { 
-            if(battery.getCurrentLevel() <= 100) battery.generate(2.5);
-            continue; 
-        }
+        sendStatus("CTX_G3_T1_4", active?1:0);
+    }
 
+    if (active) { 
         { // TASK: Collect bloodpressure data            
             dataS = dataGeneratorSys.getValue();      
 
@@ -294,22 +285,19 @@ void G3T1_4::run() {
             // for debugging
             std::cout << "Risk: " << risk << "%"  <<std::endl;
         }
-
-        { // Persist sensor data
-            if (persist) {
-              fp << id++ << ",";
-              fp << dataS << ",";
-              fp << dataD << ",";
-              fp << risk << ",";
-              fp << std::chrono::duration_cast<std::chrono::milliseconds>
-                        (std::chrono::time_point_cast<std::chrono::milliseconds>
-                        (std::chrono::high_resolution_clock::now()).time_since_epoch()).count() << std::endl;
-            }
-        }
-        ros::spinOnce();
-
-        loop_rate.sleep();
+    } else {
+        if(battery.getCurrentLevel() <= 100) battery.generate(2.5);
+        
     }
-
-    return tearDown();
+    { // Persist sensor data
+        if (persist) {
+            fp << id++ << ",";
+            fp << dataS << ",";
+            fp << dataD << ",";
+            fp << risk << ",";
+            fp << std::chrono::duration_cast<std::chrono::milliseconds>
+                    (std::chrono::time_point_cast<std::chrono::milliseconds>
+                    (std::chrono::high_resolution_clock::now()).time_since_epoch()).count() << std::endl;
+        }
+    }
 }
