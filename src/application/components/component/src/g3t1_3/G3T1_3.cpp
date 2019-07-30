@@ -224,7 +224,7 @@ void G3T1_3::body() {
         data = filter.getValue(type);
         battery.consume(0.1*params["m_avg"]);
 
-        msg.data = data;
+       msg.data = data;
         //for debugging
         std::cout << "Filtered data: " << data << std::endl;
     }

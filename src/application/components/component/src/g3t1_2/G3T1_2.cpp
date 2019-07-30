@@ -220,7 +220,7 @@ void G3T1_2::body() {
             battery.consume(0.1*params["m_avg"]);
             
             //for debugging
-            msg.data = data;
+           msg.data = data;
             std::cout << "Filtered data: " << data << std::endl;
         }
         

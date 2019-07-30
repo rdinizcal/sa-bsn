@@ -89,7 +89,7 @@ void SchedulableComponent::setUp() {
 
 	//Publishing in finish topic, which indicates end of module's execution
 	finish_topic_name = topic_name + "_finish";
-	scheduling_pub = finish_scheduling_handler.advertise<messages::FinishMessage>(finish_topic_name = topic_name + "_finish", 1);
+	scheduling_pub = finish_scheduling_handler.advertise<messages::Finish>(finish_topic_name = topic_name + "_finish", 1);
 }
 
 /********************************************************************************
@@ -97,19 +97,19 @@ void SchedulableComponent::setUp() {
 
  -> Note: If module receives it's name, execution is allowed
 
- @param: const std_msgs::StringConstPtr& msg - name received
+ @param: const messages::Init& msg - name received
 *********************************************************************************/
-void SchedulableComponent::schedulingCallback(const std_msgs::StringConstPtr& msg) {
-	ROS_INFO("I heard: [%s]", msg->data.c_str());
-	received_name = msg->data;
+void SchedulableComponent::schedulingCallback(const messages::Init& msg) {
+	ROS_INFO("I heard: [%s]", msg.module_name.c_str());
+	received_name = msg.module_name;
 
 	body();
 
 	ros::Time finish_time = ros::Time::now();
 
-	messages::FinishMessage f_msg;
+	messages::Finish f_msg;
 
-	f_msg.name = ros::this_node::getName();
+	f_msg.module_name= ros::this_node::getName();
 	f_msg.sec = finish_time.sec;
 	f_msg.nsec = finish_time.nsec;
 
@@ -151,7 +151,7 @@ void SchedulableComponent::run() {
 
 			ros::Time finish_time = ros::Time::now();
 
-			messages::FinishMessage msg;
+			messages::Finish msg;
 
 			msg.name = ros::this_node::getName();
 			msg.sec = finish_time.sec;
