@@ -1,32 +1,30 @@
-#include "G3T1_3.hpp"
+#include "component/g3t1_2/G3T1_2.hpp"
 
 using namespace bsn::range;
-using namespace bsn::resource;
 using namespace bsn::generator;
 using namespace bsn::operation;
 using namespace bsn::configuration;
 
-
-G3T1_3::G3T1_3(const int32_t &argc, char **argv) :
+G3T1_2::G3T1_2(const int32_t &argc, char **argv) :
     SchedulableComponent(argc, argv),
-    type("thermometer"),
-    battery("therm_batt", 100, 100, 1),
+    type("ecg"),
+    battery("ecg_batt", 100, 100, 1),
     available(true),
     data_accuracy(1),
     comm_accuracy(1),
     active(true),
-    params({{"freq",0.9}, {"m_avg",5}}),
+    params({{"freq",0.9},{"m_avg",5}}),
     filter(5),
-    sensorConfig(),
     persist(1),
-    path("thermometer_output.csv") {}
+    path("ecg_output.csv") {}
 
-G3T1_3::~G3T1_3() {}
+G3T1_2::~G3T1_2() {}
 
-void G3T1_3::setUp() {
+void G3T1_2::setUp() {
     ros::NodeHandle configHandler, n;
     srand(time(NULL));
-    Operation op;    
+        
+    Operation op;
     
     std::vector<std::string> t_probs;
     std::array<float, 25> transitions;
@@ -139,24 +137,14 @@ void G3T1_3::setUp() {
 
         moduleDescriptor.setConnection(true);
     }
-
 }
 
-void G3T1_3::tearDown() {
+void G3T1_2::tearDown() {
     if (persist)
         fp.close();
 }
 
-void G3T1_3::sendEvent(const std::string &type, const std::string &description) {
-    messages::Event msg;
-
-    msg.type = type;
-    msg.description = description;
-
-    event_pub.publish(msg);
-}
-
-void G3T1_3::sendStatus(const std::string &id, const double &value) {
+void G3T1_2::sendStatus(const std::string &id, const double &value) {
     messages::Status msg;
 
     msg.key = id;
@@ -165,7 +153,16 @@ void G3T1_3::sendStatus(const std::string &id, const double &value) {
     status_pub.publish(msg);
 }
 
-void G3T1_3::body() {
+void G3T1_2::sendEvent(const std::string &type, const std::string &description) {
+    messages::Event msg;
+
+    msg.type = type;
+    msg.description = description;
+
+    event_pub.publish(msg);
+}
+
+void G3T1_2::body() {
     double data;
     double risk;
     bool first_exec = true;
@@ -173,74 +170,72 @@ void G3T1_3::body() {
     bsn::generator::DataGenerator dataGenerator(markov);
 
     messages::SensorData msg;
-    msg.type = "thermometer";
+    msg.type = "ecg";
+
     ros::NodeHandle n;
 
-    dataPub = n.advertise<messages::SensorData>("thermometer_data", 10);
+    dataPub = n.advertise<messages::SensorData>("ecg_data", 10);
 
     //ros::Rate loop_rate(params["freq"]);
 
     { // recharge routine
         //for debugging
         std::cout << "Battery level: " << battery.getCurrentLevel() << "%" << std::endl;
-        if(!active && battery.getCurrentLevel() > 90){
+        
+        if (!active && battery.getCurrentLevel() > 90) {
             active = true;
         }
-        if(active && battery.getCurrentLevel() < 2){
+        if (active && battery.getCurrentLevel() < 2) {
             active = false;
         }
         
-        sendStatus("CTX_G3_T1_3", active?1:0);
+        sendStatus("CTX_G3_T1_2", active?1:0);
     }
 
-    /*
-    * Receive control command and module update
-    */
-    if(active){
+    if(active){ 
 
-    /*
-        * Module execution
-        */
-    { // TASK: Collect thermometer data with data_accuracy
-        data = dataGenerator.getValue();
+        /*
+         * Module execution
+         */
+        { // TASK: Collect thermometer data with data_accuracy
+            data = dataGenerator.getValue();
+            
+            double offset = (1 - data_accuracy + (double)rand() / RAND_MAX * (1 - data_accuracy)) * data;
+
+            if (rand() % 2 == 0)
+                data = data + offset;
+            else
+                data = data - offset;
+
+            battery.consume(0.1);
+
+            //for debugging
+            std::cout << "New data: " << data << std::endl << std::endl;
+        }
+
+        { // TASK: Filter data with moving average
+            filter.setRange(params["m_avg"]);
+            filter.insert(data, type);
+            data = filter.getValue(type);
+            battery.consume(0.1*params["m_avg"]);
+            
+            //for debugging
+            msg.data = data;
+            std::cout << "Filtered data: " << data << std::endl;
+        }
         
-        double offset = (1 - data_accuracy + (double)rand() / RAND_MAX * (1 - data_accuracy)) * data;
+        { // TASK: Transfer information to CentralHub
+            risk = sensorConfig.evaluateNumber(data);
+            msg.risk = risk;
+            battery.consume(0.1);
+            msg.batt = battery.getCurrentLevel();
 
-        if (rand() % 2 == 0)
-            data = data + offset;
-        else
-            data = data - offset;
+            if ((rand() % 100) <= comm_accuracy * 100)
+                dataPub.publish(msg);
 
-        battery.consume(0.1);
-
-
-        //for debugging
-        std::cout << "New data: " << data << std::endl << std::endl;
-    }
-
-    { // TASK: Filter data with moving average
-        filter.setRange(params["m_avg"]);
-        filter.insert(data, type);
-        data = filter.getValue(type);
-        battery.consume(0.1*params["m_avg"]);
-
-        msg.data = data;
-        //for debugging
-        std::cout << "Filtered data: " << data << std::endl;
-    }
-    
-    { // TASK: Transfer information to CentralHub
-        risk = sensorConfig.evaluateNumber(data);
-        msg.risk = risk;
-        battery.consume(2);
-        msg.batt = battery.getCurrentLevel();
-
-        if ((rand() % 100) <= comm_accuracy * 100)
-            dataPub.publish(msg);
-        
-        // for debugging
-        std::cout << "Risk: " << risk << "%" << std::endl;
-    }
+            // for debugging
+            std::cout << "Risk: " << risk << "%" << std::endl;
+        }
 
     } else {
         if(battery.getCurrentLevel() <= 100) battery.generate(2.5);

@@ -1,10 +1,10 @@
 <launch> 
-    <node name="g4t1" pkg="g4t1" type="g4t1" output="screen" />
+    <node name="g4t1" pkg="component" type="g4t1" output="screen" />
 
-    <param name="frequency" value="1" />
-    <param name="deadline" value="1000000" />
-    <param name="wce" value="10" />
-    <param name="check_frequency" value="3" />
+    <param name="frequency" value="1" /> <!-- 1 Hz -->
+    <param name="deadline" value="1000000" /> <!-- 1 ns -->
+    <param name="wce" value="1000" /> <!-- 1000μs -->
+    <param name="check_frequency" value="3" /> <!-- 3 Hz -->
 
     <param name="connect" value="true" type="bool" />
 

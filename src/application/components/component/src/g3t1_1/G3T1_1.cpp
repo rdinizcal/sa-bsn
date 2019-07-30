@@ -1,4 +1,4 @@
-#include "G3T1_1.hpp"
+#include "component/g3t1_1/G3T1_1.hpp"
 
 using namespace bsn::range;
 using namespace bsn::generator;

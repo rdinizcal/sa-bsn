@@ -1,4 +1,4 @@
-#include "G4T1.hpp"
+#include "component/g4t1/G4T1.hpp"
 
 using namespace bsn::processor;
 

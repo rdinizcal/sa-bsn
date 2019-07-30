@@ -2,7 +2,7 @@
     <node name="scheduler" pkg="scheduler" type="scheduler" output="screen" />
 
     <!-- Defines the percentages to consider low, moderate or high risk -->
-    <param name="frequency" value="1" />
-    <param name="timeout" value="100" />
+    <param name="frequency" value="5" /> <!--5 Hz-->
+    <param name="timeout" value="10" /> <!--10 ms-->
 
 </launch>
