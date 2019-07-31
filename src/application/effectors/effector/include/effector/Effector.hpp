@@ -5,7 +5,7 @@
 
 #include "ros/ros.h"
 
-#include "services/SchedulerServerData.h"
+#include "services/EffectorRegister.h"
 #include "messages/ReconfigurationCommand.h"
 
 class Effector {
@@ -23,7 +23,7 @@ class Effector {
 
   	public:
 		void receiveReconfigurationCommand(const messages::ReconfigurationCommand::ConstPtr& /*msg*/);
-		bool moduleConnect(services::SchedulerServerData::Request &req, services::SchedulerServerData::Response &res);
+		bool moduleConnect(services::EffectorRegister::Request &req, services::EffectorRegister::Response &res);
 
   	private:
 		ros::NodeHandle handler;

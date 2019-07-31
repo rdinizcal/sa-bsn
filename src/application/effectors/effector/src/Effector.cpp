@@ -4,14 +4,18 @@ Effector::Effector(int  &argc, char **argv) {}
 Effector::~Effector() {}
 
 void Effector::setUp() {
-	register_service = handler.advertiseService("ModuleManagement", &Effector::moduleConnect, this);
+	register_service = handler.advertiseService("EffectorRegister", &Effector::moduleConnect, this);
 }
 
 void Effector::receiveReconfigurationCommand(const messages::ReconfigurationCommand::ConstPtr& msg) {
-    reconfigure_pub[msg->target].publish(msg);
+	if (reconfigure_pub.find(msg->target) != reconfigure_pub.end()){
+    	reconfigure_pub[msg->target].publish(msg);
+	} else {
+		ROS_INFO("ERROR, target not found! [%s]", msg->target.c_str());
+	}
 }
 
-bool Effector::moduleConnect(services::SchedulerServerData::Request &req, services::SchedulerServerData::Response &res) {
+bool Effector::moduleConnect(services::EffectorRegister::Request &req, services::EffectorRegister::Response &res) {
 
 	try {
 		if(req.connection == true) {

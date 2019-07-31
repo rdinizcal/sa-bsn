@@ -51,6 +51,7 @@ void Logger::receiveStatus(const messages::Status::ConstPtr& msg) {
     fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::app);
     fp << logical_clock << ",";
     fp << this->now() << ",";
+    fp << msg->source << ",";
     fp << msg->key << ",";
     fp << msg->value << "\n";
 
@@ -61,13 +62,14 @@ void Logger::receiveStatus(const messages::Status::ConstPtr& msg) {
 }
 
 void Logger::receiveEvent(const messages::Event::ConstPtr& msg) {
-    ROS_INFO("I heard: [%s: %s]", msg->type.c_str(), msg->description.c_str());
+    ROS_INFO("I heard: [%s: %s]", msg->source.c_str(), msg->type.c_str());
     ++logical_clock;
 
     // persist
     fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::app);
     fp << logical_clock << ",";
     fp << this->now() << ",";
+    fp << msg->source << ",";
     fp << msg->type << ",";
     fp << msg->description << "\n";
 

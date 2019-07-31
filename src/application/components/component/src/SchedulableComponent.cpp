@@ -3,79 +3,119 @@
 SchedulableComponent::SchedulableComponent(const int32_t &argc, char **argv) : 
 	Module(argc, argv), 
 	received_name(""), 
-	topic_name(""), 
 	check_frequency(2) {}
 
 SchedulableComponent::~SchedulableComponent() {}
 
-void SchedulableComponent::schedulingSigIntHandler(int sig) {	
-	/********************************************************************************
-	Description: Basic Module SigInt Handler for module disconnection
+/********************************************************************************
+ Description: Basic Module SigInt Handler for module disconnection
 
 	-> Note: Object erasing MUST be done in a tearDown() function
-	-> Note2: If module termination is not done via SigINT, this functionality has to be
-	passed to tearDown() function
+	-> Note2: If module termination is not done via SigINT, this functionality has to be passed to tearDown() function
 
 	@param: int sig - Signal for CTRL+C event
-	*********************************************************************************/
+*********************************************************************************/
+void SchedulableComponent::schedulingSigIntHandler(int sig) {	
 
-	//Setting request parameters with connection = false
-	services::SchedulerServerData srv;
-	srv.request.name = ros::this_node::getName();
-	srv.request.frequency = 0;
-	srv.request.deadline = 0;
-	srv.request.wce = 0;
+	{	// Unregister from scheduler
+		services::SchedulerRegister srv;
+		srv.request.name = ros::this_node::getName();
+		srv.request.frequency = 0;
+		srv.request.deadline = 0;
+		srv.request.wce = 0;
 
-	srv.request.connection = false;
+		srv.request.connection = false;
 
-	ros::NodeHandle client_handler, param_handler("~");
+		ros::NodeHandle client_handler, param_handler("~");
 
-	ros::ServiceClient client_module;
+		ros::ServiceClient client_module;
 
-	//Connection to scheduler module management service
-	client_module = client_handler.serviceClient<services::SchedulerServerData>("ModuleManagement");
+		//Connection to scheduler module management service
+		client_module = client_handler.serviceClient<services::SchedulerRegister>("SchedulerRegister");
 
-	if(client_module.call(srv)) {
-		ROS_INFO("Succesfully disconnected from scheduler.");
-	} else {
-		ROS_ERROR("Failed to disconnect from scheduler.");
+		if(client_module.call(srv)) {
+			ROS_INFO("Succesfully disconnected from scheduler.");
+		} else {
+			ROS_ERROR("Failed to disconnect from scheduler.");
+		}
+	}
+
+	{	// Unregister from effector
+		services::EffectorRegister srv;
+		srv.request.name = ros::this_node::getName();
+		srv.request.frequency = 0;
+		srv.request.deadline = 0;
+		srv.request.wce = 0;
+
+		srv.request.connection = false;
+
+		ros::NodeHandle client_handler, param_handler("~");
+
+		ros::ServiceClient client_module;
+
+		//Connection to scheduler module management service
+		client_module = client_handler.serviceClient<services::EffectorRegister>("EffectorRegister");
+
+		if(client_module.call(srv)) {
+			ROS_INFO("Succesfully disconnected from effector.");
+		} else {
+			ROS_ERROR("Failed to disconnect from effector.");
+		}
 	}
 
 	ros::shutdown();
 }
 
 void SchedulableComponent::tearDown() {
-	ROS_INFO("SchedulableComponent::tearDown()");
 }
 
 /********************************************************************************
  Description: Basic Module initialization function
 
--> MUST be called before run()!!
+ -> MUST be called before run()!!
 
-@param: None
+ @param: None
 *********************************************************************************/	
 void SchedulableComponent::setUp() {
-	ROS_INFO("SchedulableComponent::setUp()");
-
 	//Defining custom SIGINT Handler
 	signal(SIGINT, schedulingSigIntHandler);
 
-	ros::NodeHandle client_handler, param_handler("~");
-	client_module = client_handler.serviceClient<services::SchedulerServerData>("ModuleManagement");
+	{ // register in scheduler
+		ros::NodeHandle client_handler, param_handler("~");
+		client_module = client_handler.serviceClient<services::SchedulerRegister>("SchedulerRegister");
 
-	services::SchedulerServerData srv;
-	srv.request.name = moduleDescriptor.getName();
-	srv.request.frequency = moduleDescriptor.getFreq();
-	srv.request.deadline = moduleDescriptor.getDeadline();
-	srv.request.wce = moduleDescriptor.getWorstCaseExecutionTime();
-	srv.request.connection = moduleDescriptor.getConnection();
+		services::SchedulerRegister srv;
+		srv.request.name = moduleDescriptor.getName();
+		srv.request.frequency = moduleDescriptor.getFreq();
+		srv.request.deadline = moduleDescriptor.getDeadline();
+		srv.request.wce = moduleDescriptor.getWorstCaseExecutionTime();
+		srv.request.connection = moduleDescriptor.getConnection();
 
-	if(client_module.call(srv)) {
-		ROS_INFO("Succesfully connected to scheduler.");
-		moduleDescriptor.setConnection(true);
-	} else {
-		ROS_ERROR("Failed to connect to scheduler.");
+		if(client_module.call(srv)) {
+			ROS_INFO("Succesfully connected to scheduler.");
+			moduleDescriptor.setConnection(true);
+		} else {
+			ROS_ERROR("Failed to connect to scheduler.");
+		}
+	}
+
+	{ // register in effector
+		ros::NodeHandle client_handler, param_handler("~");
+		client_module = client_handler.serviceClient<services::EffectorRegister>("EffectorRegister");
+
+		services::EffectorRegister srv;
+		srv.request.name = moduleDescriptor.getName();
+		srv.request.frequency = moduleDescriptor.getFreq();
+		srv.request.deadline = moduleDescriptor.getDeadline();
+		srv.request.wce = moduleDescriptor.getWorstCaseExecutionTime();
+		srv.request.connection = moduleDescriptor.getConnection();
+
+		if(client_module.call(srv)) {
+			ROS_INFO("Succesfully connected to effector.");
+			moduleDescriptor.setConnection(true);
+		} else {
+			ROS_ERROR("Failed to connect to effector.");
+		}
 	}
 
 	//Defining module's execution minimum checking period
@@ -84,14 +124,10 @@ void SchedulableComponent::setUp() {
 	ros::NodeHandle schedule_task_handler, task_finished_handler;
 
 	//Subscrbing to this module's scheduling topic
-	//topic_name = ros::this_node::getName().substr(1) + "topic";
-	//sched = scheduling_handler.subscribe(topic_name, 5, &SchedulableComponent::schedulingCallback, this);
-	schedule_task = schedule_task_handler.subscribe("schedule_task", 5, &SchedulableComponent::schedulingCallback, this);
+	schedule_task = schedule_task_handler.subscribe("effect_" + moduleDescriptor.getName(), 5, &SchedulableComponent::schedulingCallback, this);
 
 	//Publishing in finish topic, which indicates end of module's execution
-	//finish_topic_name = topic_name + "_finish";
-	//scheduling_pub = finish_scheduling_handler.advertise<messages::Finish>(finish_topic_name = topic_name + "_finish", 1);
-	task_finished_pub = task_finished_handler.advertise<messages::Finish>("task_finished", 1);
+	task_finished_pub = task_finished_handler.advertise<messages::Event>("collect_event", 1);
 
 }
 
@@ -108,19 +144,13 @@ void SchedulableComponent::schedulingCallback(const messages::ReconfigurationCom
 
 	body();
 
-	ros::Time finish_time = ros::Time::now();
+	messages::Event f_msg;
 
-	messages::Finish f_msg;
+	f_msg.source = moduleDescriptor.getName();
+	f_msg.type = "finish";
 
-	f_msg.module_name= ros::this_node::getName();
-	f_msg.sec = finish_time.sec;
-	f_msg.nsec = finish_time.nsec;
-
-	//Publishing in scheduling_finish topic
 	task_finished_pub.publish(f_msg);
 	ros::spinOnce();
-	
-
 }
 
 /********************************************************************************
@@ -154,7 +184,7 @@ void SchedulableComponent::run() {
 
 			ros::Time finish_time = ros::Time::now();
 
-			messages::Finish msg;
+			messages::Event msg;
 
 			msg.name = ros::this_node::getName();
 			msg.sec = finish_time.sec;

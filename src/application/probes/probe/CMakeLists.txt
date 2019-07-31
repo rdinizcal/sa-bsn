@@ -5,7 +5,7 @@ add_compile_options(-std=c++11)
 
 ###########################################################################
 ## Find catkin and any catkin packages
-FIND_PACKAGE(catkin REQUIRED COMPONENTS roscpp std_msgs genmsg roslib messages)
+FIND_PACKAGE(catkin REQUIRED COMPONENTS roscpp std_msgs genmsg messages)
 
 ###########################################################################
 # Export catkin package.

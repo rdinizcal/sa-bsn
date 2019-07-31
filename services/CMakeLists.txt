@@ -56,8 +56,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate services in the 'srv' folder
  add_service_files(
    FILES
-   SchedulerServerData.srv
-#   Service2.srv
+   application/internal/EffectorRegister.srv
+   manager/external/SchedulerRegister.srv
  )
 
 ## Generate actions in the 'action' folder
