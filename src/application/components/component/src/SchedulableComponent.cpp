@@ -81,15 +81,18 @@ void SchedulableComponent::setUp() {
 	//Defining module's execution minimum checking period
 	period = static_cast<float>(moduleDescriptor.getDeadline())/1000000.0;
 
-	ros::NodeHandle scheduling_handler, finish_scheduling_handler;
+	ros::NodeHandle schedule_task_handler, task_finished_handler;
 
 	//Subscrbing to this module's scheduling topic
-	topic_name = ros::this_node::getName().substr(1) + "topic";
-	sched = scheduling_handler.subscribe(topic_name, 5, &SchedulableComponent::schedulingCallback, this);
+	//topic_name = ros::this_node::getName().substr(1) + "topic";
+	//sched = scheduling_handler.subscribe(topic_name, 5, &SchedulableComponent::schedulingCallback, this);
+	schedule_task = schedule_task_handler.subscribe("schedule_task", 5, &SchedulableComponent::schedulingCallback, this);
 
 	//Publishing in finish topic, which indicates end of module's execution
-	finish_topic_name = topic_name + "_finish";
-	scheduling_pub = finish_scheduling_handler.advertise<messages::Finish>(finish_topic_name = topic_name + "_finish", 1);
+	//finish_topic_name = topic_name + "_finish";
+	//scheduling_pub = finish_scheduling_handler.advertise<messages::Finish>(finish_topic_name = topic_name + "_finish", 1);
+	task_finished_pub = task_finished_handler.advertise<messages::Finish>("task_finished", 1);
+
 }
 
 /********************************************************************************
@@ -114,7 +117,7 @@ void SchedulableComponent::schedulingCallback(const messages::Init& msg) {
 	f_msg.nsec = finish_time.nsec;
 
 	//Publishing in scheduling_finish topic
-	scheduling_pub.publish(f_msg);
+	task_finished_pub.publish(f_msg);
 	ros::spinOnce();
 	
 

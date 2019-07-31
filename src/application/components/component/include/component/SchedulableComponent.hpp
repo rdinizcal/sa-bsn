@@ -47,8 +47,8 @@ class SchedulableComponent : public arch::Module {
         double period;
 
         /* communication interface variables */
-        ros::Publisher scheduling_pub;
-        ros::Subscriber sched;
+        ros::Publisher task_finished_pub;
+        ros::Subscriber schedule_task;
         ros::ServiceClient client_module;
         std::string topic_name;
         std::string finish_topic_name;
