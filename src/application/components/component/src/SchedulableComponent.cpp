@@ -147,7 +147,7 @@ void SchedulableComponent::schedulingCallback(const messages::ReconfigurationCom
 	messages::Event f_msg;
 
 	f_msg.source = moduleDescriptor.getName();
-	f_msg.type = "finish";
+	f_msg.type = "finished";
 
 	task_finished_pub.publish(f_msg);
 	ros::spinOnce();

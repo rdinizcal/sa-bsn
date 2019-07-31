@@ -143,6 +143,7 @@ void G3T1_1::tearDown() {
 void G3T1_1::sendEvent(const std::string &type, const std::string &description) {
     messages::Event msg;
 
+    msg.source = ros::this_node::getName();
     msg.type = type;
     msg.description = description;
 
@@ -152,6 +153,7 @@ void G3T1_1::sendEvent(const std::string &type, const std::string &description) 
 void G3T1_1::sendStatus(const std::string &id, const double &value) {
     messages::Status msg;
 
+    msg.source = ros::this_node::getName();
     msg.key = id;
     msg.value = value;
 

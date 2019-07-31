@@ -1,22 +1,23 @@
 #include "Logger.hpp"
 
-Logger::Logger(int  &argc, char **argv, std::string name) : fp(), filepath(), logical_clock(0) {}
+Logger::Logger(int  &argc, char **argv, std::string name) : fp(), filepath(), logical_clock(0), time_ref() {}
 Logger::~Logger() {}
 
-std::string Logger::now() const{
-    return std::to_string(std::chrono::high_resolution_clock::now().time_since_epoch().count());
+int64_t Logger::now() const{
+    return std::chrono::high_resolution_clock::now().time_since_epoch().count();
 }
 
 void Logger::setUp() {
     std::string path = ros::package::getPath("logger");
-    std::string now = this->now();
+    filepath = path + "/resource/logs/" + std::to_string(this->now()) + ".log";
 
-    filepath = path + "/resource/logs/" + now + ".log";
     std::cout << filepath;
 
     fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
     fp << "\n";
     fp.close();
+
+    time_ref = this->now();
 
     ros::NodeHandle handler;
     reconfig_logger2effector_pub = handler.advertise<messages::ReconfigurationCommand>("reconfigure", 10);
@@ -32,9 +33,11 @@ void Logger::receiveReconfigurationCommand(const messages::ReconfigurationComman
     // persist
     fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::app);
     fp << logical_clock << ",";
-    fp << this->now() << ",";
-    fp << msg->action << ",";
-    fp << msg->target << "\n";
+    fp << std::to_string(this->now()-time_ref) << ",";
+    fp << "ReconfigurationCommand" << ",";
+    fp << msg->source << ",";
+    fp << msg->target << ",";
+    fp << msg->action << "\n";
 
     fp.close();
 
@@ -50,8 +53,10 @@ void Logger::receiveStatus(const messages::Status::ConstPtr& msg) {
     // persist
     fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::app);
     fp << logical_clock << ",";
-    fp << this->now() << ",";
+    fp << std::to_string(this->now()-time_ref) << ",";
+    fp << "Status" << ",";
     fp << msg->source << ",";
+    fp << msg->target << ",";
     fp << msg->key << ",";
     fp << msg->value << "\n";
 
@@ -68,8 +73,10 @@ void Logger::receiveEvent(const messages::Event::ConstPtr& msg) {
     // persist
     fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::app);
     fp << logical_clock << ",";
-    fp << this->now() << ",";
+    fp << std::to_string(this->now()-time_ref) << ",";
+    fp << "Event" << ",";
     fp << msg->source << ",";
+    fp << msg->target << ",";
     fp << msg->type << ",";
     fp << msg->description << "\n";
 

@@ -25,7 +25,7 @@ class Logger {
       	Logger(const Logger &);
     	Logger &operator=(const Logger &);
 
-		std::string now() const;
+		int64_t now() const;
 
   	public:
 	  	void receiveReconfigurationCommand(const messages::ReconfigurationCommand::ConstPtr& /*msg*/);
@@ -36,6 +36,7 @@ class Logger {
 		std::fstream fp;
 		std::string filepath;
 		int32_t logical_clock;
+		int64_t time_ref;
 
 		ros::Publisher reconfig_logger2effector_pub, status_logger2manager_pub, event_logger2manager_pub;
 };
