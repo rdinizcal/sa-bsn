@@ -1,5 +1,5 @@
-#ifndef LOGGER_HPP
-#define LOGGER_HPP
+#ifndef PROBE_HPP
+#define PROBE_HPP
 
 #include <fstream>
 #include <iostream>
@@ -13,7 +13,7 @@
 class Probe {
 
 	public:
-    	Probe(int &argc, char **argv, std::string);
+    	Probe(int &argc, char **argv);
     	virtual ~Probe();
 
 		void setUp();

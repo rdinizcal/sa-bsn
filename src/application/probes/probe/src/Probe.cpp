@@ -1,6 +1,6 @@
-#include "Probe.hpp"
+#include "probe/Probe.hpp"
 
-Probe::Probe(int  &argc, char **argv, std::string name) {}
+Probe::Probe(int  &argc, char **argv) {}
 Probe::~Probe() {}
 
 void Probe::setUp() {
