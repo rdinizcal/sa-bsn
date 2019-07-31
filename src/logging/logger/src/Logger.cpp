@@ -19,12 +19,32 @@ void Logger::setUp() {
     fp.close();
 
     ros::NodeHandle handler;
+    reconfig_logger2effector_pub = handler.advertise<messages::ReconfigurationCommand>("reconfigure", 10);
     status_logger2manager_pub = handler.advertise<messages::Status>("status", 10);
     event_logger2manager_pub = handler.advertise<messages::Event>("event", 10);
+
 }
 
+void Logger::receiveReconfigurationCommand(const messages::ReconfigurationCommand::ConstPtr& msg) {
+    ROS_INFO("I heard: [%s: %s]", msg->action.c_str(), msg->target.c_str());
+    ++logical_clock;
+
+    // persist
+    fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::app);
+    fp << logical_clock << ",";
+    fp << this->now() << ",";
+    fp << msg->action << ",";
+    fp << msg->target << "\n";
+
+    fp.close();
+
+    //forward
+    reconfig_logger2effector_pub.publish(msg);
+}
+
+
 void Logger::receiveStatus(const messages::Status::ConstPtr& msg) {
-    //ROS_INFO("I heard: [%s]", msg->task_id.c_str());
+    ROS_INFO("I heard: [%s: %f]", msg->key.c_str(), msg->value);
     ++logical_clock;
 
     // persist
@@ -41,7 +61,7 @@ void Logger::receiveStatus(const messages::Status::ConstPtr& msg) {
 }
 
 void Logger::receiveEvent(const messages::Event::ConstPtr& msg) {
-    //ROS_INFO("I heard: [%s]", msg->task_id.c_str());
+    ROS_INFO("I heard: [%s: %s]", msg->type.c_str(), msg->description.c_str());
     ++logical_clock;
 
     // persist
@@ -59,6 +79,8 @@ void Logger::receiveEvent(const messages::Event::ConstPtr& msg) {
 
 void Logger::run(){
     ros::NodeHandle n;
+
+    ros::Subscriber reconfig_sub = n.subscribe("log_reconfigure", 1000, &Logger::receiveReconfigurationCommand, this);
     ros::Subscriber status_sub = n.subscribe("log_status", 1000, &Logger::receiveStatus, this);
     ros::Subscriber event_sub = n.subscribe("log_event", 1000, &Logger::receiveEvent, this);
     

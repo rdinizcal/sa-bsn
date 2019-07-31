@@ -11,12 +11,12 @@
 
 #include "services/SchedulerServerData.h"
 #include "messages/Finish.h"
-#include "messages/Init.h"
+#include "messages/ReconfigurationCommand.h"
 
 class SchedulableComponent : public arch::Module {
 
     private:
-        void schedulingCallback(const messages::Init& msg);
+        void schedulingCallback(const messages::ReconfigurationCommand& msg);
 
     public:
         SchedulableComponent(const int32_t &argc, char **argv);

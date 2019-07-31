@@ -100,11 +100,11 @@ void SchedulableComponent::setUp() {
 
  -> Note: If module receives it's name, execution is allowed
 
- @param: const messages::Init& msg - name received
+ @param: const messages::ReconfigurationCommand& msg - name received
 *********************************************************************************/
-void SchedulableComponent::schedulingCallback(const messages::Init& msg) {
-	ROS_INFO("I heard: [%s]", msg.module_name.c_str());
-	received_name = msg.module_name;
+void SchedulableComponent::schedulingCallback(const messages::ReconfigurationCommand& msg) {
+	ROS_INFO("I heard: [%s]", msg.target.c_str());
+	received_name = msg.target;
 
 	body();
 
