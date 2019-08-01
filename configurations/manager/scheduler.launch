@@ -3,6 +3,6 @@
 
     <!-- Defines the percentages to consider low, moderate or high risk -->
     <param name="frequency" value="5" /> <!--5 Hz-->
-    <param name="timeout" value="10" /> <!--10 ms-->
+    <param name="timeout" value="2000" /> <!--ms-->
 
 </launch>

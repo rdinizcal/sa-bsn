@@ -124,7 +124,7 @@ void SchedulableComponent::setUp() {
 	ros::NodeHandle schedule_task_handler, task_finished_handler;
 
 	//Subscrbing to this module's scheduling topic
-	schedule_task = schedule_task_handler.subscribe("effect_" + moduleDescriptor.getName(), 5, &SchedulableComponent::schedulingCallback, this);
+	schedule_task = schedule_task_handler.subscribe("effect_" + moduleDescriptor.getName(), 1, &SchedulableComponent::schedulingCallback, this);
 
 	//Publishing in finish topic, which indicates end of module's execution
 	task_finished_pub = task_finished_handler.advertise<messages::Event>("collect_event", 1);
@@ -142,6 +142,8 @@ void SchedulableComponent::schedulingCallback(const messages::ReconfigurationCom
 	ROS_INFO("I heard: [%s]", msg.target.c_str());
 	received_name = msg.target;
 
+	if(received_name != moduleDescriptor.getName()) return;
+
 	body();
 
 	messages::Event f_msg;
@@ -150,7 +152,6 @@ void SchedulableComponent::schedulingCallback(const messages::ReconfigurationCom
 	f_msg.type = "finished";
 
 	task_finished_pub.publish(f_msg);
-	ros::spinOnce();
 }
 
 /********************************************************************************
@@ -175,40 +176,7 @@ void SchedulableComponent::run() {
 		ros::spinOnce();
 		loop_rate.sleep();
 	}
-	/* 
-		if(received_name == moduleDescriptor.getName()) {
-			//Basic printing, can be uncommented if desirable
-			ROS_INFO("Running");
-
-			body();
-
-			ros::Time finish_time = ros::Time::now();
-
-			messages::Event msg;
-
-			msg.name = ros::this_node::getName();
-			msg.sec = finish_time.sec;
-			msg.nsec = finish_time.nsec;
-
-			//Publishing in scheduling_finish topic
-			scheduling_pub.publish(msg);
-
-			ros::spinOnce();
-
-			//Sleep until next check
-			loop_rate.sleep();
-		} else {
-			//Basic printing, can be uncommented if desirable
-			ROS_INFO("Not Running");
-
-			//Sleep until next check
-			loop_rate.sleep();
-		}
-
-		received_name = "";
-	}
-	*/
-
+	
 	tearDown();
 	SchedulableComponent::tearDown();
 }

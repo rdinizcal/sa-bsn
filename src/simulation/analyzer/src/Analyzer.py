@@ -154,7 +154,6 @@ class Analyzer:
 
             ## individual reliability timeseries
 
-
         # plot global reli timeseries
         x = [x[0] for x in global_reli_timeseries]
         y = [y[1] for y in global_reli_timeseries]
