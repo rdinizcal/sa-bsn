@@ -32,9 +32,9 @@ void Logger::receiveReconfigurationCommand(const messages::ReconfigurationComman
 
     // persist
     fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::app);
+    fp << "ReconfigurationCommand" << ",";
     fp << logical_clock << ",";
     fp << std::to_string(this->now()-time_ref) << ",";
-    fp << "ReconfigurationCommand" << ",";
     fp << msg->source << ",";
     fp << msg->target << ",";
     fp << msg->action << "\n";
@@ -52,9 +52,9 @@ void Logger::receiveStatus(const messages::Status::ConstPtr& msg) {
 
     // persist
     fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::app);
+    fp << "Status" << ",";
     fp << logical_clock << ",";
     fp << std::to_string(this->now()-time_ref) << ",";
-    fp << "Status" << ",";
     fp << msg->source << ",";
     fp << msg->target << ",";
     fp << msg->key << ",";
@@ -72,9 +72,9 @@ void Logger::receiveEvent(const messages::Event::ConstPtr& msg) {
 
     // persist
     fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::app);
+    fp << "Event" << ",";
     fp << logical_clock << ",";
     fp << std::to_string(this->now()-time_ref) << ",";
-    fp << "Event" << ",";
     fp << msg->source << ",";
     fp << msg->target << ",";
     fp << msg->type << ",";
