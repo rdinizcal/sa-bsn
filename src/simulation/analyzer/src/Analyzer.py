@@ -84,7 +84,7 @@ class Analyzer:
         formula = Formula("resource/models/reliability.formula")
 
         # load log
-        with open("resource/logs/1564600009534118019.log", newline='') as log_file:
+        with open("resource/logs/1564840923328961267.log", newline='') as log_file:
             log_csv = csv.reader(log_file, delimiter=',')
             log = list(log_csv)
             del log[0] # delete first line
@@ -93,7 +93,7 @@ class Analyzer:
         tasks = dict()
         ctxs = dict()
         ctxs_timeseries = dict()
-        reli_timeseries = dict() 
+        #reli_timeseries = dict() 
         global_reli_timeseries = [] 
         t0 = int(log[0][2])
 
@@ -113,7 +113,7 @@ class Analyzer:
             elif (reg[0] == 'Status' ) :  
                 status = Status(str(reg[1]),str(reg[2]),str(reg[3]),str(reg[4]),str(reg[5]),str(reg[6]))
 
-                tag = status.key
+                tag = status.source.upper().replace(".","_").replace("/","").replace("T","_T")
 
                 if not (tag in ctxs): 
                     ctx = Context(tag)
@@ -143,7 +143,7 @@ class Analyzer:
                 formula.compute('F_'+task.getName(), task.frequency())
             
             for ctx in ctxs.values():
-                formula.compute(ctx.getName(), ctx.isActive())
+                formula.compute('CTX_'+ctx.getName(), ctx.isActive())
 
             global_reli_timeseries.append([instant, formula.eval()])
 
@@ -183,7 +183,10 @@ class Analyzer:
             ctx = context
 
         ## plot timeseries
-        #plt.title("Active contexts")
+        #plt.title("Active contexts")]
+        print (len(x))
+        for key in x.keys(): print(key)
+
         plt.plot(x[ctx], [sum(x) for x in zip(*y.values())])
         #plt.ylim(0,len(ctxs_timeseries.keys()))
         #plt.xlim(0,max(x))

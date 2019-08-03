@@ -13,6 +13,7 @@
 #include "services/SchedulerRegister.h"
 
 #include "messages/Event.h"
+#include "messages/Status.h"
 #include "messages/ReconfigurationCommand.h"
 
 class SchedulableComponent : public arch::Module {
@@ -52,6 +53,7 @@ class SchedulableComponent : public arch::Module {
         ros::Publisher task_finished_pub;
         ros::Subscriber schedule_task;
         ros::ServiceClient client_module;
+        ros::NodeHandle handle;
 };
 
 #endif

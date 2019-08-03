@@ -8,32 +8,26 @@ using namespace bsn::configuration;
 
 
 G3T1_4::G3T1_4(const int32_t &argc, char **argv) :
-    SchedulableComponent(argc, argv),
-    type("bloodpressure"),
-    battery("bp_batt",100,100,1),
-    available(true),
-    diasdata_accuracy(1),
-    diascomm_accuracy(1),
-    systdata_accuracy(1),
-    systcomm_accuracy(1),
-    active(true),
-    params({{"freq",0.90},{"m_avg",5}}),
+    Sensor(argc, argv, "bloodpressure", true, 1, bsn::resource::Battery("bp_batt", 100, 100, 1)),
+    markovSystolic(),
+    markovDiastolic(),
     filterSystolic(5),
     filterDiastolic(5),
     sensorConfigSystolic(),
     sensorConfigDiastolic(),
-    persist(1),
-    path("bloodpressure_output.csv") {}
+    dias_accuracy(0),
+    syst_accuracy(0),
+    systolic_data(0),
+    diastolic_data(0) {}
 
 G3T1_4::~G3T1_4() {}
 
 void G3T1_4::setUp() {
-    ros::NodeHandle configHandler, n;
     srand(time(NULL));
-    std::string s;
-    bool b;
-    double d;
+    
     Operation op;
+
+    std::string s;
 
     for(int32_t i = 0; i < 2; i++){
         std::vector<std::string> t_probs;
@@ -45,7 +39,7 @@ void G3T1_4::setUp() {
 
         for(uint32_t i = 0; i < transitions.size(); i++){
             for(uint32_t j = 0; j < 5; j++){
-                configHandler.getParam(x + "state" + std::to_string(j), s);
+                handle.getParam(x + "state" + std::to_string(j), s);
                 t_probs = op.split(s, ',');
                 for(uint32_t k = 0; k < 5; k++){
                     transitions[i++] = std::stod(t_probs[k]);
@@ -56,11 +50,11 @@ void G3T1_4::setUp() {
         { // Configure markov chain
             std::vector<std::string> lrs, mrs, hrs;
 
-            configHandler.getParam(x + "LowRisk", s);
+            handle.getParam(x + "LowRisk", s);
             lrs = op.split(s, ',');
-            configHandler.getParam(x + "MidRisk", s);
+            handle.getParam(x + "MidRisk", s);
             mrs = op.split(s, ',');
-            configHandler.getParam(x + "HighRisk", s);
+            handle.getParam(x + "HighRisk", s);
             hrs = op.split(s, ',');
 
             ranges[0] = Range(-1, -1);
@@ -89,15 +83,15 @@ void G3T1_4::setUp() {
 
             std::array<Range, 3> percentages;
 
-            configHandler.getParam("lowrisk", s);
+            handle.getParam("lowrisk", s);
             std::vector<std::string> low_p = op.split(s, ',');
             percentages[0] = Range(std::stod(low_p[0]), std::stod(low_p[1]));
 
-            configHandler.getParam("midrisk", s);
+            handle.getParam("midrisk", s);
             std::vector<std::string> mid_p = op.split(s, ',');
             percentages[1] = Range(std::stod(mid_p[0]), std::stod(mid_p[1]));
 
-            configHandler.getParam("highrisk", s);
+            handle.getParam("highrisk", s);
             std::vector<std::string> high_p = op.split(s, ',');
             percentages[2] = Range(std::stod(high_p[0]), std::stod(high_p[1]));
 
@@ -110,196 +104,141 @@ void G3T1_4::setUp() {
     }
 
     { // Configure sensor accuracy
-        configHandler.getParam("diasdata_accuracy", d);
-        diasdata_accuracy = d / 100;
-        configHandler.getParam("diascomm_accuracy", d);
-        diascomm_accuracy = d / 100;
-        configHandler.getParam("systdata_accuracy", d);
-        systdata_accuracy = d / 100;
-        configHandler.getParam("systcomm_accuracy", d);
-        systcomm_accuracy = d / 100;
-    }
+        double acc;
+        handle.getParam("dias_accuracy", acc);
+        dias_accuracy = acc / 100;
 
-    { // Configure sensor persistency
-        configHandler.getParam("persist", b);
-        persist = b;
-        configHandler.getParam("path", s);
-        path = s;
+        handle.getParam("syst_accuracy", acc);
+        syst_accuracy = acc / 100;
 
-        if (persist) {
-            fp.open(path);
-            fp << "ID,DATA,RISK,TIME_MS" << std::endl;
-        }
     }
+}
+
+void G3T1_4::tearDown() {}
+
+double G3T1_4::collectSystolic() {
+    bsn::generator::DataGenerator dataGenerator(markovSystolic);
+    double offset = 0;
+    double m_data = 0;
+
+    m_data = dataGenerator.getValue();
+    offset = (1 - syst_accuracy + (double)rand() / RAND_MAX * (1 - syst_accuracy)) * m_data;
+    m_data += (rand()%2==0)?offset:(-1)*offset;
+
+    battery.consume(0.1);
+
+    ROS_INFO("new data collected: [%s]", std::to_string(m_data).c_str());
+
+    // if rule throw domain_error("failure")
+    //if (m_data < 0 || m_data > 100) throw std::domain_error("failure");
+
+    return m_data;
+}
+
+double G3T1_4::collectDiastolic() {
+    bsn::generator::DataGenerator dataGenerator(markovDiastolic);
+    double offset = 0;
+    double m_data = 0;
+
+    m_data = dataGenerator.getValue();
+    offset = (1 - dias_accuracy + (double)rand() / RAND_MAX * (1 - dias_accuracy)) * m_data;
+    m_data += (rand()%2==0)?offset:(-1)*offset;
+
+    battery.consume(0.1);
+
+    ROS_INFO("new data collected: [%s]", std::to_string(m_data).c_str());
+
+    // if rule throw domain_error("failure")
+    //if (m_data < 0 || m_data > 100) throw std::domain_error("failure");
+
+    return m_data;
+}
+
+double G3T1_4::collect() {
+
+    systolic_data = collectSystolic();
+    diastolic_data = collectDiastolic();
+
+    return 0.0;
+}
+
+double G3T1_4::processSystolic(const double &m_data) {
+    double filtered_data;
     
-    status_pub =  n.advertise<messages::Status>("collect_status", 10);
-    event_pub =  n.advertise<messages::Event>("collect_event", 10);
+    filterSystolic.insert(m_data, type);
+    filtered_data = filterSystolic.getValue(type);
+    battery.consume(0.1*filterSystolic.getRange());
 
-    { // Configure module descriptor for scheduling
-        double freq, check_frequency;
-        int32_t deadline, wce;
-
-        moduleDescriptor.setName(ros::this_node::getName());
-
-        configHandler.getParam("frequency", freq);
-        moduleDescriptor.setFreq(freq);
-
-        configHandler.getParam("deadline", deadline);
-        moduleDescriptor.setDeadline(static_cast<int32_t>(deadline));
-
-        configHandler.getParam("wce", wce);
-        moduleDescriptor.setWorstCaseExecutionTime(static_cast<int32_t>(wce));
-
-        configHandler.getParam("check_frequency", check_frequency);
-        setCheckFrequency(check_frequency);
-
-        moduleDescriptor.setConnection(true);
-    }
-
+    ROS_INFO("filtered data: [%s]", std::to_string(filtered_data).c_str());
+    return filtered_data;
 }
 
-void G3T1_4::tearDown() {
-    if (persist)
-        fp.close();
+double G3T1_4::processDiastolic(const double &m_data) {
+    double filtered_data;
+    
+    filterDiastolic.insert(m_data, type);
+    filtered_data = filterDiastolic.getValue(type);
+    battery.consume(0.1*filterDiastolic.getRange());
+
+    ROS_INFO("filtered data: [%s]", std::to_string(filtered_data).c_str());
+    return filtered_data;
 }
 
-void G3T1_4::sendEvent(const std::string &type, const std::string &description) {
-    messages::Event msg;
+double G3T1_4::process(const double &m_data) {
 
-    msg.source = ros::this_node::getName();
-    msg.type = type;
-    msg.description = description;
+    systolic_data = processSystolic(systolic_data);
+    diastolic_data = processDiastolic(diastolic_data);
 
-    event_pub.publish(msg);
+    return 0.0;
 }
 
-void G3T1_4::sendStatus(const std::string &id, const double &value) {
-    messages::Status msg;
-
-    msg.source = ros::this_node::getName();
-    msg.key = id;
-    msg.value = value;
-
-    status_pub.publish(msg);
-}
-
-void G3T1_4::body() {
-    double dataS;
-    double dataD;
+void G3T1_4::transferSystolic(const double &m_data) {
     double risk;
-    bool first_exec = true;
-    uint32_t id = 0;
-    DataGenerator dataGeneratorSys(markovSystolic);
-    DataGenerator dataGeneratorDia(markovDiastolic);
+    messages::SensorData msg;
+    ros::NodeHandle handle;
 
-    messages::SensorData msgS, msgD;
-    msgS.type = "bpms";
-    msgD.type = "bpmd";
-    ros::NodeHandle n;
+    data_pub = handle.advertise<messages::SensorData>("oximeter_data", 10);
 
-    ros::Publisher systolic_pub = n.advertise<messages::SensorData>("systolic_data", 10);
-    ros::Publisher diastolic_pub = n.advertise<messages::SensorData>("diastolic_data", 10);
+    risk = sensorConfigSystolic.evaluateNumber(m_data);
+    battery.consume(0.1);
 
-    //ros::Rate loop_rate(params["freq"]);
+    msg.type = "bpms";
+    msg.data = m_data;
+    msg.risk = risk;
+    msg.batt = battery.getCurrentLevel();
 
-    { // recharge routine
-        //for debugging
-        std::cout << "Battery level: " << battery.getCurrentLevel() << "%" <<std::endl;
-        if(!active && battery.getCurrentLevel() > 90){
-            active = true;
-        }
-        if(active && battery.getCurrentLevel() < 2){
-            active = false;
-        }
+    data_pub.publish(msg);
+    
+    battery.consume(0.2);
 
-        sendStatus("CTX_G3_T1_4", active?1:0);
-    }
+    ROS_INFO("risk calculated and transfered: [%.2f%%]", risk);
+}
 
-    if (active) { 
-        { // TASK: Collect bloodpressure data            
-            dataS = dataGeneratorSys.getValue();      
+void G3T1_4::transferDiastolic(const double &m_data) {
+    double risk;
+    messages::SensorData msg;
+    ros::NodeHandle handle;
 
-            double offset = (1 - systdata_accuracy + (double)rand() / RAND_MAX * (1 - systdata_accuracy)) * dataS;
+    data_pub = handle.advertise<messages::SensorData>("oximeter_data", 10);
 
-            if (rand() % 2 == 0)
-                dataS = dataS + offset;
-            else
-                dataS = dataS - offset;
+    risk = sensorConfigDiastolic.evaluateNumber(m_data);
+    battery.consume(0.1);
 
-            battery.consume(0.1);
+    msg.type = "bpmd";
+    msg.data = m_data;
+    msg.risk = risk;
+    msg.batt = battery.getCurrentLevel();
 
-            dataD = dataGeneratorDia.getValue();
+    data_pub.publish(msg);
+    
+    battery.consume(0.2);
 
+    ROS_INFO("risk calculated and transfered: [%.2f%%]", risk);
+}
 
-            offset = (1 - diasdata_accuracy + (double)rand() / RAND_MAX * (1 - diasdata_accuracy)) * dataD;
-            if (rand() % 2 == 0)
-                dataD = dataD + offset;
-            else
-                dataD = dataD - offset;
+void G3T1_4::transfer(const double &m_data) {
 
-            battery.consume(0.1);
-            
-            //for debugging 
-            std::cout << std::endl << "New data (systolic): " << dataS <<std::endl;
-            std::cout << "New data (diastolic): " << dataD <<std::endl;
-        }
+    transferSystolic(systolic_data);
+    transferDiastolic(diastolic_data);
 
-        { // TASK: Filter data with moving average
-            filterSystolic.setRange(params["m_avg"]);
-            filterSystolic.insert(dataS, "bpms");
-            dataS = filterSystolic.getValue("bpms");
-            battery.consume(0.1*params["m_avg"]);
-
-            filterDiastolic.setRange(params["m_avg"]);
-            filterDiastolic.insert(dataD, "bpmd");
-            dataD = filterDiastolic.getValue("bpmd");
-            battery.consume(0.1*params["m_avg"]);
-
-            
-            //for debugging 
-            //cout << "Filtered data (systolic): " << dataS <<std::endl;
-            //cout << "Filtered data (diastolic): " << dataD <<std::endl;
-        }
-
-
-        { //TASK: Transfer information to CentralHub
-            risk = sensorConfigSystolic.evaluateNumber(dataS);
-            msgS.data = dataS;
-            msgS.risk = risk;
-            battery.consume(0.1);
-            msgS.batt = battery.getCurrentLevel();
-            
-            if ((rand() % 100) <= systcomm_accuracy * 100)
-                systolic_pub.publish(msgS);
-
-            // for debugging
-            std::cout << "Risk: " << risk << "%"  <<std::endl;
-
-            risk = sensorConfigDiastolic.evaluateNumber(dataD);
-            msgD.data = dataD;
-            msgD.risk = risk;
-            battery.consume(0.1);
-            msgD.batt = battery.getCurrentLevel();
-
-            if ((rand() % 100) <= diascomm_accuracy * 100)
-                diastolic_pub.publish(msgD);
-
-            // for debugging
-            std::cout << "Risk: " << risk << "%"  <<std::endl;
-        }
-    } else {
-        if(battery.getCurrentLevel() <= 100) battery.generate(2.5);
-        
-    }
-    { // Persist sensor data
-        if (persist) {
-            fp << id++ << ",";
-            fp << dataS << ",";
-            fp << dataD << ",";
-            fp << risk << ",";
-            fp << std::chrono::duration_cast<std::chrono::milliseconds>
-                    (std::chrono::time_point_cast<std::chrono::milliseconds>
-                    (std::chrono::high_resolution_clock::now()).time_since_epoch()).count() << std::endl;
-        }
-    }
 }

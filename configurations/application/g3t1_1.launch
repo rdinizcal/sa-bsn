@@ -2,7 +2,7 @@
     <node name="g3t1_1" pkg="component" type="g3t1_1" output="screen" />
 
     <param name="frequency" value="0.5" /> <!-- 1 Hz  -->
-    <param name="deadline" value="2000000" /> <!-- 2 s deadline = 10^6*(1/frequency)-->
+    <param name="deadline" value="2000000" /> <!-- (ns) deadline = 10^6*(1/frequency)-->
     <param name="wce" value="1000" /> <!-- 1000μs -->
     <param name="check_frequency" value="10" /> <!-- 10 Hz -->
 
@@ -24,11 +24,6 @@
     <param name="HighRisk1" value="0,60" />
 
     <!-- accuracy in percentage -->
-    <param name="data_accuracy" value="90" type="double" />
-    <param name="comm_accuracy" value="100" type="double" />
-
-    <!-- persistence -->
-    <param name="persist" value="true" type="bool" />
-    <param name="path" value="g3t1_1_output.csv" type="str" />
+    <param name="accuracy" value="90" type="double" />
 
 </launch>

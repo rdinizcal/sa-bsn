@@ -26,7 +26,7 @@ void SchedulableComponent::schedulingSigIntHandler(int sig) {
 
 		srv.request.connection = false;
 
-		ros::NodeHandle client_handler, param_handler("~");
+		ros::NodeHandle client_handler;
 
 		ros::ServiceClient client_module;
 
@@ -49,7 +49,7 @@ void SchedulableComponent::schedulingSigIntHandler(int sig) {
 
 		srv.request.connection = false;
 
-		ros::NodeHandle client_handler, param_handler("~");
+		ros::NodeHandle client_handler;
 
 		ros::ServiceClient client_module;
 
@@ -80,8 +80,29 @@ void SchedulableComponent::setUp() {
 	//Defining custom SIGINT Handler
 	signal(SIGINT, schedulingSigIntHandler);
 
+	{ // Configure module descriptor for scheduling
+        double freq, check_frequency;
+        int32_t deadline, wce;
+
+        moduleDescriptor.setName(ros::this_node::getName());
+
+        handle.getParam("frequency", freq);
+        moduleDescriptor.setFreq(freq);
+
+        handle.getParam("deadline", deadline);
+        moduleDescriptor.setDeadline(static_cast<int32_t>(deadline));
+
+        handle.getParam("wce", wce);
+        moduleDescriptor.setWorstCaseExecutionTime(static_cast<int32_t>(wce));
+
+        handle.getParam("check_frequency", check_frequency);
+        setCheckFrequency(check_frequency);
+
+        moduleDescriptor.setConnection(true);
+    }
+
 	{ // register in scheduler
-		ros::NodeHandle client_handler, param_handler("~");
+		ros::NodeHandle client_handler;
 		client_module = client_handler.serviceClient<services::SchedulerRegister>("SchedulerRegister");
 
 		services::SchedulerRegister srv;
@@ -100,7 +121,7 @@ void SchedulableComponent::setUp() {
 	}
 
 	{ // register in effector
-		ros::NodeHandle client_handler, param_handler("~");
+		ros::NodeHandle client_handler;
 		client_module = client_handler.serviceClient<services::EffectorRegister>("EffectorRegister");
 
 		services::EffectorRegister srv;
@@ -121,14 +142,13 @@ void SchedulableComponent::setUp() {
 	//Defining module's execution minimum checking period
 	period = static_cast<float>(moduleDescriptor.getDeadline())/1000000.0;
 
-	ros::NodeHandle schedule_task_handler, task_finished_handler;
+	ros::NodeHandle schedule_task_handler, task_finished_handler, notify_active_node;
 
 	//Subscrbing to this module's scheduling topic
 	schedule_task = schedule_task_handler.subscribe("effect_" + moduleDescriptor.getName(), 1, &SchedulableComponent::schedulingCallback, this);
 
 	//Publishing in finish topic, which indicates end of module's execution
-	task_finished_pub = task_finished_handler.advertise<messages::Event>("collect_event", 1);
-
+	task_finished_pub = task_finished_handler.advertise<messages::Event>("collect_event", 1000);
 }
 
 /********************************************************************************
@@ -163,8 +183,8 @@ void SchedulableComponent::schedulingCallback(const messages::ReconfigurationCom
 *********************************************************************************/
 void SchedulableComponent::run() {
 
-	setUp();
 	SchedulableComponent::setUp();
+	setUp();
 
 	//Defining checking frequency
 	//Note: By default it is 2/period

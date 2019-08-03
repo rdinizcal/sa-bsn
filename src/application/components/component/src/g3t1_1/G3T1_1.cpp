@@ -6,22 +6,14 @@ using namespace bsn::operation;
 using namespace bsn::configuration;
 
 G3T1_1::G3T1_1(const int32_t &argc, char **argv) :
-    SchedulableComponent(argc, argv),
-    type("oximeter"),
-    battery("oxi_batt", 100, 100, 1),
-    available(true),
-    data_accuracy(1),
-    comm_accuracy(1),
-    active(true),
-    params({{"freq",0.90},{"m_avg",5}}),
+    Sensor(argc, argv, "oximeter", true, 1, bsn::resource::Battery("oxi_batt", 100, 100, 1)),
+    markov(),
     filter(5),
-    persist(1),
-    path("oximeter_output.csv") {}
+    sensorConfig() {}
 
 G3T1_1::~G3T1_1() {}
 
 void G3T1_1::setUp() {
-    ros::NodeHandle configHandler, n;
     srand(time(NULL));
         
     Operation op;
@@ -30,12 +22,10 @@ void G3T1_1::setUp() {
     std::array<float, 25> transitions;
     std::array<bsn::range::Range,5> ranges;
     std::string s;
-    bool b;
-    double d;
 
     for(uint32_t i = 0; i < transitions.size(); i++){
         for(uint32_t j = 0; j < 5; j++){
-            configHandler.getParam("state" + std::to_string(j), s);
+            handle.getParam("state" + std::to_string(j), s);
             t_probs = op.split(s, ',');
             for(uint32_t k = 0; k < 5; k++){
                 transitions[i++] = std::stod(t_probs[k]);
@@ -46,11 +36,11 @@ void G3T1_1::setUp() {
     { // Configure markov chain
         std::vector<std::string> lrs, mrs, hrs;
 
-        configHandler.getParam("LowRisk", s);
+        handle.getParam("LowRisk", s);
         lrs = op.split(s, ',');
-        configHandler.getParam("MidRisk", s);
+        handle.getParam("MidRisk", s);
         mrs = op.split(s, ',');
-        configHandler.getParam("HighRisk", s);
+        handle.getParam("HighRisk", s);
         hrs = op.split(s, ',');
 
         ranges[0] = Range(-1, -1);
@@ -75,177 +65,79 @@ void G3T1_1::setUp() {
 
         std::array<Range,3> percentages;
 
-        configHandler.getParam("lowrisk", s);
+        handle.getParam("lowrisk", s);
         std::vector<std::string> low_p = op.split(s, ',');
         percentages[0] = Range(std::stod(low_p[0]), std::stod(low_p[1]));
 
-        configHandler.getParam("midrisk", s);
+        handle.getParam("midrisk", s);
         std::vector<std::string> mid_p = op.split(s, ',');
         percentages[1] = Range(std::stod(mid_p[0]), std::stod(mid_p[1]));
 
-        configHandler.getParam("highrisk", s);
+        handle.getParam("highrisk", s);
         std::vector<std::string> high_p = op.split(s, ',');
         percentages[2] = Range(std::stod(high_p[0]), std::stod(high_p[1]));
 
         sensorConfig = SensorConfiguration(0, low_range, midRanges, highRanges, percentages);
     }
 
-    { // Configure sensor data_accuracy
-        configHandler.getParam("data_accuracy", d);
-        data_accuracy = d / 100;
-        configHandler.getParam("comm_accuracy", d);
-        comm_accuracy = d / 100;
+    { // Configure sensor accuracy
+        double acc;
+        handle.getParam("accuracy", acc);
+        accuracy = acc / 100;
     }
-
-    { // Configure sensor persistency
-        configHandler.getParam("persist", b);
-        persist = b;
-        configHandler.getParam("path", s);
-        path = s;
-
-        if (persist) {
-            fp.open(path);
-            fp << "ID,DATA,RISK,TIME_MS" << std::endl;
-        }
-    }
-
-    status_pub = n.advertise<messages::Status>("collect_status", 10);
-    event_pub = n.advertise<messages::Event>("collect_event", 10);
-
-    { // Configure module descriptor for scheduling
-        double freq, check_frequency;
-        int32_t deadline, wce;
-
-        moduleDescriptor.setName(ros::this_node::getName());
-
-        configHandler.getParam("frequency", freq);
-        moduleDescriptor.setFreq(freq);
-
-        configHandler.getParam("deadline", deadline);
-        moduleDescriptor.setDeadline(static_cast<int32_t>(deadline));
-
-        configHandler.getParam("wce", wce);
-        moduleDescriptor.setWorstCaseExecutionTime(static_cast<int32_t>(wce));
-
-        configHandler.getParam("check_frequency", check_frequency);
-        setCheckFrequency(check_frequency);
-
-        moduleDescriptor.setConnection(true);
-    }
-
 }
 
 void G3T1_1::tearDown() {
-    if (persist)
-        fp.close();
 }
 
-void G3T1_1::sendEvent(const std::string &type, const std::string &description) {
-    messages::Event msg;
-
-    msg.source = ros::this_node::getName();
-    msg.type = type;
-    msg.description = description;
-
-    event_pub.publish(msg);
-}
-
-void G3T1_1::sendStatus(const std::string &id, const double &value) {
-    messages::Status msg;
-
-    msg.source = ros::this_node::getName();
-    msg.key = id;
-    msg.value = value;
-
-    status_pub.publish(msg);
-}
-
-void G3T1_1::body(){
-    double data;
-    double risk;
-    bool first_exec = true;
-    uint32_t id = 0;
+double G3T1_1::collect() {
     bsn::generator::DataGenerator dataGenerator(markov);
+    double offset = 0;
+    double m_data = 0;
 
-    messages::SensorData msg;
-    msg.type = "oximeter";
-    ros::NodeHandle n;
+    m_data = dataGenerator.getValue();
+    offset = (1 - accuracy + (double)rand() / RAND_MAX * (1 - accuracy)) * m_data;
+    m_data += (rand()%2==0)?offset:(-1)*offset;
 
-    dataPub = n.advertise<messages::SensorData>("oximeter_data", 10);
+    battery.consume(0.1);
 
-    //ros::Rate loop_rate(params["freq"]);
+    ROS_INFO("new data collected: [%s]", std::to_string(m_data).c_str());
 
-    { // recharge routine
-        //for debugging
-        std::cout << "Battery level: " << battery.getCurrentLevel() << "%" << std::endl;
-        if(!active && battery.getCurrentLevel() > 90){
-            active = true;
-        }
-        if(active && battery.getCurrentLevel() < 2){
-            active = false;
-        }
-        
-        sendStatus("CTX_G3_T1_1", active?1:0);
-    }
+    // if rule throw domain_error("failure")
+    if (m_data < 0 || m_data > 100) throw std::domain_error("failure");
 
-    if (active) { 
-        /*
-         * Module execution
-        **/              
-        { // TASK: Collect oximeter data with data_accuracy
-            data = dataGenerator.getValue();
-                
-            double offset = (1 - data_accuracy + (double)rand() / RAND_MAX * (1 - data_accuracy)) * data;
+    return m_data;
+}
 
-            if (rand() % 2 == 0)
-                data = data + offset;
-            else
-                data = data - offset;
-
-            battery.consume(0.1);
-
-            //for debugging
-            std::cout << "New data: " << data << std::endl << std::endl;
-        }
-
-        { // TASK: Filter data with moving average
-            filter.setRange(params["m_avg"]);
-            filter.insert(data, type);
-            data = filter.getValue(type);
-            battery.consume(0.1*params["m_avg"]);
-
-            //for debugging
-           msg.data = data;
-            std::cout << "Filtered data: " << data << std::endl;
-        }
-        
-        { // TASK: Transfer information to CentralHub
-            risk = sensorConfig.evaluateNumber(data);
-            msg.risk = risk;
-            battery.consume(0.1);
-            msg.batt = battery.getCurrentLevel();
-
-            if ((rand() % 100) <= comm_accuracy * 100)
-                dataPub.publish(msg);
-            
-            battery.consume(0.1);
-
-            // for debugging
-            std::cout << "Risk: " << risk << "%" << std::endl;
-        }
-
-    } else {
-        if(battery.getCurrentLevel() <= 100) battery.generate(2.5);            
-    }
+double G3T1_1::process(const double &m_data) {
+    double filtered_data;
     
-    { // Persist sensor data
-        if (persist) {
-            fp << id++ << ",";
-            fp << data << ",";
-            fp << risk << ",";
-            fp << std::chrono::duration_cast<std::chrono::milliseconds>
-                    (std::chrono::time_point_cast<std::chrono::milliseconds>
-                    (std::chrono::high_resolution_clock::now()).time_since_epoch()).count() << std::endl;
-        }
-    }
+    filter.insert(m_data, type);
+    filtered_data = filter.getValue(type);
+    battery.consume(0.1*filter.getRange());
+
+    ROS_INFO("filtered data: [%s]", std::to_string(filtered_data).c_str());
+    return filtered_data;
+}
+
+void G3T1_1::transfer(const double &m_data) {
+    double risk;
+    messages::SensorData msg;
+    ros::NodeHandle handle;
+
+    data_pub = handle.advertise<messages::SensorData>("oximeter_data", 10);
+
+    risk = sensorConfig.evaluateNumber(m_data);
+    battery.consume(0.1);
+
+    msg.type = type;
+    msg.data = m_data;
+    msg.risk = risk;
+    msg.batt = battery.getCurrentLevel();
+
+    data_pub.publish(msg);
+    
+    battery.consume(0.2);
+
+    ROS_INFO("risk calculated and transfered: [%.2f%%]", risk);
 }

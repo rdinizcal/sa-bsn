@@ -1,10 +1,8 @@
 #ifndef G3T1_4_HPP
 #define G3T1_4_HPP
 
-#include <fstream>
-#include <chrono>
 #include <string>
-#include <iostream>
+#include <exception>
 
 #include "ros/ros.h"
 
@@ -16,13 +14,11 @@
 #include "bsn/operation/Operation.hpp"
 #include "bsn/configuration/SensorConfiguration.hpp"
 
-#include "component/SchedulableComponent.hpp"
+#include "component/Sensor.hpp"
 
 #include "messages/SensorData.h"
-#include "messages/Status.h"
-#include "messages/Event.h"
 
-class G3T1_4 : public SchedulableComponent {
+class G3T1_4 : public Sensor {
     
 	private:
       	G3T1_4(const G3T1_4 &);
@@ -34,36 +30,36 @@ class G3T1_4 : public SchedulableComponent {
 
 		void setUp();
     	void tearDown();
-		void body();
 		
-		void sendStatus(const std::string &/*id*/, const double &/*value*/);
-		void sendEvent(const std::string &/*type*/, const std::string &/*description*/);
+		double collect();
+        double process(const double &data);
+        void transfer(const double &data);
+
+	private:
+		double collectSystolic();
+		double collectDiastolic();
+
+        double processSystolic(const double &data);
+        double processDiastolic(const double &data);
+
+        void transferSystolic(const double &data);
+        void transferDiastolic(const double &data);
+
 
   	private:
-		std::string type;
-		bsn::resource::Battery battery;
-		bool available;
-
-		double diasdata_accuracy;
-		double diascomm_accuracy;
-		double systdata_accuracy;
-		double systcomm_accuracy;
-
-		bool active;
-		std::map<std::string,double> params;
-
 		bsn::generator::Markov markovSystolic;
 		bsn::generator::Markov markovDiastolic;
 		bsn::filters::MovingAverage filterSystolic;
 		bsn::filters::MovingAverage filterDiastolic;
 		bsn::configuration::SensorConfiguration sensorConfigSystolic;
 		bsn::configuration::SensorConfiguration sensorConfigDiastolic;
+		double dias_accuracy;
+		double syst_accuracy;
+		double systolic_data;
+		double diastolic_data;
 
-		int persist;
-		std::string path;
-		std::ofstream fp;
-
-		ros::Publisher status_pub, event_pub, dataPub;
+		ros::NodeHandle handle;
+		ros::Publisher data_pub;
 };
 
 #endif 
