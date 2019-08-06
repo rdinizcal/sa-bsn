@@ -23,6 +23,7 @@ void SchedulableComponent::schedulingSigIntHandler(int sig) {
 		srv.request.frequency = 0;
 		srv.request.deadline = 0;
 		srv.request.wce = 0;
+		srv.request.priority = 0;
 
 		srv.request.connection = false;
 
@@ -83,6 +84,7 @@ void SchedulableComponent::setUp() {
 	{ // Configure module descriptor for scheduling
         double freq, check_frequency;
         int32_t deadline, wce;
+		int priority;
 
         moduleDescriptor.setName(ros::this_node::getName());
 
@@ -98,6 +100,9 @@ void SchedulableComponent::setUp() {
         handle.getParam("check_frequency", check_frequency);
         setCheckFrequency(check_frequency);
 
+		handle.getParam("priority", priority);
+        moduleDescriptor.setPriority(priority);
+
         moduleDescriptor.setConnection(true);
     }
 
@@ -111,6 +116,7 @@ void SchedulableComponent::setUp() {
 		srv.request.deadline = moduleDescriptor.getDeadline();
 		srv.request.wce = moduleDescriptor.getWorstCaseExecutionTime();
 		srv.request.connection = moduleDescriptor.getConnection();
+		srv.request.priority = moduleDescriptor.getPriority();
 
 		if(client_module.call(srv)) {
 			ROS_INFO("Succesfully connected to scheduler.");
