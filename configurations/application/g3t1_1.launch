@@ -5,6 +5,7 @@
     <param name="deadline" value="2000000" /> <!-- (ns) deadline = 10^6*(1/frequency)-->
     <param name="wce" value="1000" /> <!-- 1000μs -->
     <param name="check_frequency" value="10" /> <!-- 10 Hz -->
+    <param name="priority" value="1" /> <!-- 10 Hz -->
 
     <!-- Defines the percentages to consider low, moderate or high risk -->
     <param name="lowrisk" value="0,20" />

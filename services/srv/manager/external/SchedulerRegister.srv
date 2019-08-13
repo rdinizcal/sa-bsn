@@ -4,6 +4,7 @@ float32 frequency
 uint32 deadline
 uint32 wce
 bool connection
+int16 priority
 ---
 #response constants
 bool ACK

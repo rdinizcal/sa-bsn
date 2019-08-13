@@ -84,7 +84,7 @@ void SchedulableComponent::setUp() {
 	{ // Configure module descriptor for scheduling
         double freq, check_frequency;
         int32_t deadline, wce;
-		int priority;
+		int priority; 
 
         moduleDescriptor.setName(ros::this_node::getName());
 
