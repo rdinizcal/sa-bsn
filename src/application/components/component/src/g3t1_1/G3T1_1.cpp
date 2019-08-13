@@ -1,5 +1,8 @@
 #include "component/g3t1_1/G3T1_1.hpp"
 
+#include <algorithm>
+#include <cmath>
+
 using namespace bsn::range;
 using namespace bsn::generator;
 using namespace bsn::operation;
@@ -109,14 +112,55 @@ double G3T1_1::collect() {
     return m_data;
 }
 
+bool G3T1_1::check_failure(std::list<double> filter_buffer) {
+    std::list<double> min_buffer = filter_buffer;
+    std::list<double> max_buffer = filter_buffer;
+
+    double min = 999999;
+    double max = -999999;
+
+    double min_avg = 0;
+    double max_avg = 0;
+
+    for(std::list<double>::iterator it = filter_buffer.begin(); it != filter_buffer.end() ; it++){
+        min = ((*it)<min)?(*it):min;
+        max = ((*it)>max)?(*it):max;
+    }
+
+    min_buffer.erase(std::remove(min_buffer.begin(), min_buffer.end(), max), min_buffer.end());
+
+    for(std::list<double>::iterator it = min_buffer.begin(); it != min_buffer.end() ; it++){
+        min_avg += *it; 
+    }
+
+    min_avg /= min_buffer.size();
+
+    max_buffer.erase(std::remove(max_buffer.begin(), max_buffer.end(), min), max_buffer.end());
+
+    for(std::list<double>::iterator it = max_buffer.begin(); it != max_buffer.end() ; it++){
+        max_avg += *it; 
+    }
+
+    max_avg /= max_buffer.size();
+
+    double limit_diff = filter.getValue()*0.10; // 10% de diferenca!
+    double error_max = std::abs(filter.getValue() - max_avg);
+    double error_min = std::abs(filter.getValue() - min_avg);
+
+    return (error_max > limit_diff || error_min > limit_diff);
+}
+
 double G3T1_1::process(const double &m_data) {
     double filtered_data;
     
-    filter.insert(m_data, type);
-    filtered_data = filter.getValue(type);
+    filter.insert(m_data);
+    filtered_data = filter.getValue();
     battery.consume(0.1*filter.getRange());
 
     ROS_INFO("filtered data: [%s]", std::to_string(filtered_data).c_str());
+    
+    if (check_failure(filter.getBuffer())) throw std::domain_error("failure");
+
     return filtered_data;
 }
 
@@ -136,8 +180,9 @@ void G3T1_1::transfer(const double &m_data) {
     msg.batt = battery.getCurrentLevel();
 
     data_pub.publish(msg);
-    
     battery.consume(0.2);
 
     ROS_INFO("risk calculated and transfered: [%.2f%%]", risk);
+
+    if (risk < 0 || risk > 100) throw std::domain_error("failure");
 }

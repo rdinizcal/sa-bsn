@@ -73,8 +73,7 @@ double Sensor::process(const double &data) {
     try {
         x = process(data);
     } catch (const std::exception& e) {
-        if(e.what() == "failure") sendEvent(e.what(), "could not process data");
-        else std::cout << e.what();
+        sendEvent(e.what(), "could not process data");
     }
 
     return x;
@@ -85,8 +84,7 @@ void Sensor::transfer(const double &data) {
     try {
         transfer(data);
     } catch (const std::exception& e) {
-        if(e.what() == "failure") sendEvent(e.what(), "failed at transfering data");
-        else std::cout << e.what();
+        sendEvent(e.what(), "failed at transfering data");
     }
 
 }

@@ -165,8 +165,8 @@ double G3T1_4::collect() {
 double G3T1_4::processSystolic(const double &m_data) {
     double filtered_data;
     
-    filterSystolic.insert(m_data, type);
-    filtered_data = filterSystolic.getValue(type);
+    filterSystolic.insert(m_data);
+    filtered_data = filterSystolic.getValue();
     battery.consume(0.1*filterSystolic.getRange());
 
     ROS_INFO("filtered data: [%s]", std::to_string(filtered_data).c_str());
@@ -176,8 +176,8 @@ double G3T1_4::processSystolic(const double &m_data) {
 double G3T1_4::processDiastolic(const double &m_data) {
     double filtered_data;
     
-    filterDiastolic.insert(m_data, type);
-    filtered_data = filterDiastolic.getValue(type);
+    filterDiastolic.insert(m_data);
+    filtered_data = filterDiastolic.getValue();
     battery.consume(0.1*filterDiastolic.getRange());
 
     ROS_INFO("filtered data: [%s]", std::to_string(filtered_data).c_str());

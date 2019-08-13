@@ -116,8 +116,8 @@ double G3T1_2::collect() {
 double G3T1_2::process(const double &m_data) {
     double filtered_data;
     
-    filter.insert(m_data, type);
-    filtered_data = filter.getValue(type);
+    filter.insert(m_data);
+    filtered_data = filter.getValue();
     battery.consume(0.1*filter.getRange());
 
     ROS_INFO("filtered data: [%s]", std::to_string(filtered_data).c_str());
