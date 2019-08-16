@@ -1,0 +1,3 @@
+<launch> 
+    <node name="effector" pkg="effector" type="effector" output="screen" />
+</launch>

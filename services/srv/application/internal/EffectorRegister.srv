@@ -1,0 +1,9 @@
+#request constants
+string name
+float32 frequency
+uint32 deadline
+uint32 wce
+bool connection
+---
+#response constants
+bool ACK

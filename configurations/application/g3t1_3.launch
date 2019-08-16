@@ -1,0 +1,37 @@
+<launch> 
+    <node name="g3t1_3" pkg="component" type="g3t1_3" output="screen" />
+
+    <param name="frequency" value="0.5" /> <!-- 1 Hz  -->
+    <param name="deadline" value="2000000" /> <!-- 2 s deadline = 10^6*(1/frequency)-->
+    <param name="wce" value="1000" /> <!-- 1000μs -->
+    <param name="check_frequency" value="10" /> <!-- 10 Hz -->
+
+
+    <!-- Defines the percentages to consider low, moderate or high risk -->
+    <param name="lowrisk" value="0,20" />
+    <param name="midrisk" value="21,65" />
+    <param name="highrisk" value="66,100" />
+
+    <!-- markov chain -->
+    <param name="state0" value="10,10,10,20,40" />
+    <param name="state1" value="10,10,10,20,40" />
+    <param name="state2" value="10,10,10,20,40" />
+    <param name="state3" value="10,10,10,20,40" />
+    <param name="state4" value="10,10,10,20,40" />
+
+    <!-- risk values -->
+    <param name="HighRisk0" value="0,31.99" />
+    <param name="MidRisk0" value="32,35.99" />
+    <param name="LowRisk" value="36,37.99" />
+    <param name="MidRisk1" value="38,40.99" />
+    <param name="HighRisk1" value="41,50" />
+
+    <!-- accuracy in percentage -->
+    <param name="data_accuracy" value="90" type="double" />
+    <param name="comm_accuracy" value="100" type="double" />
+
+    <!-- persistence -->
+    <param name="persist" value="true" type="bool" />
+    <param name="path" value="g3t1_3_output.csv" type="str" />
+
+</launch>
