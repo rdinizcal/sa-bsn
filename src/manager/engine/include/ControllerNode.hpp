@@ -22,7 +22,7 @@
 
 #include "lepton/Lepton.h"
 
-#include "messages/ControlCommand.h"
+#include "messages/CommandControl.h"
 //#include "messages/SystemInfo.h"
 //#include "messages/TaskInfo.h"
 //#include "messages/ContextInfo.h"

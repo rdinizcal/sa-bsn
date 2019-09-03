@@ -277,10 +277,10 @@ void ControllerNode::setUp() {
 
     // Publishes the same messages to both topics to avoid loss of information
 
-    ecg_pub = publisher_handler.advertise<messages::ControlCommand>("ecg_control_command", 1000);
-    oxi_pub = publisher_handler.advertise<messages::ControlCommand>("oximeter_control_command", 1000);
-    abp_pub = publisher_handler.advertise<messages::ControlCommand>("abp_control_command", 1000);
-    therm_pub = publisher_handler.advertise<messages::ControlCommand>("thermometer_control_command", 1000); 
+    ecg_pub = publisher_handler.advertise<messages::CommandControl>("ecg_control_command", 1000);
+    oxi_pub = publisher_handler.advertise<messages::CommandControl>("oximeter_control_command", 1000);
+    abp_pub = publisher_handler.advertise<messages::CommandControl>("abp_control_command", 1000);
+    therm_pub = publisher_handler.advertise<messages::CommandControl>("thermometer_control_command", 1000); 
 }
 
 /** **************************************************************
@@ -422,7 +422,7 @@ void ControllerNode::execute(double action) {
     std::string actuator_name;
     std::string message_type;
 
-    messages::ControlCommand command_msg;
+    messages::CommandControl command_msg;
 
     message_type = op.split(message_id, '_')[0];
     actuator_name = message_type == "CTX" ? getContextActuator(message_id) : getTaskActuator(message_id);

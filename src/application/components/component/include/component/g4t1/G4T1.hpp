@@ -17,7 +17,6 @@
 #include "component/SchedulableComponent.hpp"
 
 #include "messages/SensorData.h"
-#include "messages/SystemInfo.h"
 
 class G4T1 : public SchedulableComponent {
     
@@ -26,7 +25,6 @@ class G4T1 : public SchedulableComponent {
         G4T1 &operator=(const G4T1 & /*obj*/);
 
         void receiveSensorData(const messages::SensorData::ConstPtr&);
-        void receiveSystemInfo(const messages::SystemInfo::ConstPtr&); 
 
         std::string makePacket();
         void persistData(std::vector<std::string>&);
