@@ -139,5 +139,23 @@ void G3T1_1::transfer(const double &m_data) {
     
     battery.consume(0.2);
 
+    //double consumo (0.1 + 0.1*filter.getRange() + 0.1 + 0.2) -> Em porcentagem?
+    //double moduleDescriptor.getFreq();
+    //double timestamp
+    messages::Info infoMsg;
+    std::string content = "";
+    content += "timestamp:,";
+    content += "name:"+moduleDescriptor.getName()+",";
+    content += "type:"+type+",";
+    content += "battery:"+std::to_string(battery.getCurrentLevel())+",";
+    content += "frequency:"+moduleDescriptor.getFreq()+",";
+    content += "cost:"+std::to_string((0.1 + 0.1*filter.getRange() + 0.1 + 0.2))+",";
+    content += "risk:"+risk;
+
+    infoMsg.source = moduleDescriptor.getName();
+    infoMsg.target = "/repository";
+    infoMsg.content = content;
+
+
     ROS_INFO("risk calculated and transfered: [%.2f%%]", risk);
 }

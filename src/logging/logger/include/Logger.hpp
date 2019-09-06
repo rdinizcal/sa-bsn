@@ -10,6 +10,7 @@
 
 #include "messages/Status.h"
 #include "messages/Event.h"
+#include "messages/Info.h"
 #include "messages/ReconfigurationCommand.h"
 
 class Logger {
@@ -31,6 +32,7 @@ class Logger {
 	  	void receiveReconfigurationCommand(const messages::ReconfigurationCommand::ConstPtr& /*msg*/);
 	  	void receiveStatus(const messages::Status::ConstPtr& /*msg*/);
 	  	void receiveEvent(const messages::Event::ConstPtr& /*msg*/);
+	  	void receiveInfo(const messages::Info::ConstPtr& /*msg*/);
 
   	private:
 		std::fstream fp;
@@ -39,6 +41,8 @@ class Logger {
 		int64_t time_ref;
 
 		ros::Publisher reconfig_logger2effector_pub, status_logger2manager_pub, event_logger2manager_pub;
+		ros::Publisher info_logger2repository_pub;
+
 };
 
 #endif 

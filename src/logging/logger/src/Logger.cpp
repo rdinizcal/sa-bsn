@@ -23,6 +23,7 @@ void Logger::setUp() {
     reconfig_logger2effector_pub = handler.advertise<messages::ReconfigurationCommand>("reconfigure", 10);
     status_logger2manager_pub = handler.advertise<messages::Status>("status", 10);
     event_logger2manager_pub = handler.advertise<messages::Event>("event", 10);
+    info_logger2repository_pub = handler.advertise<messages::Info>("info", 10);
 
 }
 
@@ -86,12 +87,17 @@ void Logger::receiveEvent(const messages::Event::ConstPtr& msg) {
     event_logger2manager_pub.publish(msg);
 }
 
+void Logger::receiveInfo(const messages::Info::ConstPtr& msg) {
+    info_logger2repository_pub.publish(msg);
+}
+
 void Logger::run(){
     ros::NodeHandle n;
 
     ros::Subscriber reconfig_sub = n.subscribe("log_reconfigure", 1000, &Logger::receiveReconfigurationCommand, this);
     ros::Subscriber status_sub = n.subscribe("log_status", 1000, &Logger::receiveStatus, this);
     ros::Subscriber event_sub = n.subscribe("log_event", 1000, &Logger::receiveEvent, this);
+    ros::Subscriber info_sub = n.subscribe("log_info", 1000, &Logger::receiveInfo, this);
     
     ros::spin();
 }
