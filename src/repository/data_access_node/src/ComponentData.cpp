@@ -4,6 +4,8 @@ ComponentData::ComponentData(/*int &argc, char **argv*/) {}
 
 ComponentData::~ComponentData() {}
 
+ComponentData::ComponentData(const ComponentData &) {}
+
 void ComponentData::setTimestamp(double &timestamp) {
     this->timestamp = timestamp;
 }
