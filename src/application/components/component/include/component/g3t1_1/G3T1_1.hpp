@@ -17,6 +17,7 @@
 #include "component/Sensor.hpp"
 
 #include "messages/SensorData.h"
+#include "messages/Info.h"
 
 class G3T1_1 : public Sensor {
 
@@ -41,7 +42,7 @@ class G3T1_1 : public Sensor {
 		bsn::configuration::SensorConfiguration sensorConfig;
 
 		ros::NodeHandle handle;
-		ros::Publisher data_pub;
+		ros::Publisher data_pub, info_pub;
 };
 
 #endif 

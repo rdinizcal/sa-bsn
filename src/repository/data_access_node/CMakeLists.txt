@@ -5,7 +5,7 @@ add_compile_options(-std=c++11)
 
 ###########################################################################
 ## Find catkin and any catkin packages
-FIND_PACKAGE(catkin REQUIRED COMPONENTS roscpp std_msgs genmsg messages services)
+FIND_PACKAGE(catkin REQUIRED COMPONENTS roscpp std_msgs genmsg roslib messages services)
 
 ###########################################################################
 # Export catkin package.
@@ -17,7 +17,7 @@ CATKIN_PACKAGE(
 
 ###########################################################################
 # Set catkin directory.
-INCLUDE_DIRECTORIES(${catkin_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(include ${catkin_INCLUDE_DIRS})
 
 # Set include directory.
 INCLUDE_DIRECTORIES(include)
@@ -26,5 +26,5 @@ INCLUDE_DIRECTORIES(include)
 # Build this project.
 FILE(GLOB_RECURSE ${PROJECT_NAME}-srcs "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 ADD_EXECUTABLE (${PROJECT_NAME} "${CMAKE_CURRENT_SOURCE_DIR}/apps/${PROJECT_NAME}.cpp" ${${PROJECT_NAME}-srcs})
-TARGET_LINK_LIBRARIES (${PROJECT_NAME} ${catkin_LIBRARIES} )
+TARGET_LINK_LIBRARIES (${PROJECT_NAME} ${catkin_LIBRARIES})
 ADD_DEPENDENCIES(${PROJECT_NAME} services_generate_messages_cpp)

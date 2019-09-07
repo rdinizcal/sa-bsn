@@ -7,7 +7,7 @@ void Probe::setUp() {
     ros::NodeHandle handler;
     status_pub = handler.advertise<messages::Status>("log_status", 1000);
     event_pub = handler.advertise<messages::Event>("log_event", 1000);
-    info_pub = handler.advertise<messages::Event>("log_info", 1000);
+    info_pub = handler.advertise<messages::Info>("log_info", 1000);
 }
 
 void Probe::receiveStatus(const messages::Status::ConstPtr& msg) {

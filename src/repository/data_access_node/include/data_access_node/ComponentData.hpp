@@ -2,18 +2,17 @@
 #define COMPONENT_DATA_HPP
 
 #include <string>
+#include <sstream>
 
 class ComponentData {
 
 	public:
-    	      ComponentData(int &argc, char **argv);
+    	      ComponentData(/*int &argc, char **argv*/); //Check
     	      virtual ~ComponentData();
 
-      private:
             ComponentData(const ComponentData &);
     	      ComponentData &operator=(const ComponentData &);
 
-  	public:
             void setTimestamp(double &timestamp);
             double getTimestamp();
 
@@ -24,7 +23,7 @@ class ComponentData {
             std::string getType();
 
             void setBatteryLevel(double &battery_level);
-            double getBaterryLevel();
+            double getBatteryLevel();
 
             void setFrequency(double &frequency);
             double getFrequency();
@@ -35,7 +34,7 @@ class ComponentData {
             void setRiskStatus(std::string &risk_status);
             std::string getRiskStatus();
 
-            void toString();
+            std::string toString();
 
   	private:
         double timestamp;

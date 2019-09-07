@@ -17,6 +17,7 @@
 #include "component/Sensor.hpp"
 
 #include "messages/SensorData.h"
+#include "messages/Info.h"
 
 class G3T1_4 : public Sensor {
     
@@ -59,7 +60,7 @@ class G3T1_4 : public Sensor {
 		double diastolic_data;
 
 		ros::NodeHandle handle;
-		ros::Publisher data_pub;
+		ros::Publisher data_pub, info_pub;
 };
 
 #endif 

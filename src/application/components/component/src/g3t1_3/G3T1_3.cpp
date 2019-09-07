@@ -131,6 +131,7 @@ void G3T1_3::transfer(const double &m_data) {
     ros::NodeHandle handle;
 
     data_pub = handle.advertise<messages::SensorData>("oximeter_data", 10);
+    info_pub = handle.advertise<messages::Info>("collect_info", 1000);
 
     risk = sensorConfig.evaluateNumber(m_data);
     battery.consume(0.1);
@@ -143,6 +144,22 @@ void G3T1_3::transfer(const double &m_data) {
     data_pub.publish(msg);
     
     battery.consume(0.2);
+
+    messages::Info infoMsg;
+    std::string content = "";
+    content += "timestamp:,";
+    content += "name:"+moduleDescriptor.getName()+",";
+    content += "type:"+type+",";
+    content += "battery:"+std::to_string(battery.getCurrentLevel())+",";
+    content += "frequency:"+std::to_string(moduleDescriptor.getFreq())+",";
+    content += "cost:"+std::to_string((0.1 + 0.1*filter.getRange() + 0.1 + 0.2))+",";
+    content += "risk:"+std::to_string(risk); //Error!;
+
+    infoMsg.source = moduleDescriptor.getName();
+    infoMsg.target = "/repository";
+    infoMsg.content = content;
+
+    info_pub.publish(infoMsg);
 
     ROS_INFO("risk calculated and transfered: [%.2f%%]", risk);
 }
