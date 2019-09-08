@@ -14,25 +14,25 @@ class ComponentData {
     	      ComponentData &operator=(const ComponentData &);
 
             void setTimestamp(double &timestamp);
-            double getTimestamp();
+            double getTimestamp() const;
 
             void setName(std::string &name);
-            std::string getName();
+            std::string getName() const;
 
             void setType(std::string &type);
-            std::string getType();
+            std::string getType() const;
 
             void setBatteryLevel(double &battery_level);
-            double getBatteryLevel();
+            double getBatteryLevel() const;
 
             void setFrequency(double &frequency);
-            double getFrequency();
+            double getFrequency() const;
 
             void setCost(double &cost);
-            double getCost();
+            double getCost() const;
 
             void setRiskStatus(std::string &risk_status);
-            std::string getRiskStatus();
+            std::string getRiskStatus() const;
 
             std::string toString();
 

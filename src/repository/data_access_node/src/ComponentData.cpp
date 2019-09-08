@@ -4,13 +4,20 @@ ComponentData::ComponentData(/*int &argc, char **argv*/) {}
 
 ComponentData::~ComponentData() {}
 
-ComponentData::ComponentData(const ComponentData &) {}
+ComponentData::ComponentData(const ComponentData &obj) :
+    timestamp(obj.getTimestamp()),
+    name(obj.getName()),
+    type(obj.getType()),
+    battery_level(obj.getBatteryLevel()),
+    frequency(obj.getFrequency()),
+    cost(obj.getCost()),
+    risk_status(obj.getRiskStatus()) {}
 
 void ComponentData::setTimestamp(double &timestamp) {
     this->timestamp = timestamp;
 }
 
-double ComponentData::getTimestamp() {
+double ComponentData::getTimestamp() const {
     return this->timestamp;
 }
 
@@ -18,7 +25,7 @@ void ComponentData::setName(std::string &name) {
     this->name = name;
 }
 
-std::string ComponentData::getName() {
+std::string ComponentData::getName() const {
     return this->name;
 }
 
@@ -26,7 +33,7 @@ void ComponentData::setType(std::string &type) {
     this->type = type;
 }
 
-std::string ComponentData::getType() {
+std::string ComponentData::getType() const {
     return this->type;
 }
 
@@ -34,7 +41,7 @@ void ComponentData::setBatteryLevel(double &battery_level) {
     this->battery_level = battery_level;
 }
 
-double ComponentData::getBatteryLevel() {
+double ComponentData::getBatteryLevel() const {
     return this->battery_level;
 }
 
@@ -42,7 +49,7 @@ void ComponentData::setFrequency(double &frequency) {
     this->frequency = frequency;
 }
 
-double ComponentData::getFrequency() {
+double ComponentData::getFrequency() const {
     return this->frequency;
 }
 
@@ -50,7 +57,7 @@ void ComponentData::setCost(double &cost) {
     this->cost = cost;
 }
 
-double ComponentData::getCost() {
+double ComponentData::getCost() const {
     return this->cost;
 }
 
@@ -58,7 +65,7 @@ void ComponentData::setRiskStatus(std::string &risk_status) {
     this->risk_status = risk_status;
 }
 
-std::string ComponentData::getRiskStatus() {
+std::string ComponentData::getRiskStatus() const {
     return this->risk_status;
 }
 
