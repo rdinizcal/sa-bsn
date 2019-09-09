@@ -9,6 +9,7 @@
 
 #include "ComponentData.hpp"
 #include "messages/Info.h"
+#include "services/ControllerInfo.h"
 
 #include "ros/ros.h"
 #include <ros/package.h>
@@ -28,6 +29,8 @@ class DataAccessNode {
 		void tearDown();
 		void run();
 
+		bool sendInfo(services::ControllerInfo::Request &req, services::ControllerInfo::Response &res);
+
 		void parse(std::string, ComponentData&);
 	  	void receiveInfo(const messages::Info::ConstPtr& /*msg*/);
 		void persistComponentData();
@@ -37,8 +40,10 @@ class DataAccessNode {
   	private:
 	    std::fstream fp;
 		ros::NodeHandle handle;
+		ros::ServiceServer info_service;
 		std::map<std::string, std::vector<ComponentData>> componentMap;
 		std::string filepath;
+		int logical_clock;
 };
 
 #endif 

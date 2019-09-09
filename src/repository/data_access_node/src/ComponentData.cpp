@@ -73,7 +73,7 @@ std::string ComponentData::toString() {
     std::ostringstream ss;
     std::string componentData;
 
-    std::string separator = " ";
+    std::string separator = ",";
 
     ss << this->getTimestamp();
     componentData += ss.str() + separator;

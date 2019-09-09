@@ -58,6 +58,8 @@ class G3T1_4 : public Sensor {
 		double syst_accuracy;
 		double systolic_data;
 		double diastolic_data;
+		double systolic_risk;
+		double diastolic_risk;
 
 		ros::NodeHandle handle;
 		ros::Publisher data_pub, info_pub;

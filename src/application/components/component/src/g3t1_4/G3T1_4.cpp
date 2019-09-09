@@ -18,7 +18,9 @@ G3T1_4::G3T1_4(const int32_t &argc, char **argv) :
     dias_accuracy(0),
     syst_accuracy(0),
     systolic_data(0),
-    diastolic_data(0) {}
+    diastolic_data(0),
+    systolic_risk(0),
+    diastolic_risk(0) {}
 
 G3T1_4::~G3T1_4() {}
 
@@ -193,63 +195,56 @@ double G3T1_4::process(const double &m_data) {
 }
 
 void G3T1_4::transferSystolic(const double &m_data) {
-    double risk;
+
     messages::SensorData msg;
     ros::NodeHandle handle;
 
-    data_pub = handle.advertise<messages::SensorData>("oximeter_data", 10);
-    info_pub = handle.advertise<messages::Info>("collect_info", 1000);
+    data_pub = handle.advertise<messages::SensorData>("systolic_data", 10);
 
-    risk = sensorConfigSystolic.evaluateNumber(m_data);
+    systolic_risk = sensorConfigSystolic.evaluateNumber(m_data);
     battery.consume(0.1);
 
     msg.type = "bpms";
     msg.data = m_data;
-    msg.risk = risk;
+    msg.risk = systolic_risk;
     msg.batt = battery.getCurrentLevel();
 
     data_pub.publish(msg);
     
     battery.consume(0.2);
 
-    messages::Info infoMsg;
-    std::string content = "";
-    content += "timestamp:,";
-    content += "name:"+moduleDescriptor.getName()+",";
-    content += "type:"+type+",";
-    content += "battery:"+std::to_string(battery.getCurrentLevel())+",";
-    content += "frequency:"+std::to_string(moduleDescriptor.getFreq())+",";
-    content += "cost:"+std::to_string((0.1 + 0.1*filterSystolic.getRange() + 0.1 + 0.2))+",";
-    content += "risk:"+std::to_string(risk); //Error!;
-
-    infoMsg.source = moduleDescriptor.getName();
-    infoMsg.target = "/repository";
-    infoMsg.content = content;
-
-    info_pub.publish(infoMsg);
-
-    ROS_INFO("risk calculated and transfered: [%.2f%%]", risk);
+    ROS_INFO("risk calculated and transfered: [%.2f%%]", systolic_risk);
 }
 
 void G3T1_4::transferDiastolic(const double &m_data) {
-    double risk;
+    
     messages::SensorData msg;
     ros::NodeHandle handle;
 
-    data_pub = handle.advertise<messages::SensorData>("oximeter_data", 10);
-    info_pub = handle.advertise<messages::Info>("collect_info", 1000);
+    data_pub = handle.advertise<messages::SensorData>("diastolic_data", 10);
 
-    risk = sensorConfigDiastolic.evaluateNumber(m_data);
+    diastolic_risk = sensorConfigDiastolic.evaluateNumber(m_data);
     battery.consume(0.1);
 
     msg.type = "bpmd";
     msg.data = m_data;
-    msg.risk = risk;
+    msg.risk = diastolic_risk;
     msg.batt = battery.getCurrentLevel();
 
     data_pub.publish(msg);
     
     battery.consume(0.2);
+
+    ROS_INFO("risk calculated and transfered: [%.2f%%]", diastolic_risk);
+}
+
+void G3T1_4::transfer(const double &m_data) {
+
+    
+    transferSystolic(systolic_data);
+    transferDiastolic(diastolic_data);
+
+    info_pub = handle.advertise<messages::Info>("collect_info", 1000);
 
     messages::Info infoMsg;
     std::string content = "";
@@ -258,21 +253,25 @@ void G3T1_4::transferDiastolic(const double &m_data) {
     content += "type:"+type+",";
     content += "battery:"+std::to_string(battery.getCurrentLevel())+",";
     content += "frequency:"+std::to_string(moduleDescriptor.getFreq())+",";
-    content += "cost:"+std::to_string((0.1 + 0.1*filterDiastolic.getRange() + 0.1 + 0.2))+",";
-    content += "risk:"+std::to_string(risk); //Error!;
+    content += "cost:"+std::to_string((0.1*2 + 0.1*filterDiastolic.getRange() + 0.1*filterSystolic.getRange()+ 0.1*2 + 0.2*2))+",";
+    
+    std::string r;
+    if(sensorConfigDiastolic.isLowRisk(diastolic_risk) && sensorConfigSystolic.isLowRisk(systolic_risk)) {
+        r = "low";
+    } else if(sensorConfigDiastolic.isMediumRisk(diastolic_risk) || sensorConfigSystolic.isMediumRisk(systolic_risk)) {
+        r = "moderate";
+    } else if(sensorConfigDiastolic.isHighRisk(diastolic_risk) || sensorConfigSystolic.isHighRisk(systolic_risk)) {
+        r = "high";
+    } else {
+        r = "undefined";
+    }
+
+    content += "risk:"+r;
 
     infoMsg.source = moduleDescriptor.getName();
     infoMsg.target = "/repository";
     infoMsg.content = content;
 
     info_pub.publish(infoMsg);
-
-    ROS_INFO("risk calculated and transfered: [%.2f%%]", risk);
-}
-
-void G3T1_4::transfer(const double &m_data) {
-
-    transferSystolic(systolic_data);
-    transferDiastolic(diastolic_data);
 
 }

@@ -148,7 +148,18 @@ void G3T1_1::transfer(const double &m_data) {
     content += "battery:"+std::to_string(battery.getCurrentLevel())+",";
     content += "frequency:"+std::to_string(moduleDescriptor.getFreq())+",";
     content += "cost:"+std::to_string((0.1 + 0.1*filter.getRange() + 0.1 + 0.2))+",";
-    content += "risk:"+std::to_string(risk); //Error!
+    
+    std::string r;
+    if(sensorConfig.isLowRisk(risk)) {
+        r = "low";
+    } else if(sensorConfig.isMediumRisk(risk)) {
+        r = "moderate";
+    } else if(sensorConfig.isHighRisk(risk)) {
+        r = "high";
+    } else {
+        r = "undefined";
+    }
+    content += "risk:"+r;
 
     infoMsg.source = moduleDescriptor.getName();
     infoMsg.target = "/repository";

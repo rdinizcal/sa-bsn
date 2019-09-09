@@ -1,6 +1,9 @@
 #include "data_access_node/DataAccessNode.hpp"
 
-DataAccessNode::DataAccessNode(int  &argc, char **argv) {}
+DataAccessNode::DataAccessNode(int  &argc, char **argv) :
+    filepath(""),
+    logical_clock(0) {}
+
 DataAccessNode::~DataAccessNode() {}
 
 void DataAccessNode::setUp() {
@@ -10,19 +13,56 @@ void DataAccessNode::setUp() {
     fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
     fp << "timestamp module_name type battery_level frequency cost risk_status\n";
     fp.close();
+
+    info_service = handle.advertiseService("InfoRequest", &DataAccessNode::sendInfo, this);
 }
 
 void DataAccessNode::tearDown() {}
 
 void DataAccessNode::run(){
-    ros::spin();
+    ros::Rate loop_rate(100);
+    ros::NodeHandle n;
+    ros::Subscriber receive_data = n.subscribe("persist", 1000, &DataAccessNode::receiveInfo, this);
+    
+    while(ros::ok()) {
+
+        
+        ros::spinOnce();
+        loop_rate.sleep();
+    }
+}
+
+bool DataAccessNode::sendInfo(services::ControllerInfo::Request &req, services::ControllerInfo::Response &res) {
+    std::map<std::string,std::vector<ComponentData>>::iterator it;
+
+    int i = 0;
+
+    for(it = componentMap.begin();it != componentMap.end();++it) {
+        res.module_name[i] = it->first;
+
+        ComponentData component = it->second.back();
+
+        res.battery_level[i] = component.getBatteryLevel();
+        res.cost[i] = component.getCost();
+        res.frequency[i] = component.getFrequency();
+        res.risk_status[i] = component.getRiskStatus();
+
+        i++;
+    }
+
+    if(i == 0) {
+        res.empty = true;
+    } else {
+        res.empty = false;
+    }
+
+    return true;
 }
 
 void DataAccessNode::parse(std::string content, ComponentData& component) {
     std::string aux = "";
     bool isValue = false;
     int valueCounter = 0;
-    //ComponentData component;
 
     char separator = ',';
     char delimiter = ':';
@@ -72,8 +112,6 @@ void DataAccessNode::parse(std::string content, ComponentData& component) {
             isValue = true;
         }
     }
-
-    //return component;
 } 
 
 void DataAccessNode::receiveInfo(const messages::Info::ConstPtr& msg) {
@@ -82,10 +120,15 @@ void DataAccessNode::receiveInfo(const messages::Info::ConstPtr& msg) {
     parse(msg->content, componentData);
 
     componentMap[componentData.getName()].push_back(componentData);
+
+    logical_clock++;
+    
+    if(logical_clock % 100 == 0) {
+        persistComponentData();
+    }
 }
 
 void DataAccessNode::persistComponentData() {
-    //To be called from time to time (period to be defined)
     std::map<std::string,std::vector<ComponentData>>::iterator componentMapIterator;
     std::vector<ComponentData>::iterator componentDataVectorIterator;
 
@@ -95,6 +138,7 @@ void DataAccessNode::persistComponentData() {
         for(componentDataVectorIterator = componentMapIterator->second.begin();componentDataVectorIterator != componentMapIterator->second.end();++componentDataVectorIterator) {
             fp << (*componentDataVectorIterator).toString();
         }
+        componentMapIterator->second.clear();
     }
 
     fp.close();
