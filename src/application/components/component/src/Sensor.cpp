@@ -1,7 +1,7 @@
 #include "component/Sensor.hpp"
 
 
-Sensor::Sensor(const int32_t &argc, char **argv, const std::string &type, const bool &active, const double &accuracy, const bsn::resource::Battery &battery) : SchedulableComponent(argc, argv), type(type), active(active), accuracy(accuracy), battery(battery), data(0.0) {}
+Sensor::Sensor(int &argc, char **argv, const std::string &name, const std::string &type, const bool &active, const double &accuracy, const bsn::resource::Battery &battery) : Component(argc, argv, name), type(type), active(active), accuracy(accuracy), battery(battery), data(0.0) {}
 
 Sensor::~Sensor() {}
 
@@ -11,28 +11,6 @@ Sensor& Sensor::operator=(const Sensor &obj) {
     this->accuracy = obj.accuracy;
     this->battery = obj.battery;
     this->data = obj.data;
-}
-
-void Sensor::sendEvent(const std::string &type, const std::string &description) {
-    messages::Event msg;
-
-    msg.source = ros::this_node::getName();
-    msg.type = type;
-    msg.description = description;
-
-    event_pub = handle.advertise<messages::Event>("collect_event", 10);
-    event_pub.publish(msg);
-}
-
-void Sensor::sendStatus(const std::string &id, const double &value) {
-    messages::Status msg;
-
-    msg.source = ros::this_node::getName();
-    msg.key = id;
-    msg.value = value;
-
-    status_pub = handle.advertise<messages::Status>("collect_status", 10);
-    status_pub.publish(msg);
 }
 
 void Sensor::body() {
@@ -52,41 +30,35 @@ void Sensor::body() {
     } else {
         recharge();
     }
+}
 
+void Sensor::reconfigure(const archlib::AdaptationCommand::ConstPtr& msg) {
+    std::string action = msg->action.c_str();
+
+    char *buffer = strdup(action.c_str());
+    char *pair = strtok(buffer, ",");
+    char *key = strtok(pair, "=");
+    double value  = std::stod(strtok(NULL, "="));
+
+    if(key=="freq"){
+        rosComponentDescriptor.setFreq(value);
+    }
 }
 
 double Sensor::collect() {
     double x = 0;
-
-    try {
-        x = collect();
-    } catch (const std::exception& e) {
-        sendEvent(e.what(), "collected data exceeded range");
-    }
-
+    x = collect();
     return x;
 }
 
 double Sensor::process(const double &data) {
     double x = 0;
-
-    try {
-        x = process(data);
-    } catch (const std::exception& e) {
-        sendEvent(e.what(), "could not process data");
-    }
-
+    x = process(data);
     return x;
 }
 
 void Sensor::transfer(const double &data) {
-    
-    try {
-        transfer(data);
-    } catch (const std::exception& e) {
-        sendEvent(e.what(), "failed at transfering data");
-    }
-
+    transfer(data);
 }
 
 bool Sensor::isActive() {

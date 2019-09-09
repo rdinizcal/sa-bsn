@@ -14,11 +14,12 @@
 #include "bsn/processor/Processor.hpp"
 #include "bsn/operation/Operation.hpp"
 
-#include "component/SchedulableComponent.hpp"
+#include "archlib/target_system/Component.hpp"
+#include "archlib/AdaptationCommand.h"
 
 #include "messages/SensorData.h"
 
-class G4T1 : public SchedulableComponent {
+class G4T1 : public arch::target_system::Component {
     
     private:
         G4T1(const G4T1 & /*obj*/);
@@ -31,15 +32,14 @@ class G4T1 : public SchedulableComponent {
         std::vector<std::string> getPatientStatus();
 
     public:
-        G4T1(const int32_t &argc, char **argv);
+        G4T1(int &argc, char **argv, const std::string &name);
         virtual ~G4T1();
 
         void setUp();
         void tearDown();   
         void body();
 
-        void sendEvent(const std::string &/*type*/, const std::string &/*description*/);
-		void sendStatus(const std::string &/*key*/, const double &/*value*/);
+        void reconfigure(const archlib::AdaptationCommand::ConstPtr& msg);
 
     private:
         bool active;

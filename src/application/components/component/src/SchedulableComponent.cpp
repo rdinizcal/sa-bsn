@@ -1,6 +1,6 @@
 #include "component/SchedulableComponent.hpp"
 
-SchedulableComponent::SchedulableComponent(const int32_t &argc, char **argv) : 
+SchedulableComponent::SchedulableComponent(int &argc, char **argv) : 
 	Module(argc, argv), 
 	received_name(""), 
 	check_frequency(2) {}
@@ -148,7 +148,7 @@ void SchedulableComponent::setUp() {
 	schedule_task = schedule_task_handler.subscribe("effect_" + moduleDescriptor.getName(), 1, &SchedulableComponent::schedulingCallback, this);
 
 	//Publishing in finish topic, which indicates end of module's execution
-	task_finished_pub = task_finished_handler.advertise<messages::Event>("collect_event", 1000);
+	task_finished_pub = task_finished_handler.advertise<archlib::Event>("collect_event", 1000);
 }
 
 /********************************************************************************
@@ -166,7 +166,7 @@ void SchedulableComponent::schedulingCallback(const messages::ReconfigurationCom
 
 	body();
 
-	messages::Event f_msg;
+	archlib::Event f_msg;
 
 	f_msg.source = moduleDescriptor.getName();
 	f_msg.type = "finished";

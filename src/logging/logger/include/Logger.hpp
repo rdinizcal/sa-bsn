@@ -8,8 +8,8 @@
 #include "ros/ros.h"
 #include <ros/package.h>
 
-#include "messages/Status.h"
-#include "messages/Event.h"
+#include "archlib/Status.h"
+#include "archlib/Event.h"
 #include "messages/ReconfigurationCommand.h"
 
 class Logger {
@@ -29,8 +29,8 @@ class Logger {
 
   	public:
 	  	void receiveReconfigurationCommand(const messages::ReconfigurationCommand::ConstPtr& /*msg*/);
-	  	void receiveStatus(const messages::Status::ConstPtr& /*msg*/);
-	  	void receiveEvent(const messages::Event::ConstPtr& /*msg*/);
+	  	void receiveStatus(const archlib::Status::ConstPtr& /*msg*/);
+	  	void receiveEvent(const archlib::Event::ConstPtr& /*msg*/);
 
   	private:
 		std::fstream fp;

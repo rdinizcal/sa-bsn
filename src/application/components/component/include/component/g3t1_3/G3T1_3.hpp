@@ -19,15 +19,16 @@
 #include "messages/SensorData.h"
 
 class G3T1_3 : public Sensor {
-    
+    	
+  	public:
+    	G3T1_3(int &argc, char **argv, const std::string &name);
+    	virtual ~G3T1_3();
+
 	private:
       	G3T1_3(const G3T1_3 &);
     	G3T1_3 &operator=(const G3T1_3 &);
-		
-  	public:
-    	G3T1_3(const int32_t &argc, char **argv);
-    	virtual ~G3T1_3();
-    	
+    
+	public:
 		virtual void setUp();
     	virtual void tearDown();
 

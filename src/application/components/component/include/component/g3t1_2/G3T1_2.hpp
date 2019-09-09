@@ -20,14 +20,15 @@
 
 class G3T1_2 : public Sensor {
     
+  	public:
+	    G3T1_2(int &argc, char **argv, const std::string &name);
+    	~G3T1_2();
+
 	private:
       	G3T1_2(const G3T1_2 &);
     	G3T1_2 &operator=(const G3T1_2 &);
 
-  	public:
-	    G3T1_2(const int32_t &argc, char **argv);
-    	~G3T1_2();
-
+	public:
     	void setUp();
     	void tearDown();
 

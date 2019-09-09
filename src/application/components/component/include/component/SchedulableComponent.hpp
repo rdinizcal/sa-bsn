@@ -12,8 +12,8 @@
 #include "services/EffectorRegister.h"
 #include "services/SchedulerRegister.h"
 
-#include "messages/Event.h"
-#include "messages/Status.h"
+#include "archlib/Event.h"
+#include "archlib/Status.h"
 #include "messages/ReconfigurationCommand.h"
 
 class SchedulableComponent : public arch::Module {
@@ -22,7 +22,7 @@ class SchedulableComponent : public arch::Module {
         void schedulingCallback(const messages::ReconfigurationCommand& msg);
 
     public:
-        SchedulableComponent(const int32_t &argc, char **argv);
+        SchedulableComponent(int &argc, char **argv);
         virtual ~SchedulableComponent();
 
         static void schedulingSigIntHandler(int sig);

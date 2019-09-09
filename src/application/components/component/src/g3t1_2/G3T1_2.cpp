@@ -5,8 +5,8 @@ using namespace bsn::generator;
 using namespace bsn::operation;
 using namespace bsn::configuration;
 
-G3T1_2::G3T1_2(const int32_t &argc, char **argv) :
-    Sensor(argc, argv, "ecg", true, 1, bsn::resource::Battery("ecg_batt", 100, 100, 1)),
+G3T1_2::G3T1_2(int &argc, char **argv, const std::string &name) :
+    Sensor(argc, argv, name, "ecg", true, 1, bsn::resource::Battery("ecg_batt", 100, 100, 1)),
     markov(),
     filter(5),
     sensorConfig() {}

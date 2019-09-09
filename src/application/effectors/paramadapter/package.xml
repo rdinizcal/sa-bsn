@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>effector</name>
+  <name>paramadapter</name>
   <version>1.0.0</version>
-  <description>The effector package</description>
+  <description>The param adapter package</description>
 
   <maintainer email="rdinizcal@gmail.com">Ricardo D. Caldas</maintainer>
   <author email="rdinizcal@gmail.com">Ricardo D. Caldas </author>
@@ -14,13 +14,13 @@
   <build_depend>std_msgs</build_depend>
   <build_depend>messages</build_depend>
   <build_depend>services</build_depend>
-
+  <build_depend>archlib</build_depend>
 
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>messages</exec_depend>
   <exec_depend>message_runtime</exec_depend>
   <exec_depend>services</exec_depend>
-
+  <exec_depend>archlib</exec_depend>
 
   <export>
   </export>

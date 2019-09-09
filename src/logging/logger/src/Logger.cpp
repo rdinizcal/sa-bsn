@@ -21,8 +21,8 @@ void Logger::setUp() {
 
     ros::NodeHandle handler;
     reconfig_logger2effector_pub = handler.advertise<messages::ReconfigurationCommand>("reconfigure", 10);
-    status_logger2manager_pub = handler.advertise<messages::Status>("status", 10);
-    event_logger2manager_pub = handler.advertise<messages::Event>("event", 10);
+    status_logger2manager_pub = handler.advertise<archlib::Status>("status", 10);
+    event_logger2manager_pub = handler.advertise<archlib::Event>("event", 10);
 
 }
 
@@ -46,7 +46,7 @@ void Logger::receiveReconfigurationCommand(const messages::ReconfigurationComman
 }
 
 
-void Logger::receiveStatus(const messages::Status::ConstPtr& msg) {
+void Logger::receiveStatus(const archlib::Status::ConstPtr& msg) {
     ROS_INFO("I heard: [%s: %f]", msg->key.c_str(), msg->value);
     ++logical_clock;
 
@@ -66,7 +66,7 @@ void Logger::receiveStatus(const messages::Status::ConstPtr& msg) {
     status_logger2manager_pub.publish(msg);
 }
 
-void Logger::receiveEvent(const messages::Event::ConstPtr& msg) {
+void Logger::receiveEvent(const archlib::Event::ConstPtr& msg) {
     ROS_INFO("I heard: [%s: %s]", msg->source.c_str(), msg->type.c_str());
     ++logical_clock;
 
