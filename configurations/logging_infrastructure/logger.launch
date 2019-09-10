@@ -1,0 +1,3 @@
+<launch> 
+    <node name="logger" pkg="logging_infrastructure" type="logger" output="screen" />
+</launch>

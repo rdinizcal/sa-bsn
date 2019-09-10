@@ -9,6 +9,8 @@ void ParamAdapter::setUp() {
 }
 
 void ParamAdapter::tearDown() {}
+void ParamAdapter::body() {}
+
 
 void ParamAdapter::receiveAdaptationCommand(const archlib::AdaptationCommand::ConstPtr& msg) {
 	if (target_arr.find(msg->target) != target_arr.end()){

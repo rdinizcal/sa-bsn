@@ -205,5 +205,5 @@ void G4T1::body() {
     ros::Subscriber diastolicSub = nh.subscribe("diastolic_data", 10, &G4T1::receiveSensorData, this);
     ros::Subscriber systolicSub = nh.subscribe("systolic_data", 10, &G4T1::receiveSensorData, this);
 
-    //ros::spin();
+    ros::spin();
 }

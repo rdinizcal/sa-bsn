@@ -22,12 +22,12 @@ class ParamAdapter : public arch::target_system::Effector {
   	public:
 		virtual void setUp();
 		virtual void tearDown();
+		virtual void body();
 
         virtual void receiveAdaptationCommand(const archlib::AdaptationCommand::ConstPtr& msg);
 		bool moduleConnect(services::EffectorRegister::Request &req, services::EffectorRegister::Response &res);
 
   	private:
-		ros::NodeHandle handle;
 		ros::ServiceServer register_service;
 	  	std::map<std::string,ros::Publisher> target_arr;
 

@@ -17,10 +17,8 @@ void Sensor::body() {
     
     if (!isActive() && battery.getCurrentLevel() > 90){
         turnOn();
-        sendStatus(ros::this_node::getName(), active?1:0);
     } else if (isActive() && battery.getCurrentLevel() < 2){
-        turnOff();
-        sendStatus(ros::this_node::getName(), active?1:0);
+        turnOff();        
     }
 
     if(isActive()) {
@@ -67,10 +65,12 @@ bool Sensor::isActive() {
 
 void Sensor::turnOn() {
     active = true;
+    activate();
 }
 
 void Sensor::turnOff() {
     active = false;
+    deactivate();
 }
 
 void Sensor::recharge() {
