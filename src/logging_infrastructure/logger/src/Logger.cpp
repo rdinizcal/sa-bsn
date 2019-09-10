@@ -15,6 +15,10 @@ void Logger::setUp() {
     status = handle.advertise<archlib::Status>("status", 10);
     event = handle.advertise<archlib::Event>("event", 10);
     persist = handle.advertise<archlib::Persist>("persist", 10);
+
+    double freq;
+	handle.getParam("frequency", freq);
+	rosComponentDescriptor.setFreq(freq);
 }
 
 void Logger::tearDown() {}

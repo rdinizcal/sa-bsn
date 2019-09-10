@@ -1,16 +1,24 @@
-#include "paramadapter/ParamAdapter.hpp"
+#include "param_adapter/ParamAdapter.hpp"
 
 ParamAdapter::ParamAdapter(int  &argc, char **argv, const std::string &name) : Effector(argc, argv, name) {}
 ParamAdapter::~ParamAdapter() {}
 
 void ParamAdapter::setUp() {
 	register_service = handle.advertiseService("EffectorRegister", &ParamAdapter::moduleConnect, this);
-	ros::Subscriber reconfigure_sub = handle.subscribe("reconfigure", 1000, &ParamAdapter::receiveAdaptationCommand, this);
+			
+	double freq;
+	handle.getParam("frequency", freq);
+	rosComponentDescriptor.setFreq(freq);
 }
 
 void ParamAdapter::tearDown() {}
-void ParamAdapter::body() {}
 
+void ParamAdapter::body() {
+	ros::NodeHandle n;
+	ros::Subscriber reconf = n.subscribe("reconfigure", 1000, &ParamAdapter::receiveAdaptationCommand, this);
+	ros::spin();
+
+}
 
 void ParamAdapter::receiveAdaptationCommand(const archlib::AdaptationCommand::ConstPtr& msg) {
 	if (target_arr.find(msg->target) != target_arr.end()){

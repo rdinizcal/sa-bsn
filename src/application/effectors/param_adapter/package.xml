@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>paramadapter</name>
+  <name>effector</name>
   <version>1.0.0</version>
-  <description>The param adapter package</description>
+  <description>The effector package</description>
 
   <maintainer email="rdinizcal@gmail.com">Ricardo D. Caldas</maintainer>
   <author email="rdinizcal@gmail.com">Ricardo D. Caldas </author>

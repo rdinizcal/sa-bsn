@@ -1,11 +1,7 @@
 <launch> 
     <node name="g3t1_4" pkg="component" type="g3t1_4" output="screen" />
 
-    <param name="frequency" value="0.5" /> <!-- 1 Hz  -->
-    <param name="deadline" value="2000000" /> <!-- 2 s deadline = 10^6*(1/frequency)-->
-    <param name="wce" value="1000" /> <!-- 1000μs -->
-    <param name="check_frequency" value="10" /> <!-- 10 Hz -->
-
+    <param name="frequency" value="1" /> <!-- 1 Hz  -->
 
     <!-- Defines the percentages to consider low, moderate or high risk -->
     <param name="lowrisk" value="0,20" />

@@ -1,5 +1,5 @@
 CMAKE_MINIMUM_REQUIRED (VERSION 2.8.3)
-PROJECT(paramadapter)
+PROJECT(effector)
 
 add_compile_options(-std=c++11)
 
@@ -24,7 +24,9 @@ INCLUDE_DIRECTORIES(include)
 
 ###########################################################################
 # Build this project.
-FILE(GLOB_RECURSE ${PROJECT_NAME}-srcs "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
-ADD_EXECUTABLE (${PROJECT_NAME} "${CMAKE_CURRENT_SOURCE_DIR}/apps/${PROJECT_NAME}.cpp" ${${PROJECT_NAME}-srcs})
-TARGET_LINK_LIBRARIES (${PROJECT_NAME} ${catkin_LIBRARIES} )
-ADD_DEPENDENCIES(${PROJECT_NAME} services_generate_messages_cpp)
+FILE(GLOB ${PROJECT_NAME}-src "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+
+SET(param_adapter-src "${CMAKE_CURRENT_SOURCE_DIR}/src/ParamAdapter.cpp")
+ADD_EXECUTABLE (param_adapter  "${CMAKE_CURRENT_SOURCE_DIR}/apps/param_adapter.cpp" ${${PROJECT_NAME}-src} ${param_adapter-src})
+TARGET_LINK_LIBRARIES (param_adapter ${catkin_LIBRARIES} ${LIBRARIES})
+ADD_DEPENDENCIES(param_adapter services_generate_messages_cpp)

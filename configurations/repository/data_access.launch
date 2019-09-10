@@ -1,3 +1,4 @@
 <launch> 
     <node name="data_access" pkg="repository" type="data_access" output="screen" />
+    <param name="frequency" value="100" /> <!-- 100 Hz  -->
 </launch>

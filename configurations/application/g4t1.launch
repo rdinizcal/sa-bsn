@@ -1,21 +1,13 @@
 <launch> 
     <node name="g4t1" pkg="component" type="g4t1" output="screen" />
 
-    <param name="frequency" value="0.5" /> <!-- 1 Hz  -->
-    <param name="deadline" value="2000000" /> <!-- 2 s deadline = 10^6*(1/frequency)-->
-    <param name="wce" value="1000" /> <!-- 1000μs -->
-    <param name="check_frequency" value="10" /> <!-- 10 Hz -->
+    <param name="frequency" value="1" /> <!-- 1 Hz  -->
 
     <param name="connect" value="true" type="bool" />
-
     <!-- Firebase Realtime Database -->
     <param name="db_url" value="https://my-project-1516369881504.firebaseio.com" />
-
     <param name="persist" value="false" type="bool" />
-
     <param name="path" value="g4t1_output.csv" />
-
     <param name="session" value="25" type="int" />
-
 
 </launch>

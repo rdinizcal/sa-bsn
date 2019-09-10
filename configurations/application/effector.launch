@@ -1,3 +1,4 @@
 <launch> 
-    <node name="paramadapter" pkg="paramadapter" type="paramadapter" output="screen" />
+    <node name="param_adapter" pkg="effector" type="param_adapter" output="screen" />
+    <param name="frequency" value="100" /> <!-- 100 Hz  -->
 </launch>

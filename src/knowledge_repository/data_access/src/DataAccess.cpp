@@ -20,6 +20,10 @@ void DataAccess::setUp() {
     fp.open(status_filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
     fp << "\n";
     fp.close();
+
+    double freq;
+	handle.getParam("frequency", freq);
+	rosComponentDescriptor.setFreq(freq);
 }
 
 void DataAccess::tearDown(){}
