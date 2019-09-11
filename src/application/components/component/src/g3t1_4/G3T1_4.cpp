@@ -7,8 +7,8 @@ using namespace bsn::operation;
 using namespace bsn::configuration;
 
 
-G3T1_4::G3T1_4(const int32_t &argc, char **argv) :
-    Sensor(argc, argv, "bloodpressure", true, 1, bsn::resource::Battery("bp_batt", 100, 100, 1)),
+G3T1_4::G3T1_4(int &argc, char **argv, const std::string &name) :
+    Sensor(argc, argv, name, "bloodpressure", true, 1, bsn::resource::Battery("bp_batt", 100, 100, 1)),
     markovSystolic(),
     markovDiastolic(),
     filterSystolic(5),

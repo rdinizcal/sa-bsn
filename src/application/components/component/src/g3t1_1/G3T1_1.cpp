@@ -8,8 +8,8 @@ using namespace bsn::generator;
 using namespace bsn::operation;
 using namespace bsn::configuration;
 
-G3T1_1::G3T1_1(const int32_t &argc, char **argv) :
-    Sensor(argc, argv, "oximeter", true, 1, bsn::resource::Battery("oxi_batt", 100, 100, 1)),
+G3T1_1::G3T1_1(int &argc, char **argv, const std::string &name) :
+    Sensor(argc, argv, name, "oximeter", true, 1, bsn::resource::Battery("oxi_batt", 100, 100, 1)),
     markov(),
     filter(5),
     sensorConfig() {}
