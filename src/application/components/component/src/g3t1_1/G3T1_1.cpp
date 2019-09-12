@@ -82,22 +82,17 @@ void G3T1_1::setUp() {
 
         sensorConfig = SensorConfiguration(0, low_range, midRanges, highRanges, percentages);
     }
-    
+
 }
 
 void G3T1_1::tearDown() {}
 
 double G3T1_1::collect() {
     bsn::generator::DataGenerator dataGenerator(markov);
-    double offset = 0;
     double m_data = 0;
-
     m_data = dataGenerator.getValue();
-    offset = (1 - accuracy + (double)rand() / RAND_MAX * (1 - accuracy)) * m_data;
-    m_data += (rand()%2==0)?offset:(-1)*offset;
 
     battery.consume(0.1);
-
     ROS_INFO("new data collected: [%s]", std::to_string(m_data).c_str());
 
     return m_data;

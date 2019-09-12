@@ -1,14 +1,13 @@
 #include "component/Sensor.hpp"
 
-
-Sensor::Sensor(int &argc, char **argv, const std::string &name, const std::string &type, const bool &active, const double &accuracy, const bsn::resource::Battery &battery) : Component(argc, argv, name), type(type), active(active), accuracy(accuracy), battery(battery), data(0.0) {}
+Sensor::Sensor(int &argc, char **argv, const std::string &name, const std::string &type, const bool &active, const double &noise_factor, const bsn::resource::Battery &battery) : Component(argc, argv, name), type(type), active(active), noise_factor(0), battery(battery), data(0.0) {}
 
 Sensor::~Sensor() {}
 
 Sensor& Sensor::operator=(const Sensor &obj) {
     this->type = obj.type;
     this->active = obj.active;
-    this->accuracy = obj.accuracy;
+    this->noise_factor = obj.noise_factor;
     this->battery = obj.battery;
     this->data = obj.data;
 }
@@ -17,6 +16,9 @@ int32_t Sensor::run() {
 
     arch::target_system::Component::setUp();
 	setUp();
+
+    ros::NodeHandle nh;
+    ros::Subscriber noise_subs = nh.subscribe("uncertainty_"+ros::this_node::getName(), 10, &Sensor::injectUncertainty, this);
 
     sendStatus("init");
 
@@ -60,21 +62,33 @@ void Sensor::body() {
     }
 }
 
+/*
+ * error = noise_factor (%)
+ * data +- [(error + rand(0,1)) * error] * data
+ **/
 void Sensor::apply_noise(double &data) {
-    //offset = (1 - accuracy + (double)rand() / RAND_MAX * (1 - accuracy)) * data;
-    //data += (rand()%2==0)?offset:(-1)*offset;
+    double offset = 0;
+ 
+    offset = (noise_factor + ((double)rand() / RAND_MAX) * noise_factor) * data;
+    data += (rand()%2==0)?offset:(-1)*offset;
 }
 
 void Sensor::reconfigure(const archlib::AdaptationCommand::ConstPtr& msg) {
     std::string action = msg->action.c_str();
+}
 
-    char *buffer = strdup(action.c_str());
-    char *pair = strtok(buffer, ",");
-    char *key = strtok(pair, "=");
-    double value  = std::stod(strtok(NULL, "="));
+void Sensor::injectUncertainty(const archlib::Uncertainty::ConstPtr& msg) {
+    std::string content = msg->content;
 
-    if(key=="freq"){
-        rosComponentDescriptor.setFreq(value);
+    bsn::operation::Operation op;
+    std::vector<std::string> pairs = op.split(content, ',');
+
+    for (std::vector<std::string>::iterator it = pairs.begin(); it != pairs.end(); ++it){
+        std::vector<std::string> param = op.split(content, '=');
+
+        if(param[0]=="noise_factor"){
+            noise_factor = stod(param[1]);
+        }
     }
 }
 

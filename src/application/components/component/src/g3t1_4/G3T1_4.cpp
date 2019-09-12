@@ -109,13 +109,9 @@ void G3T1_4::tearDown() {}
 
 double G3T1_4::collectSystolic() {
     bsn::generator::DataGenerator dataGenerator(markovSystolic);
-    double offset = 0;
     double m_data = 0;
 
     m_data = dataGenerator.getValue();
-    offset = (1 - syst_accuracy + (double)rand() / RAND_MAX * (1 - syst_accuracy)) * m_data;
-    m_data += (rand()%2==0)?offset:(-1)*offset;
-
     battery.consume(0.1);
 
     ROS_INFO("new data collected: [%s]", std::to_string(m_data).c_str());
@@ -125,13 +121,9 @@ double G3T1_4::collectSystolic() {
 
 double G3T1_4::collectDiastolic() {
     bsn::generator::DataGenerator dataGenerator(markovDiastolic);
-    double offset = 0;
     double m_data = 0;
 
     m_data = dataGenerator.getValue();
-    offset = (1 - dias_accuracy + (double)rand() / RAND_MAX * (1 - dias_accuracy)) * m_data;
-    m_data += (rand()%2==0)?offset:(-1)*offset;
-
     battery.consume(0.1);
 
     ROS_INFO("new data collected: [%s]", std::to_string(m_data).c_str());
