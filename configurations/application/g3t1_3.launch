@@ -1,8 +1,8 @@
 <launch> 
+    <!-- Temperature Measurement Sensor -->
     <node name="g3t1_3" pkg="component" type="g3t1_3" output="screen" />
 
-    <param name="frequency" value="1" /> <!-- 1 Hz  -->
-
+    <param name="frequency" value="0.1" /> <!-- 1 Hz  -->
 
     <!-- Defines the percentages to consider low, moderate or high risk -->
     <param name="lowrisk" value="0,20" />
@@ -10,11 +10,11 @@
     <param name="highrisk" value="66,100" />
 
     <!-- markov chain -->
-    <param name="state0" value="10,10,10,20,40" />
-    <param name="state1" value="10,10,10,20,40" />
-    <param name="state2" value="10,10,10,20,40" />
-    <param name="state3" value="10,10,10,20,40" />
-    <param name="state4" value="10,10,10,20,40" />
+    <param name="state0" value="25,51,21,3,0" />
+    <param name="state1" value="5,50,43,2,0" />
+    <param name="state2" value="0,4,85,11,0" />
+    <param name="state3" value="0,1,32,67,0" />
+    <param name="state4" value="0,0,0,0,0" />
 
     <!-- risk values -->
     <param name="HighRisk0" value="0,31.99" />
@@ -26,9 +26,5 @@
     <!-- accuracy in percentage -->
     <param name="data_accuracy" value="90" type="double" />
     <param name="comm_accuracy" value="100" type="double" />
-
-    <!-- persistence -->
-    <param name="persist" value="true" type="bool" />
-    <param name="path" value="g3t1_3_output.csv" type="str" />
 
 </launch>

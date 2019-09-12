@@ -14,6 +14,10 @@ import re
 #for curve analysis
 from statistics import mean
 
+#for ordered dict
+from collections import OrderedDict
+
+
 class Analyzer:
 
     def __init__(self): pass
@@ -81,58 +85,63 @@ class Analyzer:
 
     def run(self): 
         # load formula
-        formula = Formula("resource/models/reliability.formula")
-
-        # load log
-        with open("resource/logs/1564840923328961267.log", newline='') as log_file:
-            log_csv = csv.reader(log_file, delimiter=',')
-            log = list(log_csv)
-            del log[0] # delete first line
+        formula = Formula("../../knowledge_repository/resource/models/reliability.formula")
 
         # build list of participating tasks
         tasks = dict()
         ctxs = dict()
-        ctxs_timeseries = dict()
-        #reli_timeseries = dict() 
-        global_reli_timeseries = [] 
+
+        global_reli_timeseries = dict() 
+
+        ################ load status log ################
+        with open("../../knowledge_repository/resource/logs/status_1568230343172375282.log", newline='') as log_file:
+            log_csv = csv.reader(log_file, delimiter=',')
+            log_status = list(log_csv)
+            del log_status[0] # delete first line
+
+        ################ load event log ################
+        with open("../../knowledge_repository/resource/logs/event_1568230343172372967.log", newline='') as log_file:
+            log_csv = csv.reader(log_file, delimiter=',')
+            log_event = list(log_csv)
+            del log_event[0] # delete first line
+
+        #concatenate lists into one log list
+        log = list()
+        log.extend(log_status)
+        log.extend(log_event)
+
+        log = sorted(log, key = lambda x: (int(x[1])))
+
         t0 = int(log[0][2])
 
         # read log 
         for reg in log:
-            if (reg[0] == 'ReconfigurationCommand' ) :  
-                command = ReconfigurationCommand(str(reg[1]),str(reg[2]),str(reg[3]),str(reg[4]),str(reg[5]))
+            if(reg[0]=="Status"):
+                status = Status(str(reg[1]),str(reg[2]),str(reg[3]),str(reg[4]),str(reg[5]))
 
-                tag = command.target.upper().replace(".","_").replace("/","").replace("T","_T")
-                
+                tag = status.source.upper().replace(".","_").replace("/","").replace("T","_T")
+
                 if not (tag in tasks): 
                     tsk = Task(tag)
                     tasks[tag] = tsk
 
-                if (command.action == 'execute'): tasks[tag].execute()
-                
-            elif (reg[0] == 'Status' ) :  
-                status = Status(str(reg[1]),str(reg[2]),str(reg[3]),str(reg[4]),str(reg[5]),str(reg[6]))
+                if (status.content == 'success'):
+                    tasks[tag].execute() 
+                    tasks[tag].success()
+                elif (status.content == 'fail'): 
+                    tasks[tag].execute() 
+                    tasks[tag].fail()
+            elif(reg[0]=="Event"):
+                event = Event(str(reg[1]),str(reg[2]),str(reg[3]),str(reg[4]),str(reg[5]))
 
-                tag = status.source.upper().replace(".","_").replace("/","").replace("T","_T")
+                tag = event.source.upper().replace(".","_").replace("/","").replace("T","_T")
 
                 if not (tag in ctxs): 
                     ctx = Context(tag)
                     ctxs[tag] = ctx
                 
-                if (int(status.value) == 1): ctxs[tag].activate()
-                else: ctxs[tag].deactivate()
-
-            elif (reg[0] == 'Event' ) :  
-                #lstEvent.append(Event(str(reg[1]),str(reg[2]),str(reg[3]),str(reg[4]),str(reg[5]),str(reg[6])))
-                event = Event(str(reg[1]),str(reg[2]),str(reg[3]),str(reg[4]),str(reg[5]),str(reg[6]))
-
-                tag = event.source.upper().replace(".","_").replace("/","").replace("T","_T")
-
-                if not (tag in tasks): 
-                    tsk = Task(tag)
-                    tasks[tag] = tsk
-
-                if (event.type == 'failure'): tasks[tag].fail()
+                if (event.content == 'deactivate'): ctxs[tag].deactivate()
+                elif (event.content == 'activate'): ctxs[tag].activate()
 
             # compute time series
             instant = int(reg[2]) - t0
@@ -141,55 +150,32 @@ class Analyzer:
                 formula.compute('R_'+task.getName(), task.reliability())
                 formula.compute('C_'+task.getName(), task.cost())
                 formula.compute('F_'+task.getName(), task.frequency())
-            
+
             for ctx in ctxs.values():
                 formula.compute('CTX_'+ctx.getName(), ctx.isActive())
 
-            global_reli_timeseries.append([instant, formula.eval()])
+            global_reli_timeseries[instant] = formula.eval()
 
-            ## contexts timeseries
-            for tag in ctxs:
-                if tag in ctxs_timeseries: ctxs_timeseries[tag].append([instant, ctxs[tag].isActive()])
-                else: ctxs_timeseries[tag] = [[instant, ctxs[tag].isActive()]]
-
-            ## individual reliability timeseries
-
+        # sort dict
+        sorted_timeseries = OrderedDict(sorted(global_reli_timeseries.items(), key=lambda x: int(x[0])))
         # plot global reli timeseries
-        x = [x[0] for x in global_reli_timeseries]
-        y = [y[1] for y in global_reli_timeseries]
+        x = list(sorted_timeseries.keys())
+        y = list(sorted_timeseries.values())
 
         ## discretizing the curve
-        [x,y] = self.discretize(x,y,10e7)
+        [x,y] = self.discretize(x,y,10e6) #precision in ms
 
         ## perform the analysis 
         setpoint = 0.80
-        self.analyze(x,y, setpoint, setpoint*1.05, setpoint*0.95)
+        self.analyze(x, y, setpoint, setpoint*1.05, setpoint*0.95)
 
         ## plot timeseries
         plt.plot(x, y)
-        #plt.ylim(0.8,1.1)
-        #plt.xlim(0,max(x))
-
-        # plot contexts timeseries
-        x = dict()
-        y = dict()
-        ctx = ""
-        for context,timeserie in ctxs_timeseries.items():
-            x[context] = [x[0] for x in timeserie]
-            y[context] = [y[1] for y in timeserie]
-
-            ## discretizing the curve
-            [x[context],y[context]] = self.discretize(x[context], y[context],10e7)
-            ctx = context
-
-        ## plot timeseries
-        #plt.title("Active contexts")]
-        print (len(x))
-        for key in x.keys(): print(key)
-
-        plt.plot(x[ctx], [sum(x) for x in zip(*y.values())])
-        #plt.ylim(0,len(ctxs_timeseries.keys()))
-        #plt.xlim(0,max(x))
+        plt.ylim(0,1.05)
+        plt.xlim(-0.05,max(x)+0.05)
+        plt.title('System reliability in time')
+        plt.ylabel('Reliability (%)')
+        plt.xlabel('Time (ms)')
         plt.show()
 
 class Formula:
@@ -235,30 +221,29 @@ class ReconfigurationCommand:
 
 class Status:
 
-    def __init__(self, _logical_instant, _instant, _source, _target, _key, _value): 
+    def __init__(self, _logical_instant, _instant, _source, _target, _content): 
         self.source = _source
         self.target = _target
         self.logical_instant = _logical_instant
         self.instant = _instant
-        self.key = _key
-        self.value = _value
+        self.content = _content
 
 class Event:
 
-    def __init__(self, _logical_instant, _instant, _source, _target, _type, _description): 
+    def __init__(self, _logical_instant, _instant, _source, _target, _content): 
         self.source = _source
         self.target = _target
         self.logical_instant = _logical_instant
         self.instant = _instant
-        self.type = _type
-        self.description = _description
+        self.content = _content
     
 class Task:
 
     def __init__(self, _name):
         self.name = _name 
         self.nexecs = 0
-        self.nfails = 0
+        self.lstExec = []
+        self.window_size = 5
     
     def __eq__(self, other):
         if isinstance(other, Task):
@@ -269,29 +254,30 @@ class Task:
         return hash(tuple(sorted(self.__dict__.items())))
 
     def reliability (self):
-        if self.nexecs != 0: return (self.nexecs - self.nfails) / self.nexecs 
+        if self.nexecs != 0: return sum(self.lstExec) / self.nexecs # Success/Fail+Success
         else: return 0
     
-    def cost (self) :
-        return 1
+    def cost (self) : return 1
     
-    def frequency(self):
-        return 1
+    def frequency(self): return 1
 
     def execute(self) :
-        self.nexecs += 1
+        if(self.nexecs < self.window_size) : self.nexecs += 1
     
+    def success(self) :
+        if(self.nexecs < self.window_size) : self.lstExec.append(1)
+        else: 
+            self.lstExec.append(1)
+            del self.lstExec[0]
+
     def fail(self) : 
-        self.nfails += 1
+        if(self.nexecs < self.window_size) : self.lstExec.append(0)
+        else: 
+            self.lstExec.append(0)
+            del self.lstExec[0]
     
     def getName(self) :
         return self.name
-
-    def getExecs(self) :
-        return self.nexecs
-    
-    def getFails(self) :
-        return self.nfails
 
 class Context:
 

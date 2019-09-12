@@ -9,10 +9,9 @@ int64_t DataAccess::now() const{
 
 void DataAccess::setUp() {
     std::string path = ros::package::getPath("repository");
-    event_filepath = path + "/resource/logs/event_" + std::to_string(this->now()) + ".log";
-    status_filepath = path + "/resource/logs/status_" + std::to_string(this->now()) + ".log";
+    event_filepath = path + "/../resource/logs/event_" + std::to_string(this->now()) + ".log";
+    status_filepath = path + "/../resource/logs/status_" + std::to_string(this->now()) + ".log";
 
-    std::cout << "event_filepath: " << event_filepath <<std::endl; 
     fp.open(event_filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
     fp << "\n";
     fp.close();
@@ -67,9 +66,9 @@ void DataAccess::flush(){
 
     fp.open(status_filepath, std::fstream::in | std::fstream::out | std::fstream::app);   
     for(std::vector<StatusMessage>::iterator it = statusVec.begin(); it != statusVec.end(); ++it) {
+        fp << (*it).getName() << ",";
         fp << (*it).getLogicalClock() << ",";
         fp << (*it).getTimestamp() << ",";
-        fp << (*it).getName() << ",";
         fp << (*it).getSource() << ",";
         fp << (*it).getTarget() << ",";
         fp << (*it).getState() << "\n";
@@ -79,9 +78,9 @@ void DataAccess::flush(){
 
     fp.open(event_filepath, std::fstream::in | std::fstream::out | std::fstream::app);   
     for(std::vector<EventMessage>::iterator it = eventVec.begin(); it != eventVec.end(); ++it) {
+        fp << (*it).getName() << ",";
         fp << (*it).getLogicalClock() << ",";
         fp << (*it).getTimestamp() << ",";
-        fp << (*it).getName() << ",";
         fp << (*it).getSource() << ",";
         fp << (*it).getTarget() << ",";
         fp << (*it).getEvent() << "\n";

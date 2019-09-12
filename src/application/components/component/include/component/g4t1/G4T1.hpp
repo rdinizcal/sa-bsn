@@ -14,46 +14,38 @@
 #include "bsn/processor/Processor.hpp"
 #include "bsn/operation/Operation.hpp"
 
+#include "component/CentralHub.hpp"
+
 #include "archlib/target_system/Component.hpp"
 #include "archlib/AdaptationCommand.h"
 
 #include "messages/SensorData.h"
 
-class G4T1 : public arch::target_system::Component {
+class G4T1 : public CentralHub {
     
-    private:
-        G4T1(const G4T1 & /*obj*/);
-        G4T1 &operator=(const G4T1 & /*obj*/);
-
-        void receiveSensorData(const messages::SensorData::ConstPtr&);
-
-        std::string makePacket();
-        void persistData(std::vector<std::string>&);
-        std::vector<std::string> getPatientStatus();
-
     public:
         G4T1(int &argc, char **argv, const std::string &name);
         virtual ~G4T1();
 
-        void setUp();
-        void tearDown();   
-        void body();
+    private:
+        G4T1(const G4T1 & /*obj*/);
+        G4T1 &operator=(const G4T1 & /*obj*/);
 
-        void reconfigure(const archlib::AdaptationCommand::ConstPtr& msg);
+        std::string makePacket();
+        std::vector<std::string> getPatientStatus();
+
+    public:
+        virtual void setUp();
+        virtual void tearDown();   
+
+        virtual void collect(const messages::SensorData::ConstPtr& sensor_data);
+        virtual void process();
+        virtual void transfer();
 
     private:
-        bool active;
-		std::map<std::string,double> params;
-
         bool connect;
         std::string database_url;
         
-        bool persist;
-        std::ofstream fp;
-        std::string path;
-
-        std::array<double, 5> data;
-        std::vector<std::list<double>> data_list;
         double patient_status;
         int session;
 
@@ -61,13 +53,11 @@ class G4T1 : public arch::target_system::Component {
         std::string oxi_risk;
         std::string ecg_risk;
         std::string trm_risk;
-        std::string acc_risk;
 
         std::string bpr_batt;
         std::string oxi_batt;
         std::string ecg_batt;
         std::string trm_batt;
-        std::string acc_batt;
 };
 
 #endif 

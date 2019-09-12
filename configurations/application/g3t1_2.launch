@@ -1,7 +1,8 @@
 <launch> 
+    <!-- Heart Beat Rate Measurement Sensor -->
     <node name="g3t1_2" pkg="component" type="g3t1_2" output="screen" />
 
-    <param name="frequency" value="1" /> <!-- 1 Hz  -->
+    <param name="frequency" value="5" /> <!-- 2 Hz  -->
     
     <!-- Defines the percentages to consider low, moderate or high risk -->
     <param name="lowrisk" value="0,20" />
@@ -9,11 +10,11 @@
     <param name="highrisk" value="66,100" />
 
     <!-- markov chain -->
-    <param name="state0" value="10,10,10,20,40" />
-    <param name="state1" value="10,10,10,20,40" />
-    <param name="state2" value="10,10,10,20,40" />
-    <param name="state3" value="10,10,10,20,40" />
-    <param name="state4" value="10,10,10,20,40" />
+    <param name="state0" value="72,21,4,2,1" />
+    <param name="state1" value="14,61,19,4,2" />
+    <param name="state2" value="1,17,60,20,2" />
+    <param name="state3" value="0,2,15,70,13" />
+    <param name="state4" value="0,0,2,20,77" />
 
     <!-- risk values -->
     <param name="HighRisk0" value="0,70" />
@@ -25,9 +26,5 @@
     <!-- accuracy in percentage -->
     <param name="data_accuracy" value="90" type="double" />
     <param name="comm_accuracy" value="100" type="double" />
-
-    <!-- persistence -->
-    <param name="persist" value="true" type="bool" />
-    <param name="path" value="g3t1_2_output.csv" type="str" />
 
 </launch>

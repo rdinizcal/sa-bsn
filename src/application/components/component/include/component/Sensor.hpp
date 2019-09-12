@@ -21,13 +21,15 @@ class Sensor : public arch::target_system::Component {
   	public:
         virtual void setUp() = 0;
     	virtual void tearDown() = 0;
+        virtual int32_t run();
 		void body();
+        void apply_noise(double &data);
 
         void reconfigure(const archlib::AdaptationCommand::ConstPtr& msg);
 		
-        virtual double collect();
-        virtual double process(const double &data);
-        virtual void transfer(const double &data);
+        virtual double collect() = 0;
+        virtual double process(const double &data) = 0;
+        virtual void transfer(const double &data) = 0;
 
     private:
         bool isActive();

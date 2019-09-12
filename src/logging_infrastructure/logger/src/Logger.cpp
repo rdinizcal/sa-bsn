@@ -32,7 +32,7 @@ void Logger::body() {
 }
 
 void Logger::receiveAdaptationCommand(const archlib::AdaptationCommand::ConstPtr& msg) {
-    ROS_INFO("I heard: [%s: %s]", msg->action.c_str(), msg->target.c_str());
+    //ROS_INFO("I heard: [%s: %s]", msg->action.c_str(), msg->target.c_str());
 
     archlib::Persist persistMsg;
     persistMsg.source = msg->source;
@@ -47,7 +47,7 @@ void Logger::receiveAdaptationCommand(const archlib::AdaptationCommand::ConstPtr
 
 
 void Logger::receiveStatus(const archlib::Status::ConstPtr& msg) {
-    ROS_INFO("I heard: [%s: %s]", msg->source.c_str(), msg->content.c_str());
+    //ROS_INFO("I heard: [%s: %s]", msg->source.c_str(), msg->content.c_str());
 
     archlib::Persist persistMsg;
     persistMsg.source = msg->source;
@@ -61,7 +61,7 @@ void Logger::receiveStatus(const archlib::Status::ConstPtr& msg) {
 }
 
 void Logger::receiveEvent(const archlib::Event::ConstPtr& msg) {
-    ROS_INFO("I heard: [%s: %s]", msg->source.c_str(), msg->content.c_str());
+    //ROS_INFO("I heard: [%s: %s]", msg->source.c_str(), msg->content.c_str());
 
     archlib::Persist persistMsg;
     persistMsg.source = msg->source;

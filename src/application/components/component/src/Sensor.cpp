@@ -13,6 +13,32 @@ Sensor& Sensor::operator=(const Sensor &obj) {
     this->data = obj.data;
 }
 
+int32_t Sensor::run() {
+
+    arch::target_system::Component::setUp();
+	setUp();
+
+    sendStatus("init");
+
+    while(ros::ok()) {
+        ros::Rate loop_rate(rosComponentDescriptor.getFreq());
+        ros::spinOnce();
+
+        try{
+            body();
+        } catch (const std::exception& e) {
+            sendStatus("fail");
+        } 
+        loop_rate.sleep();
+    }
+    
+    sendStatus("finish");
+    tearDown();
+    arch::target_system::Component::tearDown();
+
+    return 0;
+}
+
 void Sensor::body() {
     
     if (!isActive() && battery.getCurrentLevel() > 90){
@@ -22,12 +48,21 @@ void Sensor::body() {
     }
 
     if(isActive()) {
-        data = Sensor::collect();
-        data = Sensor::process(data);
-        Sensor::transfer(data);
+        sendStatus("running");
+        data = collect();
+        apply_noise(data);
+        data = process(data);
+        transfer(data);
+		sendStatus("success");
     } else {
+        sendStatus("recharging");
         recharge();
     }
+}
+
+void Sensor::apply_noise(double &data) {
+    //offset = (1 - accuracy + (double)rand() / RAND_MAX * (1 - accuracy)) * data;
+    //data += (rand()%2==0)?offset:(-1)*offset;
 }
 
 void Sensor::reconfigure(const archlib::AdaptationCommand::ConstPtr& msg) {
@@ -41,22 +76,6 @@ void Sensor::reconfigure(const archlib::AdaptationCommand::ConstPtr& msg) {
     if(key=="freq"){
         rosComponentDescriptor.setFreq(value);
     }
-}
-
-double Sensor::collect() {
-    double x = 0;
-    x = collect();
-    return x;
-}
-
-double Sensor::process(const double &data) {
-    double x = 0;
-    x = process(data);
-    return x;
-}
-
-void Sensor::transfer(const double &data) {
-    transfer(data);
 }
 
 bool Sensor::isActive() {
@@ -73,6 +92,16 @@ void Sensor::turnOff() {
     deactivate();
 }
 
+/*  battery will always recover in 20seconds
+*
+*  b/s = 100% / 20 seconds = 5 %/s 
+*      => recovers 5% battery per second
+*  if we divide by the execution frequency
+*  we get the amount of battery we need to
+*  recover per execution cycle to achieve the
+*  5 %/s battery recovery rate
+*/
 void Sensor::recharge() {
-    if(battery.getCurrentLevel() <= 100) battery.generate(2.5);
+    if(battery.getCurrentLevel() <= 100) 
+        battery.generate((100/20)/rosComponentDescriptor.getFreq());
 }

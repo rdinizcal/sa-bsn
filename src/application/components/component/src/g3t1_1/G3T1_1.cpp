@@ -82,16 +82,10 @@ void G3T1_1::setUp() {
 
         sensorConfig = SensorConfiguration(0, low_range, midRanges, highRanges, percentages);
     }
-
-    { // Configure sensor accuracy
-        double acc;
-        handle.getParam("accuracy", acc);
-        accuracy = acc / 100;
-    }
+    
 }
 
-void G3T1_1::tearDown() {
-}
+void G3T1_1::tearDown() {}
 
 double G3T1_1::collect() {
     bsn::generator::DataGenerator dataGenerator(markov);
@@ -106,48 +100,7 @@ double G3T1_1::collect() {
 
     ROS_INFO("new data collected: [%s]", std::to_string(m_data).c_str());
 
-    // if rule throw domain_error("failure")
-    if (m_data < 0 || m_data > 100) throw std::domain_error("failure");
-
     return m_data;
-}
-
-bool G3T1_1::check_failure(std::list<double> filter_buffer) {
-    std::list<double> min_buffer = filter_buffer;
-    std::list<double> max_buffer = filter_buffer;
-
-    double min = 999999;
-    double max = -999999;
-
-    double min_avg = 0;
-    double max_avg = 0;
-
-    for(std::list<double>::iterator it = filter_buffer.begin(); it != filter_buffer.end() ; it++){
-        min = ((*it)<min)?(*it):min;
-        max = ((*it)>max)?(*it):max;
-    }
-
-    min_buffer.erase(std::remove(min_buffer.begin(), min_buffer.end(), max), min_buffer.end());
-
-    for(std::list<double>::iterator it = min_buffer.begin(); it != min_buffer.end() ; it++){
-        min_avg += *it; 
-    }
-
-    min_avg /= min_buffer.size();
-
-    max_buffer.erase(std::remove(max_buffer.begin(), max_buffer.end(), min), max_buffer.end());
-
-    for(std::list<double>::iterator it = max_buffer.begin(); it != max_buffer.end() ; it++){
-        max_avg += *it; 
-    }
-
-    max_avg /= max_buffer.size();
-
-    double limit_diff = filter.getValue()*0.10; // 10% de diferenca!
-    double error_max = std::abs(filter.getValue() - max_avg);
-    double error_min = std::abs(filter.getValue() - min_avg);
-
-    return (error_max > limit_diff || error_min > limit_diff);
 }
 
 double G3T1_1::process(const double &m_data) {
@@ -158,22 +111,18 @@ double G3T1_1::process(const double &m_data) {
     battery.consume(0.1*filter.getRange());
 
     ROS_INFO("filtered data: [%s]", std::to_string(filtered_data).c_str());
-    
-    if (check_failure(filter.getBuffer())) throw std::domain_error("failure");
-
     return filtered_data;
 }
 
 void G3T1_1::transfer(const double &m_data) {
     double risk;
-    messages::SensorData msg;
-    ros::NodeHandle handle;
-
-    data_pub = handle.advertise<messages::SensorData>("oximeter_data", 10);
-
     risk = sensorConfig.evaluateNumber(m_data);
     battery.consume(0.1);
+    if (risk < 0 || risk > 100) throw std::domain_error("failure");
 
+    ros::NodeHandle handle;
+    data_pub = handle.advertise<messages::SensorData>("oximeter_data", 10);
+    messages::SensorData msg;
     msg.type = type;
     msg.data = m_data;
     msg.risk = risk;
@@ -183,6 +132,4 @@ void G3T1_1::transfer(const double &m_data) {
     battery.consume(0.2);
 
     ROS_INFO("risk calculated and transfered: [%.2f%%]", risk);
-
-    if (risk < 0 || risk > 100) throw std::domain_error("failure");
 }

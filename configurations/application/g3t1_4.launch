@@ -1,4 +1,5 @@
 <launch> 
+    <!-- Blood Pressure Measurement sensor-->    
     <node name="g3t1_4" pkg="component" type="g3t1_4" output="screen" />
 
     <param name="frequency" value="1" /> <!-- 1 Hz  -->
@@ -11,9 +12,9 @@
     <!-- markov chain for diastolic -->
     <param name="diasstate0" value="0,0,0,0,0" />
     <param name="diasstate1" value="0,0,0,0,0" />
-    <param name="diasstate2" value="0,0,20,20,60" />
-    <param name="diasstate3" value="0,0,20,20,60" />
-    <param name="diasstate4" value="0,0,20,20,60" />
+    <param name="diasstate2" value="0,0,94,4,2" />
+    <param name="diasstate3" value="0,0,50,35,15" />
+    <param name="diasstate4" value="0,0,31,25,44" />
 
     <!-- risk values for diastolic -->
     <param name="diasLowRisk" value="0,80" />
@@ -27,9 +28,9 @@
     <!-- markov chain for systolic -->
     <param name="syststate0" value="0,0,0,0,0" />
     <param name="syststate1" value="0,0,0,0,0" />
-    <param name="syststate2" value="0,0,20,20,60" />
-    <param name="syststate3" value="0,0,20,20,60" />
-    <param name="syststate4" value="0,0,20,20,60" />
+    <param name="syststate2" value="0,0,79,18,3" />
+    <param name="syststate3" value="0,0,23,64,13" />
+    <param name="syststate4" value="0,0,5,26,69" />
 
     <!-- risk values for systolic -->
     <param name="systLowRisk" value="0,120" />
@@ -39,9 +40,5 @@
     <!-- accuracy in percentage for systolic -->
     <param name="systdata_accuracy" value="90" type="double" />
     <param name="systcomm_accuracy" value="100" type="double" />
-
-    <!-- persistence -->
-    <param name="persist" value="true" type="bool" />
-    <param name="path" value="g3t1_4_output.csv" type="str" />
 
 </launch>

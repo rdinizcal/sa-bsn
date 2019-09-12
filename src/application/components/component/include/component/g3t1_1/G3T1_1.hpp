@@ -32,8 +32,6 @@ class G3T1_1 : public Sensor {
     	void setUp();
     	void tearDown();
 
-		bool check_failure(std::list<double> filter_buffer);
-
         double collect();
         double process(const double &data);
         void transfer(const double &data);

@@ -85,12 +85,6 @@ void G3T1_3::setUp() {
 
         sensorConfig = SensorConfiguration(0, low_range, midRanges, highRanges, percentages);
     }
-
-    { // Configure sensor accuracy
-        double acc;
-        handle.getParam("accuracy", acc);
-        accuracy = acc / 100;
-    }
 }
 
 void G3T1_3::tearDown() {}
@@ -108,9 +102,6 @@ double G3T1_3::collect() {
 
     ROS_INFO("new data collected: [%s]", std::to_string(m_data).c_str());
 
-    // if rule throw domain_error("failure")
-    //if (m_data < 0 || m_data > 100) throw std::domain_error("failure");
-
     return m_data;
 }
 
@@ -127,14 +118,13 @@ double G3T1_3::process(const double &m_data) {
 
 void G3T1_3::transfer(const double &m_data) {
     double risk;
-    messages::SensorData msg;
-    ros::NodeHandle handle;
-
-    data_pub = handle.advertise<messages::SensorData>("oximeter_data", 10);
-
     risk = sensorConfig.evaluateNumber(m_data);
     battery.consume(0.1);
+    if (risk < 0 || risk > 100) throw std::domain_error("failure");
 
+    ros::NodeHandle handle;
+    data_pub = handle.advertise<messages::SensorData>("oximeter_data", 10);
+    messages::SensorData msg;
     msg.type = type;
     msg.data = m_data;
     msg.risk = risk;
@@ -145,4 +135,5 @@ void G3T1_3::transfer(const double &m_data) {
     battery.consume(0.2);
 
     ROS_INFO("risk calculated and transfered: [%.2f%%]", risk);
+
 }

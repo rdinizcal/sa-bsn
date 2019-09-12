@@ -103,15 +103,6 @@ void G3T1_4::setUp() {
         }
     }
 
-    { // Configure sensor accuracy
-        double acc;
-        handle.getParam("dias_accuracy", acc);
-        dias_accuracy = acc / 100;
-
-        handle.getParam("syst_accuracy", acc);
-        syst_accuracy = acc / 100;
-
-    }
 }
 
 void G3T1_4::tearDown() {}
@@ -129,9 +120,6 @@ double G3T1_4::collectSystolic() {
 
     ROS_INFO("new data collected: [%s]", std::to_string(m_data).c_str());
 
-    // if rule throw domain_error("failure")
-    //if (m_data < 0 || m_data > 100) throw std::domain_error("failure");
-
     return m_data;
 }
 
@@ -147,9 +135,6 @@ double G3T1_4::collectDiastolic() {
     battery.consume(0.1);
 
     ROS_INFO("new data collected: [%s]", std::to_string(m_data).c_str());
-
-    // if rule throw domain_error("failure")
-    //if (m_data < 0 || m_data > 100) throw std::domain_error("failure");
 
     return m_data;
 }
@@ -194,46 +179,43 @@ double G3T1_4::process(const double &m_data) {
 
 void G3T1_4::transferSystolic(const double &m_data) {
     double risk;
-    messages::SensorData msg;
-    ros::NodeHandle handle;
-
-    data_pub = handle.advertise<messages::SensorData>("oximeter_data", 10);
-
     risk = sensorConfigSystolic.evaluateNumber(m_data);
     battery.consume(0.1);
+    if (risk < 0 || risk > 100) throw std::domain_error("failure");
 
+    ros::NodeHandle handle;
+    data_pub = handle.advertise<messages::SensorData>("systolic_data", 10);
+    messages::SensorData msg;
     msg.type = "bpms";
     msg.data = m_data;
     msg.risk = risk;
     msg.batt = battery.getCurrentLevel();
-
     data_pub.publish(msg);
-    
     battery.consume(0.2);
 
     ROS_INFO("risk calculated and transfered: [%.2f%%]", risk);
+    
 }
 
 void G3T1_4::transferDiastolic(const double &m_data) {
     double risk;
-    messages::SensorData msg;
-    ros::NodeHandle handle;
-
-    data_pub = handle.advertise<messages::SensorData>("oximeter_data", 10);
 
     risk = sensorConfigDiastolic.evaluateNumber(m_data);
     battery.consume(0.1);
+    if (risk < 0 || risk > 100) throw std::domain_error("failure");
 
+    ros::NodeHandle handle;
+    data_pub = handle.advertise<messages::SensorData>("diastolic_data", 10);
+    messages::SensorData msg;
     msg.type = "bpmd";
     msg.data = m_data;
     msg.risk = risk;
     msg.batt = battery.getCurrentLevel();
-
     data_pub.publish(msg);
-    
     battery.consume(0.2);
 
     ROS_INFO("risk calculated and transfered: [%.2f%%]", risk);
+
 }
 
 void G3T1_4::transfer(const double &m_data) {
