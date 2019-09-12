@@ -185,7 +185,7 @@ void G3T1_4::transferSystolic(const double &m_data) {
     data_pub.publish(msg);
     battery.consume(0.2);
 
-    ROS_INFO("risk calculated and transfered: [%.2f%%]", risk);
+    ROS_INFO("risk calculated and transferred: [%.2f%%]", risk);
     
 }
 
@@ -206,7 +206,7 @@ void G3T1_4::transferDiastolic(const double &m_data) {
     data_pub.publish(msg);
     battery.consume(0.2);
 
-    ROS_INFO("risk calculated and transfered: [%.2f%%]", risk);
+    ROS_INFO("risk calculated and transferred: [%.2f%%]", risk);
 
 }
 

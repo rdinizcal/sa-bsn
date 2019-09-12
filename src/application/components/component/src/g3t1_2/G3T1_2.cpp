@@ -94,7 +94,7 @@ double G3T1_2::collect() {
 
     m_data = dataGenerator.getValue();
     battery.consume(0.1);
-    
+
     ROS_INFO("new data collected: [%s]", std::to_string(m_data).c_str());
 
     return m_data;
@@ -129,6 +129,6 @@ void G3T1_2::transfer(const double &m_data) {
     
     battery.consume(0.2);
 
-    ROS_INFO("risk calculated and transfered: [%.2f%%]", risk);
+    ROS_INFO("risk calculated and transferred: [%.2f%%]", risk);
     
 }
