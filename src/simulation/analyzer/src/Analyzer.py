@@ -94,13 +94,13 @@ class Analyzer:
         global_reli_timeseries = dict() 
 
         ################ load status log ################
-        with open("../../knowledge_repository/resource/logs/status_1568230343172375282.log", newline='') as log_file:
+        with open("../../knowledge_repository/resource/logs/status_1568376001862731476.log", newline='') as log_file:
             log_csv = csv.reader(log_file, delimiter=',')
             log_status = list(log_csv)
             del log_status[0] # delete first line
 
         ################ load event log ################
-        with open("../../knowledge_repository/resource/logs/event_1568230343172372967.log", newline='') as log_file:
+        with open("../../knowledge_repository/resource/logs/event_1568376001862729115.log", newline='') as log_file:
             log_csv = csv.reader(log_file, delimiter=',')
             log_event = list(log_csv)
             del log_event[0] # delete first line
@@ -131,6 +131,7 @@ class Analyzer:
                 elif (status.content == 'fail'): 
                     tasks[tag].execute() 
                     tasks[tag].fail()
+
             elif(reg[0]=="Event"):
                 event = Event(str(reg[1]),str(reg[2]),str(reg[3]),str(reg[4]),str(reg[5]))
 
@@ -200,7 +201,7 @@ class Formula:
 
         arg_val = {}
         for argument in arguments :
-            arg_val[argument] = 1
+            arg_val[argument] = 0
 
         return arg_val
 

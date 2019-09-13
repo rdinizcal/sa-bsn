@@ -35,7 +35,7 @@ SET (LIBRARIES ${BSN_LIBRARY})
 # Build this project.
 FILE(GLOB ${PROJECT_NAME}-src "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
-SET(logger-src "${CMAKE_CURRENT_SOURCE_DIR}/src/Logger.cpp")
-ADD_EXECUTABLE (logger  "${CMAKE_CURRENT_SOURCE_DIR}/apps/logger.cpp" ${${PROJECT_NAME}-src} ${logger-src})
-TARGET_LINK_LIBRARIES (logger ${catkin_LIBRARIES} ${LIBRARIES})
-ADD_DEPENDENCIES(logger messages_generate_messages_cpp)
+SET(injector-src "${CMAKE_CURRENT_SOURCE_DIR}/src/Injector.cpp")
+ADD_EXECUTABLE (injector  "${CMAKE_CURRENT_SOURCE_DIR}/apps/injector.cpp" ${${PROJECT_NAME}-src} ${injector-src})
+TARGET_LINK_LIBRARIES (injector ${catkin_LIBRARIES} ${LIBRARIES})
+ADD_DEPENDENCIES(injector messages_generate_messages_cpp)

@@ -17,6 +17,9 @@ class Injector : public arch::ROSComponent {
       	Injector(const Injector &);
     	Injector &operator=(const Injector &);
 
+		int second_to_cycles(const int32_t &seconds);
+
+
 	public:
 		virtual void setUp();
 		virtual void tearDown();
@@ -28,6 +31,8 @@ class Injector : public arch::ROSComponent {
 		ros::NodeHandle handle;
 		int cycles;
 		double noise_factor;
+
+		ros::Publisher uncertainty_g3t1_1;
 };
 
 #endif 
