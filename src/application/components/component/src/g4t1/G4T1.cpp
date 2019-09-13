@@ -99,7 +99,7 @@ void G4T1::collect(const messages::SensorData::ConstPtr& msg) {
     double batt = msg->batt;
     
     battery.consume(BATT_UNIT);
-    if(msg->type == "null" || int32_t(risk) == -1)  throw std::domain_error("failure");
+    if(msg->type == "null" || int32_t(risk) == -1)  throw std::domain_error("content failure");
 
     /*update battery status for received sensor info*/
     if (msg->type=="thermometer"){

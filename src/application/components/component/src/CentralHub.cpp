@@ -55,8 +55,8 @@ void CentralHub::body() {
             sendStatus("success");
         }
     } else {
-        sendStatus("recharging");
         recharge();
+        throw std::domain_error("out of charge");
     }
 }
 

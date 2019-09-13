@@ -117,7 +117,7 @@ void G3T1_2::transfer(const double &m_data) {
     double risk;
     risk = sensorConfig.evaluateNumber(m_data);
     battery.consume(BATT_UNIT);
-    if (risk < 0 || risk > 100) throw std::domain_error("failure");
+    if (risk < 0 || risk > 100) throw std::domain_error("content failure");
 
     ros::NodeHandle handle;
     data_pub = handle.advertise<messages::SensorData>("oximeter_data", 10);

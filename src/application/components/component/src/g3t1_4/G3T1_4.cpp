@@ -175,7 +175,7 @@ void G3T1_4::transferSystolic(const double &m_data) {
     double risk;
     risk = sensorConfigSystolic.evaluateNumber(m_data);
     battery.consume(BATT_UNIT);
-    if (risk < 0 || risk > 100) throw std::domain_error("failure");
+    if (risk < 0 || risk > 100) throw std::domain_error("content failure");
 
     ros::NodeHandle handle;
     data_pub = handle.advertise<messages::SensorData>("systolic_data", 10);
@@ -196,7 +196,7 @@ void G3T1_4::transferDiastolic(const double &m_data) {
 
     risk = sensorConfigDiastolic.evaluateNumber(m_data);
     battery.consume(BATT_UNIT);
-    if (risk < 0 || risk > 100) throw std::domain_error("failure");
+    if (risk < 0 || risk > 100) throw std::domain_error("content failure");
 
     ros::NodeHandle handle;
     data_pub = handle.advertise<messages::SensorData>("diastolic_data", 10);

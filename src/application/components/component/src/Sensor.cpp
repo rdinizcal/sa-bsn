@@ -58,8 +58,8 @@ void Sensor::body() {
         transfer(data);
 		sendStatus("success");
     } else {
-        sendStatus("recharging");
         recharge();
+        throw std::domain_error("out of charge");
     }
 }
 
@@ -99,12 +99,10 @@ bool Sensor::isActive() {
 
 void Sensor::turnOn() {
     active = true;
-    activate();
 }
 
 void Sensor::turnOff() {
     active = false;
-    deactivate();
 }
 
 /*  battery will always recover in 20seconds

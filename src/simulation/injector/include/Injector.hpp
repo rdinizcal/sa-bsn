@@ -30,9 +30,9 @@ class Injector : public arch::ROSComponent {
 	private:
 		ros::NodeHandle handle;
 		int cycles;
-		double noise_factor;
 
-		ros::Publisher uncertainty_g3t1_2;
+		std::map<std::string, ros::Publisher> uncertainty_pub;
+		std::map<std::string, double> noise_factor;
 };
 
 #endif 

@@ -94,13 +94,13 @@ class Analyzer:
         global_reli_timeseries = dict() 
 
         ################ load status log ################
-        with open("../../knowledge_repository/resource/logs/status_1568385211317913514.log", newline='') as log_file:
+        with open("../../knowledge_repository/resource/logs/status_1568398216188441548.log", newline='') as log_file:
             log_csv = csv.reader(log_file, delimiter=',')
             log_status = list(log_csv)
             del log_status[0] # delete first line
 
         ################ load event log ################
-        with open("../../knowledge_repository/resource/logs/event_1568385211317908350.log", newline='') as log_file:
+        with open("../../knowledge_repository/resource/logs/event_1568398216188439373.log", newline='') as log_file:
             log_csv = csv.reader(log_file, delimiter=',')
             log_event = list(log_csv)
             del log_event[0] # delete first line
@@ -164,7 +164,7 @@ class Analyzer:
         y = list(sorted_timeseries.values())
 
         ## discretizing the curve
-        [x,y] = self.discretize(x,y,10e6) #precision in ms
+        [x,y] = self.discretize(x,y,1) #precision in ms
 
         ## perform the analysis 
         setpoint = 0.80
@@ -244,7 +244,7 @@ class Task:
         self.name = _name 
         self.nexecs = 0
         self.lstExec = []
-        self.window_size = 5
+        self.window_size = 100
     
     def __eq__(self, other):
         if isinstance(other, Task):
