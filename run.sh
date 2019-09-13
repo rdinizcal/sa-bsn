@@ -9,15 +9,15 @@ gnome-terminal --working-directory=${bsn}/configurations/repository -e 'roslaunc
 #gnome-terminal --working-directory=${bsn}/configurations/manager -e 'roslaunch scheduler.launch'
 
 ################# LOGGING INFRASTRUCTURE #################
-gnome-terminal --working-directory=${bsn}/configurations/logging_infrastructure -e 'roslaunch logger.launch' & sleep 2s
+gnome-terminal --working-directory=${bsn}/configurations/logging_infrastructure -e 'roslaunch logger.launch' & sleep 10s
 
 ################# APPLICATION #################
-gnome-terminal --working-directory=${bsn}/configurations/application -e 'roslaunch probe.launch' & sleep 2s
+gnome-terminal --working-directory=${bsn}/configurations/application -e 'roslaunch probe.launch' & sleep 10s
 #gnome-terminal --working-directory=${bsn}/configurations/application -e 'roslaunch effector.launch'
 
-#gnome-terminal --working-directory=${bsn}/configurations/application -e 'roslaunch g4t1.launch' & sleep 5s
-gnome-terminal --working-directory=${bsn}/configurations/application -e 'roslaunch g3t1_1.launch'
-#gnome-terminal --working-directory=${bsn}/configurations/application -e 'roslaunch g3t1_2.launch'
+gnome-terminal --working-directory=${bsn}/configurations/application -e 'roslaunch g4t1.launch' & sleep 5s
+#gnome-terminal --working-directory=${bsn}/configurations/application -e 'roslaunch g3t1_1.launch'
+gnome-terminal --working-directory=${bsn}/configurations/application -e 'roslaunch g3t1_2.launch'
 #gnome-terminal --working-directory=${bsn}/configurations/application -e 'roslaunch g3t1_3.launch'
 #gnome-terminal --working-directory=${bsn}/configurations/application -e 'roslaunch g3t1_4.launch'
 

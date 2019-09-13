@@ -32,7 +32,7 @@ class Injector : public arch::ROSComponent {
 		int cycles;
 		double noise_factor;
 
-		ros::Publisher uncertainty_g3t1_1;
+		ros::Publisher uncertainty_g3t1_2;
 };
 
 #endif 

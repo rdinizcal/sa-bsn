@@ -19,8 +19,9 @@ int32_t Sensor::run() {
 
     ros::NodeHandle nh;
     ros::Subscriber noise_subs = nh.subscribe("uncertainty_"+ros::this_node::getName(), 10, &Sensor::injectUncertainty, this);
-    std::cout << "\"uncertainty_\"+ros::this_node::getName() = " << "uncertainty_"+ros::this_node::getName() << std::endl;
+
     sendStatus("init");
+    ros::spinOnce();
 
     while(ros::ok()) {
         ros::Rate loop_rate(rosComponentDescriptor.getFreq());
@@ -78,7 +79,6 @@ void Sensor::reconfigure(const archlib::AdaptationCommand::ConstPtr& msg) {
 }
 
 void Sensor::injectUncertainty(const archlib::Uncertainty::ConstPtr& msg) {
-    ROS_INFO("Received uncertainty packet [%s]", msg->content.c_str());
     std::string content = msg->content;
 
     bsn::operation::Operation op;

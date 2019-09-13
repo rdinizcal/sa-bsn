@@ -10,7 +10,7 @@ void Injector::setUp() {
 	config.getParam("frequency", freq);
 	rosComponentDescriptor.setFreq(freq);
 
-   uncertainty_g3t1_1 = handle.advertise<archlib::Uncertainty>("uncertainty_/g3t1_1", 10);
+   uncertainty_g3t1_2 = handle.advertise<archlib::Uncertainty>("uncertainty_/g3t1_2", 10);
 }
 
 void Injector::tearDown() {}
@@ -25,7 +25,7 @@ void Injector::body() {
 
     if(cycles % second_to_cycles(60) == 0) {
         noise_factor*=2;
-        injectUncertainty("/g3t1_1", "noise_factor=" + std::to_string(noise_factor));
+        injectUncertainty("/g3t1_2", "noise_factor=" + std::to_string(noise_factor));
     }
 }
 
@@ -36,6 +36,6 @@ void Injector::injectUncertainty(const std::string &component, const std::string
     msg.target = component;
     msg.content = content;
 
-    uncertainty_g3t1_1.publish(msg);
+    uncertainty_g3t1_2.publish(msg);
     ROS_INFO("Inject [%s] at [%s]!", content.c_str(), component.c_str());
 }
