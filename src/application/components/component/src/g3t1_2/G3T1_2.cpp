@@ -1,5 +1,7 @@
 #include "component/g3t1_2/G3T1_2.hpp"
 
+#define BATT_UNIT 0.01
+
 using namespace bsn::range;
 using namespace bsn::generator;
 using namespace bsn::operation;
@@ -93,7 +95,7 @@ double G3T1_2::collect() {
     double m_data = 0;
 
     m_data = dataGenerator.getValue();
-    battery.consume(0.1);
+    battery.consume(BATT_UNIT);
 
     ROS_INFO("new data collected: [%s]", std::to_string(m_data).c_str());
 
@@ -105,7 +107,7 @@ double G3T1_2::process(const double &m_data) {
     
     filter.insert(m_data);
     filtered_data = filter.getValue();
-    battery.consume(0.1*filter.getRange());
+    battery.consume(BATT_UNIT*filter.getRange());
 
     ROS_INFO("filtered data: [%s]", std::to_string(filtered_data).c_str());
     return filtered_data;
@@ -114,7 +116,7 @@ double G3T1_2::process(const double &m_data) {
 void G3T1_2::transfer(const double &m_data) {
     double risk;
     risk = sensorConfig.evaluateNumber(m_data);
-    battery.consume(0.1);
+    battery.consume(BATT_UNIT);
     if (risk < 0 || risk > 100) throw std::domain_error("failure");
 
     ros::NodeHandle handle;

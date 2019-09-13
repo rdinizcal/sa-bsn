@@ -23,8 +23,8 @@ int Injector::second_to_cycles(const int32_t &seconds) {
 void Injector::body() {
     ++cycles;
 
-    if(cycles % second_to_cycles(60) == 0) {
-        noise_factor*=2;
+    if(cycles % second_to_cycles(30) == 0 && noise_factor <= 1) {
+        noise_factor += 0.1;
         injectUncertainty("/g3t1_2", "noise_factor=" + std::to_string(noise_factor));
     }
 }

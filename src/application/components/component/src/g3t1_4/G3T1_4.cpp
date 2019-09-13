@@ -1,5 +1,7 @@
 #include "component/g3t1_4/G3T1_4.hpp"
 
+#define BATT_UNIT 0.1
+
 using namespace bsn::range;
 using namespace bsn::resource;
 using namespace bsn::generator;
@@ -112,7 +114,7 @@ double G3T1_4::collectSystolic() {
     double m_data = 0;
 
     m_data = dataGenerator.getValue();
-    battery.consume(0.1);
+    battery.consume(BATT_UNIT);
 
     ROS_INFO("new data collected: [%s]", std::to_string(m_data).c_str());
 
@@ -124,7 +126,7 @@ double G3T1_4::collectDiastolic() {
     double m_data = 0;
 
     m_data = dataGenerator.getValue();
-    battery.consume(0.1);
+    battery.consume(BATT_UNIT);
 
     ROS_INFO("new data collected: [%s]", std::to_string(m_data).c_str());
 
@@ -144,7 +146,7 @@ double G3T1_4::processSystolic(const double &m_data) {
     
     filterSystolic.insert(m_data);
     filtered_data = filterSystolic.getValue();
-    battery.consume(0.1*filterSystolic.getRange());
+    battery.consume(BATT_UNIT*filterSystolic.getRange());
 
     ROS_INFO("filtered data: [%s]", std::to_string(filtered_data).c_str());
     return filtered_data;
@@ -155,7 +157,7 @@ double G3T1_4::processDiastolic(const double &m_data) {
     
     filterDiastolic.insert(m_data);
     filtered_data = filterDiastolic.getValue();
-    battery.consume(0.1*filterDiastolic.getRange());
+    battery.consume(BATT_UNIT*filterDiastolic.getRange());
 
     ROS_INFO("filtered data: [%s]", std::to_string(filtered_data).c_str());
     return filtered_data;
@@ -172,7 +174,7 @@ double G3T1_4::process(const double &m_data) {
 void G3T1_4::transferSystolic(const double &m_data) {
     double risk;
     risk = sensorConfigSystolic.evaluateNumber(m_data);
-    battery.consume(0.1);
+    battery.consume(BATT_UNIT);
     if (risk < 0 || risk > 100) throw std::domain_error("failure");
 
     ros::NodeHandle handle;
@@ -193,7 +195,7 @@ void G3T1_4::transferDiastolic(const double &m_data) {
     double risk;
 
     risk = sensorConfigDiastolic.evaluateNumber(m_data);
-    battery.consume(0.1);
+    battery.consume(BATT_UNIT);
     if (risk < 0 || risk > 100) throw std::domain_error("failure");
 
     ros::NodeHandle handle;

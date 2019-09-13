@@ -3,6 +3,7 @@
 
 #include <stdio.h> 
 #include <string>
+#include <numeric>
 
 #include "archlib/target_system/Component.hpp"
 #include "archlib/AdaptationCommand.h"
@@ -41,7 +42,8 @@ class CentralHub : public arch::target_system::Component {
     protected:
 		bool active;
         int max_size;
-        int buffer_size;
+        int total_buffer_size;
+        std::array<int, 5> buffer_size;
 		bsn::resource::Battery battery;
         std::vector<std::list<double>> data_buffer;
 };

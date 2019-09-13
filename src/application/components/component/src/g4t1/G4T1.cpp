@@ -87,9 +87,8 @@ void G4T1::setUp() {
 
     for(std::vector<std::list<double>>::iterator it = data_buffer.begin();
         it != data_buffer.end(); ++it) {
-            (*it).push_back(0);
+            (*it) = {0.0};
     }
-
 }
 
 void G4T1::tearDown() {}
@@ -113,25 +112,21 @@ void G4T1::collect(const messages::SensorData::ConstPtr& msg) {
         bpr_batt = std::to_string(batt);
     } 
 
-    ++buffer_size;
+    ++buffer_size[type];
+    total_buffer_size = std::accumulate(std::begin(buffer_size), std::end(buffer_size), 0, std::plus<int>());
 
-    std::cout << "msg->type = " << msg->type << ", id = " << get_sensor_id(msg->type) << std::endl;
-    std::cout << "if(buffer_size < max_size) =" << (buffer_size < max_size) << std::endl;
-    if(buffer_size < max_size){
-        std::cout << "pushed" << std::endl;
+    if(buffer_size[type] < max_size){
         data_buffer[type].push_back(risk);
     } else {
-        std::cout << "pushed" <<  std::endl;
         data_buffer[type].push_back(risk);
-        std::cout << "erased" << std::endl;
-        data_buffer.erase(data_buffer.begin());//erase the first element to avoid overflow
+        data_buffer[type].erase(data_buffer[type].begin());//erase the first element to avoid overflow
     }
 }
 
 void G4T1::process(){
     battery.consume(BATT_UNIT*data_buffer.size());
     patient_status = data_fuse(data_buffer);
-    --buffer_size;
+    --total_buffer_size;    
 
     std::vector<std::string> risks;
     risks = getPatientStatus();

@@ -1,6 +1,6 @@
 #include "component/CentralHub.hpp"
 
-CentralHub::CentralHub(int &argc, char **argv, const std::string &name, const bool &active, const bsn::resource::Battery &battery) : Component(argc, argv, name), active(active), max_size(5), buffer_size(0), battery(battery), data_buffer() {}
+CentralHub::CentralHub(int &argc, char **argv, const std::string &name, const bool &active, const bsn::resource::Battery &battery) : Component(argc, argv, name), active(active), max_size(5), total_buffer_size(0), buffer_size({0,0,0,0,0}), battery(battery), data_buffer({{0},{0},{0},{0},{0}}) {}
 
 CentralHub::~CentralHub() {}
 
@@ -8,7 +8,6 @@ int32_t CentralHub::run() {
 
     arch::target_system::Component::setUp();
 	setUp();
-    std::cout << "setUp();" << std::endl;
 
     ros::NodeHandle nh;
     ros::Subscriber thermometerSub = nh.subscribe("thermometer_data", 10, &CentralHub::collect, this);
@@ -16,7 +15,6 @@ int32_t CentralHub::run() {
     ros::Subscriber ecgSub = nh.subscribe("ecg_data", 10, &CentralHub::collect, this);
     ros::Subscriber diastolicSub = nh.subscribe("diastolic_data", 10, &CentralHub::collect, this);
     ros::Subscriber systolicSub = nh.subscribe("systolic_data", 10, &CentralHub::collect, this);
-    std::cout << "ros::NodeHandle nh;" << std::endl;
 
     sendStatus("init");
 
@@ -25,12 +23,12 @@ int32_t CentralHub::run() {
 
         try{
             body();
-            std::cout << "body();" << std::endl;
         } catch (const std::exception& e) {
             sendStatus("fail");
         } 
         loop_rate.sleep();
     }
+
     sendStatus("finish");
 
     tearDown();
@@ -41,23 +39,19 @@ int32_t CentralHub::run() {
 
 void CentralHub::body() {
     
-    ros::spinOnce(); //calls collect if there's data in the topics
+    ros::spinOnce(); //calls collect() if there's data in the topics
 
     if (!isActive() && battery.getCurrentLevel() > 90){
         turnOn();
     } else if (isActive() && battery.getCurrentLevel() < 2){
         turnOff();        
     }
-
+    
     if(isActive()) {
-        if(buffer_size > 0){
-            sendStatus("running");
+        if(total_buffer_size > 0){
             apply_noise();
-            std::cout << "    apply_noise();" << std::endl;
             process();
-            std::cout << "    body();" << std::endl;
             transfer();
-            std::cout << "    transfer();" << std::endl;
             sendStatus("success");
         }
     } else {
