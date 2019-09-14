@@ -76,6 +76,8 @@ std::vector<std::string> G4T1::getPatientStatus() {
 }
 
 void G4T1::setUp() {
+    Component::setUp();
+
     ros::NodeHandle config;
     config.getParam("connect", connect);
     config.getParam("db_url", database_url);

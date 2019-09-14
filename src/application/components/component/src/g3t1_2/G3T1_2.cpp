@@ -16,6 +16,8 @@ G3T1_2::G3T1_2(int &argc, char **argv, const std::string &name) :
 G3T1_2::~G3T1_2() {}
 
 void G3T1_2::setUp() {
+    Component::setUp();
+    
     srand(time(NULL));
         
     Operation op;
@@ -88,7 +90,9 @@ void G3T1_2::setUp() {
 
 }
 
-void G3T1_2::tearDown() {}
+void G3T1_2::tearDown() {
+    Component::tearDown();
+}
 
 double G3T1_2::collect() {
     bsn::generator::DataGenerator dataGenerator(markov);
@@ -120,7 +124,7 @@ void G3T1_2::transfer(const double &m_data) {
     if (risk < 0 || risk > 100) throw std::domain_error("content failure");
 
     ros::NodeHandle handle;
-    data_pub = handle.advertise<messages::SensorData>("oximeter_data", 10);
+    data_pub = handle.advertise<messages::SensorData>("ecg_data", 10);
     messages::SensorData msg;
     msg.type = type;
     msg.data = m_data;

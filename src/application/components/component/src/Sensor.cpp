@@ -14,7 +14,6 @@ Sensor& Sensor::operator=(const Sensor &obj) {
 
 int32_t Sensor::run() {
 
-    arch::target_system::Component::setUp();
 	setUp();
 
     ros::NodeHandle nh;
@@ -35,10 +34,6 @@ int32_t Sensor::run() {
         loop_rate.sleep();
     }
     
-    sendStatus("finish");
-    tearDown();
-    arch::target_system::Component::tearDown();
-
     return 0;
 }
 

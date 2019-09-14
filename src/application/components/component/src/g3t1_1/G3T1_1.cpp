@@ -19,6 +19,8 @@ G3T1_1::G3T1_1(int &argc, char **argv, const std::string &name) :
 G3T1_1::~G3T1_1() {}
 
 void G3T1_1::setUp() {
+    Component::setUp();
+
     srand(time(NULL));
         
     Operation op;
@@ -87,7 +89,9 @@ void G3T1_1::setUp() {
 
 }
 
-void G3T1_1::tearDown() {}
+void G3T1_1::tearDown() {
+    Component::tearDown();
+}
 
 double G3T1_1::collect() {
     bsn::generator::DataGenerator dataGenerator(markov);

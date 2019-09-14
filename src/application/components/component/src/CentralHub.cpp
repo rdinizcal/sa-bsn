@@ -5,8 +5,6 @@ CentralHub::CentralHub(int &argc, char **argv, const std::string &name, const bo
 CentralHub::~CentralHub() {}
 
 int32_t CentralHub::run() {
-
-    arch::target_system::Component::setUp();
 	setUp();
 
     ros::NodeHandle nh;
@@ -15,8 +13,6 @@ int32_t CentralHub::run() {
     ros::Subscriber ecgSub = nh.subscribe("ecg_data", 10, &CentralHub::collect, this);
     ros::Subscriber diastolicSub = nh.subscribe("diastolic_data", 10, &CentralHub::collect, this);
     ros::Subscriber systolicSub = nh.subscribe("systolic_data", 10, &CentralHub::collect, this);
-
-    sendStatus("init");
 
     while(ros::ok()) {
         ros::Rate loop_rate(rosComponentDescriptor.getFreq());
@@ -28,11 +24,6 @@ int32_t CentralHub::run() {
         } 
         loop_rate.sleep();
     }
-
-    sendStatus("finish");
-
-    tearDown();
-    arch::target_system::Component::tearDown();
 
     return 0;
 }

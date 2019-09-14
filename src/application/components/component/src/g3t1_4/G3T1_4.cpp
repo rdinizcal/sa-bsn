@@ -25,6 +25,7 @@ G3T1_4::G3T1_4(int &argc, char **argv, const std::string &name) :
 G3T1_4::~G3T1_4() {}
 
 void G3T1_4::setUp() {
+    Component::setUp();
     srand(time(NULL));
     
     Operation op;
@@ -107,7 +108,9 @@ void G3T1_4::setUp() {
 
 }
 
-void G3T1_4::tearDown() {}
+void G3T1_4::tearDown() {
+    Component::tearDown();
+}
 
 double G3T1_4::collectSystolic() {
     bsn::generator::DataGenerator dataGenerator(markovSystolic);
