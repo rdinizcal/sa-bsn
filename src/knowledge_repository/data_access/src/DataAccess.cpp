@@ -11,12 +11,17 @@ void DataAccess::setUp() {
     std::string path = ros::package::getPath("repository");
     event_filepath = path + "/../resource/logs/event_" + std::to_string(this->now()) + ".log";
     status_filepath = path + "/../resource/logs/status_" + std::to_string(this->now()) + ".log";
+    uncertainty_filepath = path + "/../resource/logs/uncertainty_" + std::to_string(this->now()) + ".log";
 
     fp.open(event_filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
     fp << "\n";
     fp.close();
 
     fp.open(status_filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
+    fp << "\n";
+    fp.close();
+
+    fp.open(uncertainty_filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
     fp << "\n";
     fp.close();
 
@@ -41,6 +46,8 @@ void DataAccess::receivePersistMessage(const archlib::Persist::ConstPtr& msg) {
         persistStatus(msg->timestamp, msg->source, msg->target, msg->content);
     } else if(msg->type=="Event") {
         persistEvent(msg->timestamp, msg->source, msg->target, msg->content);
+    } else if(msg->type=="Uncertainty") {
+        persistUncertainty(msg->timestamp, msg->source, msg->target, msg->content);
     } else {
         std::cout << "(Could not identify message type!!)" << std::endl;
     }
@@ -58,6 +65,14 @@ void DataAccess::persistStatus(const int64_t &timestamp, const std::string &sour
     
     StatusMessage obj("Status", timestamp, logical_clock, source, target, content);
     statusVec.push_back(obj);
+
+    if(logical_clock%30==0) flush();
+}
+
+void DataAccess::persistUncertainty(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content){
+    
+    UncertaintyMessage obj("Uncertainty", timestamp, logical_clock, source, target, content);
+    uncertainVec.push_back(obj);
 
     if(logical_clock%30==0) flush();
 }
@@ -87,4 +102,16 @@ void DataAccess::flush(){
     }
     fp.close();
     eventVec.clear();
+
+    fp.open(uncertainty_filepath, std::fstream::in | std::fstream::out | std::fstream::app);   
+    for(std::vector<UncertaintyMessage>::iterator it = uncertainVec.begin(); it != uncertainVec.end(); ++it) {
+        fp << (*it).getName() << ",";
+        fp << (*it).getLogicalClock() << ",";
+        fp << (*it).getTimestamp() << ",";
+        fp << (*it).getSource() << ",";
+        fp << (*it).getTarget() << ",";
+        fp << (*it).getContent() << "\n";
+    }
+    fp.close();
+    uncertainVec.clear();
 }

@@ -14,6 +14,9 @@ void Injector::setUp() {
    uncertainty_pub["/g3t1_2"] = handle.advertise<archlib::Uncertainty>("uncertainty_/g3t1_2", 10);
    uncertainty_pub["/g3t1_3"] = handle.advertise<archlib::Uncertainty>("uncertainty_/g3t1_3", 10);
    uncertainty_pub["/g3t1_4"] = handle.advertise<archlib::Uncertainty>("uncertainty_/g3t1_4", 10);
+   
+   log_uncertainty = handle.advertise<archlib::Uncertainty>("log_uncertainty", 10);
+
 }
 
 void Injector::tearDown() {}
@@ -55,5 +58,6 @@ void Injector::injectUncertainty(const std::string &component, const std::string
     msg.content = content;
 
     uncertainty_pub[component].publish(msg);
+    log_uncertainty.publish(msg);
     ROS_INFO("Inject [%s] at [%s]!", content.c_str(), component.c_str());
 }

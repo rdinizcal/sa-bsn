@@ -10,7 +10,9 @@
 #include "archlib/Status.h"
 #include "archlib/Event.h"
 #include "archlib/AdaptationCommand.h"
+#include "archlib/Uncertainty.h"
 #include "archlib/Persist.h"
+
 #include "archlib/ROSComponent.hpp"
 
 class Logger : public arch::ROSComponent {
@@ -32,6 +34,7 @@ class Logger : public arch::ROSComponent {
 	  	void receiveAdaptationCommand(const archlib::AdaptationCommand::ConstPtr& msg);
 	  	void receiveStatus(const archlib::Status::ConstPtr& msg);
 	  	void receiveEvent(const archlib::Event::ConstPtr& msg);
+	  	void receiveUncertainty(const archlib::Uncertainty::ConstPtr& msg);
 
   	protected:
         ros::NodeHandle handle;

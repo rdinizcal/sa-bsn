@@ -33,6 +33,8 @@ class Injector : public arch::ROSComponent {
 
 		std::map<std::string, ros::Publisher> uncertainty_pub;
 		std::map<std::string, double> noise_factor;
+
+		ros::Publisher log_uncertainty;
 };
 
 #endif 

@@ -28,6 +28,7 @@ void Logger::body() {
     ros::Subscriber reconfig_sub = n.subscribe("log_reconfigure", 1000, &Logger::receiveAdaptationCommand, this);
     ros::Subscriber status_sub = n.subscribe("log_status", 1000, &Logger::receiveStatus, this);
     ros::Subscriber event_sub = n.subscribe("log_event", 1000, &Logger::receiveEvent, this);
+    ros::Subscriber uncertainty_sub = n.subscribe("log_uncertainty", 1000, &Logger::receiveUncertainty, this);
     ros::spin();
 }
 
@@ -72,4 +73,17 @@ void Logger::receiveEvent(const archlib::Event::ConstPtr& msg) {
 
     persist.publish(persistMsg);
     event.publish(msg);
+}
+
+void Logger::receiveUncertainty(const archlib::Uncertainty::ConstPtr& msg) {
+    //ROS_INFO("I heard: [%s: %s]", msg->source.c_str(), msg->content.c_str());
+
+    archlib::Persist persistMsg;
+    persistMsg.source = msg->source;
+    persistMsg.target = msg->target;
+    persistMsg.type = "Uncertainty";
+    persistMsg.timestamp = this->now()-time_ref;
+    persistMsg.content = msg->content;
+
+    persist.publish(persistMsg);
 }
