@@ -1,0 +1,3 @@
+<launch> 
+    <node name="dataAccessNode" pkg="dataAccessNode" type="dataAccessNode" output="screen" />
+</launch>

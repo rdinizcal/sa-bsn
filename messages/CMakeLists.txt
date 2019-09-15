@@ -28,6 +28,7 @@ ADD_MESSAGE_FILES( FILES
   application/external/Status.msg
   application/external/Event.msg
   application/external/Info.msg
+  application/external/LearningData.msg
   manager/external/ReconfigurationCommand.msg
   manager/internal/CommandControl.msg
 )

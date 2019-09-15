@@ -1,0 +1,3 @@
+<launch> 
+    <node name="illness_identifier" pkg="illness_identifier" type="illness_identifier" output="screen" />
+</launch>

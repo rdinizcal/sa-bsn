@@ -23,7 +23,8 @@ void Logger::setUp() {
     reconfig_logger2effector_pub = handler.advertise<messages::ReconfigurationCommand>("reconfigure", 10);
     status_logger2manager_pub = handler.advertise<messages::Status>("status", 10);
     event_logger2manager_pub = handler.advertise<messages::Event>("event", 10);
-    info_logger2repository_pub = handler.advertise<messages::Info>("info", 10);
+    info_logger2repository_pub = handler.advertise<messages::Info>("persist", 10);
+
 
 }
 
