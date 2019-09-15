@@ -197,6 +197,28 @@ void G4T1::receiveSensorData(const messages::SensorData::ConstPtr& msg) {
     if (persist)
         this->persistData(risks);
 
+    info_pub = handle.advertise<messages::Info>("collect_info", 1000);
+
+    messages::Info infoMsg;
+    std::string content = "";
+    content += "timestamp:,";
+    content += "name:"+moduleDescriptor.getName()+",";
+    content += "type:centralhub,";
+    //content += "battery:"+std::to_string(battery.getCurrentLevel())+",";
+    content += "battery:,";
+    content += "frequency:"+std::to_string(moduleDescriptor.getFreq())+",";
+    //content += "cost:"+std::to_string((0.1 + 0.1*filter.getRange() + 0.1 + 0.2))+",";
+    content += "cost:,";
+    
+    content += "risk:";
+    content += ((patient_status>=66)?"CRITICAL STATE":"NORMAL STATE");
+
+    infoMsg.source = moduleDescriptor.getName();
+    infoMsg.target = "/repository";
+    infoMsg.content = content;
+
+    info_pub.publish(infoMsg);
+    
     std::cout << std::endl << "*****************************************" << std::endl;
     std::cout << "PatientStatusInfo#" << std::endl;
     std::cout << "| THERM_RISK: " << trm_risk << std::endl;

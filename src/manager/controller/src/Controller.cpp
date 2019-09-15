@@ -19,8 +19,6 @@ bool Controller::getInfo() {
 	Function to use a client to pull information from log
 	********************************************************/
 
-	ros::NodeHandle info_request_handler;
-
 	ros::ServiceClient info_request;
 
 	info_request = info_request_handler.serviceClient<services::ControllerInfo>("InfoRequest");

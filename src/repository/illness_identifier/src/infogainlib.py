@@ -2,8 +2,6 @@
 
 import csv
 import math
-import rospy
-
 '''------------------------------ Entropy ---------------------------'''
 
 # Calculates the entropy of the given data set for the target attribute.
@@ -50,7 +48,7 @@ def gain(data, attr, target_attr):
  
     # Subtract the entropy of the chosen attribute from the entropy of the whole data set with respect to the target attribute (and return it)
     return (entropy(data, target_attr) - subset_entropy)
-        
+
 '''------------------------------ Main ---------------------------'''
 
 if __name__ == '__main__':
@@ -60,18 +58,19 @@ if __name__ == '__main__':
     with open("template.csv") as f:
         read = csv.reader(f)
         features = next(read)
-
+    i = 0
     with open("template.csv") as f:
         reader = csv.DictReader(f)
         data = [r for r in reader]
-
+    
+    print(type(data))
     ent = entropy(data, features[-1])
 ##    print("\n\n--------------------------------------------------------------")
-    print("Shannon's Entropy of class '"+features[-1]+"': ",ent)
+    #print("Shannon's Entropy of class '"+features[-1]+"': ",ent)
 ##    print("--------------------------------------------------------------\n")
     
     for item in range(0, len(features)-1):
 ##        gain(data, features[item], features[-1])
-        print(features[item]+"'s information gain:",gain(data, features[item], features[-1]))
+        #print(features[item]+"'s information gain:",gain(data, features[item], features[-1]))
         item+=1
 ##    print("\n------------------------------------------------------------\n")

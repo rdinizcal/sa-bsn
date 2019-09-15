@@ -48,6 +48,8 @@ class Controller {
 		std::map<std::string, CurrentInfo> info;
 		std::map<std::string, float> new_parameters;
 
+		ros::NodeHandle info_request_handler;
+		
 		float adapt_frequency;
 };
 

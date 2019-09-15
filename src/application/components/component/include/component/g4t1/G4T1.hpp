@@ -17,6 +17,7 @@
 #include "component/SchedulableComponent.hpp"
 
 #include "messages/SensorData.h"
+#include "messages/Info.h"
 
 class G4T1 : public SchedulableComponent {
     
@@ -68,6 +69,9 @@ class G4T1 : public SchedulableComponent {
         std::string ecg_batt;
         std::string trm_batt;
         std::string acc_batt;
+
+        ros::Publisher info_pub;
+        ros::NodeHandle handle;
 };
 
 #endif 

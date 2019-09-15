@@ -122,21 +122,25 @@ void DataAccessNode::parse(std::string content, ComponentData& component) {
 void DataAccessNode::finishCycle(double &timestamp) {
     std::map<std::string,std::vector<ComponentData>>::iterator componentMapIterator;
     std::vector<std::string>::iterator componentsInCycleIterator;
-
+    ROS_INFO("[finishCycle] Entered finishCycle");
     for(componentMapIterator = componentMap.begin();componentMapIterator != componentMap.end();++componentMapIterator) {
         componentsInCycleIterator = std::find(components_in_cycle.begin(), components_in_cycle.end(), componentMapIterator->first);
 
-        if(componentsInCycleIterator == components_in_cycle.end()) {
+        if(componentsInCycleIterator == components_in_cycle.end() && componentMapIterator->second.size() > 0) {
+            ROS_INFO("Inserting Data in component %s", componentMapIterator->first.c_str());
             ComponentData component(componentMapIterator->second.back());
 
             component.setTimestamp(timestamp);
 
             std::string risk = "-";
             component.setRiskStatus(risk);
+        
+            componentMapIterator->second.push_back(component);
         }
     }
 
     components_in_cycle.clear();
+    ROS_INFO("[finishCycle] Left finishCycle");
 }
 
 void DataAccessNode::receiveInfo(const messages::Info::ConstPtr& msg) {
@@ -147,6 +151,33 @@ void DataAccessNode::receiveInfo(const messages::Info::ConstPtr& msg) {
     parse(msg->content, componentData);
 
     int size = componentMap[componentData.getName()].size();
+    
+    if(size == 0) { //Making vector sizes equal
+        int max_size = 0;
+        std::map<std::string,std::vector<ComponentData>>::iterator componentMapIterator;
+        for(componentMapIterator = componentMap.begin();componentMapIterator != componentMap.end();++componentMapIterator) {
+            if(componentMapIterator->second.size() > max_size) {
+                max_size = componentMapIterator->second.size();
+            }
+        }
+
+        if(max_size > 1) {
+            ComponentData dummy_data(componentData);
+            std::string aux;
+            double aux_d;
+
+            aux = "-";
+            dummy_data.setRiskStatus(aux);
+            aux_d = 0;
+            dummy_data.setCost(aux_d);
+            dummy_data.setTimestamp(aux_d);
+
+            for(int i = 0;i < max_size-1;i++) {
+                componentMap[componentData.getName()].push_back(dummy_data);
+            }
+        }
+    }
+
     double timestamp;
 
     componentsInCycleIterator = std::find(components_in_cycle.begin(), components_in_cycle.end(), componentData.getName());
@@ -170,32 +201,57 @@ void DataAccessNode::receiveInfo(const messages::Info::ConstPtr& msg) {
 }
 
 void DataAccessNode::sendLearningInfo() {
+    ROS_INFO("Entering sendLearningInfo");
     //Send info to learning block in a specific way
     std::map<std::string,std::vector<ComponentData>>::iterator componentMapIterator;
     messages::LearningData learning_data;
     
     int i = 0;
-    int j = 0;
 
     componentMapIterator = componentMap.begin();
 
     int size = componentMapIterator->second.size();
 
+    /*ROS_INFO("*******************************************************************************************************************");
+    for(componentMapIterator = componentMap.begin();componentMapIterator != componentMap.end();++componentMapIterator) {
+        ROS_INFO("[sendLearningInfo] Module %s", componentMapIterator->first.c_str());
+        ROS_INFO("[sendLearningInfo] Vector size %d", static_cast<int>(componentMapIterator->second.size()));
+    }
+    ROS_INFO("*******************************************************************************************************************");*/
+
+    std::string aux;
     while(i < size) {
         for(componentMapIterator = componentMap.begin();componentMapIterator != componentMap.end();++componentMapIterator) {
+            if(componentMapIterator->second.back().getType() != "centralhub") {
+                if(i == 0) {
+                    learning_data.types.push_back(componentMapIterator->second.at(i).getType());
+                }
+
+                learning_data.type.push_back(componentMapIterator->second.at(i).getType());
+
+                learning_data.risk_status.push_back(componentMapIterator->second.at(i).getRiskStatus());
+
+            } else {
+                aux = componentMapIterator->first;
+            }
+        }
+        
+        componentMapIterator = componentMap.find(aux);
+
+        if(componentMapIterator != componentMap.end()) {
             if(i == 0) {
-                learning_data.types[j] = componentMapIterator->second[i].getType();
+                learning_data.types.push_back(componentMapIterator->second.at(i).getType());
             }
 
-            learning_data.type[j] = componentMapIterator->second[i].getType();
-            learning_data.risk_status[j] = componentMapIterator->second[i].getRiskStatus();
-
-            j++;
+            learning_data.type.push_back(componentMapIterator->second.at(i).getType());
+            learning_data.risk_status.push_back(componentMapIterator->second.at(i).getRiskStatus());
         }
+        
         i++;
     }
 
     info_dataaccessnode2learning_pub.publish(learning_data);
+    ROS_INFO("Leaving sendLearningInfo");
 }
 
 void DataAccessNode::persistComponentData() {
@@ -204,16 +260,19 @@ void DataAccessNode::persistComponentData() {
 
     sendLearningInfo();
 
+    ROS_INFO("Entering persistComponentData");
     fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
 
     for(componentMapIterator = componentMap.begin();componentMapIterator != componentMap.end();++componentMapIterator) {
         for(componentDataVectorIterator = componentMapIterator->second.begin();componentDataVectorIterator != componentMapIterator->second.end();++componentDataVectorIterator) {
             fp << (*componentDataVectorIterator).toString();
         }
-        componentMapIterator->second.clear();
+        //componentMapIterator->second.clear();
+        componentMap.erase(componentMapIterator);
     }
 
     fp.close();
+    ROS_INFO("Leaving persistComponentData");
 }
 
 int64_t DataAccessNode::now() const{
