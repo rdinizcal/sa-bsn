@@ -100,8 +100,8 @@ void G4T1::collect(const messages::SensorData::ConstPtr& msg) {
     double risk = msg->risk;
     double batt = msg->batt;
     
-    battery.consume(BATT_UNIT);
-    if(msg->type == "null" || int32_t(risk) == -1)  throw std::domain_error("content failure");
+    //battery.consume(BATT_UNIT);
+    if(msg->type == "null" || int32_t(risk) == -1)  throw std::domain_error("risk data out of boundaries");
 
     /*update battery status for received sensor info*/
     if (msg->type=="thermometer"){
@@ -126,7 +126,7 @@ void G4T1::collect(const messages::SensorData::ConstPtr& msg) {
 }
 
 void G4T1::process(){
-    battery.consume(BATT_UNIT*data_buffer.size());
+    //battery.consume(BATT_UNIT*data_buffer.size());
     patient_status = data_fuse(data_buffer);
     --total_buffer_size;    
 
@@ -150,7 +150,7 @@ void G4T1::process(){
 
 void G4T1::transfer(){
     if (connect) {
-    battery.consume(BATT_UNIT*data_buffer.size()*5);
+    //battery.consume(BATT_UNIT*data_buffer.size()*5);
     web::http::client::http_client client(U(database_url));
     web::json::value json_obj; 
         json_obj["VitalData"] = web::json::value::string(makePacket());

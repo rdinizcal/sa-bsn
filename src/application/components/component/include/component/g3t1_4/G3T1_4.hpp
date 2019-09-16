@@ -28,6 +28,8 @@ class G3T1_4 : public Sensor {
 	private:
       	G3T1_4(const G3T1_4 &);
     	G3T1_4 &operator=(const G3T1_4 &);
+
+		std::string label(bsn::configuration::SensorConfiguration &sensorConfig, double &risk);
 	
 	public:
 		void setUp();
@@ -55,13 +57,15 @@ class G3T1_4 : public Sensor {
 		bsn::filters::MovingAverage filterDiastolic;
 		bsn::configuration::SensorConfiguration sensorConfigSystolic;
 		bsn::configuration::SensorConfiguration sensorConfigDiastolic;
-		double dias_accuracy;
-		double syst_accuracy;
 		double systolic_data;
 		double diastolic_data;
 
 		ros::NodeHandle handle;
 		ros::Publisher data_pub;
+
+		double collected_systolic_risk;
+		double collected_diastolic_risk;
+
 };
 
 #endif 

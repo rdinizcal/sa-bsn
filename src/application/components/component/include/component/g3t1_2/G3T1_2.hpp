@@ -28,6 +28,8 @@ class G3T1_2 : public Sensor {
       	G3T1_2(const G3T1_2 &);
     	G3T1_2 &operator=(const G3T1_2 &);
 
+		std::string label(double &risk);
+
 	public:
     	void setUp();
     	void tearDown();
@@ -43,6 +45,9 @@ class G3T1_2 : public Sensor {
 
 		ros::NodeHandle handle;
 		ros::Publisher data_pub;
+
+		double collected_risk;
+
 };
 
 #endif 

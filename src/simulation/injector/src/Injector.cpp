@@ -21,32 +21,77 @@ void Injector::setUp() {
 
 void Injector::tearDown() {}
 
-// converts the number of seconds (input) to number of cycles
-int Injector::second_to_cycles(const int32_t &seconds) {
+int Injector::seconds_in_cycles(const int32_t &seconds){
     return seconds*rosComponentDescriptor.getFreq();
+}
+
+int Injector::cycles_in_seconds(const int32_t &cycles) {
+    return cycles/rosComponentDescriptor.getFreq();
+}
+
+// converts the number of seconds (input) to number of cycles
+bool Injector::passed_in_seconds(const int32_t &seconds) {
+    if(seconds == 0) return false;
+    return cycles % seconds_in_cycles(seconds) == 0;
+}
+
+void Injector::step(const std::string &component, double &amplitude) {
+    injectUncertainty(component, "noise_factor=" + std::to_string(amplitude));
 }
 
 void Injector::body() {
     ++cycles;
 
-    if(cycles % second_to_cycles(60) == 0 && noise_factor["/g3t1_1"] < 1) {
-        noise_factor["/g3t1_1"] += 0.2;
-        injectUncertainty("/g3t1_1", "noise_factor=" + std::to_string(noise_factor["/g3t1_1"]));
+    /* Inject step input with duration of 20 seconds at every minute, amplitude = 1*/
+    if(passed_in_seconds(60)) {
+        noise_factor["/g3t1_1"] = 1;
+        step("/g3t1_1", noise_factor["/g3t1_1"]);
+        step_duration["/g3t1_1"] = cycles_in_seconds(cycles)+20;
     }
 
-    if(cycles % second_to_cycles(30) == 0 && noise_factor["/g3t1_2"] < 1) {
-        noise_factor["/g3t1_2"] += 0.1;
-        injectUncertainty("/g3t1_2", "noise_factor=" + std::to_string(noise_factor["/g3t1_2"]));
+    if(passed_in_seconds(step_duration["/g3t1_1"])) {
+        noise_factor["/g3t1_1"] = 0;
+        step("/g3t1_1", noise_factor["/g3t1_1"]);
+        step_duration["/g3t1_1"] = 0;
     }
 
-    if(cycles % second_to_cycles(15) == 0 && noise_factor["/g3t1_3"] < 1) {
-        noise_factor["/g3t1_3"] += 0.03;
-        injectUncertainty("/g3t1_3", "noise_factor=" + std::to_string(noise_factor["/g3t1_3"]));
+    /* Inject step input with duration of 10 seconds at every 30 seconds, amplitude = 1*/
+    if(passed_in_seconds(30)) {
+        noise_factor["/g3t1_2"] = 1;
+        step("/g3t1_2", noise_factor["/g3t1_2"]);
+        step_duration["/g3t1_2"] = cycles_in_seconds(cycles)+10;
     }
 
-    if(cycles % second_to_cycles(5) == 0 && noise_factor["/g3t1_4"] < 1) {
-        noise_factor["/g3t1_4"] += 0.02;
-        injectUncertainty("/g3t1_4", "noise_factor=" + std::to_string(noise_factor["/g3t1_4"]));
+    if(passed_in_seconds(step_duration["/g3t1_2"])) {
+        noise_factor["/g3t1_2"] = 0;
+        step("/g3t1_2", noise_factor["/g3t1_2"]);
+        step_duration["/g3t1_2"] = 0;
+    }
+
+    /* Inject step input with duration of 10 seconds at every 15 seconds, amplitude = 1*/
+    if(passed_in_seconds(15)) {
+        noise_factor["/g3t1_3"] = 1;
+        step("/g3t1_3", noise_factor["/g3t1_3"]);
+        step_duration["/g3t1_3"] = cycles_in_seconds(cycles)+5;
+    }
+
+    if(passed_in_seconds(step_duration["/g3t1_3"])) {
+        noise_factor["/g3t1_3"] = 0;
+        step("/g3t1_3", noise_factor["/g3t1_3"]);
+        step_duration["/g3t1_3"] = 0;
+    }
+    
+    /* Inject step input with duration of 10 seconds at every 20 seconds, amplitude = 1*/
+    if(passed_in_seconds(20)) {
+        noise_factor["/g3t1_4"] = 1;
+        step("/g3t1_4", noise_factor["/g3t1_4"]);
+        step_duration["/g3t1_4"] = cycles_in_seconds(cycles)+10;
+    }
+
+    if(passed_in_seconds(step_duration["/g3t1_4"])) {
+        noise_factor["/g3t1_4"] = 0;
+        step("/g3t1_4", noise_factor["/g3t1_4"]);
+        step_duration["/g3t1_4"] = 0;
     }
 }
 

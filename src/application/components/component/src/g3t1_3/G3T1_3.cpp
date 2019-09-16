@@ -12,8 +12,9 @@ using namespace bsn::configuration;
 G3T1_3::G3T1_3(int &argc, char **argv, const std::string &name) :
     Sensor(argc, argv, name, "thermometer", true, 1, bsn::resource::Battery("therm_batt", 100, 100, 1)),
     markov(),
-    filter(5),
-    sensorConfig() {}
+    filter(1),
+    sensorConfig(),
+    collected_risk() {}
 
 G3T1_3::~G3T1_3() {}
 
@@ -100,9 +101,11 @@ double G3T1_3::collect() {
     double m_data = 0;
 
     m_data = dataGenerator.getValue();
-    battery.consume(BATT_UNIT);
+    //battery.consume(BATT_UNIT);
 
     ROS_INFO("new data collected: [%s]", std::to_string(m_data).c_str());
+
+    collected_risk = sensorConfig.evaluateNumber(m_data);
 
     return m_data;
 }
@@ -112,7 +115,7 @@ double G3T1_3::process(const double &m_data) {
     
     filter.insert(m_data);
     filtered_data = filter.getValue();
-    battery.consume(BATT_UNIT*filter.getRange());
+    //battery.consume(BATT_UNIT*filter.getRange());
 
     ROS_INFO("filtered data: [%s]", std::to_string(filtered_data).c_str());
     return filtered_data;
@@ -121,8 +124,9 @@ double G3T1_3::process(const double &m_data) {
 void G3T1_3::transfer(const double &m_data) {
     double risk;
     risk = sensorConfig.evaluateNumber(m_data);
-    battery.consume(BATT_UNIT);
-    if (risk < 0 || risk > 100) throw std::domain_error("content failure");
+    //battery.consume(BATT_UNIT);
+    if (risk < 0 || risk > 100) throw std::domain_error("risk data out of boundaries");
+    if (label(risk) != label(collected_risk)) throw std::domain_error("content failure due to noise");
 
     ros::NodeHandle handle;
     data_pub = handle.advertise<messages::SensorData>("thermometer_data", 10);
@@ -134,8 +138,23 @@ void G3T1_3::transfer(const double &m_data) {
 
     data_pub.publish(msg);
     
-    battery.consume(0.2);
+    //battery.consume(0.2);
 
     ROS_INFO("risk calculated and transferred: [%.2f%%]", risk);
 
+}
+
+std::string G3T1_3::label(double &risk) {
+    std::string ans;
+    if(sensorConfig.isLowRisk(risk)){
+        ans = "low";
+    } else if (sensorConfig.isMediumRisk(risk)) {
+        ans = "moderate";
+    } else if (sensorConfig.isHighRisk(risk)) {
+        ans = "high";
+    } else {
+        ans = "unknown";
+    }
+
+    return ans;
 }

@@ -13,14 +13,14 @@ G3T1_4::G3T1_4(int &argc, char **argv, const std::string &name) :
     Sensor(argc, argv, name, "bloodpressure", true, 1, bsn::resource::Battery("bp_batt", 100, 100, 1)),
     markovSystolic(),
     markovDiastolic(),
-    filterSystolic(5),
-    filterDiastolic(5),
+    filterSystolic(1),
+    filterDiastolic(1),
     sensorConfigSystolic(),
     sensorConfigDiastolic(),
-    dias_accuracy(0),
-    syst_accuracy(0),
     systolic_data(0),
-    diastolic_data(0) {}
+    diastolic_data(0),
+    collected_systolic_risk(),
+    collected_diastolic_risk() {}
 
 G3T1_4::~G3T1_4() {}
 
@@ -117,9 +117,11 @@ double G3T1_4::collectSystolic() {
     double m_data = 0;
 
     m_data = dataGenerator.getValue();
-    battery.consume(BATT_UNIT);
+    //battery.consume(BATT_UNIT);
 
     ROS_INFO("new data collected: [%s]", std::to_string(m_data).c_str());
+
+    collected_systolic_risk = sensorConfigSystolic.evaluateNumber(m_data);
 
     return m_data;
 }
@@ -129,9 +131,11 @@ double G3T1_4::collectDiastolic() {
     double m_data = 0;
 
     m_data = dataGenerator.getValue();
-    battery.consume(BATT_UNIT);
+    //battery.consume(BATT_UNIT);
 
     ROS_INFO("new data collected: [%s]", std::to_string(m_data).c_str());
+
+    collected_diastolic_risk = sensorConfigDiastolic.evaluateNumber(m_data);
 
     return m_data;
 }
@@ -139,7 +143,10 @@ double G3T1_4::collectDiastolic() {
 double G3T1_4::collect() {
 
     systolic_data = collectSystolic();
-    diastolic_data = collectDiastolic();
+    apply_noise(systolic_data);
+
+    diastolic_data = collectSystolic();
+    apply_noise(diastolic_data);
 
     return 0.0;
 }
@@ -149,7 +156,7 @@ double G3T1_4::processSystolic(const double &m_data) {
     
     filterSystolic.insert(m_data);
     filtered_data = filterSystolic.getValue();
-    battery.consume(BATT_UNIT*filterSystolic.getRange());
+    //battery.consume(BATT_UNIT*filterSystolic.getRange());
 
     ROS_INFO("filtered data: [%s]", std::to_string(filtered_data).c_str());
     return filtered_data;
@@ -160,7 +167,7 @@ double G3T1_4::processDiastolic(const double &m_data) {
     
     filterDiastolic.insert(m_data);
     filtered_data = filterDiastolic.getValue();
-    battery.consume(BATT_UNIT*filterDiastolic.getRange());
+    //battery.consume(BATT_UNIT*filterDiastolic.getRange());
 
     ROS_INFO("filtered data: [%s]", std::to_string(filtered_data).c_str());
     return filtered_data;
@@ -170,15 +177,16 @@ double G3T1_4::process(const double &m_data) {
 
     systolic_data = processSystolic(systolic_data);
     diastolic_data = processDiastolic(diastolic_data);
-
+    
     return 0.0;
 }
 
 void G3T1_4::transferSystolic(const double &m_data) {
     double risk;
     risk = sensorConfigSystolic.evaluateNumber(m_data);
-    battery.consume(BATT_UNIT);
-    if (risk < 0 || risk > 100) throw std::domain_error("content failure");
+    //battery.consume(BATT_UNIT);
+    if (risk < 0 || risk > 100) throw std::domain_error("risk data out of boundaries");
+    if (label(sensorConfigSystolic, risk) != label(sensorConfigSystolic, collected_systolic_risk)) throw std::domain_error("content failure due to noise");
 
     ros::NodeHandle handle;
     data_pub = handle.advertise<messages::SensorData>("systolic_data", 10);
@@ -188,7 +196,7 @@ void G3T1_4::transferSystolic(const double &m_data) {
     msg.risk = risk;
     msg.batt = battery.getCurrentLevel();
     data_pub.publish(msg);
-    battery.consume(0.2);
+    //battery.consume(0.2);
 
     ROS_INFO("risk calculated and transferred: [%.2f%%]", risk);
     
@@ -196,10 +204,10 @@ void G3T1_4::transferSystolic(const double &m_data) {
 
 void G3T1_4::transferDiastolic(const double &m_data) {
     double risk;
-
     risk = sensorConfigDiastolic.evaluateNumber(m_data);
-    battery.consume(BATT_UNIT);
-    if (risk < 0 || risk > 100) throw std::domain_error("content failure");
+    //battery.consume(BATT_UNIT);
+    if (risk < 0 || risk > 100) throw std::domain_error("risk data out of boundaries");
+    if (label(sensorConfigDiastolic, risk) != label(sensorConfigDiastolic, collected_diastolic_risk)) throw std::domain_error("content failure due to noise");
 
     ros::NodeHandle handle;
     data_pub = handle.advertise<messages::SensorData>("diastolic_data", 10);
@@ -209,7 +217,7 @@ void G3T1_4::transferDiastolic(const double &m_data) {
     msg.risk = risk;
     msg.batt = battery.getCurrentLevel();
     data_pub.publish(msg);
-    battery.consume(0.2);
+    //battery.consume(0.2);
 
     ROS_INFO("risk calculated and transferred: [%.2f%%]", risk);
 
@@ -220,4 +228,19 @@ void G3T1_4::transfer(const double &m_data) {
     transferSystolic(systolic_data);
     transferDiastolic(diastolic_data);
 
+}
+
+std::string G3T1_4::label(bsn::configuration::SensorConfiguration &sensorConfig, double &risk) {
+    std::string ans;
+    if(sensorConfig.isLowRisk(risk)){
+        ans = "low";
+    } else if (sensorConfig.isMediumRisk(risk)) {
+        ans = "moderate";
+    } else if (sensorConfig.isHighRisk(risk)) {
+        ans = "high";
+    } else {
+        ans = "unknown";
+    }
+
+    return ans;
 }
