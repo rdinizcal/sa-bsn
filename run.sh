@@ -9,8 +9,8 @@ gnome-terminal --working-directory=${bsn}/configurations/manager -e 'roslaunch s
 gnome-terminal --working-directory=${bsn}/configurations/logging -e 'roslaunch logger.launch'
 
 ################# REPOSITORY #################
-#gnome-terminal --working-directory=${bsn}/configurations/repository -e 'roslaunch data_access_node.launch'
-#gnome-terminal --working-directory=${bsn}/configurations/repository -e 'roslaunch illness_identifier.launch'
+gnome-terminal --working-directory=${bsn}/configurations/repository -e 'roslaunch data_access_node.launch'
+gnome-terminal --working-directory=${bsn}/configurations/repository -e 'roslaunch illness_identifier.launch'
 
 ################# APPLICATION #################
 gnome-terminal --working-directory=${bsn}/configurations/application -e 'roslaunch probe.launch'

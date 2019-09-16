@@ -55,10 +55,10 @@ class IllnessIdentifier:
         for val in val_freq.keys():
             val_prob = val_freq[val] / sum(val_freq.values())
             data_subset = [record for record in data if record[attr] == val]
-            subset_entropy += val_prob * entropy(data_subset, target_attr)
+            subset_entropy += val_prob * self.entropy(data_subset, target_attr)
     
         # Subtract the entropy of the chosen attribute from the entropy of the whole data set with respect to the target attribute (and return it)
-        return (entropy(data, target_attr) - subset_entropy)
+        return (self.entropy(data, target_attr) - subset_entropy)
 
     '''------------------------------ Receive Data Callback --------------------'''
 
@@ -75,8 +75,23 @@ class IllnessIdentifier:
     ***************** Problems may be solved! (need testing) *****************
     '''
     def receiveData(self, data):
+        self.features = []
         for type in data.types:
-            self.features.append(type)
+            #centralhub is PATIENT_STATUS
+            if "centralhub" in self.features:
+                if len(self.features > 1):
+                    self.features.insert(len(self.features)-2,type)
+                elif len(self.features == 1):
+                    self.features.insert(len(self.features)-1, type)
+            else:
+                self.features.append(type)
+
+        #print("TYPE")
+        #print(data.type)
+        #print("RISKS")
+        #print(data.risk_status)
+        #print("FEATURES")
+        #print(self.features)
 
         i = 0
 
@@ -86,11 +101,17 @@ class IllnessIdentifier:
             d = OrderedDict()
             
             for j in range(len(self.features)):
-                aux_dict[data.type[i]] = data.risk_status[i]
+                aux_dict[data.type[j]] = data.risk_status[j]
+
+            #print("AUX_DICT")
+            #print(aux_dict)
             
             d.update(aux_dict)
             self.status_dict_list.append(d)
         
+        #print("STATUS_DICT_LIST\n")
+        #print(self.status_dict_list)
+
         ent = self.entropy(self.status_dict_list, self.features[-1])
     ##    print("\n\n--------------------------------------------------------------")
         print("Shannon's Entropy of class '"+self.features[-1]+"': ",ent)
