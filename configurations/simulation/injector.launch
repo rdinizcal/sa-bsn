@@ -1,6 +1,6 @@
 <launch> 
     <node name="injector" pkg="injector" type="injector" output="screen" />
 
-    <param name="frequency" value="100" type="int" /> <!--100Hz-->
+    <param name="frequency" value="10" type="int" /> <!--Hz-->
 
 </launch>

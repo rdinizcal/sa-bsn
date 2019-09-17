@@ -1,101 +1,104 @@
 #include "Injector.hpp"
 
 
-Injector::Injector(int  &argc, char **argv, const std::string &name) : ROSComponent(argc, argv, name), cycles(0) {}
+Injector::Injector(int  &argc, char **argv, const std::string &name) : ROSComponent(argc, argv, name), cycles(0), duration(), frequency(), amplitude(), noise_factor(), begin(), end(), type() {}
 Injector::~Injector() {}
 
 void Injector::setUp() {
+    srand(time(NULL));
+
     ros::NodeHandle config;
     double freq;
-	config.getParam("frequency", freq);
-	rosComponentDescriptor.setFreq(freq);
+    config.getParam("frequency", freq);
+    rosComponentDescriptor.setFreq(freq);
 
-   uncertainty_pub["/g3t1_1"] = handle.advertise<archlib::Uncertainty>("uncertainty_/g3t1_1", 10);
-   uncertainty_pub["/g3t1_2"] = handle.advertise<archlib::Uncertainty>("uncertainty_/g3t1_2", 10);
-   uncertainty_pub["/g3t1_3"] = handle.advertise<archlib::Uncertainty>("uncertainty_/g3t1_3", 10);
-   uncertainty_pub["/g3t1_4"] = handle.advertise<archlib::Uncertainty>("uncertainty_/g3t1_4", 10);
-   
-   log_uncertainty = handle.advertise<archlib::Uncertainty>("log_uncertainty", 10);
+    uncertainty_pub["/g3t1_1"] = handle.advertise<archlib::Uncertainty>("uncertainty_/g3t1_1", 1000);
+    uncertainty_pub["/g3t1_2"] = handle.advertise<archlib::Uncertainty>("uncertainty_/g3t1_2", 1000);
+    uncertainty_pub["/g3t1_3"] = handle.advertise<archlib::Uncertainty>("uncertainty_/g3t1_3", 1000);
+    uncertainty_pub["/g3t1_4"] = handle.advertise<archlib::Uncertainty>("uncertainty_/g3t1_4", 1000);
+
+    log_uncertainty = handle.advertise<archlib::Uncertainty>("log_uncertainty", 10);
+
+    components = {"/g3t1_1", "/g3t1_2", "/g3t1_3", "/g3t1_4"};
+
+    type["/g3t1_1"] = "step";
+    amplitude["/g3t1_1"] = 1.0;
+    frequency["/g3t1_1"] = 0.0333333;                                                // once every 30 secs
+    duration["/g3t1_1"] = 20;                                                        // 20 seconds
+    noise_factor["/g3t1_1"] = 0;
+    begin["/g3t1_1"] = 1;                                                           // 1st cycle
+    end["/g3t1_1"] = begin["/g3t1_1"] + seconds_in_cycles(duration["/g3t1_1"]);     // 1st cycle + the correspondent number of cycles of 20 seconds
+
+    type["/g3t1_2"] = "ramp";
+    amplitude["/g3t1_2"] = 1.0;
+    frequency["/g3t1_2"] = 0.0333333; // once every 30 secs
+    duration["/g3t1_2"] = 20;
+    noise_factor["/g3t1_2"] = 0;
+    begin["/g3t1_2"] = 10;
+    end["/g3t1_2"] = begin["/g3t1_2"] + seconds_in_cycles(duration["/g3t1_2"]);
+
+    type["/g3t1_3"] = "random";
+    amplitude["/g3t1_3"] = 1.0;
+    frequency["/g3t1_3"] = 1; // once every 2 sec
+    duration["/g3t1_3"] = 0;
+    noise_factor["/g3t1_3"] = 0;
+    begin["/g3t1_3"] = 20;
+    end["/g3t1_3"] = begin["/g3t1_3"] + seconds_in_cycles(duration["/g3t1_3"]);
+    
+    type["/g3t1_4"] = "step";
+    amplitude["/g3t1_4"] = 1.0;
+    frequency["/g3t1_4"] = 0.0333333; // once every 30 secs
+    duration["/g3t1_4"] = 1;
+    noise_factor["/g3t1_4"] = 0;
+    begin["/g3t1_4"] = 30;
+    end["/g3t1_4"] = begin["/g3t1_4"] + seconds_in_cycles(duration["/g3t1_4"]);
 
 }
 
 void Injector::tearDown() {}
 
-int Injector::seconds_in_cycles(const int32_t &seconds){
+int64_t Injector::seconds_in_cycles(const double &seconds){
     return seconds*rosComponentDescriptor.getFreq();
 }
 
-int Injector::cycles_in_seconds(const int32_t &cycles) {
+int64_t Injector::cycles_in_seconds(const double &cycles) {
     return cycles/rosComponentDescriptor.getFreq();
 }
 
-// converts the number of seconds (input) to number of cycles
-bool Injector::passed_in_seconds(const int32_t &seconds) {
-    if(seconds == 0) return false;
-    return cycles % seconds_in_cycles(seconds) == 0;
-}
+double Injector::gen_noise(const std::string &component, double &noise, int &duration, double &amplitude, std::string &type){
 
-void Injector::step(const std::string &component, double &amplitude) {
-    injectUncertainty(component, "noise_factor=" + std::to_string(amplitude));
+    bool is_last_cycle = (cycles == end[component])?true:false;
+
+    if(type=="step" && !is_last_cycle){
+        return amplitude;
+    } else if(type=="ramp" && !is_last_cycle) {
+        return noise + amplitude/seconds_in_cycles(duration);
+    } else if(type=="random") {
+        return ((double) rand() / (RAND_MAX)) * amplitude;
+    } 
+    
+    return 0.0;
 }
 
 void Injector::body() {
     ++cycles;
 
-    /* Inject step input with duration of 20 seconds at every minute, amplitude = 1*/
-    if(passed_in_seconds(60)) {
-        noise_factor["/g3t1_1"] = 1;
-        step("/g3t1_1", noise_factor["/g3t1_1"]);
-        step_duration["/g3t1_1"] = cycles_in_seconds(cycles)+20;
-    }
+    for(std::vector<std::string>::iterator component = components.begin(); component != components.end(); ++component){
+        if(begin[*component] <= cycles && cycles <= end[*component]) {
 
-    if(passed_in_seconds(step_duration["/g3t1_1"])) {
-        noise_factor["/g3t1_1"] = 0;
-        step("/g3t1_1", noise_factor["/g3t1_1"]);
-        step_duration["/g3t1_1"] = 0;
-    }
+            noise_factor[*component] = gen_noise(*component, noise_factor[*component], duration[*component], amplitude[*component], type[*component]);
+            inject(*component, "noise_factor=" + std::to_string(noise_factor[*component]));
 
-    /* Inject step input with duration of 10 seconds at every 30 seconds, amplitude = 1*/
-    if(passed_in_seconds(30)) {
-        noise_factor["/g3t1_2"] = 1;
-        step("/g3t1_2", noise_factor["/g3t1_2"]);
-        step_duration["/g3t1_2"] = cycles_in_seconds(cycles)+10;
-    }
-
-    if(passed_in_seconds(step_duration["/g3t1_2"])) {
-        noise_factor["/g3t1_2"] = 0;
-        step("/g3t1_2", noise_factor["/g3t1_2"]);
-        step_duration["/g3t1_2"] = 0;
-    }
-
-    /* Inject step input with duration of 10 seconds at every 15 seconds, amplitude = 1*/
-    if(passed_in_seconds(15)) {
-        noise_factor["/g3t1_3"] = 1;
-        step("/g3t1_3", noise_factor["/g3t1_3"]);
-        step_duration["/g3t1_3"] = cycles_in_seconds(cycles)+5;
-    }
-
-    if(passed_in_seconds(step_duration["/g3t1_3"])) {
-        noise_factor["/g3t1_3"] = 0;
-        step("/g3t1_3", noise_factor["/g3t1_3"]);
-        step_duration["/g3t1_3"] = 0;
-    }
-    
-    /* Inject step input with duration of 10 seconds at every 20 seconds, amplitude = 1*/
-    if(passed_in_seconds(20)) {
-        noise_factor["/g3t1_4"] = 1;
-        step("/g3t1_4", noise_factor["/g3t1_4"]);
-        step_duration["/g3t1_4"] = cycles_in_seconds(cycles)+10;
-    }
-
-    if(passed_in_seconds(step_duration["/g3t1_4"])) {
-        noise_factor["/g3t1_4"] = 0;
-        step("/g3t1_4", noise_factor["/g3t1_4"]);
-        step_duration["/g3t1_4"] = 0;
+            //update begin and end tags in last cycle
+            if(cycles == end[*component]){
+                begin[*component] += seconds_in_cycles(1.0/frequency[*component]);
+                end[*component]   += seconds_in_cycles(1.0/frequency[*component]);
+            }
+        }
     }
 }
 
-void Injector::injectUncertainty(const std::string &component, const std::string &content){
+void Injector::inject(const std::string &component, const std::string &content){
     archlib::Uncertainty msg;
 
     msg.source = ros::this_node::getName();
@@ -104,5 +107,5 @@ void Injector::injectUncertainty(const std::string &component, const std::string
 
     uncertainty_pub[component].publish(msg);
     log_uncertainty.publish(msg);
-    ROS_INFO("Inject [%s] at [%s]!", content.c_str(), component.c_str());
+    ROS_INFO("Inject [%s] at [%s].", content.c_str(), component.c_str());
 }

@@ -7,6 +7,7 @@ import csv
 #for plotting
 import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.ticker as ticker
 
 #for splitting
 import re
@@ -16,7 +17,6 @@ from statistics import mean
 
 #for ordered dict
 from collections import OrderedDict
-
 
 class Analyzer:
 
@@ -94,16 +94,22 @@ class Analyzer:
         global_reli_timeseries = dict() 
 
         ################ load status log ################
-        with open("../../knowledge_repository/resource/logs/status_1568398216188441548.log", newline='') as log_file:
+        with open("../../knowledge_repository/resource/logs/status_1568743240867569295.log", newline='') as log_file:
             log_csv = csv.reader(log_file, delimiter=',')
             log_status = list(log_csv)
             del log_status[0] # delete first line
 
         ################ load event log ################
-        with open("../../knowledge_repository/resource/logs/event_1568398216188439373.log", newline='') as log_file:
+        with open("../../knowledge_repository/resource/logs/event_1568743240867566692.log", newline='') as log_file:
             log_csv = csv.reader(log_file, delimiter=',')
             log_event = list(log_csv)
             del log_event[0] # delete first line
+
+        ################ load uncertainty log ################
+        with open("../../knowledge_repository/resource/logs/uncertainty_1568743240867569932.log", newline='') as log_file:
+            log_csv = csv.reader(log_file, delimiter=',')
+            log_uncert = list(log_csv)
+            del log_uncert[0] # delete first line
 
         #concatenate lists into one log list
         log = list()
@@ -157,11 +163,28 @@ class Analyzer:
 
             global_reli_timeseries[instant] = formula.eval()
 
-        # sort dict
-        sorted_timeseries = OrderedDict(sorted(global_reli_timeseries.items(), key=lambda x: int(x[0])))
+        input_timeseries = dict()
+        noise_factor = dict()
+
+        for reg in log_uncert:
+            instant = (int(reg[2]) - t0)
+            tag = reg[4].upper().replace(".","_").replace("/","").replace("T","_T")
+            noise = float(reg[5].split("=")[1])
+
+            if not (tag in input_timeseries): 
+                input_timeseries[tag] = [[0,0]]
+                input_timeseries[tag] = [[instant,noise]]
+
+            if not (tag in noise_factor): 
+                noise_factor[tag] = 0
+
+            input_timeseries[tag].append([instant-1,noise_factor[tag]])
+            input_timeseries[tag].append([instant,noise])
+            noise_factor[tag] = noise
+
         # plot global reli timeseries
-        x = list(sorted_timeseries.keys())
-        y = list(sorted_timeseries.values())
+        x = list(global_reli_timeseries.keys())
+        y = list(global_reli_timeseries.values())
 
         ## discretizing the curve
         [x,y] = self.discretize(x,y,1) #precision in ms
@@ -170,13 +193,42 @@ class Analyzer:
         setpoint = 0.80
         self.analyze(x, y, setpoint, setpoint*1.05, setpoint*0.95)
 
+        scale = 10e-10
+        ticks = ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(x*scale))
+
         ## plot timeseries
-        plt.plot(x, y)
-        plt.ylim(0,1.05)
-        plt.xlim(-0.05,max(x)+0.05)
-        plt.title('System reliability in time')
-        plt.ylabel('Reliability (%)')
-        plt.xlabel('Time (ms)')
+        fig, ax = plt.subplots()
+        ax.plot(x, y)
+        ax.set_ylim(0,1.05)
+        ax.xaxis.set_major_formatter(ticks)
+        #ax.axvline(x=0.7*10e10, linestyle='--', color='red')
+        #ax.axvline(x=0.9*10e10, linestyle='--', color='red')
+
+        fig.suptitle('System reliability in time')
+        fig.text(0.04, 0.5, 'Reliability (%)', va='center', rotation='vertical')
+        fig.text(0.5, 0.04, 'Time (s)', ha='center')
+        plt.grid()
+        
+        fig, axs = plt.subplots(len(input_timeseries),1, sharex='all')
+        fig.suptitle('Noise in sensing')
+        i = 0
+        for tag in input_timeseries:
+            x = [el[0] for el in input_timeseries[tag]]
+            y = [el[1] for el in input_timeseries[tag]]
+
+            axs[i].plot(x,y)
+            axs[i].set_ylabel(tag, fontsize=8)
+            axs[i].xaxis.set_visible(False)
+            #axs[i].axvline(x=0.7*10e10, linestyle='--', color='red')
+            #axs[i].axvline(x=0.9*10e10, linestyle='--', color='red')
+
+            i += 1
+        
+        fig.text(0.04, 0.5, 'Noise factor injected', va='center', rotation='vertical')
+        fig.text(0.5, 0.04, 'Time (s)', ha='center')
+        axs[len(input_timeseries)-1].xaxis.set_visible(True)
+        axs[len(input_timeseries)-1].xaxis.set_major_formatter(ticks)
+
         plt.show()
 
 class Formula:
@@ -244,7 +296,7 @@ class Task:
         self.name = _name 
         self.nexecs = 0
         self.lstExec = []
-        self.window_size = 100
+        self.window_size = 5
     
     def __eq__(self, other):
         if isinstance(other, Task):

@@ -4,6 +4,10 @@
 #include "ros/ros.h"
 #include <ros/package.h>
 
+#include <time.h>
+#include <map>
+#include <vector>
+
 #include "archlib/Uncertainty.h"
 #include "archlib/ROSComponent.hpp"
 
@@ -17,25 +21,34 @@ class Injector : public arch::ROSComponent {
       	Injector(const Injector &);
     	Injector &operator=(const Injector &);
 
-		int seconds_in_cycles(const int32_t &seconds);
-		int cycles_in_seconds(const int32_t &cycles);
-		bool passed_in_seconds(const int32_t &seconds);
-		void step(const std::string &component, double &amplitude);
+		int64_t seconds_in_cycles(const double &seconds);
+		int64_t cycles_in_seconds(const double &cycles);
+		double gen_noise(const std::string &component, double &noise, int &duration, double &amplitude, std::string &type);
 
 	public:
 		virtual void setUp();
 		virtual void tearDown();
 		virtual void body();
 
-		void injectUncertainty(const std::string &component, const std::string &content);
+		void inject(const std::string &component, const std::string &content);
 
 	private:
 		ros::NodeHandle handle;
 		int cycles;
 
 		std::map<std::string, ros::Publisher> uncertainty_pub;
+
+		std::vector<std::string> components;
+
 		std::map<std::string, double> noise_factor;
-		std::map<std::string, int> step_duration;
+		std::map<std::string, int> duration;
+		std::map<std::string, double> frequency;
+		std::map<std::string, double> amplitude;
+		std::map<std::string, int> begin;
+		std::map<std::string, int> end;
+		std::map<std::string, std::string> type;
+
+
 
 		ros::Publisher log_uncertainty;
 };

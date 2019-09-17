@@ -1,0 +1,8 @@
+
+Event,1,20416992096,/g4t1,,activate
+Event,4,25629848012,/g3t1_1,,activate
+Event,8,25732036946,/g3t1_2,,activate
+Event,13,25833354753,/g3t1_3,,activate
+Event,18,25933834159,/g3t1_4,,activate
+Event,7490,286990583457,/g3t1_4,,deactivate
+Event,7527,290333681759,/g3t1_3,,deactivate
