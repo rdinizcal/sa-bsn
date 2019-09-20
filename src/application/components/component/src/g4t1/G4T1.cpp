@@ -6,7 +6,7 @@ G4T1::G4T1(const int32_t &argc, char **argv) :
     SchedulableComponent(argc, argv),
     active(true),
     params({{"freq",1}}),
-    connect(true),
+    connect(false),
     database_url(),
     persist(true),
     fp(),
@@ -197,7 +197,7 @@ void G4T1::receiveSensorData(const messages::SensorData::ConstPtr& msg) {
     if (persist)
         this->persistData(risks);
 
-    info_pub = handle.advertise<messages::Info>("collect_info", 1000);
+    //info_pub = handle.advertise<messages::Info>("collect_info", 1000);
 
     messages::Info infoMsg;
     std::string content = "";
@@ -218,7 +218,7 @@ void G4T1::receiveSensorData(const messages::SensorData::ConstPtr& msg) {
     infoMsg.content = content;
 
     info_pub.publish(infoMsg);
-    
+
     std::cout << std::endl << "*****************************************" << std::endl;
     std::cout << "PatientStatusInfo#" << std::endl;
     std::cout << "| THERM_RISK: " << trm_risk << std::endl;
@@ -240,6 +240,8 @@ void G4T1::body() {
     ros::Subscriber oximeterSub = nh.subscribe("oximeter_data", 10, &G4T1::receiveSensorData, this);
     ros::Subscriber ecgSub = nh.subscribe("ecg_data", 10, &G4T1::receiveSensorData, this);
     ros::Subscriber diastolicSub = nh.subscribe("bpm_data", 10, &G4T1::receiveSensorData, this);
+
+    info_pub = handle.advertise<messages::Info>("collect_info", 1000);
 
     ros::spin();
 }

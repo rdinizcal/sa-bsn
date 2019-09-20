@@ -165,6 +165,8 @@ void G3T1_2::transfer(const double &m_data) {
     }
     content += "risk:"+r;
 
+    //ROS_INFO("Processed risk: %s", r.c_str());
+
     infoMsg.source = moduleDescriptor.getName();
     infoMsg.target = "/repository";
     infoMsg.content = content;

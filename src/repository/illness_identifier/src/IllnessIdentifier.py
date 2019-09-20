@@ -37,7 +37,7 @@ class IllnessIdentifier:
     '''------------------------------ Information Gain ---------------------------'''
 
     # Calculates the information gain (reduction in entropy) that
-    #   would result by splittingthe data on the chosen attribute (attr).
+    #   would result by splitting the data on the chosen attribute (attr).
 
     def gain(self, data, attr, target_attr):
     
@@ -86,42 +86,35 @@ class IllnessIdentifier:
             else:
                 self.features.append(type)
 
-        #print("TYPE")
-        #print(data.type)
-        #print("RISKS")
-        #print(data.risk_status)
-        #print("FEATURES")
-        #print(self.features)
-
         i = 0
+        counter = 0
 
-        for i in range(len(data.type)):
+        while counter < len(data.type):
             j = 0
             aux_dict = {}
             d = OrderedDict()
             
             for j in range(len(self.features)):
-                aux_dict[data.type[j]] = data.risk_status[j]
-
-            #print("AUX_DICT")
-            #print(aux_dict)
+                aux_dict[data.type[counter]] = data.risk_status[counter]
+                counter = counter + 1
             
             d.update(aux_dict)
             self.status_dict_list.append(d)
         
-        #print("STATUS_DICT_LIST\n")
-        #print(self.status_dict_list)
+        target_attr = self.features[-1]
+        data = self.status_dict_list
+        attr = self.features
 
-        ent = self.entropy(self.status_dict_list, self.features[-1])
-    ##    print("\n\n--------------------------------------------------------------")
+        ent = self.entropy(data, target_attr)
+        print("\n\n--------------------------------------------------------------")
         print("Shannon's Entropy of class '"+self.features[-1]+"': ",ent)
-    ##    print("--------------------------------------------------------------\n")
+        print("--------------------------------------------------------------\n")
         
-        for item in range(0, len(self.features)-1):
+        for item in range(0, len(attr)-1):
     ##        gain(self.status_dict_list, self.features[item], self.features[-1])
-            print(self.features[item]+"'s information gain:",self.gain(self.status_dict_list, self.features[item], self.features[-1]))
+            print(attr[item]+"'s information gain:",self.gain(data, attr[item], target_attr))
             item+=1
-    ##    print("\n------------------------------------------------------------\n")
+        print("\n------------------------------------------------------------\n")
 
     '''------------------------------ Listener ---------------------------------'''
 

@@ -136,8 +136,8 @@ void DataAccessNode::finishCycle(double &timestamp) {
 
             component.setTimestamp(timestamp);
 
-            std::string risk = "-";
-            component.setRiskStatus(risk);
+            //std::string risk = "-";
+            //component.setRiskStatus(risk);
         
             componentMapIterator->second.push_back(component);
         }
@@ -170,8 +170,8 @@ void DataAccessNode::receiveInfo(const messages::Info::ConstPtr& msg) {
             std::string aux;
             double aux_d;
 
-            aux = "-";
-            dummy_data.setRiskStatus(aux);
+            //aux = "-";
+            //dummy_data.setRiskStatus(aux);
             aux_d = 0;
             dummy_data.setCost(aux_d);
             dummy_data.setTimestamp(aux_d);
@@ -197,7 +197,7 @@ void DataAccessNode::receiveInfo(const messages::Info::ConstPtr& msg) {
 
     logical_clock++;
     
-    if(logical_clock % 100 == 0) { //Change size (100)
+    if(logical_clock % 300 == 0) { //Change size (100)
         timestamp = componentData.getTimestamp();
         finishCycle(timestamp);
         persistComponentData();
@@ -235,10 +235,10 @@ void DataAccessNode::sendLearningInfo() {
 
                 learning_data.risk_status.push_back(componentMapIterator->second.at(i).getRiskStatus());
 
-                if(componentMapIterator->second.at(i).getRiskStatus() != "-" && componentMapIterator->second.at(i).getRiskStatus() != "") {
+                /*if(componentMapIterator->second.at(i).getRiskStatus() != "-" && componentMapIterator->second.at(i).getRiskStatus() != "") {
                     ROS_INFO("Module %s", componentMapIterator->second.at(i).getName().c_str());
                     ROS_INFO("RISK: %s", componentMapIterator->second.at(i).getRiskStatus().c_str());
-                }
+                }*/
 
             } else {
                 aux = componentMapIterator->first;
