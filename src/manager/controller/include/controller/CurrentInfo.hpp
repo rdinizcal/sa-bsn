@@ -17,7 +17,7 @@ class CurrentInfo {
         void setModuleName(const std::string &module_name);
         std::string getModuleName() const;
 
-        void setExpectedBatteryLife(const int &expected_battery_life);
+        void setExpectedBatteryLife(const float &expected_battery_life);
         float getExpectedBatteryLife() const;
 
         void setBatteryLevel(const float &battery_level);

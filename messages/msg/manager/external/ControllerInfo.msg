@@ -1,6 +1,3 @@
-#request constants
----
-#response constants
 string[] module_name
 float64[] battery_level
 float64[] cost

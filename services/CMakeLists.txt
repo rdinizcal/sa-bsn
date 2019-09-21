@@ -58,7 +58,6 @@ find_package(catkin REQUIRED COMPONENTS
    FILES
    application/internal/EffectorRegister.srv
    manager/external/SchedulerRegister.srv
-   manager/external/ControllerInfo.srv
    manager/external/ParameterReconfiguration.srv
  )
 

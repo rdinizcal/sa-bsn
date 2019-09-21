@@ -11,7 +11,7 @@
 #include "ComponentData.hpp"
 #include "messages/Info.h"
 #include "messages/LearningData.h"
-#include "services/ControllerInfo.h"
+#include "messages/ControllerInfo.h"
 
 #include "ros/ros.h"
 #include <ros/package.h>
@@ -31,7 +31,7 @@ class DataAccessNode {
 		void tearDown();
 		void run();
 
-		bool sendInfo(services::ControllerInfo::Request &req, services::ControllerInfo::Response &res);
+		void sendControllerInfo();
 
 		void parse(std::string, ComponentData&);
 		void finishCycle(double &timestamp);
@@ -43,11 +43,15 @@ class DataAccessNode {
 
   	private:
 	    std::fstream fp;
+
 		ros::NodeHandle handle;
-		ros::ServiceServer info_service;
+
 		std::map<std::string, std::vector<ComponentData>> componentMap;
 		std::vector<std::string> components_in_cycle;
+
 		ros::Publisher info_dataaccessnode2learning_pub;
+		ros::Publisher info_dataaccessnode2controller_pub;
+
 		std::string filepath;
 		int logical_clock;
 };

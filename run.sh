@@ -4,6 +4,7 @@ gnome-terminal -x roscore & sleep 5s
 
 ################# MANAGER #################
 gnome-terminal --working-directory=${bsn}/configurations/manager -e 'roslaunch scheduler.launch'
+gnome-terminal --working-directory=${bsn}/configurations/manager -e 'roslaunch controller.launch'
 
 ################# LOGGING INFRASTRUCTURE #################
 gnome-terminal --working-directory=${bsn}/configurations/logging -e 'roslaunch logger.launch'

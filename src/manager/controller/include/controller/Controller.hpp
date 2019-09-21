@@ -3,12 +3,13 @@
 
 #include <string>
 #include <map>
+#include <iostream>
 
 #include "ros/ros.h"
 
 #include "CurrentInfo.hpp"
 
-#include "services/ControllerInfo.h"
+#include "messages/ControllerInfo.h"
 #include "services/ParameterReconfiguration.h"
 
 #include "std_msgs/String.h"
@@ -30,7 +31,8 @@ class Controller {
 
 		virtual ~Controller();
 
-		bool getInfo();
+
+		void getInfo(const messages::ControllerInfo::ConstPtr& msg);
 
 		CurrentInfo parseInfo(/*receiveInfo return type*/);
 
@@ -48,9 +50,11 @@ class Controller {
 		std::map<std::string, CurrentInfo> info;
 		std::map<std::string, float> new_parameters;
 
-		ros::NodeHandle info_request_handler;
-		
+		ros::NodeHandle n;
+
 		float adapt_frequency;
+
+		bool empty;
 };
 
 #endif

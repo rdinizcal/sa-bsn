@@ -47,7 +47,7 @@ std::string CurrentInfo::getModuleName() const {
     return this->module_name;
 }
 
-void CurrentInfo::setExpectedBatteryLife(const int &expected_battery_life) {
+void CurrentInfo::setExpectedBatteryLife(const float &expected_battery_life) {
     this->expected_battery_life = expected_battery_life;
 }
 

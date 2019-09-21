@@ -31,6 +31,7 @@ ADD_MESSAGE_FILES( FILES
   application/external/LearningData.msg
   manager/external/ReconfigurationCommand.msg
   manager/internal/CommandControl.msg
+  manager/external/ControllerInfo.msg
 )
 
 GENERATE_MESSAGES(DEPENDENCIES std_msgs)

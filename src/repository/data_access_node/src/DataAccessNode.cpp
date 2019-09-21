@@ -14,8 +14,8 @@ void DataAccessNode::setUp() {
     fp << "timestamp module_name type battery_level frequency cost risk_status\n";
     fp.close();
 
-    info_service = handle.advertiseService("InfoRequest", &DataAccessNode::sendInfo, this);
     info_dataaccessnode2learning_pub = handle.advertise<messages::LearningData>("learning_info", 10);
+    info_dataaccessnode2controller_pub = handle.advertise<messages::ControllerInfo>("controller_info", 10);
 
     ROS_INFO("Running DataAccessNode\n");
 }
@@ -23,43 +23,42 @@ void DataAccessNode::setUp() {
 void DataAccessNode::tearDown() {}
 
 void DataAccessNode::run(){
-    ros::Rate loop_rate(100);
+    ros::Rate loop_rate(10);
     ros::NodeHandle n;
     ros::Subscriber receive_data = n.subscribe("persist", 1000, &DataAccessNode::receiveInfo, this);
-    
-    while(ros::ok()) {
 
-        
-        ros::spinOnce();
-        loop_rate.sleep();
-    }
+    ros::spin();
 }
 
-bool DataAccessNode::sendInfo(services::ControllerInfo::Request &req, services::ControllerInfo::Response &res) {
+void DataAccessNode::sendControllerInfo() {
+    messages::ControllerInfo info;
+
     std::map<std::string,std::vector<ComponentData>>::iterator it;
 
     int i = 0;
 
     for(it = componentMap.begin();it != componentMap.end();++it) {
-        res.module_name[i] = it->first;
+        if(it->second.back().getType() != "centralhub") { //Test purposes, centralhub does not send relevant controller info until now!
+            info.module_name.push_back(it->first);
 
-        ComponentData component = it->second.back();
+            ComponentData component = it->second.back();
 
-        res.battery_level[i] = component.getBatteryLevel();
-        res.cost[i] = component.getCost();
-        res.frequency[i] = component.getFrequency();
-        res.risk_status[i] = component.getRiskStatus();
+            info.battery_level.push_back(component.getBatteryLevel());
+            info.cost.push_back(component.getCost());
+            info.frequency.push_back(component.getFrequency());
+            info.risk_status.push_back(component.getRiskStatus());
 
-        i++;
+            i++;
+        }
     }
 
     if(i == 0) {
-        res.empty = true;
+        info.empty = true;
     } else {
-        res.empty = false;
+        info.empty = false;
     }
 
-    return true;
+    info_dataaccessnode2controller_pub.publish(info);
 }
 
 void DataAccessNode::parse(std::string content, ComponentData& component) {
@@ -126,33 +125,29 @@ void DataAccessNode::parse(std::string content, ComponentData& component) {
 void DataAccessNode::finishCycle(double &timestamp) {
     std::map<std::string,std::vector<ComponentData>>::iterator componentMapIterator;
     std::vector<std::string>::iterator componentsInCycleIterator;
-    //ROS_INFO("[finishCycle] Entered finishCycle");
+
     for(componentMapIterator = componentMap.begin();componentMapIterator != componentMap.end();++componentMapIterator) {
         componentsInCycleIterator = std::find(components_in_cycle.begin(), components_in_cycle.end(), componentMapIterator->first);
 
         if(componentsInCycleIterator == components_in_cycle.end() && componentMapIterator->second.size() > 0) {
-            //ROS_INFO("Inserting Data in component %s", componentMapIterator->first.c_str());
             ComponentData component(componentMapIterator->second.back());
 
             component.setTimestamp(timestamp);
-
-            //std::string risk = "-";
-            //component.setRiskStatus(risk);
         
             componentMapIterator->second.push_back(component);
         }
     }
 
     components_in_cycle.clear();
-   //ROS_INFO("[finishCycle] Left finishCycle");
 }
 
 void DataAccessNode::receiveInfo(const messages::Info::ConstPtr& msg) {
     ComponentData componentData;
     std::vector<std::string>::iterator componentsInCycleIterator;
 
-    ROS_INFO("I heard: %s", msg->content.c_str());
     parse(msg->content, componentData);
+
+    ROS_INFO("I heard: [%s]", msg->content.c_str());
 
     int size = componentMap[componentData.getName()].size();
     
@@ -167,14 +162,6 @@ void DataAccessNode::receiveInfo(const messages::Info::ConstPtr& msg) {
 
         if(max_size > 1) {
             ComponentData dummy_data(componentData);
-            std::string aux;
-            double aux_d;
-
-            //aux = "-";
-            //dummy_data.setRiskStatus(aux);
-            aux_d = 0;
-            dummy_data.setCost(aux_d);
-            dummy_data.setTimestamp(aux_d);
 
             for(int i = 0;i < max_size-1;i++) {
                 componentMap[componentData.getName()].push_back(dummy_data);
@@ -196,8 +183,8 @@ void DataAccessNode::receiveInfo(const messages::Info::ConstPtr& msg) {
     components_in_cycle.push_back(componentData.getName());
 
     logical_clock++;
-    
-    if(logical_clock % 300 == 0) { //Change size (100)
+
+    if(logical_clock % 300 == 0) { //Maybe change size
         timestamp = componentData.getTimestamp();
         finishCycle(timestamp);
         persistComponentData();
@@ -205,7 +192,6 @@ void DataAccessNode::receiveInfo(const messages::Info::ConstPtr& msg) {
 }
 
 void DataAccessNode::sendLearningInfo() {
-    //ROS_INFO("Entering sendLearningInfo");
     //Send info to learning block in a specific way
     std::map<std::string,std::vector<ComponentData>>::iterator componentMapIterator;
     messages::LearningData learning_data;
@@ -216,14 +202,8 @@ void DataAccessNode::sendLearningInfo() {
 
     int size = componentMapIterator->second.size();
 
-    /*ROS_INFO("*******************************************************************************************************************");
-    for(componentMapIterator = componentMap.begin();componentMapIterator != componentMap.end();++componentMapIterator) {
-        ROS_INFO("[sendLearningInfo] Module %s", componentMapIterator->first.c_str());
-        ROS_INFO("[sendLearningInfo] Vector size %d", static_cast<int>(componentMapIterator->second.size()));
-    }
-    ROS_INFO("*******************************************************************************************************************");*/
-
     std::string aux;
+
     while(i < size) {
         for(componentMapIterator = componentMap.begin();componentMapIterator != componentMap.end();++componentMapIterator) {
             if(componentMapIterator->second.back().getType() != "centralhub") {
@@ -234,12 +214,6 @@ void DataAccessNode::sendLearningInfo() {
                 learning_data.type.push_back(componentMapIterator->second.at(i).getType());
 
                 learning_data.risk_status.push_back(componentMapIterator->second.at(i).getRiskStatus());
-
-                /*if(componentMapIterator->second.at(i).getRiskStatus() != "-" && componentMapIterator->second.at(i).getRiskStatus() != "") {
-                    ROS_INFO("Module %s", componentMapIterator->second.at(i).getName().c_str());
-                    ROS_INFO("RISK: %s", componentMapIterator->second.at(i).getRiskStatus().c_str());
-                }*/
-
             } else {
                 aux = componentMapIterator->first;
             }
@@ -260,28 +234,25 @@ void DataAccessNode::sendLearningInfo() {
     }
 
     info_dataaccessnode2learning_pub.publish(learning_data);
-    //ROS_INFO("Leaving sendLearningInfo");
 }
 
 void DataAccessNode::persistComponentData() {
     std::map<std::string,std::vector<ComponentData>>::iterator componentMapIterator;
     std::vector<ComponentData>::iterator componentDataVectorIterator;
 
+    sendControllerInfo();
     sendLearningInfo();
 
-    //ROS_INFO("Entering persistComponentData");
     fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
 
     for(componentMapIterator = componentMap.begin();componentMapIterator != componentMap.end();++componentMapIterator) {
         for(componentDataVectorIterator = componentMapIterator->second.begin();componentDataVectorIterator != componentMapIterator->second.end();++componentDataVectorIterator) {
             fp << (*componentDataVectorIterator).toString();
         }
-        //componentMapIterator->second.clear();
         componentMap.erase(componentMapIterator);
     }
 
     fp.close();
-    //ROS_INFO("Leaving persistComponentData");
 }
 
 int64_t DataAccessNode::now() const{
