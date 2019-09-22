@@ -11,7 +11,7 @@ int64_t Logger::now() const{
 void Logger::setUp() {
     time_ref = this->now();
 
-    adapt = handle.advertise<archlib::AdaptationCommand>("adapt", 10);
+    adapt = handle.advertise<archlib::AdaptationCommand>("reconfigure", 10);
     status = handle.advertise<archlib::Status>("status", 10);
     event = handle.advertise<archlib::Event>("event", 10);
     persist = handle.advertise<archlib::Persist>("persist", 10);
@@ -25,7 +25,7 @@ void Logger::tearDown() {}
 
 void Logger::body() {
     ros::NodeHandle n;
-    ros::Subscriber reconfig_sub = n.subscribe("log_reconfigure", 1000, &Logger::receiveAdaptationCommand, this);
+    ros::Subscriber reconfig_sub = n.subscribe("log_adapt", 1000, &Logger::receiveAdaptationCommand, this);
     ros::Subscriber status_sub = n.subscribe("log_status", 1000, &Logger::receiveStatus, this);
     ros::Subscriber event_sub = n.subscribe("log_event", 1000, &Logger::receiveEvent, this);
     ros::Subscriber uncertainty_sub = n.subscribe("log_uncertainty", 1000, &Logger::receiveUncertainty, this);

@@ -15,8 +15,8 @@ G3T1_4::G3T1_4(int &argc, char **argv, const std::string &name) :
     dataGeneratorSystolic(),
     markovDiastolic(),
     dataGeneratorDiastolic(),
-    filterSystolic(1),
-    filterDiastolic(1),
+    filterSystolic(buffer_size),
+    filterDiastolic(buffer_size),
     sensorConfigSystolic(),
     sensorConfigDiastolic(),
     systolic_data(0),
@@ -162,6 +162,7 @@ double G3T1_4::collect() {
 double G3T1_4::processSystolic(const double &m_data) {
     double filtered_data;
     
+    filterSystolic.setRange(buffer_size);
     filterSystolic.insert(m_data);
     filtered_data = filterSystolic.getValue();
     //battery.consume(BATT_UNIT*filterSystolic.getRange());
@@ -173,6 +174,7 @@ double G3T1_4::processSystolic(const double &m_data) {
 double G3T1_4::processDiastolic(const double &m_data) {
     double filtered_data;
     
+    filterDiastolic.setRange(buffer_size);
     filterDiastolic.insert(m_data);
     filtered_data = filterDiastolic.getValue();
     //battery.consume(BATT_UNIT*filterDiastolic.getRange());

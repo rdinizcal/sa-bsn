@@ -12,8 +12,8 @@
     <!-- markov chain -->
     <param name="state0" value="0,0,0,0,0" />
     <param name="state1" value="0,0,0,0,0" />
-    <param name="state2" value="0,0,80,18,2" />
-    <param name="state3" value="0,0,55,35,10" />
+    <param name="state2" value="0,0,90,8,2" />
+    <param name="state3" value="0,0,75,10,5" />
     <param name="state4" value="0,0,40,20,40" />
 
     <!-- risk values -->

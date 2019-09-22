@@ -11,7 +11,7 @@ G3T1_2::G3T1_2(int &argc, char **argv, const std::string &name) :
     Sensor(argc, argv, name, "ecg", true, 1, bsn::resource::Battery("ecg_batt", 100, 100, 1)),
     markov(),
     dataGenerator(),
-    filter(1),
+    filter(buffer_size),
     sensorConfig(),
     collected_risk() {}
 
@@ -115,6 +115,7 @@ double G3T1_2::collect() {
 double G3T1_2::process(const double &m_data) {
     double filtered_data;
     
+    filter.setRange(buffer_size);
     filter.insert(m_data);
     filtered_data = filter.getValue();
     //battery.consume(BATT_UNIT*filter.getRange());

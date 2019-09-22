@@ -13,7 +13,7 @@ G3T1_3::G3T1_3(int &argc, char **argv, const std::string &name) :
     Sensor(argc, argv, name, "thermometer", true, 1, bsn::resource::Battery("therm_batt", 100, 100, 1)),
     markov(),
     dataGenerator(),
-    filter(1),
+    filter(buffer_size),
     sensorConfig(),
     collected_risk() {}
 
@@ -116,6 +116,7 @@ double G3T1_3::collect() {
 double G3T1_3::process(const double &m_data) {
     double filtered_data;
     
+    filter.setRange(buffer_size);
     filter.insert(m_data);
     filtered_data = filter.getValue();
     //battery.consume(BATT_UNIT*filter.getRange());

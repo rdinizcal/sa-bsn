@@ -94,19 +94,19 @@ class Analyzer:
         global_reli_timeseries = dict() 
 
         ################ load status log ################
-        with open("../../knowledge_repository/resource/logs/status_1568743240867569295.log", newline='') as log_file:
+        with open("../../knowledge_repository/resource/logs/status_1569164462697479152.log", newline='') as log_file:
             log_csv = csv.reader(log_file, delimiter=',')
             log_status = list(log_csv)
             del log_status[0] # delete first line
 
         ################ load event log ################
-        with open("../../knowledge_repository/resource/logs/event_1568743240867566692.log", newline='') as log_file:
+        with open("../../knowledge_repository/resource/logs/event_1569164462697479152.log", newline='') as log_file:
             log_csv = csv.reader(log_file, delimiter=',')
             log_event = list(log_csv)
             del log_event[0] # delete first line
 
         ################ load uncertainty log ################
-        with open("../../knowledge_repository/resource/logs/uncertainty_1568743240867569932.log", newline='') as log_file:
+        with open("../../knowledge_repository/resource/logs/uncertainty_1569164462697479152.log", newline='') as log_file:
             log_csv = csv.reader(log_file, delimiter=',')
             log_uncert = list(log_csv)
             del log_uncert[0] # delete first line
@@ -211,23 +211,31 @@ class Analyzer:
         
         fig, axs = plt.subplots(len(input_timeseries),1, sharex='all')
         fig.suptitle('Noise in sensing')
-        i = 0
-        for tag in input_timeseries:
+        if(len(input_timeseries) > 1):
+            i = 0
+            for tag in input_timeseries:
+                x = [el[0] for el in input_timeseries[tag]]
+                y = [el[1] for el in input_timeseries[tag]]
+
+                axs[i].plot(x,y)
+                axs[i].set_ylabel(tag, fontsize=8)
+                axs[i].xaxis.set_visible(False)
+                #axs[i].axvline(x=0.7*10e10, linestyle='--', color='red')
+                #axs[i].axvline(x=0.9*10e10, linestyle='--', color='red')
+
+                i += 1
+            axs[len(input_timeseries)-1].xaxis.set_visible(True)
+            axs[len(input_timeseries)-1].xaxis.set_major_formatter(ticks)
+        else:
             x = [el[0] for el in input_timeseries[tag]]
             y = [el[1] for el in input_timeseries[tag]]
 
-            axs[i].plot(x,y)
-            axs[i].set_ylabel(tag, fontsize=8)
-            axs[i].xaxis.set_visible(False)
-            #axs[i].axvline(x=0.7*10e10, linestyle='--', color='red')
-            #axs[i].axvline(x=0.9*10e10, linestyle='--', color='red')
-
-            i += 1
+            axs.plot(x,y)
+            axs.set_ylabel(tag, fontsize=8)
+            axs.xaxis.set_major_formatter(ticks)
         
         fig.text(0.04, 0.5, 'Noise factor injected', va='center', rotation='vertical')
         fig.text(0.5, 0.04, 'Time (s)', ha='center')
-        axs[len(input_timeseries)-1].xaxis.set_visible(True)
-        axs[len(input_timeseries)-1].xaxis.set_major_formatter(ticks)
 
         plt.show()
 
@@ -296,7 +304,7 @@ class Task:
         self.name = _name 
         self.nexecs = 0
         self.lstExec = []
-        self.window_size = 5
+        self.window_size = 100
     
     def __eq__(self, other):
         if isinstance(other, Task):

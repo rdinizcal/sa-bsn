@@ -13,6 +13,8 @@
 #include "StatusMessage.hpp"
 #include "EventMessage.hpp"
 #include "UncertaintyMessage.hpp"
+#include "AdaptationMessage.hpp"
+
 
 class DataAccess : public arch::ROSComponent {
 
@@ -28,6 +30,7 @@ class DataAccess : public arch::ROSComponent {
 		void persistEvent(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content);
 		void persistStatus(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content);
 		void persistUncertainty(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content);
+		void persistAdaptation(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content);
 
 		void flush();
 
@@ -46,12 +49,14 @@ class DataAccess : public arch::ROSComponent {
 		std::string event_filepath;
 		std::string status_filepath;
 		std::string  uncertainty_filepath;
+		std::string  adaptation_filepath;
 
 		int64_t logical_clock;
 
 		std::vector<StatusMessage> statusVec;
 		std::vector<EventMessage> eventVec;
 		std::vector<UncertaintyMessage> uncertainVec;
+		std::vector<AdaptationMessage> adaptVec;
 
 };
 

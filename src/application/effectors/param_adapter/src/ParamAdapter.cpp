@@ -33,7 +33,7 @@ bool ParamAdapter::moduleConnect(services::EffectorRegister::Request &req, servi
 	try {
 		if(req.connection == true) {
 
-            ros::Publisher pub = handle.advertise<archlib::AdaptationCommand>("effect_" + req.name, 1);
+            ros::Publisher pub = handle.advertise<archlib::AdaptationCommand>("reconfigure_" + req.name, 1);
             target_arr[req.name] = pub;
 
 			ROS_INFO("Module Connected. [%s]", req.name.c_str());

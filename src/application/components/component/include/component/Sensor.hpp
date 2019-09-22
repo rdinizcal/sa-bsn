@@ -44,6 +44,7 @@ class Sensor : public arch::target_system::Component {
     protected:
 		std::string type;
 		bool active;
+        int buffer_size;
 		double noise_factor;
 		bsn::resource::Battery battery;
         double data;

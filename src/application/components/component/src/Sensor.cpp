@@ -1,6 +1,6 @@
 #include "component/Sensor.hpp"
 
-Sensor::Sensor(int &argc, char **argv, const std::string &name, const std::string &type, const bool &active, const double &noise_factor, const bsn::resource::Battery &battery) : Component(argc, argv, name), type(type), active(active), noise_factor(0), battery(battery), data(0.0) {}
+Sensor::Sensor(int &argc, char **argv, const std::string &name, const std::string &type, const bool &active, const double &noise_factor, const bsn::resource::Battery &battery) : Component(argc, argv, name), type(type), active(active), buffer_size(1), noise_factor(0), battery(battery), data(0.0) {}
 
 Sensor::~Sensor() {}
 
@@ -18,6 +18,7 @@ int32_t Sensor::run() {
 
     ros::NodeHandle nh;
     ros::Subscriber noise_subs = nh.subscribe("uncertainty_"+ros::this_node::getName(), 10, &Sensor::injectUncertainty, this);
+    ros::Subscriber reconfig_subs = nh.subscribe("reconfigure_"+ros::this_node::getName(), 10, &Sensor::reconfigure, this);
 
     sendStatus("init");
     ros::spinOnce();
@@ -72,6 +73,17 @@ void Sensor::apply_noise(double &data) {
 
 void Sensor::reconfigure(const archlib::AdaptationCommand::ConstPtr& msg) {
     std::string action = msg->action.c_str();
+
+    bsn::operation::Operation op;
+    std::vector<std::string> pairs = op.split(action, ',');
+
+    for (std::vector<std::string>::iterator it = pairs.begin(); it != pairs.end(); ++it){
+        std::vector<std::string> param = op.split(action, '=');
+
+        if(param[0]=="buffer_size"){
+            buffer_size = stod(param[1]);
+        }
+    }
 }
 
 void Sensor::injectUncertainty(const archlib::Uncertainty::ConstPtr& msg) {

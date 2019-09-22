@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>enactor</name>
+  <version>1.0.0</version>
+  <description>The enactor engine package</description>
+
+  <maintainer email="rdinizcal@gmail.com">Ricardo D. Caldas</maintainer>
+  <author email="rdinizcal@gmail.com">Ricardo D. Caldas </author>
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roscpp</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>messages</build_depend>
+  <build_depend>roslib</build_depend>
+  <build_depend>archlib</build_depend>
+
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>messages</exec_depend>
+  <exec_depend>message_runtime</exec_depend>
+  <exec_depend>archlib</exec_depend>
+
+  <export>
+  </export>
+  
+</package>

@@ -9,9 +9,13 @@ int64_t DataAccess::now() const{
 
 void DataAccess::setUp() {
     std::string path = ros::package::getPath("repository");
-    event_filepath = path + "/../resource/logs/event_" + std::to_string(this->now()) + ".log";
-    status_filepath = path + "/../resource/logs/status_" + std::to_string(this->now()) + ".log";
-    uncertainty_filepath = path + "/../resource/logs/uncertainty_" + std::to_string(this->now()) + ".log";
+
+    std::string now = std::to_string(this->now());
+
+    event_filepath = path + "/../resource/logs/event_" + now + ".log";
+    status_filepath = path + "/../resource/logs/status_" + now + ".log";
+    uncertainty_filepath = path + "/../resource/logs/uncertainty_" + now + ".log";
+    adaptation_filepath = path + "/../resource/logs/adaptation_" + now + ".log";
 
     fp.open(event_filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
     fp << "\n";
@@ -22,6 +26,10 @@ void DataAccess::setUp() {
     fp.close();
 
     fp.open(uncertainty_filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
+    fp << "\n";
+    fp.close();
+
+    fp.open(adaptation_filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
     fp << "\n";
     fp.close();
 
@@ -48,6 +56,8 @@ void DataAccess::receivePersistMessage(const archlib::Persist::ConstPtr& msg) {
         persistEvent(msg->timestamp, msg->source, msg->target, msg->content);
     } else if(msg->type=="Uncertainty") {
         persistUncertainty(msg->timestamp, msg->source, msg->target, msg->content);
+    } else if(msg->type=="AdaptationCommand") {
+        persistAdaptation(msg->timestamp, msg->source, msg->target, msg->content);
     } else {
         std::cout << "(Could not identify message type!!)" << std::endl;
     }
@@ -73,6 +83,14 @@ void DataAccess::persistUncertainty(const int64_t &timestamp, const std::string 
     
     UncertaintyMessage obj("Uncertainty", timestamp, logical_clock, source, target, content);
     uncertainVec.push_back(obj);
+
+    if(logical_clock%30==0) flush();
+}
+
+void DataAccess::persistAdaptation(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content){
+    
+    AdaptationMessage obj("Adaptation", timestamp, logical_clock, source, target, content);
+    adaptVec.push_back(obj);
 
     if(logical_clock%30==0) flush();
 }
@@ -114,4 +132,16 @@ void DataAccess::flush(){
     }
     fp.close();
     uncertainVec.clear();
+
+    fp.open(adaptation_filepath, std::fstream::in | std::fstream::out | std::fstream::app);   
+    for(std::vector<AdaptationMessage>::iterator it = adaptVec.begin(); it != adaptVec.end(); ++it) {
+        fp << (*it).getName() << ",";
+        fp << (*it).getLogicalClock() << ",";
+        fp << (*it).getTimestamp() << ",";
+        fp << (*it).getSource() << ",";
+        fp << (*it).getTarget() << ",";
+        fp << (*it).getContent() << "\n";
+    }
+    fp.close();
+    adaptVec.clear();
 }

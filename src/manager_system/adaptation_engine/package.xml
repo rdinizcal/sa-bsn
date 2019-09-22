@@ -2,7 +2,7 @@
 <package format="2">
   <name>controller</name>
   <version>1.0.0</version>
-  <description>The controller package</description>
+  <description>The adaptation engine package</description>
 
   <maintainer email="rdinizcal@gmail.com">Ricardo D. Caldas</maintainer>
   <author email="rdinizcal@gmail.com">Ricardo D. Caldas </author>
