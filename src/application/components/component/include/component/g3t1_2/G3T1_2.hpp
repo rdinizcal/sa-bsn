@@ -40,6 +40,7 @@ class G3T1_2 : public Sensor {
 
   	private:
 		bsn::generator::Markov markov;
+		bsn::generator::DataGenerator dataGenerator;
 		bsn::filters::MovingAverage filter;
 		bsn::configuration::SensorConfiguration sensorConfig;
 

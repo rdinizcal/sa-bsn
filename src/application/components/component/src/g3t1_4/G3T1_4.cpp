@@ -12,7 +12,9 @@ using namespace bsn::configuration;
 G3T1_4::G3T1_4(int &argc, char **argv, const std::string &name) :
     Sensor(argc, argv, name, "bloodpressure", true, 1, bsn::resource::Battery("bp_batt", 100, 100, 1)),
     markovSystolic(),
+    dataGeneratorSystolic(),
     markovDiastolic(),
+    dataGeneratorDiastolic(),
     filterSystolic(1),
     filterDiastolic(1),
     sensorConfigSystolic(),
@@ -68,9 +70,17 @@ void G3T1_4::setUp() {
 
             if(i==0){
                 markovSystolic = Markov(transitions, ranges, 2);
+                bsn::generator::DataGenerator dt(markovSystolic);
+                dataGeneratorSystolic = dt;
+                dataGeneratorSystolic.setSeed();
             } else {
                 markovDiastolic = Markov(transitions, ranges, 2);
+                bsn::generator::DataGenerator dt(markovDiastolic);
+                dataGeneratorDiastolic = dt;
+                dataGeneratorDiastolic.setSeed();
             }
+
+
         }
 
         { // Configure sensor configuration
@@ -113,10 +123,9 @@ void G3T1_4::tearDown() {
 }
 
 double G3T1_4::collectSystolic() {
-    bsn::generator::DataGenerator dataGenerator(markovSystolic);
     double m_data = 0;
 
-    m_data = dataGenerator.getValue();
+    m_data = dataGeneratorSystolic.getValue();
     //battery.consume(BATT_UNIT);
 
     ROS_INFO("new data collected: [%s]", std::to_string(m_data).c_str());
@@ -127,10 +136,9 @@ double G3T1_4::collectSystolic() {
 }
 
 double G3T1_4::collectDiastolic() {
-    bsn::generator::DataGenerator dataGenerator(markovDiastolic);
     double m_data = 0;
 
-    m_data = dataGenerator.getValue();
+    m_data = dataGeneratorDiastolic.getValue();
     //battery.consume(BATT_UNIT);
 
     ROS_INFO("new data collected: [%s]", std::to_string(m_data).c_str());
@@ -186,7 +194,7 @@ void G3T1_4::transferSystolic(const double &m_data) {
     risk = sensorConfigSystolic.evaluateNumber(m_data);
     //battery.consume(BATT_UNIT);
     if (risk < 0 || risk > 100) throw std::domain_error("risk data out of boundaries");
-    if (label(sensorConfigSystolic, risk) != label(sensorConfigSystolic, collected_systolic_risk)) throw std::domain_error("content failure due to noise");
+    if (label(sensorConfigSystolic, risk) != label(sensorConfigSystolic, collected_systolic_risk)) throw std::domain_error("sensor accuracy fail");
 
     ros::NodeHandle handle;
     data_pub = handle.advertise<messages::SensorData>("systolic_data", 10);
@@ -207,7 +215,7 @@ void G3T1_4::transferDiastolic(const double &m_data) {
     risk = sensorConfigDiastolic.evaluateNumber(m_data);
     //battery.consume(BATT_UNIT);
     if (risk < 0 || risk > 100) throw std::domain_error("risk data out of boundaries");
-    if (label(sensorConfigDiastolic, risk) != label(sensorConfigDiastolic, collected_diastolic_risk)) throw std::domain_error("content failure due to noise");
+    if (label(sensorConfigDiastolic, risk) != label(sensorConfigDiastolic, collected_diastolic_risk)) throw std::domain_error("sensor accuracy fail");
 
     ros::NodeHandle handle;
     data_pub = handle.advertise<messages::SensorData>("diastolic_data", 10);

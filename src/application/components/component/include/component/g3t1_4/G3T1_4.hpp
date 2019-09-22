@@ -52,7 +52,9 @@ class G3T1_4 : public Sensor {
 
   	private:
 		bsn::generator::Markov markovSystolic;
+		bsn::generator::DataGenerator dataGeneratorSystolic;
 		bsn::generator::Markov markovDiastolic;
+		bsn::generator::DataGenerator dataGeneratorDiastolic;
 		bsn::filters::MovingAverage filterSystolic;
 		bsn::filters::MovingAverage filterDiastolic;
 		bsn::configuration::SensorConfiguration sensorConfigSystolic;

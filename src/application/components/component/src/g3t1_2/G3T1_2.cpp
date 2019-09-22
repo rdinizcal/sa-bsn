@@ -10,6 +10,7 @@ using namespace bsn::configuration;
 G3T1_2::G3T1_2(int &argc, char **argv, const std::string &name) :
     Sensor(argc, argv, name, "ecg", true, 1, bsn::resource::Battery("ecg_batt", 100, 100, 1)),
     markov(),
+    dataGenerator(),
     filter(1),
     sensorConfig(),
     collected_risk() {}
@@ -59,6 +60,9 @@ void G3T1_2::setUp() {
         ranges[4] = Range(std::stod(hrs1[0]), std::stod(hrs1[1]));
 
         markov = Markov(transitions, ranges, 2);
+        bsn::generator::DataGenerator dt(markov);
+        dataGenerator = dt;
+        dataGenerator.setSeed();
     }
 
     { // Configure sensor configuration
@@ -96,7 +100,6 @@ void G3T1_2::tearDown() {
 }
 
 double G3T1_2::collect() {
-    bsn::generator::DataGenerator dataGenerator(markov);
     double m_data = 0;
 
     m_data = dataGenerator.getValue();
@@ -125,7 +128,7 @@ void G3T1_2::transfer(const double &m_data) {
     risk = sensorConfig.evaluateNumber(m_data);
     //battery.consume(BATT_UNIT);
     if (risk < 0 || risk > 100) throw std::domain_error("risk data out of boundaries");
-    if (label(risk) != label(collected_risk)) throw std::domain_error("content failure due to noise");
+    if (label(risk) != label(collected_risk)) throw std::domain_error("sensor accuracy fail");
 
     ros::NodeHandle handle;
     data_pub = handle.advertise<messages::SensorData>("ecg_data", 10);
