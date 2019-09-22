@@ -10,7 +10,6 @@ FIND_PACKAGE(catkin REQUIRED COMPONENTS roscpp std_msgs genmsg messages archlib)
 ###########################################################################
 # Export catkin package.
 CATKIN_PACKAGE(
-    INCLUDE_DIRS include
     LIBRARIES ${PROJECT_NAME}
     CATKIN_DEPENDS messages message_runtime archlib
 )
@@ -20,10 +19,10 @@ CATKIN_PACKAGE(
 INCLUDE_DIRECTORIES(${catkin_INCLUDE_DIRS})
 
 # Set include directory.
-INCLUDE_DIRECTORIES(include)
+#INCLUDE_DIRECTORIES(include)
 
 ###########################################################################
 # Build this project.
-ADD_EXECUTABLE (collector  "${CMAKE_CURRENT_SOURCE_DIR}/apps/collector.cpp")
+ADD_EXECUTABLE (collector "${CMAKE_CURRENT_SOURCE_DIR}/apps/collector.cpp")
 TARGET_LINK_LIBRARIES (collector ${catkin_LIBRARIES} ${LIBRARIES})
 ADD_DEPENDENCIES(collector messages_generate_messages_cpp)

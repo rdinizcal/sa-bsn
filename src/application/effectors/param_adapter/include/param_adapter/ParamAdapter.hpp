@@ -5,7 +5,7 @@
 
 #include "ros/ros.h"
 
-#include "services/EffectorRegister.h"
+#include "archlib/EffectorRegister.h"
 #include "archlib/target_system/Effector.hpp"
 #include "archlib/AdaptationCommand.h"
 
@@ -25,7 +25,7 @@ class ParamAdapter : public arch::target_system::Effector {
 		virtual void body();
 
         virtual void receiveAdaptationCommand(const archlib::AdaptationCommand::ConstPtr& msg);
-		bool moduleConnect(services::EffectorRegister::Request &req, services::EffectorRegister::Response &res);
+		bool moduleConnect(archlib::EffectorRegister::Request &req, archlib::EffectorRegister::Response &res);
 
   	private:
 		ros::ServiceServer register_service;

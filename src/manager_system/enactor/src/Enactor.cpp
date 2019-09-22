@@ -48,7 +48,7 @@ void Enactor::receiveStatus(const archlib::Status::ConstPtr& msg) {
 
     } else if (msg->content=="success") {
         
-        if(executions[msg->source].size() < 10) {
+        if(executions[msg->source].size() < 5) {
             executions[msg->source].push_back(1);
             std::cout << msg->source <<"  - executions: [";
             for(std::deque<int>::iterator itt = executions[msg->source ].begin(); itt != executions[msg->source ].end(); ++itt) std::cout << *itt << " ";
@@ -69,7 +69,7 @@ void Enactor::receiveStatus(const archlib::Status::ConstPtr& msg) {
 
     } else if (msg->content=="fail") {
         //apply strategy only if you have at least 10 executions information
-        if(executions[msg->source].size() < 10) {
+        if(executions[msg->source].size() < 5) {
             executions[msg->source].push_back(0);
             std::cout << msg->source << "  - executions: [";
             for(std::deque<int>::iterator itt = executions[msg->source ].begin(); itt != executions[msg->source ].end(); ++itt) std::cout << *itt << " ";

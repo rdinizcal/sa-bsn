@@ -94,19 +94,19 @@ class Analyzer:
         global_reli_timeseries = dict() 
 
         ################ load status log ################
-        with open("../../knowledge_repository/resource/logs/status_1569164462697479152.log", newline='') as log_file:
+        with open("../../knowledge_repository/resource/logs/status_1569174520555742018.log", newline='') as log_file:
             log_csv = csv.reader(log_file, delimiter=',')
             log_status = list(log_csv)
             del log_status[0] # delete first line
 
         ################ load event log ################
-        with open("../../knowledge_repository/resource/logs/event_1569164462697479152.log", newline='') as log_file:
+        with open("../../knowledge_repository/resource/logs/event_1569174520555742018.log", newline='') as log_file:
             log_csv = csv.reader(log_file, delimiter=',')
             log_event = list(log_csv)
             del log_event[0] # delete first line
 
         ################ load uncertainty log ################
-        with open("../../knowledge_repository/resource/logs/uncertainty_1569164462697479152.log", newline='') as log_file:
+        with open("../../knowledge_repository/resource/logs/uncertainty_1569174520555742018.log", newline='') as log_file:
             log_csv = csv.reader(log_file, delimiter=',')
             log_uncert = list(log_csv)
             del log_uncert[0] # delete first line

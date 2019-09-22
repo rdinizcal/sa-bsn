@@ -5,14 +5,14 @@ add_compile_options(-std=c++11)
 
 ###########################################################################
 ## Find catkin and any catkin packages
-FIND_PACKAGE(catkin REQUIRED COMPONENTS roscpp std_msgs genmsg messages services archlib)
+FIND_PACKAGE(catkin REQUIRED COMPONENTS roscpp std_msgs genmsg messages archlib)
 
 ###########################################################################
 # Export catkin package.
 CATKIN_PACKAGE(
     INCLUDE_DIRS include
     LIBRARIES ${PROJECT_NAME}
-    CATKIN_DEPENDS messages services message_runtime archlib
+    CATKIN_DEPENDS messages message_runtime archlib
 )
 
 ###########################################################################

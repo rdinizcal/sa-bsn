@@ -28,7 +28,7 @@ void ParamAdapter::receiveAdaptationCommand(const archlib::AdaptationCommand::Co
 	}
 }
 
-bool ParamAdapter::moduleConnect(services::EffectorRegister::Request &req, services::EffectorRegister::Response &res) {
+bool ParamAdapter::moduleConnect(archlib::EffectorRegister::Request &req, archlib::EffectorRegister::Response &res) {
 
 	try {
 		if(req.connection == true) {
