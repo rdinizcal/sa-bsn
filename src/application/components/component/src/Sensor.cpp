@@ -1,6 +1,6 @@
 #include "component/Sensor.hpp"
 
-Sensor::Sensor(int &argc, char **argv, const std::string &name, const std::string &type, const bool &active, const double &noise_factor, const bsn::resource::Battery &battery) : Component(argc, argv, name), type(type), active(active), buffer_size(1), noise_factor(0), battery(battery), data(0.0) {}
+Sensor::Sensor(int &argc, char **argv, const std::string &name, const std::string &type, const bool &active, const double &noise_factor, const bsn::resource::Battery &battery) : Component(argc, argv, name), type(type), active(active), buffer_size(1), replicate_collect(1), noise_factor(0), battery(battery), data(0.0) {}
 
 Sensor::~Sensor() {}
 
@@ -49,8 +49,20 @@ void Sensor::body() {
 
     if(isActive()) {
         sendStatus("running");
+        
         data = collect();
-        apply_noise(data);
+
+        /*for data replication, as if replicate_collect values were collected*/
+        {
+            double sum;
+            for(int i = 0; i < replicate_collect; ++i) {
+                double aux_data = data;
+                apply_noise(aux_data);
+                sum += aux_data;
+            }
+            data = sum/replicate_collect;
+        }
+
         data = process(data);
         transfer(data);
 		sendStatus("success");
@@ -81,7 +93,9 @@ void Sensor::reconfigure(const archlib::AdaptationCommand::ConstPtr& msg) {
         std::vector<std::string> param = op.split(action, '=');
 
         if(param[0]=="buffer_size"){
-            buffer_size = stod(param[1]);
+            buffer_size = stoi(param[1]);
+        } else if (param[0]=="replicate_collect") {
+            replicate_collect = stoi(param[1]);
         }
     }
 }

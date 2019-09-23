@@ -40,7 +40,7 @@ class Enactor : public arch::ROSComponent {
 
 		std::map<std::string, double> reliability;
 		std::map<std::string, std::deque<int>> executions; //a map of deques where 1s represent successes and 0s represents failures
-		std::map<std::string, int> buffer_size;
+		std::map<std::string, int> replicate_task;
 		std::vector<std::string> connected;
 
 		int64_t cycles;

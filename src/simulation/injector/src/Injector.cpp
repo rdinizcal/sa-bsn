@@ -19,8 +19,9 @@ void Injector::setUp() {
 
     log_uncertainty = handle.advertise<archlib::Uncertainty>("log_uncertainty", 10);
 
-    components = {"/g3t1_1"/*, "/g3t1_2", "/g3t1_3", "/g3t1_4"*/};
+    components = {"/g3t1_1", "/g3t1_2", "/g3t1_3", "/g3t1_4"*/};
 
+    
     type["/g3t1_1"] = "step";
     amplitude["/g3t1_1"] = 0.15;
     frequency["/g3t1_1"] = 1.0/180000000;                                                 // once every 120 secs
@@ -28,32 +29,31 @@ void Injector::setUp() {
     noise_factor["/g3t1_1"] = 0;
     begin["/g3t1_1"] = seconds_in_cycles(30);                                                           // 1st cycle
     end["/g3t1_1"] = begin["/g3t1_1"] + seconds_in_cycles(duration["/g3t1_1"]);     // 1st cycle + the correspondent number of cycles of 20 seconds
-
-    /*
-    type["/g3t1_2"] = "ramp";
-    amplitude["/g3t1_2"] = 1.0;
-    frequency["/g3t1_2"] = 1.0/120; // once every 120 secs
-    duration["/g3t1_2"] = 60;
+    
+    type["/g3t1_2"] = "step";
+    amplitude["/g3t1_2"] = 0.15;
+    frequency["/g3t1_2"] = 1.0/180000000; // once every 120 secs
+    duration["/g3t1_2"] = 12000000;
     noise_factor["/g3t1_2"] = 0;
-    begin["/g3t1_2"] = 10;
+    begin["/g3t1_2"] = seconds_in_cycles(30);
     end["/g3t1_2"] = begin["/g3t1_2"] + seconds_in_cycles(duration["/g3t1_2"]);
-
-    type["/g3t1_3"] = "ramp";
+    
+    type["/g3t1_3"] = "step";
     amplitude["/g3t1_3"] = 1.0;
-    frequency["/g3t1_3"] = 1.0/360; // once every 120 sec
-    duration["/g3t1_3"] = 180;
+    frequency["/g3t1_3"] = 1.0/180000000; // once every 120 sec
+    duration["/g3t1_3"] = 12000000;
     noise_factor["/g3t1_3"] = 0;
-    begin["/g3t1_3"] = 20;
+    begin["/g3t1_3"] = seconds_in_cycles(30);
     end["/g3t1_3"] = begin["/g3t1_3"] + seconds_in_cycles(duration["/g3t1_3"]);
     
-    type["/g3t1_4"] = "ramp";
+    type["/g3t1_4"] = "step";
     amplitude["/g3t1_4"] = 1.0;
-    frequency["/g3t1_4"] = 1.0/120; // once every 120 secs
-    duration["/g3t1_4"] = 60;
+    frequency["/g3t1_4"] = 1.0/180000000; // once every 120 secs
+    duration["/g3t1_4"] = 12000000;
     noise_factor["/g3t1_4"] = 0;
-    begin["/g3t1_4"] = 30;
+    begin["/g3t1_4"] = seconds_in_cycles(30);
     end["/g3t1_4"] = begin["/g3t1_4"] + seconds_in_cycles(duration["/g3t1_4"]);
-    */
+    
 
 }
 

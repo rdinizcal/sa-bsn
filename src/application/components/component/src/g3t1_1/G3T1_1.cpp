@@ -14,7 +14,7 @@ G3T1_1::G3T1_1(int &argc, char **argv, const std::string &name) :
     Sensor(argc, argv, name, "oximeter", true, 1, bsn::resource::Battery("oxi_batt", 100, 100, 1)),
     markov(),
     dataGenerator(),
-    filter(buffer_size),
+    filter(1),
     sensorConfig(),
     collected_risk() {}
 
@@ -113,7 +113,7 @@ double G3T1_1::collect() {
 double G3T1_1::process(const double &m_data) {
     double filtered_data;
     
-    filter.setRange(buffer_size);
+    
     filter.insert(m_data);
     filtered_data = filter.getValue();
     //battery.consume(BATT_UNIT*filter.getRange());

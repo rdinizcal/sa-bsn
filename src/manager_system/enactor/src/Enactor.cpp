@@ -33,7 +33,7 @@ void Enactor::receiveEvent(const archlib::Event::ConstPtr& msg) {
 
         executions.erase(msg->source);
         reliability.erase(msg->source);
-        buffer_size.erase(msg->source);
+        replicate_task.erase(msg->source);
     }
 
 }
@@ -44,7 +44,7 @@ void Enactor::receiveStatus(const archlib::Status::ConstPtr& msg) {
 
         executions[msg->source] = {};
         reliability[msg->source] = 1;
-        buffer_size[msg->source] = 1;
+        replicate_task[msg->source] = 1;
 
     } else if (msg->content=="success") {
         
@@ -99,14 +99,14 @@ void Enactor::apply_strategy(const std::string &component) {
 
     if(strategy_condition) {
 
-        if(buffer_size[(component)] <= 88) buffer_size[(component)] += 2;
-        else buffer_size[(component)] = 100;
+        if(replicate_task[(component)] <= 88) replicate_task[(component)] += 2;
+        else replicate_task[(component)] = 100;
 
         archlib::AdaptationCommand msg;
 
         msg.source = ros::this_node::getName();
         msg.target = component;
-        msg.action = "buffer_size=" + std::to_string(buffer_size[(component)]);
+        msg.action = "replicate_collect=" + std::to_string(replicate_task[(component)]);
 
         adapt.publish(msg);
 
@@ -115,16 +115,16 @@ void Enactor::apply_strategy(const std::string &component) {
 
     std::vector<std::string> reliable_components;
     for (std::map<std::string, double>::iterator it = reliability.begin(); it != reliability.end(); ++it){
-        if((*it).second==1 && buffer_size[(*it).first] > 1) reliable_components.push_back((*it).first);
+        if((*it).second==1 && replicate_task[(*it).first] > 1) reliable_components.push_back((*it).first);
     }
     
     for (std::vector<std::string>::iterator it = reliable_components.begin(); it != reliable_components.end(); ++it){
-        buffer_size[(*it)] -= 1;
+        replicate_task[(*it)] -= 1;
         archlib::AdaptationCommand msg;
 
         msg.source = ros::this_node::getName();
         msg.target = *it;
-        msg.action = "buffer_size=" + std::to_string(buffer_size[(*it)]);
+        msg.action = "replicate_collect=" + std::to_string(replicate_task[(*it)]);
 
         adapt.publish(msg);
     }
@@ -149,7 +149,7 @@ void Enactor::print() {
         for(std::deque<int>::iterator itt = executions[*it].begin(); itt != executions[*it].end(); ++itt) std::cout << *itt << " ";
         std::cout << "]" << std::endl;
         std::cout << "  - reliability: " << reliability[*it] << std::endl;
-        std::cout << "  - buffer size: " << buffer_size[*it] << std::endl;
+        std::cout << "  - buffer size: " << replicate_task[*it] << std::endl;
         std::cout << "****************************************" << std::endl;
     }
 }
