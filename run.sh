@@ -6,7 +6,7 @@ gnome-terminal -x roscore & sleep 5s
 gnome-terminal --working-directory=${bsn}/configurations/knowledge_repository -e 'roslaunch data_access.launch' & sleep 2s
 
 ################# MANAGER #################
-#gnome-terminal --working-directory=${bsn}/configurations/manager_system -e 'roslaunch enactor.launch' & sleep 2s
+gnome-terminal --working-directory=${bsn}/configurations/manager_system -e 'roslaunch enactor.launch' & sleep 2s
 
 ################# LOGGING INFRASTRUCTURE #################
 gnome-terminal --working-directory=${bsn}/configurations/logging_infrastructure -e 'roslaunch logger.launch' & sleep 10s

@@ -19,9 +19,9 @@ void Injector::setUp() {
 
     log_uncertainty = handle.advertise<archlib::Uncertainty>("log_uncertainty", 10);
 
-    components = {"/g3t1_1", "/g3t1_2", "/g3t1_3", "/g3t1_4"*/};
+    components = {/*"/g3t1_1", */"/g3t1_2"/*, "/g3t1_3", "/g3t1_4"*/};
 
-    
+    /*
     type["/g3t1_1"] = "step";
     amplitude["/g3t1_1"] = 0.15;
     frequency["/g3t1_1"] = 1.0/180000000;                                                 // once every 120 secs
@@ -29,7 +29,7 @@ void Injector::setUp() {
     noise_factor["/g3t1_1"] = 0;
     begin["/g3t1_1"] = seconds_in_cycles(30);                                                           // 1st cycle
     end["/g3t1_1"] = begin["/g3t1_1"] + seconds_in_cycles(duration["/g3t1_1"]);     // 1st cycle + the correspondent number of cycles of 20 seconds
-    
+    */
     type["/g3t1_2"] = "step";
     amplitude["/g3t1_2"] = 0.15;
     frequency["/g3t1_2"] = 1.0/180000000; // once every 120 secs
@@ -37,7 +37,7 @@ void Injector::setUp() {
     noise_factor["/g3t1_2"] = 0;
     begin["/g3t1_2"] = seconds_in_cycles(30);
     end["/g3t1_2"] = begin["/g3t1_2"] + seconds_in_cycles(duration["/g3t1_2"]);
-    
+    /*
     type["/g3t1_3"] = "step";
     amplitude["/g3t1_3"] = 1.0;
     frequency["/g3t1_3"] = 1.0/180000000; // once every 120 sec
@@ -53,8 +53,7 @@ void Injector::setUp() {
     noise_factor["/g3t1_4"] = 0;
     begin["/g3t1_4"] = seconds_in_cycles(30);
     end["/g3t1_4"] = begin["/g3t1_4"] + seconds_in_cycles(duration["/g3t1_4"]);
-    
-
+    */
 }
 
 void Injector::tearDown() {}

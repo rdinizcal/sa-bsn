@@ -48,7 +48,7 @@ void Enactor::receiveStatus(const archlib::Status::ConstPtr& msg) {
 
     } else if (msg->content=="success") {
         
-        if(executions[msg->source].size() < 5) {
+        if(executions[msg->source].size() < 10) {
             executions[msg->source].push_back(1);
             std::cout << msg->source <<"  - executions: [";
             for(std::deque<int>::iterator itt = executions[msg->source ].begin(); itt != executions[msg->source ].end(); ++itt) std::cout << *itt << " ";
@@ -69,7 +69,7 @@ void Enactor::receiveStatus(const archlib::Status::ConstPtr& msg) {
 
     } else if (msg->content=="fail") {
         //apply strategy only if you have at least 10 executions information
-        if(executions[msg->source].size() < 5) {
+        if(executions[msg->source].size() < 10) {
             executions[msg->source].push_back(0);
             std::cout << msg->source << "  - executions: [";
             for(std::deque<int>::iterator itt = executions[msg->source ].begin(); itt != executions[msg->source ].end(); ++itt) std::cout << *itt << " ";
@@ -92,43 +92,23 @@ void Enactor::receiveStatus(const archlib::Status::ConstPtr& msg) {
 
 void Enactor::apply_strategy(const std::string &component) {
 
-    print();
-
-    bool strategy_condition = false;
-    if (reliability[component]<0.8) strategy_condition = true; 
-
-    if(strategy_condition) {
-
-        if(replicate_task[(component)] <= 88) replicate_task[(component)] += 2;
-        else replicate_task[(component)] = 100;
-
-        archlib::AdaptationCommand msg;
-
-        msg.source = ros::this_node::getName();
-        msg.target = component;
-        msg.action = "replicate_collect=" + std::to_string(replicate_task[(component)]);
-
-        adapt.publish(msg);
-
-        executions[component].clear();
+    if(reliability[component]<0.8) {
+        replicate_task[(component)] += 10;
+    } else if (reliability[component] > 0.95 && replicate_task[(component)] > 1) {
+        replicate_task[(component)] -= 1;
+    } else {
+        return;
     }
 
-    std::vector<std::string> reliable_components;
-    for (std::map<std::string, double>::iterator it = reliability.begin(); it != reliability.end(); ++it){
-        if((*it).second==1 && replicate_task[(*it).first] > 1) reliable_components.push_back((*it).first);
-    }
-    
-    for (std::vector<std::string>::iterator it = reliable_components.begin(); it != reliable_components.end(); ++it){
-        replicate_task[(*it)] -= 1;
-        archlib::AdaptationCommand msg;
+    archlib::AdaptationCommand msg;
 
-        msg.source = ros::this_node::getName();
-        msg.target = *it;
-        msg.action = "replicate_collect=" + std::to_string(replicate_task[(*it)]);
+    msg.source = ros::this_node::getName();
+    msg.target = component;
+    msg.action = "replicate_collect=" + std::to_string(replicate_task[(component)]);
 
-        adapt.publish(msg);
-    }
+    adapt.publish(msg);
 
+    executions[component].clear();
 }
 
 void Enactor::body(){
