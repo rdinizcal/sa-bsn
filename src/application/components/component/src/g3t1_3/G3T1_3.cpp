@@ -10,6 +10,7 @@ using namespace bsn::configuration;
 G3T1_3::G3T1_3(const int32_t &argc, char **argv) :
     Sensor(argc, argv, "thermometer", true, 1, bsn::resource::Battery("therm_batt", 100, 100, 1)),
     markov(),
+    dataGenerator(),
     filter(5),
     sensorConfig() {}
 
@@ -56,6 +57,9 @@ void G3T1_3::setUp() {
         ranges[4] = Range(std::stod(hrs1[0]), std::stod(hrs1[1]));
 
         markov = Markov(transitions, ranges, 2);
+        bsn::generator::DataGenerator dt(markov);
+        dataGenerator = dt;
+        dataGenerator.setSeed();
     }
 
     { // Configure sensor configuration
@@ -96,7 +100,7 @@ void G3T1_3::setUp() {
 void G3T1_3::tearDown() {}
 
 double G3T1_3::collect() {
-    bsn::generator::DataGenerator dataGenerator(markov);
+    //bsn::generator::DataGenerator dataGenerator(markov);
     double offset = 0;
     double m_data = 0;
 

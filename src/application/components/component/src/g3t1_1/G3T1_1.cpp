@@ -8,6 +8,7 @@ using namespace bsn::configuration;
 G3T1_1::G3T1_1(const int32_t &argc, char **argv) :
     Sensor(argc, argv, "oximeter", true, 1, bsn::resource::Battery("oxi_batt", 100, 100, 1)),
     markov(),
+    dataGenerator(),
     filter(5),
     sensorConfig() {}
 
@@ -50,6 +51,9 @@ void G3T1_1::setUp() {
         ranges[4] = Range(std::stod(hrs[0]), std::stod(hrs[1]));
 
         markov = Markov(transitions, ranges, 2);
+        bsn::generator::DataGenerator dt(markov);
+        dataGenerator = dt;
+        dataGenerator.setSeed();
     }
 
     { // Configure sensor configuration
@@ -91,7 +95,7 @@ void G3T1_1::tearDown() {
 }
 
 double G3T1_1::collect() {
-    bsn::generator::DataGenerator dataGenerator(markov);
+    //bsn::generator::DataGenerator dataGenerator(markov);
     double offset = 0;
     double m_data = 0;
 

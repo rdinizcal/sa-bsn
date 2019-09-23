@@ -10,7 +10,9 @@ using namespace bsn::configuration;
 G3T1_4::G3T1_4(const int32_t &argc, char **argv) :
     Sensor(argc, argv, "bloodpressure", true, 1, bsn::resource::Battery("bp_batt", 100, 100, 1)),
     markovSystolic(),
+    dataGeneratorSystolic(),
     markovDiastolic(),
+    dataGeneratorDiastolic(),
     filterSystolic(5),
     filterDiastolic(5),
     sensorConfigSystolic(),
@@ -67,8 +69,14 @@ void G3T1_4::setUp() {
 
             if(i==0){
                 markovSystolic = Markov(transitions, ranges, 2);
+                bsn::generator::DataGenerator dt(markovSystolic);
+                dataGeneratorSystolic = dt;
+                dataGeneratorSystolic.setSeed();
             } else {
                 markovDiastolic = Markov(transitions, ranges, 2);
+                bsn::generator::DataGenerator dt(markovDiastolic);
+                dataGeneratorDiastolic = dt;
+                dataGeneratorDiastolic.setSeed();
             }
         }
 
@@ -119,11 +127,12 @@ void G3T1_4::setUp() {
 void G3T1_4::tearDown() {}
 
 double G3T1_4::collectSystolic() {
-    bsn::generator::DataGenerator dataGenerator(markovSystolic);
+    //bsn::generator::DataGenerator dataGenerator(markovSystolic);
     double offset = 0;
     double m_data = 0;
 
-    m_data = dataGenerator.getValue();
+    //m_data = dataGenerator.getValue();
+    m_data = dataGeneratorSystolic.getValue();
     offset = (1 - syst_accuracy + (double)rand() / RAND_MAX * (1 - syst_accuracy)) * m_data;
     m_data += (rand()%2==0)?offset:(-1)*offset;
 
@@ -138,11 +147,12 @@ double G3T1_4::collectSystolic() {
 }
 
 double G3T1_4::collectDiastolic() {
-    bsn::generator::DataGenerator dataGenerator(markovDiastolic);
+    //bsn::generator::DataGenerator dataGenerator(markovDiastolic);
     double offset = 0;
     double m_data = 0;
 
-    m_data = dataGenerator.getValue();
+    //m_data = dataGenerator.getValue();
+    m_data = dataGeneratorDiastolic.getValue();
     offset = (1 - dias_accuracy + (double)rand() / RAND_MAX * (1 - dias_accuracy)) * m_data;
     m_data += (rand()%2==0)?offset:(-1)*offset;
 

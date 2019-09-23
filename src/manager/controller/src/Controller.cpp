@@ -100,7 +100,11 @@ void Controller::adaptation(CurrentInfo module_info) {
 	k = -1*(module_info.getBatteryLevel()/(static_cast<float>(setpoint*module_info.getExpectedBatteryLife())*module_info.getCost()));
 
 	//Here the risk_status comes in to give boundaries to the frequency value (When implemented)
-	new_parameters[module_info.getModuleName()] = module_info.getFrequency() + static_cast<float>(errorCalculation(static_cast<int>(module_info.getExpectedBatteryLife())))*k; //Delta F
+	double new_frequency = module_info.getFrequency() + static_cast<float>(errorCalculation(static_cast<int>(module_info.getExpectedBatteryLife())))*k; //Delta F
+	ROS_INFO("Calculated new frequency: %lf", new_frequency);
+	if(new_frequency > 0) {
+		new_parameters[module_info.getModuleName()] = new_frequency;
+	}
 
 	ROS_INFO("Module: %s", module_info.getModuleName().c_str());
 	ROS_INFO("New Frequency: %.2f", new_parameters[module_info.getModuleName()]);
