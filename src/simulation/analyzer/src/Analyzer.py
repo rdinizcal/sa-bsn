@@ -20,7 +20,8 @@ from collections import OrderedDict
 
 class Analyzer:
 
-    def __init__(self): pass
+    def __init__(self, argc, argv):
+        self.file_id = argv[1]
         
     # computes the average for evey truncated (which dependes on the resolution) x value 
     # [38.1, 38.5, 38.7]:[5, 10, 15] returns [38,15]
@@ -94,19 +95,19 @@ class Analyzer:
         global_reli_timeseries = dict() 
 
         ################ load status log ################
-        with open("../../knowledge_repository/resource/logs/status_1569283251138874390.log", newline='') as log_file:
+        with open("../../knowledge_repository/resource/logs/status_" + self.file_id + ".log", newline='') as log_file:
             log_csv = csv.reader(log_file, delimiter=',')
             log_status = list(log_csv)
             del log_status[0] # delete first line
 
         ################ load event log ################
-        with open("../../knowledge_repository/resource/logs/event_1569283251138874390.log", newline='') as log_file:
+        with open("../../knowledge_repository/resource/logs/event_" + self.file_id + ".log", newline='') as log_file:
             log_csv = csv.reader(log_file, delimiter=',')
             log_event = list(log_csv)
             del log_event[0] # delete first line
 
         ################ load uncertainty log ################
-        with open("../../knowledge_repository/resource/logs/uncertainty_1569283251138874390.log", newline='') as log_file:
+        with open("../../knowledge_repository/resource/logs/uncertainty_" + self.file_id + ".log", newline='') as log_file:
             log_csv = csv.reader(log_file, delimiter=',')
             log_uncert = list(log_csv)
             del log_uncert[0] # delete first line
@@ -131,12 +132,8 @@ class Analyzer:
                     tsk = Task(tag)
                     tasks[tag] = tsk
 
-                if (status.content == 'success'):
-                    tasks[tag].execute() 
-                    tasks[tag].success()
-                elif (status.content == 'fail'): 
-                    tasks[tag].execute() 
-                    tasks[tag].fail()
+                if (status.content == 'success'): tasks[tag].success()
+                elif (status.content == 'fail'): tasks[tag].fail()
 
             elif(reg[0]=="Event"):
                 event = Event(str(reg[1]),str(reg[2]),str(reg[3]),str(reg[4]),str(reg[5]))
@@ -158,10 +155,13 @@ class Analyzer:
                 formula.compute('C_'+task.getName(), task.cost())
                 formula.compute('F_'+task.getName(), task.frequency())
 
+                #print('R_'+task.getName()+"= "+str(task.reliability()))
+
             for ctx in ctxs.values():
                 formula.compute('CTX_'+ctx.getName(), ctx.isActive())
 
             global_reli_timeseries[instant] = formula.eval()
+            #print(str(instant) +". "+ str(formula.eval()))
 
         input_timeseries = dict()
         noise_factor = dict()
@@ -231,16 +231,19 @@ class Analyzer:
                 i += 1
             axs[len(input_timeseries)-1].xaxis.set_visible(True)
             axs[len(input_timeseries)-1].xaxis.set_major_formatter(ticks)
-        else:
+            fig.text(0.04, 0.5, 'Noise factor injected', va='center', rotation='vertical')
+            fig.text(0.5, 0.04, 'Time (s)', ha='center')
+
+        elif (len(input_timeseries) == 1):
             x = [el[0] for el in input_timeseries[tag]]
             y = [el[1] for el in input_timeseries[tag]]
 
             axs.plot(x,y)
             axs.set_ylabel(tag, fontsize=8)
             axs.xaxis.set_major_formatter(ticks)
-        
-        fig.text(0.04, 0.5, 'Noise factor injected', va='center', rotation='vertical')
-        fig.text(0.5, 0.04, 'Time (s)', ha='center')
+
+            fig.text(0.04, 0.5, 'Noise factor injected', va='center', rotation='vertical')
+            fig.text(0.5, 0.04, 'Time (s)', ha='center')
 
         plt.show()
 
@@ -307,9 +310,8 @@ class Task:
 
     def __init__(self, _name):
         self.name = _name 
-        self.nexecs = 0
         self.lstExec = []
-        self.window_size = 20
+        self.window_size = 10
     
     def __eq__(self, other):
         if isinstance(other, Task):
@@ -320,26 +322,21 @@ class Task:
         return hash(tuple(sorted(self.__dict__.items())))
 
     def reliability (self):
-        if self.nexecs != 0: return sum(self.lstExec) / self.nexecs # Success/Fail+Success
+        if len(self.lstExec) != 0: return sum(self.lstExec) / len(self.lstExec) # Success/Fail+Success
         else: return 0
     
     def cost (self) : return 1
     
     def frequency(self): return 1
-
-    def execute(self) :
-        if(self.nexecs < self.window_size) : self.nexecs += 1
     
     def success(self) :
-        if(self.nexecs < self.window_size) : self.lstExec.append(1)
-        else: 
-            self.lstExec.append(1)
-            del self.lstExec[0]
+        self.lstExec.append(1)
+        if(len(self.lstExec) > self.window_size) : 
+            del self.lstExec[0] 
 
     def fail(self) : 
-        if(self.nexecs < self.window_size) : self.lstExec.append(0)
-        else: 
-            self.lstExec.append(0)
+        self.lstExec.append(0)
+        if(len(self.lstExec) > self.window_size) : 
             del self.lstExec[0]
     
     def getName(self) :
