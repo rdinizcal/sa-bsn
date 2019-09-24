@@ -6,20 +6,37 @@ Injector::~Injector() {}
 
 void Injector::setUp() {
     srand(time(NULL));
+    log_uncertainty = handle.advertise<archlib::Uncertainty>("log_uncertainty", 10);
 
     ros::NodeHandle config;
+    bsn::operation::Operation op;
+    
     double freq;
     config.getParam("frequency", freq);
     rosComponentDescriptor.setFreq(freq);
 
-    uncertainty_pub["/g3t1_1"] = handle.advertise<archlib::Uncertainty>("uncertainty_/g3t1_1", 1000);
-    uncertainty_pub["/g3t1_2"] = handle.advertise<archlib::Uncertainty>("uncertainty_/g3t1_2", 1000);
-    uncertainty_pub["/g3t1_3"] = handle.advertise<archlib::Uncertainty>("uncertainty_/g3t1_3", 1000);
-    uncertainty_pub["/g3t1_4"] = handle.advertise<archlib::Uncertainty>("uncertainty_/g3t1_4", 1000);
+    std::string comps;
+    config.getParam("components", comps);
+    //components = {/*"/g3t1_1", */"/g3t1_2"/*, "/g3t1_3", "/g3t1_4"*/};
+    components = op.split(comps, ',');
 
-    log_uncertainty = handle.advertise<archlib::Uncertainty>("log_uncertainty", 10);
+    for(std::vector<std::string>::iterator component = components.begin(); component != components.end(); ++component){
+        uncertainty_pub[*component] = handle.advertise<archlib::Uncertainty>("uncertainty_/"+(*component), 1000);
+        config.getParam((*component)+"/type", type[*component]);
+        config.getParam((*component)+"/offset", noise_factor[*component]);
+        config.getParam((*component)+"/amplitude", amplitude[*component]);
+        config.getParam((*component)+"/frequency", frequency[*component]);
+        config.getParam((*component)+"/duration", duration[*component]);
+        int beg;
+        config.getParam((*component)+"/begin", beg);
+        begin[*component] = seconds_in_cycles(beg);
+        end[*component] = begin[*component] + seconds_in_cycles(duration[*component]);
+    }
 
-    components = {/*"/g3t1_1", */"/g3t1_2"/*, "/g3t1_3", "/g3t1_4"*/};
+    //uncertainty_pub["/g3t1_1"] = handle.advertise<archlib::Uncertainty>("uncertainty_/g3t1_1", 1000);
+    //uncertainty_pub["/g3t1_2"] = handle.advertise<archlib::Uncertainty>("uncertainty_/g3t1_2", 1000);
+    //uncertainty_pub["/g3t1_3"] = handle.advertise<archlib::Uncertainty>("uncertainty_/g3t1_3", 1000);
+    //uncertainty_pub["/g3t1_4"] = handle.advertise<archlib::Uncertainty>("uncertainty_/g3t1_4", 1000);
 
     /*
     type["/g3t1_1"] = "step";
@@ -29,7 +46,7 @@ void Injector::setUp() {
     noise_factor["/g3t1_1"] = 0;
     begin["/g3t1_1"] = seconds_in_cycles(30);                                                           // 1st cycle
     end["/g3t1_1"] = begin["/g3t1_1"] + seconds_in_cycles(duration["/g3t1_1"]);     // 1st cycle + the correspondent number of cycles of 20 seconds
-    */
+    
     type["/g3t1_2"] = "step";
     amplitude["/g3t1_2"] = 0.15;
     frequency["/g3t1_2"] = 1.0/180000000; // once every 120 secs
@@ -37,7 +54,7 @@ void Injector::setUp() {
     noise_factor["/g3t1_2"] = 0;
     begin["/g3t1_2"] = seconds_in_cycles(30);
     end["/g3t1_2"] = begin["/g3t1_2"] + seconds_in_cycles(duration["/g3t1_2"]);
-    /*
+    
     type["/g3t1_3"] = "step";
     amplitude["/g3t1_3"] = 1.0;
     frequency["/g3t1_3"] = 1.0/180000000; // once every 120 sec
@@ -103,7 +120,7 @@ void Injector::inject(const std::string &component, const std::string &content){
     archlib::Uncertainty msg;
 
     msg.source = ros::this_node::getName();
-    msg.target = component;
+    msg.target = "/"+component;
     msg.content = content;
 
     uncertainty_pub[component].publish(msg);

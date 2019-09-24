@@ -66,8 +66,8 @@ class Analyzer:
         print('Stability: %r' % bool(stability_point is not 0))
 
         #calculate settling time
-        settling_time = x[stability_point] - x[0]
-        print('Settling Time: %s' % settling_time)
+        settling_time = float(x[stability_point] - x[0])/10e9
+        print('Settling Time: %.2fs' % settling_time)
 
         #calculate overshoot
         overshoot = 100*(max(y) - setpoint)/setpoint
@@ -94,19 +94,19 @@ class Analyzer:
         global_reli_timeseries = dict() 
 
         ################ load status log ################
-        with open("../../knowledge_repository/resource/logs/status_1569266547068539192.log", newline='') as log_file:
+        with open("../../knowledge_repository/resource/logs/status_1569283251138874390.log", newline='') as log_file:
             log_csv = csv.reader(log_file, delimiter=',')
             log_status = list(log_csv)
             del log_status[0] # delete first line
 
         ################ load event log ################
-        with open("../../knowledge_repository/resource/logs/event_1569267228335286696.log", newline='') as log_file:
+        with open("../../knowledge_repository/resource/logs/event_1569283251138874390.log", newline='') as log_file:
             log_csv = csv.reader(log_file, delimiter=',')
             log_event = list(log_csv)
             del log_event[0] # delete first line
 
         ################ load uncertainty log ################
-        with open("../../knowledge_repository/resource/logs/uncertainty_1569267228335286696.log", newline='') as log_file:
+        with open("../../knowledge_repository/resource/logs/uncertainty_1569283251138874390.log", newline='') as log_file:
             log_csv = csv.reader(log_file, delimiter=',')
             log_uncert = list(log_csv)
             del log_uncert[0] # delete first line
@@ -205,9 +205,9 @@ class Analyzer:
         ax.xaxis.set_major_formatter(ticks)
         #ax.axvline(x=0.7*10e10, linestyle='--', color='red')
         #ax.axvline(x=0.9*10e10, linestyle='--', color='red')
-        ax.axvline(y=setpoint, linestyle='--', linewidth=1.0)
-        ax.axvline(y=upper_margin, linestyle='--', linewidth=0.5)
-        ax.axvline(y=lower_margin, linestyle='--', linewidth=0.5)
+        ax.axhline(y=setpoint, linestyle='--', linewidth=1.0, color="black")
+        ax.axhline(y=upper_margin, linestyle='--', linewidth=0.5, color="black")
+        ax.axhline(y=lower_margin, linestyle='--', linewidth=0.5, color="black")
 
         fig.suptitle('System reliability in time')
         fig.text(0.04, 0.5, 'Reliability (%)', va='center', rotation='vertical')

@@ -24,9 +24,9 @@ FIND_PACKAGE(catkin REQUIRED COMPONENTS std_msgs message_generation)
 ###########################################################################
 # Set message generation.
 ADD_MESSAGE_FILES( FILES
-  application/internal/SensorData.msg
-  manager/external/ReconfigurationCommand.msg
-  manager/internal/CommandControl.msg
+  target_system/internal/SensorData.msg
+  system_manager/external/ReconfigurationCommand.msg
+  system_manager/internal/CommandControl.msg
 )
 
 GENERATE_MESSAGES(DEPENDENCIES std_msgs)
