@@ -25,18 +25,6 @@
     <param name="diasdata_accuracy" value="90" type="double" />
     <param name="diascomm_accuracy" value="100" type="double" />
 
-    <!-- markov chain for systolic -->
-    <param name="syststate0" value="0,0,0,0,0" />
-    <param name="syststate1" value="0,0,0,0,0" />
-    <param name="syststate2" value="0,0,79,18,3" />
-    <param name="syststate3" value="0,0,23,64,13" />
-    <param name="syststate4" value="0,0,5,26,69" />
-
-    <!-- risk values for systolic -->
-    <param name="systLowRisk" value="0,120" />
-    <param name="systMidRisk" value="120,140" />
-    <param name="systHighRisk" value="140,300" />
-
     <!-- accuracy in percentage for systolic -->
     <param name="systdata_accuracy" value="90" type="double" />
     <param name="systcomm_accuracy" value="100" type="double" />

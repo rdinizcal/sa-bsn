@@ -39,7 +39,7 @@ bsn::generator::DataGenerator PatientModule::configureDataGenerator(const std::s
 
     for(uint32_t i = 0; i < transitions.size(); i++){
         for(uint32_t j = 0; j < 5; j++){
-            handle.getParam(vitalSign + "State" + std::to_string(j), s);
+            handle.getParam(vitalSign + "_State" + std::to_string(j), s);
             t_probs = op.split(s, ',');
             for(uint32_t k = 0; k < 5; k++){
                 transitions[i++] = std::stod(t_probs[k]);
@@ -49,15 +49,15 @@ bsn::generator::DataGenerator PatientModule::configureDataGenerator(const std::s
     
     std::vector<std::string> lrs,mrs0,hrs0,mrs1,hrs1;
 
-    handle.getParam(vitalSign + "LowRisk", s);
+    handle.getParam(vitalSign + "_LowRisk", s);
     lrs = op.split(s, ',');
-    handle.getParam(vitalSign + "MidRisk0", s);
+    handle.getParam(vitalSign + "_MidRisk0", s);
     mrs0 = op.split(s, ',');
-    handle.getParam(vitalSign + "HighRisk0", s);
+    handle.getParam(vitalSign + "_HighRisk0", s);
     hrs0 = op.split(s, ',');
-    handle.getParam(vitalSign + "MidRisk1", s);
+    handle.getParam(vitalSign + "_MidRisk1", s);
     mrs1 = op.split(s, ',');
-    handle.getParam(vitalSign + "HighRisk1", s);
+    handle.getParam(vitalSign + "_HighRisk1", s);
     hrs1 = op.split(s, ',');
 
     ranges[0] = bsn::range::Range(std::stod(hrs0[0]), std::stod(hrs0[1]));
@@ -84,7 +84,6 @@ bool PatientModule::getPatientData(services::PatientData::Request &request,
 }
 
 void PatientModule::run() {
-    // TODO client-server logic to get the patient data
     ros::NodeHandle handle;
     ros::ServiceServer service = handle.advertiseService("getPatientData", &PatientModule::getPatientData, this);
 
