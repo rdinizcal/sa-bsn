@@ -23,45 +23,30 @@ G3T1_1::~G3T1_1() {}
 void G3T1_1::setUp() {
     Component::setUp();
 
-    srand(time(NULL));
-        
     Operation op;
-    
-    std::vector<std::string> t_probs;
-    std::array<float, 25> transitions;
-    std::array<bsn::range::Range,5> ranges;
     std::string s;
 
-    for(uint32_t i = 0; i < transitions.size(); i++){
-        for(uint32_t j = 0; j < 5; j++){
-            handle.getParam("state" + std::to_string(j), s);
-            t_probs = op.split(s, ',');
-            for(uint32_t k = 0; k < 5; k++){
-                transitions[i++] = std::stod(t_probs[k]);
-            }
-        }
-    }
+    std::array<bsn::range::Range,5> ranges;
     
     { // Configure markov chain
-        std::vector<std::string> lrs, mrs, hrs;
+        std::vector<std::string> lrs,mrs0,hrs0,mrs1,hrs1;
 
         handle.getParam("LowRisk", s);
         lrs = op.split(s, ',');
-        handle.getParam("MidRisk", s);
-        mrs = op.split(s, ',');
-        handle.getParam("HighRisk", s);
-        hrs = op.split(s, ',');
+        handle.getParam("MidRisk0", s);
+        mrs0 = op.split(s, ',');
+        handle.getParam("HighRisk0", s);
+        hrs0 = op.split(s, ',');
+        handle.getParam("MidRisk1", s);
+        mrs1 = op.split(s, ',');
+        handle.getParam("HighRisk1", s);
+        hrs1 = op.split(s, ',');
 
-        ranges[0] = Range(-1, -1);
-        ranges[1] = Range(-1, -1);
+        ranges[0] = Range(std::stod(hrs0[0]), std::stod(hrs0[1]));
+        ranges[1] = Range(std::stod(mrs0[0]), std::stod(mrs0[1]));
         ranges[2] = Range(std::stod(lrs[0]), std::stod(lrs[1]));
-        ranges[3] = Range(std::stod(mrs[0]), std::stod(mrs[1]));
-        ranges[4] = Range(std::stod(hrs[0]), std::stod(hrs[1]));
-
-        markov = Markov(transitions, ranges, 2);
-        bsn::generator::DataGenerator dt(markov);
-        dataGenerator = dt;
-        dataGenerator.setSeed();
+        ranges[3] = Range(std::stod(mrs1[0]), std::stod(mrs1[1]));
+        ranges[4] = Range(std::stod(hrs1[0]), std::stod(hrs1[1]));
     }
 
     { // Configure sensor configuration

@@ -23,11 +23,11 @@ int32_t Sensor::run() {
     sendStatus("init");
     ros::spinOnce();
 
-    while(ros::ok()) {
+    while (ros::ok()) {
         ros::Rate loop_rate(rosComponentDescriptor.getFreq());
         ros::spinOnce();
 
-        try{
+        try {
             body();
         } catch (const std::exception& e) {
             std::cout << "sensor failed: " << e.what() << std::endl;

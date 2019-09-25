@@ -19,25 +19,11 @@ G3T1_2::~G3T1_2() {}
 
 void G3T1_2::setUp() {
     Component::setUp();
-    
-    srand(time(NULL));
-        
+            
     Operation op;
     
-    std::vector<std::string> t_probs;
-    std::array<float, 25> transitions;
     std::array<bsn::range::Range,5> ranges;
     std::string s;
-
-    for(uint32_t i = 0; i < transitions.size(); i++){
-        for(uint32_t j = 0; j < 5; j++){
-            handle.getParam("state" + std::to_string(j), s);
-            t_probs = op.split(s, ',');
-            for(uint32_t k = 0; k < 5; k++){
-                transitions[i++] = std::stod(t_probs[k]);
-            }
-        }
-    }
     
     { // Configure markov chain
         std::vector<std::string> lrs,mrs0,hrs0,mrs1,hrs1;
@@ -58,11 +44,6 @@ void G3T1_2::setUp() {
         ranges[2] = Range(std::stod(lrs[0]), std::stod(lrs[1]));
         ranges[3] = Range(std::stod(mrs1[0]), std::stod(mrs1[1]));
         ranges[4] = Range(std::stod(hrs1[0]), std::stod(hrs1[1]));
-
-        markov = Markov(transitions, ranges, 2);
-        bsn::generator::DataGenerator dt(markov);
-        dataGenerator = dt;
-        dataGenerator.setSeed();
     }
 
     { // Configure sensor configuration

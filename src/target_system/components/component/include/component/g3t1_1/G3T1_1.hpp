@@ -46,7 +46,8 @@ class G3T1_1 : public Sensor {
 
 		ros::NodeHandle handle;
 		ros::Publisher data_pub;
-
+		ros::ServiceClient client;
+		
 		double collected_risk;
 };
 

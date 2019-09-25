@@ -9,17 +9,19 @@
     <param name="midrisk" value="21,65" />
     <param name="highrisk" value="66,100" />
 
-    <!-- markov chain for diastolic -->
-    <param name="diasstate0" value="0,0,0,0,0" />
-    <param name="diasstate1" value="0,0,0,0,0" />
-    <param name="diasstate2" value="0,0,94,4,2" />
-    <param name="diasstate3" value="0,0,50,35,15" />
-    <param name="diasstate4" value="0,0,31,25,44" />
-
     <!-- risk values for diastolic -->
+    <param name="diasHighRisk0" value="-1,-1" />
+    <param name="diasMidRisk0" value="-1,-1" />
     <param name="diasLowRisk" value="0,80" />
-    <param name="diasMidRisk" value="80,90" />
-    <param name="diasHighRisk" value="90,300" />
+    <param name="diasMidRisk1" value="80,90" />
+    <param name="diasHighRisk1" value="90,300" />
+
+    <!-- risk values for systolic -->
+    <param name="systHighRisk0" value="-1,-1" />
+    <param name="systMidRisk0" value="-1,-1" />
+    <param name="systLowRisk" value="0,120" />
+    <param name="systMidRisk1" value="120,140" />
+    <param name="systHighRisk1" value="140,300" />
 
     <!-- accuracy in percentage for diastolic -->
     <param name="diasdata_accuracy" value="90" type="double" />
