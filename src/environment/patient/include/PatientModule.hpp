@@ -15,7 +15,7 @@ class PatientModule {
         void run();
 
     private:
-        bool getPatientData();
+        bool getPatientData(services::PatientData::Request &request, services::PatientData::Response &response);
         bsn::generator::DataGenerator configureDataGenerator(const std::string& vitalSign);
 
         std::map<std::string, bsn::generator::DataGenerator> patientData;
