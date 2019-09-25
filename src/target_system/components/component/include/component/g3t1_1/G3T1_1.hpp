@@ -16,6 +16,7 @@
 
 #include "component/Sensor.hpp"
 
+#include "services/PatientData.h"
 #include "messages/SensorData.h"
 
 class G3T1_1 : public Sensor {
@@ -46,7 +47,6 @@ class G3T1_1 : public Sensor {
 
 		ros::NodeHandle handle;
 		ros::Publisher data_pub;
-		ros::ServiceClient client;
 		
 		double collected_risk;
 };

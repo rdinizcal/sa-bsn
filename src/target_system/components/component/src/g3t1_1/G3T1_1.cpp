@@ -85,10 +85,19 @@ void G3T1_1::tearDown() {
 
 double G3T1_1::collect() {
     double m_data = 0;
-    m_data = dataGenerator.getValue();
+    ros::ServiceClient client = handle.serviceClient<services::PatientData>("getPatientData");
+    services::PatientData srv;
+
+    srv.request.vitalSign = "oxigenation";
+
+    if (client.call(srv)) {
+        m_data = srv.response.data;
+        ROS_INFO("new data collected: [%s]", std::to_string(m_data).c_str());
+    } else {
+        ROS_INFO("error collecting data");
+    }
 
     //battery.consume(BATT_UNIT);
-    ROS_INFO("new data collected: [%s]", std::to_string(m_data).c_str());
 
     collected_risk = sensorConfig.evaluateNumber(m_data);
 

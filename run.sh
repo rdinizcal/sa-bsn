@@ -16,10 +16,10 @@ mate-terminal --working-directory=${bsn}/configurations/target_system -e 'roslau
 mate-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch effector.launch' & sleep 10s
 
 mate-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g4t1.launch' & sleep 5s
-#mate-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g3t1_1.launch'
-mate-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g3t1_2.launch'
-#mate-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g3t1_3.launch'
-#mate-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g3t1_4.launch'
+# mate-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g3t1_1.launch'
+# mate-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g3t1_2.launch'
+# mate-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g3t1_3.launch'
+mate-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g3t1_4.launch'
 
 ################# SIMULATION #################
 mate-terminal --working-directory=${bsn}/configurations/simulation -e 'roslaunch injector.launch' & sleep 5s

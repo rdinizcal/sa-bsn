@@ -101,11 +101,18 @@ void G3T1_4::tearDown() {
 
 double G3T1_4::collectSystolic() {
     double m_data = 0;
+    ros::ServiceClient client = handle.serviceClient<services::PatientData>("getPatientData");
+    services::PatientData srv;
 
-    m_data = dataGeneratorSystolic.getValue();
+    srv.request.vitalSign = "systolic_pressure";
+
+    if (client.call(srv)) {
+        m_data = srv.response.data;
+        ROS_INFO("new data collected: [%s]", std::to_string(m_data).c_str());
+    } else {
+        ROS_INFO("error collecting data");
+    }
     //battery.consume(BATT_UNIT);
-
-    ROS_INFO("new data collected: [%s]", std::to_string(m_data).c_str());
 
     collected_systolic_risk = sensorConfigSystolic.evaluateNumber(m_data);
 
@@ -114,11 +121,18 @@ double G3T1_4::collectSystolic() {
 
 double G3T1_4::collectDiastolic() {
     double m_data = 0;
+    ros::ServiceClient client = handle.serviceClient<services::PatientData>("getPatientData");
+    services::PatientData srv;
 
-    m_data = dataGeneratorDiastolic.getValue();
+    srv.request.vitalSign = "diastolic_pressure";
+
+    if (client.call(srv)) {
+        m_data = srv.response.data;
+        ROS_INFO("new data collected: [%s]", std::to_string(m_data).c_str());
+    } else {
+        ROS_INFO("error collecting data");
+    }
     //battery.consume(BATT_UNIT);
-
-    ROS_INFO("new data collected: [%s]", std::to_string(m_data).c_str());
 
     collected_diastolic_risk = sensorConfigDiastolic.evaluateNumber(m_data);
 

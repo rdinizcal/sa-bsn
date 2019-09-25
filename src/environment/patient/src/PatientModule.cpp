@@ -13,10 +13,10 @@ void PatientModule::setUp() {
     ros::NodeHandle handle;
 
     // Get what vital signs this module will simulate
-    handle.getParam("vitalSigns", vitalSigns); 
+    handle.getParam("vitalSigns", vitalSigns);
 
     // Removes white spaces from vitalSigns
-    std::remove_if(vitalSigns.begin(), vitalSigns.end(), isspace);
+    vitalSigns.erase(std::remove(vitalSigns.begin(), vitalSigns.end(),' '), vitalSigns.end());
 
     std::vector<std::string> splittedVitalSigns = op.split(vitalSigns, ',');
 
@@ -37,6 +37,7 @@ bsn::generator::DataGenerator PatientModule::configureDataGenerator(const std::s
     std::string s;
     ros::NodeHandle handle;
 
+    // std::cout << vitalSign << std::endl;
     for(uint32_t i = 0; i < transitions.size(); i++){
         for(uint32_t j = 0; j < 5; j++){
             handle.getParam(vitalSign + "_State" + std::to_string(j), s);

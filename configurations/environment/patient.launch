@@ -2,7 +2,7 @@
     <!-- Blood Oxigenation Measurement Sensor -->    
     <node name="patient" pkg="patient" type="patient" output="screen" />    
 
-    <param name="vitalSigns" value="oxigenation, heart_frequency, temperature, systolic_pressure, diastolic_pressure" >
+    <param name="vitalSigns" value="oxigenation, heart_frequency, temperature, systolic_pressure, diastolic_pressure" />
 
     <!-- Markov chain for oxigenation -->
     <param name="oxigenation_State0" value="0,0,0,0,0" />

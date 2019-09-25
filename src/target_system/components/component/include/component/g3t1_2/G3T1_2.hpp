@@ -17,6 +17,7 @@
 #include "component/Sensor.hpp"
 
 #include "messages/SensorData.h"
+#include "services/PatientData.h"
 
 class G3T1_2 : public Sensor {
     
