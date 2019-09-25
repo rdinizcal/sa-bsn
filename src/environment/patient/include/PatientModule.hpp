@@ -1,7 +1,9 @@
 #include <ros/ros.h>
 #include "bsn/generator/DataGenerator.hpp"
 #include "bsn/operation/Operation.hpp"
+#include "bsn/range/Range.hpp"
 #include <string>
+#include "services/PatientData.h"
 
 class PatientModule {
     public:
@@ -13,7 +15,7 @@ class PatientModule {
         void run();
 
     private:
-        uint32_t getData(const std::string& vitalSign);
+        bool getPatientData();
         bsn::generator::DataGenerator configureDataGenerator(const std::string& vitalSign);
 
         std::map<std::string, bsn::generator::DataGenerator> patientData;

@@ -75,12 +75,16 @@ bsn::generator::DataGenerator PatientModule::configureDataGenerator(const std::s
 
 void PatientModule::tearDown() {}
 
-uint32_t PatientModule::getData(const std::string& vitalSign) {
+bool PatientModule::getPatientData() {
     // TODO return the specified data with patientData
-    return patientData[vitalSign].getValue();
+    return true;
 }
 
 void PatientModule::run() {
     // TODO client-server logic to get the patient data
+    ros::NodeHandle handle;
+    // ros::ServiceServer service = handle.advertiseService("getPatientData", getPatientData);
+
+    ros::spin();
 }
 
