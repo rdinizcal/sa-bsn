@@ -184,7 +184,7 @@ void DataAccessNode::receiveInfo(const messages::Info::ConstPtr& msg) {
 
     logical_clock++;
 
-    if(logical_clock % 300 == 0) { //Maybe change size
+    if(logical_clock % 2000 == 0) { //Maybe change size
         timestamp = componentData.getTimestamp();
         finishCycle(timestamp);
         persistComponentData();

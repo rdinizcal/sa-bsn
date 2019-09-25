@@ -197,7 +197,7 @@ void G4T1::receiveSensorData(const messages::SensorData::ConstPtr& msg) {
     if (persist)
         this->persistData(risks);
 
-    //info_pub = handle.advertise<messages::Info>("collect_info", 1000);
+    info_pub = handle.advertise<messages::Info>("collect_info", 1000);
 
     messages::Info infoMsg;
     std::string content = "";
@@ -233,15 +233,13 @@ void G4T1::sendEvent(const std::string &type, const std::string &description) {}
 
 void G4T1::sendStatus(const std::string &id, const double &value) {}
 
-void G4T1::body() {   
+void G4T1::body() {
     ros::NodeHandle nh;
     
     ros::Subscriber thermometerSub = nh.subscribe("thermometer_data", 10, &G4T1::receiveSensorData, this);
     ros::Subscriber oximeterSub = nh.subscribe("oximeter_data", 10, &G4T1::receiveSensorData, this);
     ros::Subscriber ecgSub = nh.subscribe("ecg_data", 10, &G4T1::receiveSensorData, this);
     ros::Subscriber diastolicSub = nh.subscribe("bpm_data", 10, &G4T1::receiveSensorData, this);
-
-    info_pub = handle.advertise<messages::Info>("collect_info", 1000);
 
     ros::spin();
 }
