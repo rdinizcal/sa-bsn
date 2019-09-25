@@ -10,11 +10,11 @@ class PatientModule {
 
         void setUp();
         void tearDown();
-
-    private:
-        uint32_t getData();
         void run();
 
-        std::map<std::string, bsn::generator::DataGenerator> patientData;
+    private:
+        uint32_t getData(const std::string& vitalSign);
+        bsn::generator::DataGenerator configureDataGenerator(const std::string& vitalSign);
 
+        std::map<std::string, bsn::generator::DataGenerator> patientData;
 };
