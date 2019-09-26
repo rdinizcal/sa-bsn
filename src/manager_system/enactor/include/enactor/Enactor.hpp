@@ -3,6 +3,7 @@
 
 #include <map>
 #include <deque>
+#include <math.h>
 
 #include "ros/ros.h"
 #include "ros/package.h"

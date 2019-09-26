@@ -48,11 +48,8 @@ void Enactor::receiveStatus(const archlib::Status::ConstPtr& msg) {
 
     } else if (msg->content=="success") {
         
-        if(executions[msg->source].size() < 10) {
+        if(executions[msg->source].size() < 100) {
             executions[msg->source].push_back(1);
-            std::cout << msg->source <<"  - executions: [";
-            for(std::deque<int>::iterator itt = executions[msg->source ].begin(); itt != executions[msg->source ].end(); ++itt) std::cout << *itt << " ";
-            std::cout << "]" << std::endl;
         } else {
             executions[msg->source].pop_front();
             executions[msg->source].push_back(1);
@@ -62,18 +59,15 @@ void Enactor::receiveStatus(const archlib::Status::ConstPtr& msg) {
                 sum += (*it);
             }
 
-            reliability[msg->source] = sum/executions[msg->source].size();
+            reliability[msg->source] = double(sum)/double(executions[msg->source].size());
 
             apply_strategy(msg->source);
         }
 
     } else if (msg->content=="fail") {
         //apply strategy only if you have at least 10 executions information
-        if(executions[msg->source].size() < 10) {
+        if(executions[msg->source].size() < 100) {
             executions[msg->source].push_back(0);
-            std::cout << msg->source << "  - executions: [";
-            for(std::deque<int>::iterator itt = executions[msg->source ].begin(); itt != executions[msg->source ].end(); ++itt) std::cout << *itt << " ";
-            std::cout << "]" << std::endl;
         } else {
             executions[msg->source].pop_front();
             executions[msg->source].push_back(0);
@@ -83,7 +77,7 @@ void Enactor::receiveStatus(const archlib::Status::ConstPtr& msg) {
                 sum += (*it);
             }
 
-            reliability[msg->source] = sum/executions[msg->source].size();
+            reliability[msg->source] = double(sum)/double(executions[msg->source].size());
 
             apply_strategy(msg->source);
         }
@@ -92,13 +86,20 @@ void Enactor::receiveStatus(const archlib::Status::ConstPtr& msg) {
 
 void Enactor::apply_strategy(const std::string &component) {
 
-    if(reliability[component]<0.8) {
+    /*if(reliability[component]<0.8) {
         replicate_task[(component)] += 10;
     } else if (reliability[component] > 0.95 && replicate_task[(component)] > 1) {
         replicate_task[(component)] -= 1;
     } else {
         return;
-    }
+    }*/
+    std::cout << "reli[" << component << "] = "<< reliability[component] <<std::endl;
+    double Kp = 7;
+    double reference = 0.90;
+    double error = reference - reliability[component]; //error = Rref - Rcurr
+    replicate_task[component] += (error>0)?ceil(Kp * error):floor(Kp*error);
+
+    if(replicate_task[component] < 1) replicate_task[component]=1;
 
     archlib::AdaptationCommand msg;
 
@@ -108,7 +109,7 @@ void Enactor::apply_strategy(const std::string &component) {
 
     adapt.publish(msg);
 
-    executions[component].clear();
+    //executions[component].clear();
 }
 
 void Enactor::body(){

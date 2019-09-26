@@ -1,0 +1,10 @@
+
+Event,1,3510025837,/g4t1,,activate
+Event,3,8726096633,/g3t1_1,,activate
+Event,9,8828606375,/g3t1_2,,activate
+Event,32,9028863413,/g3t1_3,,activate
+Event,46,9129535643,/g3t1_4,,activate
+Event,136971,713716853394,/g3t1_4,,deactivate
+Event,137119,714979206181,/g3t1_3,,deactivate
+Event,137246,716080016645,/g3t1_2,,deactivate
+Event,137274,717888342406,/g3t1_1,,deactivate
