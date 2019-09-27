@@ -1,7 +1,7 @@
 <launch> 
     <node name="g4t1" pkg="component" type="g4t1" output="screen" />
 
-    <param name="frequency" value="10" /> <!-- 1 Hz  -->
+    <param name="frequency" value="50" /> <!-- 1 Hz  -->
 
     <param name="connect" value="false" type="bool" />
     <!-- Firebase Realtime Database -->

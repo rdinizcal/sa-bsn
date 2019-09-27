@@ -2,7 +2,7 @@
     <!-- Heart Beat Rate Measurement Sensor -->
     <node name="g3t1_2" pkg="component" type="g3t1_2" output="screen" />
 
-    <param name="frequency" value="50" /> <!-- 2 Hz  -->
+    <param name="frequency" value="10" /> <!-- 2 Hz  -->
     
     <!-- Defines the percentages to consider low, moderate or high risk -->
     <param name="lowrisk" value="0,20" />

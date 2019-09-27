@@ -3,14 +3,14 @@
 
     <param name="frequency" value="5" type="int" /> <!--Hz-->
 
-    <param name="components" value="g3t1_1,g3t1_2,g3t1_3,g3t1_4" /> <!--Names of the components in which uncertainty will be injected (separeted per ,) --> 
+    <param name="components" value="g3t1_1,g3t1_2,g3t1_3" /> <!--Names of the components in which uncertainty will be injected (separeted per ,) --> 
 
     <!--Parameters for g3t1_1 uncertainty injection-->
-    <param name="g3t1_1/type" value="step" />                        <!--Could be: step, ramp or random-->
+    <param name="g3t1_1/type" value="ramp" />                        <!--Could be: step, ramp or random-->
     <param name="g3t1_1/offset" value="0.2" />
     <param name="g3t1_1/amplitude" value="0.40" />
     <param name="g3t1_1/frequency" value="0.000011574" />            <!-- 1 hour = 1/(60*60)-->
-    <param name="g3t1_1/duration" value="86400" type="int" />        <!-- 1 hour (s) -->
+    <param name="g3t1_1/duration" value="600" type="int" />        <!-- 1 hour (s) -->
     <param name="g3t1_1/begin" value="10" type="int" />              <!-- (s) instant to begin the injection-->
 
     <!--Parameters for g3t1_2 uncertainty injection-->
@@ -36,5 +36,13 @@
     <param name="g3t1_4/frequency" value="0.000011574" />                   <!-- 0.01 Hz-->
     <param name="g3t1_4/duration" value="600" type="int" />            <!-- -->
     <param name="g3t1_4/begin" value="10" type="int" />              <!-- (s) instant to begin the injection-->
+
+    <!--Parameters for g4t1 uncertainty injection-->
+    <param name="g4t1/type" value="step" />                       <!--Could be: step, ramp or random-->
+    <param name="g4t1/offset" value="0.2" />
+    <param name="g4t1/amplitude" value="0.30" />
+    <param name="g4t1/frequency" value="0.000011574" />                   <!-- 0.01 Hz-->
+    <param name="g4t1/duration" value="600" type="int" />            <!-- -->
+    <param name="g4t1/begin" value="10" type="int" />              <!-- (s) instant to begin the injection-->
 
 </launch>

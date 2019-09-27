@@ -122,6 +122,49 @@ void G3T1_4::tearDown() {
     Component::tearDown();
 }
 
+
+void G3T1_4::body() {
+    
+    if (!isActive() && battery.getCurrentLevel() > 90){
+        turnOn();
+    } else if (isActive() && battery.getCurrentLevel() < 2){
+        turnOff();        
+    }
+
+    if(isActive()) {
+        sendStatus("running");
+        
+        systolic_data = collectSystolic();
+        diastolic_data = collectDiastolic();
+
+        /*for data replication, as if replicate_collect values were collected*/
+        {
+            double sum;
+            for(int i = 0; i < replicate_collect; ++i) {
+                double aux_data = systolic_data;
+                apply_noise(aux_data);
+                sum += aux_data;
+            }
+            systolic_data = sum/replicate_collect;
+
+            sum = 0;
+            for(int i = 0; i < replicate_collect; ++i) {
+                double aux_data = diastolic_data;
+                apply_noise(aux_data);
+                sum += aux_data;
+            }
+            diastolic_data = sum/replicate_collect;
+        }
+
+        data = process(data);
+        transfer(data);
+		sendStatus("success");
+    } else {
+        recharge();
+        throw std::domain_error("out of charge");
+    }
+}
+
 double G3T1_4::collectSystolic() {
     double m_data = 0;
 

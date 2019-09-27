@@ -122,6 +122,7 @@ void G4T1::collect(const messages::SensorData::ConstPtr& msg) {
     } else {
         data_buffer[type].push_back(risk);
         data_buffer[type].erase(data_buffer[type].begin());//erase the first element to avoid overflow
+        throw std::domain_error("lost data due to package overflow");
     }
 }
 
