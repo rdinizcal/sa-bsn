@@ -109,6 +109,12 @@ class Analyzer:
         #                                                                #
         ################################################################## 
 
+        ################ load adaptation log ################
+        with open("../../knowledge_repository/resource/logs/adaptation_" + self.file_id + ".log", newline='') as log_file:
+            log_csv = csv.reader(log_file, delimiter=',')
+            log_adaptation = list(log_csv)
+            del log_adaptation[0] # delete first line
+
         ################ load status log ################
         with open("../../knowledge_repository/resource/logs/status_" + self.file_id + ".log", newline='') as log_file:
             log_csv = csv.reader(log_file, delimiter=',')
@@ -226,9 +232,9 @@ class Analyzer:
         [x,y] = self.discretize(x,y,1) #precision in ms
 
         setpoint = 0.9
-        upper_margin = setpoint*1.05
-        lower_margin = setpoint*0.95
-        self.analyze(x, y, setpoint, setpoint*1.05, setpoint*0.95)
+        upper_margin = setpoint*1.20
+        lower_margin = setpoint*0.80
+        self.analyze(x, y, setpoint, upper_margin, lower_margin)
 
         ################################################################## 
         #                                                                #
@@ -246,6 +252,9 @@ class Analyzer:
             colors[tag] = default_colors[i]
             i+=1
 
+        ##############################################
+        #                 First Plot                 #
+        ############################################## 
         ## First, plot the global reliability against time
         fig, ax = plt.subplots()
         ax.plot(x, y, label='BSN', color = "#1f77b4", linewidth=2)
@@ -277,9 +286,11 @@ class Analyzer:
         plt.grid()
         plt.legend()
         
+        ##############################################
+        #               Second Plot                  #
+        ############################################## 
         ## Second, plot the local uncertainty inputs against time (second figure)
         fig, ax = plt.subplots()
-        ax.set_ylabel(tag, fontsize=8)
         ax.set_ylim(0,1.05)
         ax.xaxis.set_major_formatter(ticks)
 
@@ -295,17 +306,19 @@ class Analyzer:
         plt.grid()
         plt.legend()
 
+        ##############################################
+        #                Third Plot                  #
+        ############################################## 
         ## Third, plot in horizontal bars the failures and successes of each component at a time (third figure)
-
-        # First I have to discretize the curves
         discretized_status_timeseries = dict()
-        res = 10e9 # resolution in seconds
+        res = 10e7 # resolution in milliseconds
 
         x_max = 0
         for tag in local_status_timeseries:
             last = len(local_status_timeseries[tag]) - 1
             x_max  = local_status_timeseries[tag][last][0] if local_status_timeseries[tag][last][0] > x_max else x_max
 
+        # First I have to discretize the curves
         for tag in local_status_timeseries:
             lst = local_status_timeseries[tag] # a list of pairs [instant,"status"] for that tag
 
@@ -314,64 +327,65 @@ class Analyzer:
 
             instant = 0 
             aux = list()
-            flag = True
-            for pair in lst:
-
-                if flag : 
-                    instant = pair[0]
-                    flag = False
-
-                if(pair[0] < instant + res):
-                    aux.append(pair)
-                else:
-                    success = 0
-                    fail = 0
-                    for pair in aux:
-                        if pair[1] == "success" : success += 1
-                        elif pair[1] == "fail" : fail+=1
+            steps = list(range(0, int(x_max), int(res)))
+            last = len(steps)-1
+            steps[last] = x_max # fix last value due to transformation to integer (mandatory)
+            flag = False
+            for step in steps:
+                for pair in lst:
+                    if instant < pair[0] and pair[0] <= step :
+                        aux.append(pair)
+                    elif pair[0] > step:
+                        success = 0
+                        fail = 0
+                        for pair in aux:
+                            if pair[1] == "success" : success += 1
+                            elif pair[1] == "fail" : fail+=1
+                        val = (1 if (success/(success+fail) < upper_margin) and (success/(success+fail) > lower_margin) else 0) if success+fail != 0 else -1
+                        #val = (1 if (success>fail) else 0) if success+fail > 0 else -1
+                        discretized_status_timeseries[tag].append([step, val]) # |    ->|
+                        aux.clear()
+                        break
                     
-                    val = (1 if success/(success+fail) > 0.80 else 0) if success+fail > 0 else -1
-                    discretized_status_timeseries[tag].append([instant, val])
-                    aux.clear()
-                    flag = True
+                instant = step
         
         #calculate whole system reliability based on the discretized status timeseries and append
         bsn_tag = "BSN"
         discretized_status_timeseries[bsn_tag] = [[0,0]]
-        steps = list(range(0, int(x_max), int(res)))
-        last = len(steps)-1
-        steps[last] = x_max # fix last value due to transformation to integer (mandatory)
-
-        x = 0
         for step in steps:
-            val = 0
+
+            g4t1 = False
+            g3t1_1 = False
+            g3t1_2 = False
+            g3t1_3 = False
+            #g3t1_4 = False
+
             for pair in discretized_status_timeseries["G3_T1_1"]:
-                if pair[0] >= x and pair[0] < step :
-                    val += pair[1]
+                if pair[0] == step:
+                    g3t1_1 = True if pair[1] == 1 else False
                     break 
             
             for pair in discretized_status_timeseries["G3_T1_2"]:
-                if pair[0] >= x and pair[0] < step :
-                    val += pair[1]
+                if pair[0] == step:
+                    g3t1_2 = True if pair[1] == 1 else False
                     break 
                     
             for pair in discretized_status_timeseries["G3_T1_3"]:
-                if pair[0] >= x and pair[0] < step :
-                    val += pair[1]
+                if pair[0] == step:
+                    g3t1_3 = True if pair[1] == 1 else False
                     break 
             
-            for pair in discretized_status_timeseries["G3_T1_4"]:
-                if pair[0] >= x and pair[0] < step :
-                    val += pair[1]
-                    break 
+            #for pair in discretized_status_timeseries["G3_T1_4"]:
+            #   if pair[0] == step:
+            #        g3t1_4 = True if pair[1] == 1 else False
+            #        break 
 
             for pair in discretized_status_timeseries["G4_T1"]:
-                if pair[0] >= x and pair[0] < step :
-                    val *= pair[1]
+                if pair[0] == step:
+                    g4t1 = True if pair[1] == 1 else False
                     break 
             
-            discretized_status_timeseries[bsn_tag].append([step, 1 if val > 0 else 0])
-            x = step
+            discretized_status_timeseries[bsn_tag].append([step, 1 if (g4t1 and (g3t1_1 or g3t1_2 or g3t1_3)) == True else 0])
 
         #Then plot horizontal lines
         scalez = int(x_max) * 10e-10
@@ -385,6 +399,7 @@ class Analyzer:
             #last = len(discretized_status_timeseries[tag])-1
             #x_max = discretized_status_timeseries[tag][last][0]
             for pair in discretized_status_timeseries[tag]:
+                #print(str(pair) + "=> x_min: " +str(x/x_max)+ "| x_max : " + str(pair[0]/x_max))
                 ax.axhline(y=tag, xmin=x/x_max, xmax=pair[0]/x_max, linewidth=5.0, color=cc[pair[1]])
                 x = pair[0]
         
