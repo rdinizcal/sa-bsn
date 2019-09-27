@@ -6,8 +6,6 @@
 #include <memory>
 #include <map>
 
-#include <cpprest/http_client.h>
-#include <cpprest/json.h>
 #include <ros/package.h>
 #include "ros/ros.h"
 

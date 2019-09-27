@@ -10,7 +10,7 @@ FIND_PACKAGE(catkin REQUIRED COMPONENTS roscpp std_msgs genmsg messages archlib)
 ###########################################################################
 # Export catkin package.
 CATKIN_PACKAGE(
-    INCLUDE_DIRS include
+    # INCLUDE_DIRS include
     LIBRARIES ${PROJECT_NAME}
     CATKIN_DEPENDS messages message_runtime archlib
 )
@@ -20,7 +20,7 @@ CATKIN_PACKAGE(
 INCLUDE_DIRECTORIES(${catkin_INCLUDE_DIRS})
 
 # Set include directory.
-INCLUDE_DIRECTORIES(include)
+# INCLUDE_DIRECTORIES(include)
 
 ###########################################################################
 # Build this project.

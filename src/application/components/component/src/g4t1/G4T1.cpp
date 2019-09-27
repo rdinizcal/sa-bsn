@@ -144,9 +144,7 @@ void G4T1::receiveSensorData(const messages::SensorData::ConstPtr& msg) {
     double risk = msg->risk;
     double batt = msg->batt;
     std::vector<std::string> risks;
-    web::http::client::http_client client(U(database_url));
-    web::json::value json_obj; 
-
+    
     std::cout << "Received data from " + type << std::endl; 
 
     if (type=="thermometer"){
@@ -168,8 +166,7 @@ void G4T1::receiveSensorData(const messages::SensorData::ConstPtr& msg) {
         patient_status = data_fuse(data_list);
 
         if (connect) {
-            json_obj["VitalData"] = web::json::value::string(makePacket());
-            client.request(web::http::methods::PUT, U("/sessions/" + std::to_string(session) + ".json") ,json_obj);
+            // send data to server
         }
     }
 
