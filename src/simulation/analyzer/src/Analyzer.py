@@ -57,6 +57,7 @@ class Analyzer:
 
     def analyze(self, x, y, setpoint):
 
+        print('-----------------------------------------------')
         self.mean = mean(val for val in y[int(3*len(x)/4):]) # last quarter of the curve, lets hope it sufficses
         print('Converge to: %.2f' % self.mean)
 
@@ -92,11 +93,13 @@ class Analyzer:
         self.sse = 100*(abs(setpoint - self.mean)/setpoint)
         print('Steady-State Error: %.2f%%' % self.sse)
 
-        #controller effort, not engough information yet
+        #controller effort, not enough information yet
 
         #robustness
         self.robustness = 100*(1 - sum([abs(setpoint - val) for val in y])/len(x))
         print('Robustness: %.2f%%' % self.robustness)
+
+        print('-----------------------------------------------')
 
     def run(self): 
         # load formula
@@ -321,7 +324,7 @@ class Analyzer:
         sse = self.sse 
         fig.suptitle('Formula Reliability')
         is_stable = "stable" if self.stability else "not stable" 
-        subtitle = 'converge to %.2f | ST = %.2fs | OS = %.2f%% | SSE = %.2f%%' % (mn,st,os,sse)        
+        subtitle = '%s | converges to %.2f | ST = %.2fs | OS = %.2f%% | SSE = %.2f%%' % (is_stable,mn,st,os,sse)        
         fig.text(0.5, 0.90, subtitle, ha='center', color = "grey") # subtitle
         fig.text(0.04, 0.5, 'Reliability (%)', va='center', rotation='vertical')
         fig.text(0.5, 0.035, 'Time (s)', ha='center')
@@ -377,73 +380,7 @@ class Analyzer:
                     if inv[0] > before_last_step and inv[0] <= last_step:
                         aux.append(1 if inv[1] == 'success' else 0)
 
-                discretized_status_timeseries[tag].append([pair[0],(1 if (sum(aux)/len(aux) < self.mean*1.05) and (sum(aux)/len(aux) > self.mean*0.95) else 0) if len(aux) > 0 else -1])  # status = Success/Fail+Success
-
-        #for tag in local_status_timeseries:
-        #    lst = local_status_timeseries[tag] # a list of pairs [instant,"status"] for that tag
-        #    if not (tag in discretized_status_timeseries): # initialize dict
-        #        discretized_status_timeseries[tag] = [[lst[0][0], 1 if lst[0][1] == 'success' else 0]]
-        #    instant = 0 
-        #    aux = list()
-        #    steps = list(range(0, int(x_max), int(res)))
-        #    last = len(steps)-1
-        #    steps[last] = x_max # fix last value due to transformation to integer (mandatory)
-        #    flag = False
-        #    for step in steps:
-        #        for pair in lst:
-        #            if instant < pair[0] and pair[0] <= step :
-        #                aux.append(pair)
-        #            elif pair[0] > step:
-        #                success = 0
-        #                fail = 0
-        #                for pair in aux:
-        #                    if pair[1] == "success" : success += 1
-        #                    elif pair[1] == "fail" : fail+=1
-        #                #val = (1 if (success/(success+fail) < self.mean*1.05) and (success/(success+fail) > self.mean*0.95) else 0) if success+fail != 0 else -1
-        #                val = (1 if success>fail else 0) if success+fail != 0 else -1
-        #                discretized_status_timeseries[tag].append([step, val]) # |    ->|
-        #                aux.clear()
-        #                break
-        #        instant = step
-
-
-        #calculate whole system reliability based on the discretized status timeseries and append
-        #bsn_tag = "BSN"
-        #discretized_status_timeseries[bsn_tag] = [[0,0]]
-        #for step in steps:
-        #
-        #    g4t1 = False
-        #    g3t1_1 = False
-        #    g3t1_2 = False
-        #    g3t1_3 = False
-        #    #g3t1_4 = False
-#
-        #    for pair in discretized_status_timeseries["G3_T1_1"]:
-        #        if pair[0] == step:
-        #            g3t1_1 = True if pair[1] == 1 else False
-        #            break 
-        #    
-        #    for pair in discretized_status_timeseries["G3_T1_2"]:
-        #        if pair[0] == step:
-        #            g3t1_2 = True if pair[1] == 1 else False
-        #            break 
-        #            
-        #    for pair in discretized_status_timeseries["G3_T1_3"]:
-        #        if pair[0] == step:
-        #            g3t1_3 = True if pair[1] == 1 else False
-        #            break 
-        #    
-        #    #for pair in discretized_status_timeseries["G3_T1_4"]:
-        #    #   if pair[0] == step:
-        #    #        g3t1_4 = True if pair[1] == 1 else False
-        #    #        break 
-        #
-        #    for pair in discretized_status_timeseries["G4_T1"]:
-        #        if pair[0] == step:
-        #            g4t1 = True if pair[1] == 1 else False
-        #            break 
-        #    
-        #    discretized_status_timeseries[bsn_tag].append([step, 1 if (g4t1 and (g3t1_1 or g3t1_2 or g3t1_3)) == True else 0])
+                discretized_status_timeseries[tag].append([pair[0],(1 if sum(aux)/len(aux) > 0.5 else 0) if len(aux) > 0 else -1])  # status = Success/Fail+Success
 
         #calculate whole system reliability based on the discretized status timeseries and append
         bsn_tag = "BSN"
@@ -512,7 +449,7 @@ class Analyzer:
         self.analyze(xa, ya, setpoint)
 
         #Then plot horizontal lines
-        scalez = int(x_max) * 10e-10
+        scalez = ceil(int(x_max) * 10e-10)
         ticksz = ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(x*scalez))
         fig, ax = plt.subplots()
         ax.xaxis.set_major_formatter(ticksz)
@@ -522,8 +459,6 @@ class Analyzer:
             x = discretized_status_timeseries[tag][0][0]
             for pair in discretized_status_timeseries[tag]:
                 ax.axhline(y=tag, xmin=x/x_max, xmax=pair[0]/x_max, linewidth=5.0, color=cc[pair[1]])
-                #a = 1 if (pair[1]>self.mean*0.95) and (pair[1]<self.mean*1.05) else 0
-                #ax.axhline(y=tag, xmin=x/x_max, xmax=pair[0]/x_max, linewidth=5.0, color=cc[a])
                 x = pair[0]
         
         ## Insert labels, titles, texts, grid...
@@ -533,7 +468,7 @@ class Analyzer:
         sse = self.sse 
         fig.suptitle('Calculated Reliability')
         is_stable = "stable" if self.stability else "not stable" 
-        subtitle = 'converge to %.2f | ST = %.2fs | OS = %.2f%% | SSE = %.2f%%' % (mn,st,os,sse)        
+        subtitle = '%s | converges to %.2f | ST = %.2fs | OS = %.2f%% | SSE = %.2f%%' % (is_stable,mn,st,os,sse)        
         fig.text(0.5, 0.90, subtitle, ha='center', color = "grey") # subtitle
         fig.text(0.5, 0.035, 'Time (s)', ha='center')
         fig.text(0.8, 0.020, 'g4t1 and (g3t1_1 or g3t1_2 or g3t1_3)', ha='center', color = "grey", fontsize=6) # files used

@@ -1,8 +1,0 @@
-
-Event,1,3417093581,/g4t1,,activate
-Event,4,8710085182,/g3t1_1,,activate
-Event,8,8810657999,/g3t1_2,,activate
-Event,10,8810779712,/g3t1_3,,activate
-Event,49772,273887832365,/g3t1_3,,deactivate
-Event,49846,274688933272,/g3t1_2,,deactivate
-Event,49880,275141311354,/g3t1_1,,deactivate
