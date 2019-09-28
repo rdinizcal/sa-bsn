@@ -103,7 +103,8 @@ class Analyzer:
 
     def run(self): 
         # load formula
-        formula = Formula("../../knowledge_repository/resource/models/"+self.formula_id+".formula")
+        formula = Formula("../../knowledge_repository/resource/models/"+self.formula_id+".formula", "float")
+        b_formula = Formula("../../knowledge_repository/resource/models/b_"+self.formula_id+".formula", "bool")
 
         # build list of participating tasks
         tasks = dict()
@@ -187,18 +188,22 @@ class Analyzer:
 
                 if (status.content == 'success' or status.content == 'fail'):
                     if not (tag in local_status_timeseries):
-                        local_status_timeseries[tag] = [[0,0]]
                         local_status_timeseries[tag] = [[instant,status.content]]
-
-                    local_status_timeseries[tag].append([instant,status.content])
-                    global_status_timeseries[instant] = status.content
+                    else:
+                        local_status_timeseries[tag].append([instant,status.content])
 
                     if not (tag in local_reli_timeseries): 
-                        local_reli_timeseries[tag] = [[0,0]]
                         local_reli_timeseries[tag] = [[instant,tasks[tag].reliability()]]
+                    else:
+                        local_reli_timeseries[tag].append([instant,tasks[tag].reliability()])
 
-                    local_reli_timeseries[tag].append([instant,tasks[tag].reliability()])
+                    ## compute global formulae
+                    for tag in tasks:
+                        formula.compute('R_'+tag, tasks[tag].reliability())
+                        formula.compute('C_'+tag, tasks[tag].cost())
+                        formula.compute('F_'+tag, tasks[tag].frequency())
 
+                        b_formula.compute('B_'+tag, status.content == 'success')
 
             elif(reg[0]=="Event"):
                 event = Event(str(reg[1]),str(reg[2]),str(reg[3]),str(reg[4]),str(reg[5]))
@@ -212,19 +217,13 @@ class Analyzer:
                 if (event.content == 'deactivate'): ctxs[tag].deactivate()
                 elif (event.content == 'activate'): ctxs[tag].activate()
 
-            ## global reliability timeseries
-            for task in tasks.values():
-                formula.compute('R_'+task.getName(), task.reliability())
-                formula.compute('C_'+task.getName(), task.cost())
-                formula.compute('F_'+task.getName(), task.frequency())
+                for ctx in ctxs.values():
+                    formula.compute('CTX_'+ctx.getName(), ctx.isActive())
 
-                #print('R_'+task.getName()+"= "+str(task.reliability()))
 
-            for ctx in ctxs.values():
-                formula.compute('CTX_'+ctx.getName(), ctx.isActive())
-
-            global_reli_timeseries[instant] = formula.eval()
-            #print(str(instant) +". "+ str(formula.eval()))
+            if(reg[0]=="Event" or reg[0]=="Status"):
+                global_status_timeseries[instant] = b_formula.eval()
+                global_reli_timeseries[instant] = formula.eval()
 
         input_timeseries = dict()
         noise_factor = dict()
@@ -295,7 +294,7 @@ class Analyzer:
         ############################################## 
         ## First, plot the global reliability against time
         fig, ax = plt.subplots()
-        ax.plot(x, y, label='BSN', color = "#1f77b4", linewidth=2)
+        ax.plot(x, y, label='formula', color = "#1f77b4", linewidth=2)
         ax.set_ylim(0,1.05)
         ax.xaxis.set_major_formatter(ticks)
 
@@ -305,11 +304,11 @@ class Analyzer:
             x_max  = local_status_timeseries[tag][last][0] if local_status_timeseries[tag][last][0] > x_max else x_max
 
         ## Then, plot the local reliabilities against time (same figure)
-        i = 0
-        for tag in local_reli_timeseries:
-            x = [el[0] for el in local_reli_timeseries[tag]]
-            y = [el[1] for el in local_reli_timeseries[tag]]
-            ax.plot(x, y, label=tag, color=colors[tag])
+        #i = 0
+        #for tag in local_reli_timeseries:
+        #    x = [el[0] for el in local_reli_timeseries[tag]]
+        #    y = [el[1] for el in local_reli_timeseries[tag]]
+        #    ax.plot(x, y, label=tag, color=colors[tag])
 
         ## Plot horizontal lines for setpoint
         ax.axhline(y=setpoint, linestyle='--', linewidth=0.7, color="black")
@@ -322,10 +321,10 @@ class Analyzer:
         st = self.settling_time
         os = self.overshoot
         sse = self.sse 
-        fig.suptitle('Formula Reliability')
+        fig.suptitle('Formula vs. Expected Behavior')
         is_stable = "stable" if self.stability else "not stable" 
-        subtitle = '%s | converges to %.2f | ST = %.2fs | OS = %.2f%% | SSE = %.2f%%' % (is_stable,mn,st,os,sse)        
-        fig.text(0.5, 0.90, subtitle, ha='center', color = "grey") # subtitle
+        subtitle = '%s: %s | converges to %.2f | ST = %.2fs | OS = %.2f%% | SSE = %.2f%%' % ("formula",is_stable,mn,st,os,sse)        
+        fig.text(0.5, 0.92, subtitle, ha='center', color = "grey", fontsize=7) # subtitle
         fig.text(0.04, 0.5, 'Reliability (%)', va='center', rotation='vertical')
         fig.text(0.5, 0.035, 'Time (s)', ha='center')
         fig.text(0.8, 0.020, self.file_id + '.log', ha='center', color = "grey", fontsize=6) # files used
@@ -342,21 +341,21 @@ class Analyzer:
         #               Second Plot                  #
         ############################################## 
         ## Second, plot the local uncertainty inputs against time (second figure)
-        fig, ax = plt.subplots()
-        ax.set_ylim(0,1.05)
-        ax.xaxis.set_major_formatter(ticks)
-
-        for tag in input_timeseries:
-            x = [el[0] for el in input_timeseries[tag]]
-            y = [el[1] for el in input_timeseries[tag]]
-
-            ax.plot(x,y, label=tag, color=colors[tag])
-
-        fig.suptitle('Uncertainty injection inputs')
-        fig.text(0.04, 0.5, 'Noise factor injected', va='center', rotation='vertical')
-        fig.text(0.5, 0.035, 'Time (s)', ha='center')
-        plt.grid()
-        plt.legend()
+        #fig, ax = plt.subplots()
+        #ax.set_ylim(0,1.05)
+        #ax.xaxis.set_major_formatter(ticks)
+#
+        #for tag in input_timeseries:
+        #    x = [el[0] for el in input_timeseries[tag]]
+        #    y = [el[1] for el in input_timeseries[tag]]
+#
+        #    ax.plot(x,y, label=tag, color=colors[tag])
+#
+        #fig.suptitle('Uncertainty injection inputs')
+        #fig.text(0.04, 0.5, 'Noise factor injected', va='center', rotation='vertical')
+        #fig.text(0.5, 0.035, 'Time (s)', ha='center')
+        #plt.grid()
+        #plt.legend()
 
         ##############################################
         #                Third Plot                  #
@@ -365,74 +364,41 @@ class Analyzer:
         discretized_status_timeseries = dict()
         res = 2.5 * 10e9 # resolution in milliseconds
 
-        for tag in local_status_timeseries:
-            lst = local_status_timeseries[tag] # a list of pairs [instant,"status"] for that tag
-            if not (tag in discretized_status_timeseries): # initialize dict
-                discretized_status_timeseries[tag] = [[lst[0][0], 1 if lst[0][1] == 'success' else 0]]
-
-            for pair in lst:
-                last_instant = pair[0]
-                last_step = last_instant
-                before_last_step = last_step - res
-
-                aux = []
-                for inv in lst:
-                    if inv[0] > before_last_step and inv[0] <= last_step:
-                        aux.append(1 if inv[1] == 'success' else 0)
-
-                discretized_status_timeseries[tag].append([pair[0],(1 if sum(aux)/len(aux) > 0.5 else 0) if len(aux) > 0 else -1])  # status = Success/Fail+Success
+        #for tag in local_status_timeseries:
+        #    lst = local_status_timeseries[tag] # a list of pairs [instant,"status"] for that tag
+        #    if not (tag in discretized_status_timeseries): # initialize dict
+        #        discretized_status_timeseries[tag] = [[lst[0][0], 1 if lst[0][1] == 'success' else 0]]
+#
+        #    for pair in lst:
+        #        last_instant = pair[0]
+        #        last_step = last_instant
+        #        before_last_step = last_step - res
+#
+        #        aux = []
+        #        for inv in lst:
+        #            if inv[0] > before_last_step and inv[0] <= last_step:
+        #                aux.append(1 if inv[1] == 'success' else 0)
+#
+        #        discretized_status_timeseries[tag].append([pair[0],(1 if sum(aux)/len(aux) > 0.5 else 0) if len(aux) > 0 else -1])  # status = Success/#Fail+Success
 
         #calculate whole system reliability based on the discretized status timeseries and append
-        bsn_tag = "BSN"
-        g4t1 = False
-        g3t1_1 = False
-        g3t1_2 = False
-        g3t1_3 = False
-        #g3t1_4 = False
-        for instant in global_status_timeseries:
-
-            for pair in local_status_timeseries["G3_T1_1"]:
-                if pair[0] == instant:
-                    g3t1_1 = True if pair[1] == 'success' else False
-                    break 
-            
-            for pair in local_status_timeseries["G3_T1_2"]:
-                if pair[0] == instant:
-                    g3t1_2 = True if pair[1] == 'success' else False
-                    break 
-                    
-            for pair in local_status_timeseries["G3_T1_3"]:
-                if pair[0] == instant:
-                    g3t1_3 = True if pair[1] == 'success' else False
-                    break 
-            
-            #for pair in local_status_timeseries["G3_T1_4"]:
-            #   if pair[0] == instant:
-            #        g3t1_4 = True if pair[1] == 1 else False
-            #        break 
-        
-            for pair in local_status_timeseries["G4_T1"]:
-                if pair[0] == instant:
-                    g4t1 = True if pair[1] == 'success' else False
-                    break 
-
-            if not (bsn_tag in discretized_status_timeseries): discretized_status_timeseries[bsn_tag] = [[instant, 1 if (g4t1 and (g3t1_1 or g3t1_2 or g3t1_3)) == True else 0]]
-            else : discretized_status_timeseries[bsn_tag].append([instant, 1 if (g4t1 and (g3t1_1 or g3t1_2 or g3t1_3)) == True else 0])
+        #bsn_tag = "BSN"
+        #for instant in global_status_timeseries:
+        #    if not (bsn_tag in discretized_status_timeseries): discretized_status_timeseries[bsn_tag] = [[instant, global_status_timeseries[instant]]]
+        #    else : discretized_status_timeseries[bsn_tag].append([instant, global_status_timeseries[instant]])
 
         reli_from_calc = list()
 
-        for pair in discretized_status_timeseries[bsn_tag]:
-            last_instant = pair[0]
-            last_step = last_instant
-            before_last_step = last_step - res
+        for instant in global_status_timeseries:
+            before_last_step = instant - res
 
             aux = []
-            for inv in discretized_status_timeseries[bsn_tag]:
-                if inv[0] > before_last_step and inv[0] <= last_step:
-                    aux.append(inv[1])
+            for x in global_status_timeseries:
+                if x > before_last_step and x <= instant:
+                    aux.append(int(global_status_timeseries[x]))
 
-            if len(reli_from_calc) == 0 : reli_from_calc = [[last_instant, sum(aux)/len(aux) if len(aux) > 0 else 0]]
-            else : reli_from_calc.append([pair[0], sum(aux)/len(aux) if len(aux) > 0 else 0])
+            reli_from_calc.append([instant, sum(aux)/len(aux) if len(aux) > 0 else 0])
+        
 
         x = [pair[0] for pair in reli_from_calc]
         y = [pair[1] for pair in reli_from_calc]
@@ -448,42 +414,57 @@ class Analyzer:
                 
         self.analyze(xa, ya, setpoint)
 
-        #Then plot horizontal lines
-        scalez = ceil(int(x_max) * 10e-10)
-        ticksz = ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(x*scalez))
-        fig, ax = plt.subplots()
-        ax.xaxis.set_major_formatter(ticksz)
-
-        cc = {1:"green", 0:"red", -1:"white"}
-        for tag in discretized_status_timeseries:
-            x = discretized_status_timeseries[tag][0][0]
-            for pair in discretized_status_timeseries[tag]:
-                ax.axhline(y=tag, xmin=x/x_max, xmax=pair[0]/x_max, linewidth=5.0, color=cc[pair[1]])
-                x = pair[0]
-        
-        ## Insert labels, titles, texts, grid...
+        #fig, ax = plt.subplots()
+        ax.plot(x, y, label='expected behavior', color = "#ff7f0e", linewidth=2)
         mn = self.mean
         st = self.settling_time
         os = self.overshoot
         sse = self.sse 
-        fig.suptitle('Calculated Reliability')
         is_stable = "stable" if self.stability else "not stable" 
-        subtitle = '%s | converges to %.2f | ST = %.2fs | OS = %.2f%% | SSE = %.2f%%' % (is_stable,mn,st,os,sse)        
-        fig.text(0.5, 0.90, subtitle, ha='center', color = "grey") # subtitle
-        fig.text(0.5, 0.035, 'Time (s)', ha='center')
-        fig.text(0.8, 0.020, 'g4t1 and (g3t1_1 or g3t1_2 or g3t1_3)', ha='center', color = "grey", fontsize=6) # files used
-        ax.annotate('adapt', xy=(x_triggered, 1),
-            xytext=(x_triggered/x_max, 1.1), textcoords='axes fraction',
-            arrowprops=dict(facecolor='black', shrink=0.03),
-            horizontalalignment='right', verticalalignment='top',
-            )
+        subtitle = '%s: %s | converges to %.2f | ST = %.2fs | OS = %.2f%% | SSE = %.2f%%' % ("expected",is_stable,mn,st,os,sse) 
+        fig.text(0.5, 0.89, subtitle, ha='center', color = "grey", fontsize=7) # subtitle
         plt.grid()
+        plt.legend()
+        #ax.set_ylim(0,1.05)
+        #ax.xaxis.set_major_formatter(ticks)
+
+        ##Then plot horizontal lines
+        #scalez = ceil(int(x_max) * 10e-10)
+        #ticksz = ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(x*scalez))
+        #fig, ax = plt.subplots()
+        #ax.xaxis.set_major_formatter(ticksz)
+#
+        #cc = {1:"green", 0:"red", -1:"white"}
+        #for tag in discretized_status_timeseries:
+        #    x = discretized_status_timeseries[tag][0][0]
+        #    for pair in discretized_status_timeseries[tag]:
+        #        ax.axhline(y=tag, xmin=x/x_max, xmax=pair[0]/x_max, linewidth=5.0, color=cc[pair[1]])
+        #        x = pair[0]
+        #
+        ### Insert labels, titles, texts, grid...
+        #mn = self.mean
+        #st = self.settling_time
+        #os = self.overshoot
+        #sse = self.sse 
+        #fig.suptitle('Calculated Reliability')
+        #is_stable = "stable" if self.stability else "not stable" 
+        #subtitle = '%s | converges to %.2f | ST = %.2fs | OS = %.2f%% | SSE = %.2f%%' % (is_stable,mn,st,os,sse)        
+        #fig.text(0.5, 0.90, subtitle, ha='center', color = "grey") # subtitle
+        #fig.text(0.5, 0.035, 'Time (s)', ha='center')
+        #fig.text(0.8, 0.020, 'g4t1 and (g3t1_1 or g3t1_2 or g3t1_3)', ha='center', color = "grey", fontsize=6) # files used
+        #ax.annotate('adapt', xy=(x_triggered, 1),
+        #    xytext=(x_triggered/x_max, 1.1), textcoords='axes fraction',
+        #    arrowprops=dict(facecolor='black', shrink=0.03),
+        #    horizontalalignment='right', verticalalignment='top',
+        #    )
+        #plt.grid()
 
         plt.show()
 
 class Formula:
 
-    def __init__(self, path): 
+    def __init__(self, path, _type): 
+        self.type = _type
         formula_file = open(path, 'r')
         if formula_file.mode == 'r': 
             self.expression = formula_file.read()
@@ -498,18 +479,22 @@ class Formula:
         expr = expr.replace("/"," ")
         expr = expr.replace("("," ")
         expr = expr.replace(")"," ")
+        expr = expr.replace("and"," ")
+        expr = expr.replace("or"," ")
         expr = re.split(' ',expr)
         arguments = list(filter(None, expr))
 
         arg_val = {}
         for argument in arguments :
-            arg_val[argument] = 0
+            if self.type == "bool": arg_val[argument] = False
+            else : arg_val[argument] = 0
 
         return arg_val
 
     def compute(self, arg, value):
-        self.mapping[arg] = float(value)
-
+        if self.type == "bool": self.mapping[arg] = bool(value)
+        else: self.mapping[arg] = float(value)
+    
     def eval(self):
         return eval(self.expression, self.mapping)
 
@@ -558,8 +543,7 @@ class Task:
     def reliability (self):
         last = len(self.lstInvocations)-1
         if(last <= 0): return 0
-        last_instant = self.lstInvocations[last][0]
-        last_step = last_instant
+        last_step = self.lstInvocations[last][0]
         before_last_step = last_step - self.res
 
         aux = []
