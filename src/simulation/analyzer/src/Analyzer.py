@@ -86,7 +86,8 @@ class Analyzer:
         print('Settling Time: %.2fs' % self.settling_time)
 
         #calculate overshoot
-        self.overshoot = 100*(max(y) - self.mean)/self.mean
+        y_max = max(yi for yi in y[:stability_point])
+        self.overshoot = 100*(y_max - self.mean)/self.mean
         print('Overshoot: %.2f%%' % self.overshoot)
 
         #calculate steady-state error
@@ -312,6 +313,7 @@ class Analyzer:
 
         ## Plot horizontal lines for setpoint
         ax.axhline(y=setpoint, linestyle='--', linewidth=0.7, color="black")
+        ax.text(-15, setpoint, "setpoint" , fontsize=8)
         ax.axhline(y=self.mean*1.05, linestyle='--', linewidth=0.3, color="black")
         ax.axhline(y=self.mean, linestyle='-.', linewidth=0.5, color="black")
         ax.axhline(y=self.mean*0.95, linestyle='--', linewidth=0.3, color="black")
@@ -321,26 +323,27 @@ class Analyzer:
         st = self.settling_time
         os = self.overshoot
         sse = self.sse 
-        fig.suptitle('Formula vs. Expected Behavior')
+        fig.suptitle('Parametric Formula vs. Monitored')
+        #fig.suptitle('Reliability in time')
         is_stable = "stable" if self.stability else "not stable" 
         subtitle = '%s: %s | converges to %.2f | ST = %.2fs | OS = %.2f%% | SSE = %.2f%%' % ("formula",is_stable,mn,st,os,sse)        
         fig.text(0.5, 0.92, subtitle, ha='center', color = "grey", fontsize=7) # subtitle
-        fig.text(0.04, 0.5, 'Reliability (%)', va='center', rotation='vertical')
+        fig.text(0.04, 0.5, 'Reliability', va='center', rotation='vertical')
         fig.text(0.5, 0.035, 'Time (s)', ha='center')
-        fig.text(0.8, 0.020, self.file_id + '.log', ha='center', color = "grey", fontsize=6) # files used
-        fig.text(0.8, 0.005, self.formula_id + '.formula', ha='center', color = "grey", fontsize=6) # files used
-        ax.annotate('adapt', xy=(x_triggered, 0),
+        #fig.text(0.8, 0.020, self.file_id + '.log', ha='center', color = "grey", fontsize=6) # files used
+        #fig.text(0.8, 0.005, self.formula_id + '.formula', ha='center', color = "grey", fontsize=6) # files used
+        ax.annotate('trigger adaptation', xy=(x_triggered, 0),
             xytext=(x_triggered/x_max, -0.1), textcoords='axes fraction',
             arrowprops=dict(facecolor='black', shrink=0.03),
             horizontalalignment='right', verticalalignment='top',
             )
-        plt.grid()
-        plt.legend()
+        #plt.grid()
+        #plt.legend()
         
         ##############################################
         #               Second Plot                  #
         ############################################## 
-        ## Second, plot the local uncertainty inputs against time (second figure)
+        # Second, plot the local uncertainty inputs against time (second figure)
         #fig, ax = plt.subplots()
         #ax.set_ylim(0,1.05)
         #ax.xaxis.set_major_formatter(ticks)
@@ -351,8 +354,8 @@ class Analyzer:
 #
         #    ax.plot(x,y, label=tag, color=colors[tag])
 #
-        #fig.suptitle('Uncertainty injection inputs')
-        #fig.text(0.04, 0.5, 'Noise factor injected', va='center', rotation='vertical')
+        #fig.suptitle('Noise injection inputs')
+        #fig.text(0.04, 0.5, 'Noise percentage', va='center', rotation='vertical')
         #fig.text(0.5, 0.035, 'Time (s)', ha='center')
         #plt.grid()
         #plt.legend()
@@ -415,13 +418,13 @@ class Analyzer:
         self.analyze(xa, ya, setpoint)
 
         #fig, ax = plt.subplots()
-        ax.plot(x, y, label='expected behavior', color = "#ff7f0e", linewidth=2)
+        ax.plot(x, y, label='monitored', color = "#ff7f0e", linewidth=2)
         mn = self.mean
         st = self.settling_time
         os = self.overshoot
         sse = self.sse 
         is_stable = "stable" if self.stability else "not stable" 
-        subtitle = '%s: %s | converges to %.2f | ST = %.2fs | OS = %.2f%% | SSE = %.2f%%' % ("expected",is_stable,mn,st,os,sse) 
+        subtitle = '%s: %s | converges to %.2f | ST = %.2fs | OS = %.2f%% | SSE = %.2f%%' % ("monitored",is_stable,mn,st,os,sse) 
         fig.text(0.5, 0.89, subtitle, ha='center', color = "grey", fontsize=7) # subtitle
         plt.grid()
         plt.legend()

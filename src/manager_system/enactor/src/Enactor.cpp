@@ -48,7 +48,7 @@ void Enactor::receiveStatus(const archlib::Status::ConstPtr& msg) {
 
     } else if (msg->content=="success") {
         
-        if(executions[msg->source].size() < 50) {
+        if(executions[msg->source].size() < 100) {
             executions[msg->source].push_back(1);
         } else {
             executions[msg->source].pop_front();
@@ -66,7 +66,7 @@ void Enactor::receiveStatus(const archlib::Status::ConstPtr& msg) {
 
     } else if (msg->content=="fail") {
         //apply strategy only if you have at least 10 executions information
-        if(executions[msg->source].size() < 50) {
+        if(executions[msg->source].size() < 100) {
             executions[msg->source].push_back(0);
         } else {
             executions[msg->source].pop_front();
@@ -94,8 +94,8 @@ void Enactor::apply_strategy(const std::string &component) {
         return;
     }*/
     std::cout << "reli[" << component << "] = "<< reliability[component] <<std::endl;
-    double Kp = 7;
-    double reference = 0.70;
+    double Kp = 200;
+    double reference = 0.80;
     double error = reference - reliability[component]; //error = Rref - Rcurr
     replicate_task[component] += (error>0)?ceil(Kp * error):floor(Kp*error);
 
@@ -109,7 +109,7 @@ void Enactor::apply_strategy(const std::string &component) {
 
     adapt.publish(msg);
 
-    //executions[component].clear();
+    executions[component].clear();
 }
 
 void Enactor::body(){

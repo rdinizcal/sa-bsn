@@ -2,7 +2,7 @@ from scipy import stats
 import csv 
 
 ################ load data ################
-with open("../data/summary.csv", newline='') as file:
+with open("../data/second_try/summary.csv", newline='') as file:
     s_csv = csv.reader(file, delimiter=',')
     summary = list(s_csv)
     del summary[0] # header1
@@ -45,4 +45,4 @@ with open("../data/summary.csv", newline='') as file:
         x = expected_behavior[tag]
         
         #print("%s p-value = %s" % (tag.replace("_", " "), stats.ttest_ind(x, y)))
-        print("%s p-value = %f" % (tag.replace("_", " "), stats.wilcoxon(x, y, zero_method='wilcox', correction=True)[1]) )
+        print("%s p-value = %f" % (tag.replace("_", " "), stats.wilcoxon(x, y, zero_method='wilcox', correction=False)[1]) )
