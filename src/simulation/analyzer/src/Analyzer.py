@@ -86,8 +86,8 @@ class Analyzer:
         print('Settling Time: %.2fs' % self.settling_time)
 
         #calculate overshoot
-        y_max = max(yi for yi in y[:stability_point])
-        self.overshoot = 100*(y_max - self.mean)/self.mean
+        #y_max = max(yi for yi in y[:stability_point])
+        self.overshoot = 100*(max(y) - self.mean)/self.mean
         print('Overshoot: %.2f%%' % self.overshoot)
 
         #calculate steady-state error
@@ -283,7 +283,7 @@ class Analyzer:
         scale = 10e-10
         ticks = ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(x*scale))
 
-        default_colors = ["#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf"]
+        default_colors = ["#17becf", "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#ff7f0e"]
         colors = dict()
         i = 0
         for tag in tasks:
@@ -305,11 +305,11 @@ class Analyzer:
             x_max  = local_status_timeseries[tag][last][0] if local_status_timeseries[tag][last][0] > x_max else x_max
 
         ## Then, plot the local reliabilities against time (same figure)
-        #i = 0
-        #for tag in local_reli_timeseries:
-        #    x = [el[0] for el in local_reli_timeseries[tag]]
-        #    y = [el[1] for el in local_reli_timeseries[tag]]
-        #    ax.plot(x, y, label=tag, color=colors[tag])
+        i = 0
+        for tag in local_reli_timeseries:
+            x = [el[0] for el in local_reli_timeseries[tag]]
+            y = [el[1] for el in local_reli_timeseries[tag]]
+            ax.plot(x, y, label=tag, color=colors[tag])
 
         ## Plot horizontal lines for setpoint
         ax.axhline(y=setpoint, linestyle='--', linewidth=0.7, color="black")
