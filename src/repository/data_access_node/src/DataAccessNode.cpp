@@ -2,17 +2,29 @@
 
 DataAccessNode::DataAccessNode(int  &argc, char **argv) :
     filepath(""),
-    logical_clock(0) {}
+    logical_clock(0),
+    first_persist(false) {}
 
 DataAccessNode::~DataAccessNode() {}
 
 void DataAccessNode::setUp() {
-    std::string path = ros::package::getPath("logger");
-    filepath = path + "/resource/logs/DataAccessNode-" + std::to_string(this->now()) + ".log";
+    //std::string path = ros::package::getPath("data_access_node");
+    //filepath = path + "/DataAccessNode-" + std::to_string(this->now()) + ".csv";
 
-    fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
-    fp << "timestamp module_name type battery_level frequency cost risk_status\n";
-    fp.close();
+    const char *homedir = getenv("HOME");
+		if(homedir == NULL) {
+			homedir = getpwuid(getuid())->pw_dir;
+		}
+
+    std::string path(homedir);
+
+    filepath += path;
+
+    filepath += "/DataAccessNodeData.csv";
+
+    fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::app);
+    //fp << "timestamp module_name type battery_level frequency cost risk_status\n";
+    //fp.close();
 
     info_dataaccessnode2learning_pub = handle.advertise<messages::LearningData>("learning_info", 10);
     info_dataaccessnode2controller_pub = handle.advertise<messages::ControllerInfo>("controller_info", 10);
@@ -20,7 +32,9 @@ void DataAccessNode::setUp() {
     ROS_INFO("Running DataAccessNode\n");
 }
 
-void DataAccessNode::tearDown() {}
+void DataAccessNode::tearDown() {
+    fp.close();
+}
 
 void DataAccessNode::run(){
     ros::Rate loop_rate(10);
@@ -28,6 +42,8 @@ void DataAccessNode::run(){
     ros::Subscriber receive_data = n.subscribe("persist", 1000, &DataAccessNode::receiveInfo, this);
 
     ros::spin();
+
+    return tearDown();
 }
 
 void DataAccessNode::sendControllerInfo() {
@@ -184,14 +200,14 @@ void DataAccessNode::receiveInfo(const messages::Info::ConstPtr& msg) {
 
     logical_clock++;
 
-    if(logical_clock % 2000 == 0) { //Maybe change size
+    if(logical_clock % 300 == 0) { //Maybe change size
         timestamp = componentData.getTimestamp();
         finishCycle(timestamp);
         persistComponentData();
     }
 }
 
-void DataAccessNode::sendLearningInfo() {
+/*void DataAccessNode::sendLearningInfo() {
     //Send info to learning block in a specific way
     std::map<std::string,std::vector<ComponentData>>::iterator componentMapIterator;
     messages::LearningData learning_data;
@@ -234,25 +250,58 @@ void DataAccessNode::sendLearningInfo() {
     }
 
     info_dataaccessnode2learning_pub.publish(learning_data);
-}
+}*/
 
 void DataAccessNode::persistComponentData() {
     std::map<std::string,std::vector<ComponentData>>::iterator componentMapIterator;
     std::vector<ComponentData>::iterator componentDataVectorIterator;
 
     sendControllerInfo();
-    sendLearningInfo();
+    //sendLearningInfo();
 
-    fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
+    std::string aux;
 
-    for(componentMapIterator = componentMap.begin();componentMapIterator != componentMap.end();++componentMapIterator) {
-        for(componentDataVectorIterator = componentMapIterator->second.begin();componentDataVectorIterator != componentMapIterator->second.end();++componentDataVectorIterator) {
-            fp << (*componentDataVectorIterator).toString();
+    if(first_persist == false) {
+        for(componentMapIterator = componentMap.begin();componentMapIterator != componentMap.end();++componentMapIterator) {
+            if(componentMapIterator->second.back().getType() != "centralhub") {
+                components_to_persist.push_back(componentMapIterator->first);
+                fp << componentMapIterator->second.back().getType() << "_DATA,";
+            } else {
+                aux = componentMapIterator->first;
+            }
         }
-        componentMap.erase(componentMapIterator);
+
+        components_to_persist.push_back(aux);
+        fp << "PATIENT_STATE\n";
+
+        first_persist = true;
     }
 
-    fp.close();
+    std::vector<std::string>::iterator persistIterator;
+
+    int index = 0;
+
+    componentMapIterator = componentMap.begin();
+
+    int size = componentMapIterator->second.size();
+
+    while(index < size) {
+        for(persistIterator = components_to_persist.begin();persistIterator != components_to_persist.end();++persistIterator) {
+            componentMapIterator = componentMap.find(*persistIterator);
+            if(componentMapIterator != componentMap.end()) {
+                if(*persistIterator != components_to_persist.back()) {
+                    fp << componentMapIterator->second.at(index).getRiskStatus() << ",";
+                } else {
+                    fp << componentMapIterator->second.at(index).getRiskStatus() << "\n";
+                }
+            }
+        }
+        index++;
+    }
+
+    for(componentMapIterator = componentMap.begin();componentMapIterator != componentMap.end();++componentMapIterator) {
+        componentMap.erase(componentMapIterator);
+    }
 }
 
 int64_t DataAccessNode::now() const{
