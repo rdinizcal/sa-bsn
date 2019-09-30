@@ -8,19 +8,19 @@ DataAccessNode::DataAccessNode(int  &argc, char **argv) :
 DataAccessNode::~DataAccessNode() {}
 
 void DataAccessNode::setUp() {
-    //std::string path = ros::package::getPath("data_access_node");
+    std::string path = ros::package::getPath("illness_identifier");
     //filepath = path + "/DataAccessNode-" + std::to_string(this->now()) + ".csv";
 
-    const char *homedir = getenv("HOME");
+    /*const char *homedir = getenv("HOME");
 		if(homedir == NULL) {
 			homedir = getpwuid(getuid())->pw_dir;
 		}
 
-    std::string path(homedir);
+    std::string path(homedir);*/
 
     filepath += path;
 
-    filepath += "/DataAccessNodeData.csv";
+    filepath += "/src/DataAccessNodeData.csv";
 
     fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::app);
     //fp << "timestamp module_name type battery_level frequency cost risk_status\n";

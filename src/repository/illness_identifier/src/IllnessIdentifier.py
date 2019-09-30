@@ -5,6 +5,7 @@ import math
 import rospy
 from collections import OrderedDict
 from messages.msg import LearningData
+import rospkg
 
 class IllnessIdentifier:
 
@@ -12,6 +13,11 @@ class IllnessIdentifier:
         self.status_dict_list = []
         self.features = []
         self.gains = {}
+        
+        rospack = rospkg.RosPack()
+
+        self.path = rospack.get_path('illness_identifier')
+        self.path = self.path + "/src/DataAccessNodeData.csv"
     
     '''------------------------------ Entropy ---------------------------'''
 
@@ -74,32 +80,14 @@ class IllnessIdentifier:
     
     ***************** Problems may be solved! (need testing) *****************
     '''
-    def receiveData(self, data):
-        self.features = []
-        for type in data.types:
-            #centralhub is PATIENT_STATUS
-            if "centralhub" in self.features:
-                if len(self.features > 1):
-                    self.features.insert(len(self.features)-2,type)
-                elif len(self.features == 1):
-                    self.features.insert(len(self.features)-1, type)
-            else:
-                self.features.append(type)
-
-        i = 0
-        counter = 0
-
-        while counter < len(data.type):
-            j = 0
-            aux_dict = {}
-            d = OrderedDict()
-            
-            for j in range(len(self.features)):
-                aux_dict[data.type[counter]] = data.risk_status[counter]
-                counter = counter + 1
-            
-            d.update(aux_dict)
-            self.status_dict_list.append(d)
+    def receiveData(self):
+        with open(self.path) as f:
+            read = csv.reader(f)
+            self.features = next(read)
+            i = 0
+        with open(self.path) as f:
+            reader = csv.DictReader(f)
+            self.status_dict_list = [r for r in reader]
         
         target_attr = self.features[-1]
         data = self.status_dict_list
@@ -122,8 +110,11 @@ class IllnessIdentifier:
 
     def listener(self):
         rospy.init_node("illness_identifier")
-
-        rospy.Subscriber("learning_info", LearningData, self.receiveData)
+        loop_rate = rospy.Rate(0.01)
+        loop_rate.sleep()
+        while not rospy.is_shutdown():
+            self.receiveData()
+            loop_rate.sleep()
 
 '''------------------------------ Main ---------------------------'''
 
@@ -132,4 +123,3 @@ if __name__ == '__main__':
     illness_identifier = IllnessIdentifier()
     
     illness_identifier.listener()
-    rospy.spin()
