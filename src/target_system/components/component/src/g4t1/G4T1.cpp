@@ -8,6 +8,7 @@ G4T1::G4T1(int &argc, char **argv, const std::string &name) :
     CentralHub(argc, argv, name, true, bsn::resource::Battery("ch_batt", 100, 100, 1) ),
     connect(true),
     database_url(),
+    lost_packt(false),
     patient_status(0.0) {}
 	
 G4T1::~G4T1() {}
@@ -114,22 +115,24 @@ void G4T1::collect(const messages::SensorData::ConstPtr& msg) {
         bpr_batt = std::to_string(batt);
     } 
 
-    ++buffer_size[type];
-    total_buffer_size = std::accumulate(std::begin(buffer_size), std::end(buffer_size), 0, std::plus<int>());
-
     if(buffer_size[type] < max_size){
         data_buffer[type].push_back(risk);
+        buffer_size[type] = data_buffer[type].size();
+        total_buffer_size = std::accumulate(std::begin(buffer_size), std::end(buffer_size), 0, std::plus<int>());
     } else {
         data_buffer[type].push_back(risk);
         data_buffer[type].erase(data_buffer[type].begin());//erase the first element to avoid overflow
-        throw std::domain_error("lost data due to package overflow");
+        lost_packt = true;
     }
 }
 
 void G4T1::process(){
     //battery.consume(BATT_UNIT*data_buffer.size());
-    patient_status = data_fuse(data_buffer);
-    --total_buffer_size;    
+    patient_status = data_fuse(data_buffer); // consumes 1 packt per sensor (in the buffers that have packages to be processed)
+    for (int i = 0; i < buffer_size.size(); ++i){ // update buffer sizes
+        buffer_size[i] = data_buffer[i].size();
+    }
+    total_buffer_size = std::accumulate(std::begin(buffer_size), std::end(buffer_size), 0, std::plus<int>()); //update total buffer size 
 
     std::vector<std::string> risks;
     risks = getPatientStatus();
@@ -156,5 +159,10 @@ void G4T1::transfer(){
     web::json::value json_obj; 
         json_obj["VitalData"] = web::json::value::string(makePacket());
         client.request(web::http::methods::PUT, U("/sessions/" + std::to_string(session) + ".json") ,json_obj);
+    }
+
+    if(lost_packt){
+        lost_packt = false;
+        throw std::domain_error("lost data due to package overflow");
     }
 }

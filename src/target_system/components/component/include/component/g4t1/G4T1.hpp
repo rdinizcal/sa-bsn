@@ -46,6 +46,7 @@ class G4T1 : public CentralHub {
         bool connect;
         std::string database_url;
         
+        bool lost_packt;
         double patient_status;
         int session;
 

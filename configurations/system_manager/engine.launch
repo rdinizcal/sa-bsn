@@ -1,0 +1,8 @@
+<launch> 
+    <node name="engine" pkg="adaptation_engine" type="engine" output="screen" />
+
+    <param name="frequency" value="0.1" /> <!--0.1 Hz-->
+
+    <param name="reliability" value="0.8" /> <!--100 Hz-->
+
+</launch>

@@ -8,8 +8,12 @@
 #include "ros/ros.h"
 #include "ros/package.h"
 
+#include "bsn/operation/Operation.hpp"
+
 #include "archlib/Status.h"
 #include "archlib/Event.h"
+#include "archlib/Strategy.h"
+#include "archlib/Exception.h"
 #include "archlib/AdaptationCommand.h"
 
 #include "archlib/ROSComponent.hpp"
@@ -31,6 +35,7 @@ class Enactor : public arch::ROSComponent {
 
 	  	void receiveStatus(const archlib::Status::ConstPtr& msg);
 	  	void receiveEvent(const archlib::Event::ConstPtr& msg);
+	  	void receiveStrategy(const archlib::Strategy::ConstPtr& msg);
 
 		void apply_strategy(const std::string &component);
 
@@ -38,13 +43,18 @@ class Enactor : public arch::ROSComponent {
 
   	private:
 		ros::Publisher adapt;
+		ros::Publisher except;
 
-		std::map<std::string, double> reliability;
-		std::map<std::string, std::deque<int>> executions; //a map of deques where 1s represent successes and 0s represents failures
+		std::map<std::string, double> r_curr;
+		std::map<std::string, double> r_ref;
+		std::map<std::string, double> kp;
+		std::map<std::string, std::deque<int>> invocations; //a map of deques where 1s represent successes and 0s represents failures
 		std::map<std::string, int> replicate_task;
-		std::vector<std::string> connected;
+		std::map<std::string, double> freq;
+		std::map<std::string, int> exception_buffer;
 
 		int64_t cycles;
+		double stability_margin;
 };
 
 #endif 

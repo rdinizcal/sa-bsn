@@ -141,7 +141,7 @@ void G3T1_2::transfer(const double &m_data) {
 
     data_pub.publish(msg);
     
-    //battery.consume(0.2);
+    //battery.consume(BATT_UNIT);
 
     ROS_INFO("risk calculated and transferred: [%.2f%%]", risk);
     

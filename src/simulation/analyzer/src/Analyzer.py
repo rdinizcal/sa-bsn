@@ -82,7 +82,7 @@ class Analyzer:
         print('Stability: %r' % self.stability)
 
         #calculate settling time
-        self.settling_time = float(x[stability_point] - x[0])/10e9
+        self.settling_time = float(x[stability_point] - x[0])/10e8
         print('Settling Time: %.2fs' % self.settling_time)
 
         #calculate overshoot
@@ -261,7 +261,7 @@ class Analyzer:
         ## discretizing the curve
         #[x,y] = self.discretize(x,y,1) #precision in ms
 
-        setpoint = 0.90
+        setpoint = 0.8
 
         xa = []
         ya = []
@@ -295,7 +295,7 @@ class Analyzer:
         ############################################## 
         ## First, plot the global reliability against time
         fig, ax = plt.subplots()
-        ax.plot(x, y, label='formula', color = "#1f77b4", linewidth=2)
+        ax.plot(x, y, label='BSN', color = "#1f77b4", linewidth=2)
         ax.set_ylim(0,1.05)
         ax.xaxis.set_major_formatter(ticks)
 
@@ -313,32 +313,32 @@ class Analyzer:
 
         ## Plot horizontal lines for setpoint
         ax.axhline(y=setpoint, linestyle='--', linewidth=0.7, color="black")
-        ax.text(-15, setpoint, "setpoint" , fontsize=8)
+        ax.text(x_max, setpoint, "setpoint" , fontsize=8)
         ax.axhline(y=self.mean*1.05, linestyle='--', linewidth=0.3, color="black")
         ax.axhline(y=self.mean, linestyle='-.', linewidth=0.5, color="black")
-        ax.axhline(y=self.mean*0.95, linestyle='--', linewidth=0.3, color="black")
+        ax.axhline(y=self.mean*0.95,   ' linestyle='--', linewidth=0.3, color="black")
 
         ## Insert labels, titles, texts, grid...
         mn = self.mean
         st = self.settling_time
         os = self.overshoot
         sse = self.sse 
-        fig.suptitle('Parametric Formula vs. Monitored')
-        #fig.suptitle('Reliability in time')
+        #fig.suptitle('Parametric Formula vs. Monitored')
+        fig.suptitle('Reliability in time')
         is_stable = "stable" if self.stability else "not stable" 
         subtitle = '%s: %s | converges to %.2f | ST = %.2fs | OS = %.2f%% | SSE = %.2f%%' % ("formula",is_stable,mn,st,os,sse)        
         fig.text(0.5, 0.92, subtitle, ha='center', color = "grey", fontsize=7) # subtitle
         fig.text(0.04, 0.5, 'Reliability', va='center', rotation='vertical')
         fig.text(0.5, 0.035, 'Time (s)', ha='center')
-        #fig.text(0.8, 0.020, self.file_id + '.log', ha='center', color = "grey", fontsize=6) # files used
-        #fig.text(0.8, 0.005, self.formula_id + '.formula', ha='center', color = "grey", fontsize=6) # files used
+        fig.text(0.8, 0.020, self.file_id + '.log', ha='center', color = "grey", fontsize=6) # files used
+        fig.text(0.8, 0.005, self.formula_id + '.formula', ha='center', color = "grey", fontsize=6) # files used
         ax.annotate('trigger adaptation', xy=(x_triggered, 0),
             xytext=(x_triggered/x_max, -0.1), textcoords='axes fraction',
             arrowprops=dict(facecolor='black', shrink=0.03),
             horizontalalignment='right', verticalalignment='top',
             )
-        #plt.grid()
-        #plt.legend()
+        plt.grid()
+        plt.legend()
         
         ##############################################
         #               Second Plot                  #
@@ -390,44 +390,43 @@ class Analyzer:
         #    if not (bsn_tag in discretized_status_timeseries): discretized_status_timeseries[bsn_tag] = [[instant, global_status_timeseries[instant]]]
         #    else : discretized_status_timeseries[bsn_tag].append([instant, global_status_timeseries[instant]])
 
-        reli_from_calc = list()
+        #reli_from_calc = list()
 
-        for instant in global_status_timeseries:
-            before_last_step = instant - res
+        #for instant in global_status_timeseries:
+        #    before_last_step = instant - res
+        #    aux = []
+        #    for x in global_status_timeseries:
+        #        if x > before_last_step and x <= instant:
+        #            aux.append(int(global_status_timeseries[x]))
 
-            aux = []
-            for x in global_status_timeseries:
-                if x > before_last_step and x <= instant:
-                    aux.append(int(global_status_timeseries[x]))
-
-            reli_from_calc.append([instant, sum(aux)/len(aux) if len(aux) > 0 else 0])
+        #    reli_from_calc.append([instant, sum(aux)/len(aux) if len(aux) > 0 else 0])
         
 
-        x = [pair[0] for pair in reli_from_calc]
-        y = [pair[1] for pair in reli_from_calc]
+        #x = [pair[0] for pair in reli_from_calc]
+        #y = [pair[1] for pair in reli_from_calc]
 
-        xa = []
-        ya = []
-        i = 0
-        for xi in x:
-            if xi >= x_triggered: 
-                xa.append(x[i])
-                ya.append(y[i])
-            i += 1
+        #xa = []
+        #ya = []
+        #i = 0
+        #for xi in x:
+        #    if xi >= x_triggered: 
+        #        xa.append(x[i])
+        #        ya.append(y[i])
+        #    i += 1
                 
-        self.analyze(xa, ya, setpoint)
+        #self.analyze(xa, ya, setpoint)
 
-        #fig, ax = plt.subplots()
-        ax.plot(x, y, label='monitored', color = "#ff7f0e", linewidth=2)
-        mn = self.mean
-        st = self.settling_time
-        os = self.overshoot
-        sse = self.sse 
-        is_stable = "stable" if self.stability else "not stable" 
-        subtitle = '%s: %s | converges to %.2f | ST = %.2fs | OS = %.2f%% | SSE = %.2f%%' % ("monitored",is_stable,mn,st,os,sse) 
-        fig.text(0.5, 0.89, subtitle, ha='center', color = "grey", fontsize=7) # subtitle
-        plt.grid()
-        plt.legend()
+        ##fig, ax = plt.subplots()
+        #ax.plot(x, y, label='monitored', color = "#ff7f0e", linewidth=2)
+        #mn = self.mean
+        #st = self.settling_time
+        #os = self.overshoot
+        #sse = self.sse 
+        #is_stable = "stable" if self.stability else "not stable" 
+        #subtitle = '%s: %s | converges to %.2f | ST = %.2fs | OS = %.2f%% | SSE = %.2f%%' % ("monitored",is_stable,mn,st,os,sse) 
+        #fig.text(0.5, 0.89, subtitle, ha='center', color = "grey", fontsize=7) # subtitle
+        #plt.grid()
+        #plt.legend()
         #ax.set_ylim(0,1.05)
         #ax.xaxis.set_major_formatter(ticks)
 
