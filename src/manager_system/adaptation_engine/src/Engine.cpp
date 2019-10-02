@@ -13,7 +13,7 @@ struct comp{
     }
 };
 
-Engine::Engine(int  &argc, char **argv, std::string name): ROSComponent(argc, argv, name), r_ref(0.9), stability_margin(0.05), reliability_expression(), strategy(),  priority(),  Kp(0.01), cycles(0), counter(0) {}
+Engine::Engine(int  &argc, char **argv, std::string name): ROSComponent(argc, argv, name), r_ref(0.9), stability_margin(0.02), reliability_expression(), strategy(),  priority(),  Kp(0.01), cycles(0), counter(0) {}
 
 Engine::~Engine() {}
 
@@ -301,7 +301,12 @@ void Engine::plan() {
 
         //reset offset
         for (std::vector<std::string>::iterator it = r_vec.begin(); it != r_vec.end(); ++it) {
-            strategy[*it] = r_curr*0.50;
+            if(error>0){
+                strategy[*it] = r_curr*0.50;
+            } else if(error<0) {
+                strategy[*it] = (r_curr*1.5>1)?1:r_curr*1.5;
+                
+            }
         }
         double r_new = calculate_reli(); // set offset
 

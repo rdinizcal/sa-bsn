@@ -1,6 +1,6 @@
 #include "enactor/Enactor.hpp"
 
-Enactor::Enactor(int  &argc, char **argv, std::string name) : ROSComponent(argc, argv, name), cycles(0), stability_margin(0.05) {}
+Enactor::Enactor(int  &argc, char **argv, std::string name) : ROSComponent(argc, argv, name), cycles(0), stability_margin(0.02) {}
 
 Enactor::~Enactor() {}
 

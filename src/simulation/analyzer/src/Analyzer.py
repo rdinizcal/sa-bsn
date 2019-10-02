@@ -23,6 +23,7 @@ class Analyzer:
     def __init__(self, argc, argv):
         self.file_id = argv[1]
         self.formula_id = argv[2]
+        self.stability_margin = 0.02
         self.stability = False
         self.settling_time = 0
         self.overshoot = 0
@@ -61,8 +62,8 @@ class Analyzer:
         self.mean = mean(val for val in y[int(3*len(x)/4):]) # last quarter of the curve, lets hope it sufficses
         print('Converge to: %.2f' % self.mean)
 
-        lower_bound = self.mean*0.95
-        upper_bound = self.mean*1.05
+        lower_bound = self.mean*(1-self.stability_margin)
+        upper_bound = self.mean*(1+self.stability_margin)
 
         # calculate stability point
         pos = 0
@@ -261,7 +262,7 @@ class Analyzer:
         ## discretizing the curve
         #[x,y] = self.discretize(x,y,1) #precision in ms
 
-        setpoint = 0.8
+        setpoint = 0.92
 
         xa = []
         ya = []
@@ -296,7 +297,7 @@ class Analyzer:
         ## First, plot the global reliability against time
         fig, ax = plt.subplots()
         ax.plot(x, y, label='BSN', color = "#1f77b4", linewidth=2)
-        ax.set_ylim(0,1.05)
+        ax.set_ylim(0,(1+self.stability_margin))
         ax.xaxis.set_major_formatter(ticks)
 
         x_max = 0
@@ -314,9 +315,9 @@ class Analyzer:
         ## Plot horizontal lines for setpoint
         ax.axhline(y=setpoint, linestyle='--', linewidth=0.7, color="black")
         ax.text(x_max, setpoint, "setpoint" , fontsize=8)
-        ax.axhline(y=self.mean*1.05, linestyle='--', linewidth=0.3, color="black")
+        ax.axhline(y=self.mean*(1+self.stability_margin), linestyle='--', linewidth=0.3, color="black")
         ax.axhline(y=self.mean, linestyle='-.', linewidth=0.5, color="black")
-        ax.axhline(y=self.mean*0.95,   ' linestyle='--', linewidth=0.3, color="black")
+        ax.axhline(y=self.mean*(1-self.stability_margin), linestyle='--', linewidth=0.3, color="black")
 
         ## Insert labels, titles, texts, grid...
         mn = self.mean
@@ -345,7 +346,7 @@ class Analyzer:
         ############################################## 
         # Second, plot the local uncertainty inputs against time (second figure)
         #fig, ax = plt.subplots()
-        #ax.set_ylim(0,1.05)
+        #ax.set_ylim(0,(1+self.stability_margin))
         #ax.xaxis.set_major_formatter(ticks)
 #
         #for tag in input_timeseries:
@@ -427,7 +428,7 @@ class Analyzer:
         #fig.text(0.5, 0.89, subtitle, ha='center', color = "grey", fontsize=7) # subtitle
         #plt.grid()
         #plt.legend()
-        #ax.set_ylim(0,1.05)
+        #ax.set_ylim(0,(1+self.stability_margin))
         #ax.xaxis.set_major_formatter(ticks)
 
         ##Then plot horizontal lines
