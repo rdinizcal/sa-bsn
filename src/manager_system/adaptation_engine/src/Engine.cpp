@@ -13,20 +13,20 @@ struct comp{
     }
 };
 
-Engine::Engine(int  &argc, char **argv, std::string name): ROSComponent(argc, argv, name), r_ref(0.9), stability_margin(0.02), reliability_expression(), strategy(),  priority(),  Kp(0.01), cycles(0), counter(0) {}
+Engine::Engine(int  &argc, char **argv, std::string name): ROSComponent(argc, argv, name), r_ref(0.9), stability_margin(0.02), offset(0), info_quant(0), monitor_freq(1), actuation_freq(1), reliability_expression(), strategy(),  priority(),  Kp(0.01), cycles(0) {}
 
 Engine::~Engine() {}
 
 void Engine::setUp() {
     ros::NodeHandle nh;
 
-    double freq;
-	nh.getParam("frequency", freq);
-	rosComponentDescriptor.setFreq(freq);
-
-    double ref;
-	nh.getParam("reliability", ref);
-	r_ref = ref;
+	nh.getParam("setpoint", r_ref);
+	nh.getParam("offset", offset);
+	nh.getParam("gain", Kp);
+	nh.getParam("info_quant", info_quant);
+	nh.getParam("monitor_freq", monitor_freq);
+    rosComponentDescriptor.setFreq(monitor_freq);
+	nh.getParam("actuation_freq", actuation_freq);
 
     enact = handle.advertise<archlib::Strategy>("strategy", 10);
 
@@ -119,7 +119,8 @@ double Engine::calculate_reli() {
  * ***************************************************************
 */ 
 void Engine::monitor() {
-    std::cout << "it is monitoring..." << std::endl;
+    std::cout << "[monitoring]" << std::endl;
+    cycles++;
 
     // request system status data for the knowledge repository
     ros::NodeHandle client_handler;
@@ -138,7 +139,7 @@ void Engine::monitor() {
     /*request reliability status for all tasks*/
     archlib::DataAccessRequest r_srv;
     r_srv.request.name = ros::this_node::getName();
-    r_srv.request.query = "all:status:100";
+    r_srv.request.query = "all:status:"+std::to_string(info_quant);
 
     if(!client_module.call(r_srv)) {
         ROS_ERROR("Failed to connect to data access node.");
@@ -229,7 +230,7 @@ void Engine::monitor() {
  * ***************************************************************
 */ 
 void Engine::analyze() {
-    std::cout << "and analyzing..." << std::endl;
+    std::cout << "[analyze]" << std::endl;
 
     //std::cout << "strategy: [";
     //for (std::map<std::string,double>::iterator itt = strategy.begin(); itt != strategy.end(); ++itt) {
@@ -241,9 +242,8 @@ void Engine::analyze() {
     double error = r_ref - r_curr;
     // if the error is out of the stability margin, plan!
     if((error > r_ref*stability_margin) || (error < -stability_margin*r_ref)){
-        if(++counter > 10){
-            blacklist.push_back(active_strategy);
-            counter = 0;
+        if(cycles >= monitor_freq/actuation_freq){
+            cycles = 0;
             plan();
         }
     }
@@ -255,7 +255,7 @@ void Engine::analyze() {
  * ***************************************************************
 */
 void Engine::plan() {
-    std::cout << "and planning..." << std::endl;
+    std::cout << "[plan]" << std::endl;
 
     std::cout << "r_ref= " << r_ref << std::endl;
     double r_curr = calculate_reli();
@@ -294,7 +294,7 @@ void Engine::plan() {
     std::cout << "]" << std::endl;
 
     // ladies and gentleman, the search...
-    std::cout << "offset=" << calculate_reli() << std::endl;
+
     std::vector<std::map<std::string, double>> solutions;
     for(std::vector<std::string>::iterator i = r_vec.begin(); i != r_vec.end(); ++i) { 
         //std::cout <<"i: "<< *i << std::endl;
@@ -302,13 +302,13 @@ void Engine::plan() {
         //reset offset
         for (std::vector<std::string>::iterator it = r_vec.begin(); it != r_vec.end(); ++it) {
             if(error>0){
-                strategy[*it] = r_curr*0.50;
+                strategy[*it] = r_curr*(1-offset);
             } else if(error<0) {
-                strategy[*it] = (r_curr*1.5>1)?1:r_curr*1.5;
-                
+                strategy[*it] = (r_curr*(1+offset)>1)?1:r_curr*(1+offset);
             }
         }
         double r_new = calculate_reli(); // set offset
+        std::cout << "offset=" << r_new << std::endl;
 
         std::map<std::string,double> prev;
         double r_prev=0;
@@ -331,7 +331,6 @@ void Engine::plan() {
         strategy = prev;
         r_new = calculate_reli();
 
-
         for(std::vector<std::string>::iterator j = r_vec.begin(); j != r_vec.end(); ++j) { // all the others
             if(*i == *j) continue;
             //std::cout <<"j: "<< *j << std::endl;
@@ -342,14 +341,14 @@ void Engine::plan() {
                     r_prev = r_new;
                     strategy[*j] += Kp*error;
                     r_new = calculate_reli();
-                } while(r_new < r_ref && r_prev < r_new && strategy[*i] > 0 && strategy[*i] < 1);
+                } while(r_new < r_ref && r_prev < r_new && strategy[*j] > 0 && strategy[*j] < 1);
             } else if (error < 0) {
                 do {
                     prev = strategy;
                     r_prev = r_new;
                     strategy[*j] += Kp*error;
                     r_new = calculate_reli();
-                } while(r_new > r_ref && r_prev > r_new && strategy[*i] > 0 && strategy[*i] < 1);
+                } while(r_new > r_ref && r_prev > r_new && strategy[*j] > 0 && strategy[*j] < 1);
             }
             
             strategy = prev;
@@ -386,7 +385,7 @@ void Engine::plan() {
  * ***************************************************************
 */
 void Engine::execute() {
-    std::cout << "and executed!" << std::endl;
+    std::cout << "[execute]" << std::endl;
 
     std::string content = "";
     size_t index = 0;
@@ -420,8 +419,6 @@ void Engine::execute() {
         aux.clear();
     }
 
-    active_strategy = strategy;
-
     //remove last ';'
     if(flagO) content.pop_back();
 
@@ -440,13 +437,10 @@ void Engine::execute() {
 void Engine::body(){
     ros::NodeHandle n;
     ros::Subscriber t_sub = n.subscribe("exception", 1000, &Engine::receiveException, this);
+
     ros::Rate loop_rate(rosComponentDescriptor.getFreq());
     while(ros::ok){
-        ++cycles;
-        if(cycles == 10*rosComponentDescriptor.getFreq()) { // monitors every 1sec
-            monitor();
-            cycles=0;
-        }
+        monitor();
         ros::spinOnce();
         loop_rate.sleep();        
     }   

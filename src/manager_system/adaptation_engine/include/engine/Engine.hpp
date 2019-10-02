@@ -58,14 +58,16 @@ class Engine : public arch::ROSComponent {
 
 	private:
 		double r_ref;
+		double offset;
+		double Kp;
+		double info_quant;
+		double monitor_freq;
+		double actuation_freq;
 		double stability_margin;
+
 		bsn::model::Formula reliability_expression;
 		std::map<std::string, double> strategy;
 		std::map<std::string, int> priority;
-		std::map<std::string, double> active_strategy;
-		std::vector<std::map<std::string, double>> blacklist;
-
-		double Kp;
 
 		ros::NodeHandle handle;
 		ros::Publisher enact;

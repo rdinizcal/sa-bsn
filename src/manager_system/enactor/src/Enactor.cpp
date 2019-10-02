@@ -25,12 +25,25 @@ void Enactor::receiveEvent(const archlib::Event::ConstPtr& msg) {
 
         invocations[msg->source] = {};
         r_curr[msg->source] = 1;
-        r_ref[msg->source] = 0.8;
+        r_ref[msg->source] = 0.80;
         kp[msg->source] = 200;
         replicate_task[msg->source] = 1;
         freq[msg->source] = 20;
         exception_buffer[msg->source] = 0;
 
+        /*
+        if(msg->source=="/g3t1_1"){
+            r_ref[msg->source] = 0.680054;
+        } else if (msg->source=="/g3t1_2") {
+            r_ref[msg->source] = 0.606458;
+        } else if (msg->source=="/g3t1_3") {
+            r_ref[msg->source] = 0.606458;
+        } else if (msg->source=="/g3t1_4") {
+            r_ref[msg->source] = 1;
+        } else if (msg->source=="/g4t1") {
+            r_ref[msg->source] = 0.999528;
+        }
+        */
 
     } else if (msg->content=="deactivate") {
 

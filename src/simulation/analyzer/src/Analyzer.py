@@ -23,7 +23,7 @@ class Analyzer:
     def __init__(self, argc, argv):
         self.file_id = argv[1]
         self.formula_id = argv[2]
-        self.stability_margin = 0.02
+        self.stability_margin = 0.03
         self.stability = False
         self.settling_time = 0
         self.overshoot = 0
@@ -262,7 +262,7 @@ class Analyzer:
         ## discretizing the curve
         #[x,y] = self.discretize(x,y,1) #precision in ms
 
-        setpoint = 0.92
+        setpoint = 0.95
 
         xa = []
         ya = []
@@ -314,7 +314,7 @@ class Analyzer:
 
         ## Plot horizontal lines for setpoint
         ax.axhline(y=setpoint, linestyle='--', linewidth=0.7, color="black")
-        ax.text(x_max, setpoint, "setpoint" , fontsize=8)
+        ax.text(0.9*x_max, setpoint, "setpoint" , fontsize=8)
         ax.axhline(y=self.mean*(1+self.stability_margin), linestyle='--', linewidth=0.3, color="black")
         ax.axhline(y=self.mean, linestyle='-.', linewidth=0.5, color="black")
         ax.axhline(y=self.mean*(1-self.stability_margin), linestyle='--', linewidth=0.3, color="black")
@@ -348,14 +348,11 @@ class Analyzer:
         #fig, ax = plt.subplots()
         #ax.set_ylim(0,(1+self.stability_margin))
         #ax.xaxis.set_major_formatter(ticks)
-#
         #for tag in input_timeseries:
         #    x = [el[0] for el in input_timeseries[tag]]
         #    y = [el[1] for el in input_timeseries[tag]]
-#
         #    ax.plot(x,y, label=tag, color=colors[tag])
-#
-        #fig.suptitle('Noise injection inputs')
+        #fig.suptitle('Uncertainty injection inputs')
         #fig.text(0.04, 0.5, 'Noise percentage', va='center', rotation='vertical')
         #fig.text(0.5, 0.035, 'Time (s)', ha='center')
         #plt.grid()

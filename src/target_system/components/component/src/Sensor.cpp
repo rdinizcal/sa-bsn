@@ -94,10 +94,10 @@ void Sensor::reconfigure(const archlib::AdaptationCommand::ConstPtr& msg) {
 
         if(param[0]=="freq"){
             double new_freq =  stod(param[1]);
-            if(new_freq>5 && new_freq<35) rosComponentDescriptor.setFreq(new_freq);
+            if(new_freq>5 && new_freq<25) rosComponentDescriptor.setFreq(new_freq);
         } else if (param[0]=="replicate_collect") {
             int new_replicate_collect = stoi(param[1]);
-            if(new_replicate_collect>1 && new_replicate_collect<250) replicate_collect = new_replicate_collect;
+            if(new_replicate_collect>1 && new_replicate_collect<200) replicate_collect = new_replicate_collect;
         }
     }
 }
