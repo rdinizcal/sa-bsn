@@ -236,10 +236,11 @@ void G4T1::sendStatus(const std::string &id, const double &value) {}
 void G4T1::body() {
     ros::NodeHandle nh;
     
-    ros::Subscriber thermometerSub = nh.subscribe("thermometer_data", 10, &G4T1::receiveSensorData, this);
-    ros::Subscriber oximeterSub = nh.subscribe("oximeter_data", 10, &G4T1::receiveSensorData, this);
-    ros::Subscriber ecgSub = nh.subscribe("ecg_data", 10, &G4T1::receiveSensorData, this);
-    ros::Subscriber diastolicSub = nh.subscribe("bpm_data", 10, &G4T1::receiveSensorData, this);
+    thermometerSub = nh.subscribe("thermometer_data", 10, &G4T1::receiveSensorData, this);
+    oximeterSub = nh.subscribe("oximeter_data", 10, &G4T1::receiveSensorData, this);
+    ecgSub = nh.subscribe("ecg_data", 10, &G4T1::receiveSensorData, this);
+    diastolicSub = nh.subscribe("bpm_data", 10, &G4T1::receiveSensorData, this);
 
-    ros::spin();
+    //ros::spin();
+    ros::getGlobalCallbackQueue()->callAvailable();
 }

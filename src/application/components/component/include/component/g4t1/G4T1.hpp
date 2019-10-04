@@ -10,6 +10,7 @@
 #include <cpprest/json.h>
 #include <ros/package.h>
 #include "ros/ros.h"
+#include <ros/callback_queue.h>
 
 #include "bsn/processor/Processor.hpp"
 #include "bsn/operation/Operation.hpp"
@@ -72,6 +73,11 @@ class G4T1 : public SchedulableComponent {
 
         ros::Publisher info_pub;
         ros::NodeHandle handle;
+
+        ros::Subscriber thermometerSub;
+        ros::Subscriber oximeterSub;
+        ros::Subscriber ecgSub;
+        ros::Subscriber diastolicSub;
 };
 
 #endif 
