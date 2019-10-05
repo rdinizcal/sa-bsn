@@ -186,7 +186,6 @@ void G4T1::receiveSensorData(const messages::SensorData::ConstPtr& msg) {
         }
     }
 
-    
     risks = getPatientStatus();
     trm_risk = risks[0];
     ecg_risk = risks[1];
@@ -212,7 +211,7 @@ void G4T1::receiveSensorData(const messages::SensorData::ConstPtr& msg) {
     
     content += "risk:";
     content += ((patient_status>=66)?"CRITICAL STATE":"NORMAL STATE");
-
+    //content += ((patient_status>=25)?"CRITICAL STATE":"NORMAL STATE");
     infoMsg.source = moduleDescriptor.getName();
     infoMsg.target = "/repository";
     infoMsg.content = content;

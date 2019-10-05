@@ -22,7 +22,7 @@ void DataAccessNode::setUp() {
 
     filepath += "/src/DataAccessNodeData.csv";
 
-    fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::app);
+    fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
     //fp << "timestamp module_name type battery_level frequency cost risk_status\n";
     //fp.close();
 

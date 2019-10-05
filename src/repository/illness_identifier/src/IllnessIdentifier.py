@@ -81,28 +81,31 @@ class IllnessIdentifier:
     ***************** Problems may be solved! (need testing) *****************
     '''
     def receiveData(self):
-        with open(self.path) as f:
-            read = csv.reader(f)
-            self.features = next(read)
-            i = 0
-        with open(self.path) as f:
-            reader = csv.DictReader(f)
-            self.status_dict_list = [r for r in reader]
-        
-        target_attr = self.features[-1]
-        data = self.status_dict_list
-        attr = self.features
+        try:
+            with open(self.path) as f:
+                read = csv.reader(f)
+                self.features = next(read)
+                i = 0
+            with open(self.path) as f:
+                reader = csv.DictReader(f)
+                self.status_dict_list = [r for r in reader]
+            
+            target_attr = self.features[-1]
+            data = self.status_dict_list
+            attr = self.features
 
-        ent = self.entropy(data, target_attr)
-        print("\n\n--------------------------------------------------------------")
-        print("Shannon's Entropy of class '"+self.features[-1]+"': ",ent)
-        print("--------------------------------------------------------------\n")
-        
-        for item in range(0, len(attr)-1):
-    ##        gain(self.status_dict_list, self.features[item], self.features[-1])
-            print(attr[item]+"'s information gain:",self.gain(data, attr[item], target_attr))
-            item+=1
-        print("\n------------------------------------------------------------\n")
+            ent = self.entropy(data, target_attr)
+            print("\n\n--------------------------------------------------------------")
+            print("Shannon's Entropy of class '"+self.features[-1]+"': ",ent)
+            print("--------------------------------------------------------------\n")
+            
+            for item in range(0, len(attr)-1):
+        ##        gain(self.status_dict_list, self.features[item], self.features[-1])
+                print(attr[item]+"'s information gain:",self.gain(data, attr[item], target_attr))
+                item+=1
+            print("\n------------------------------------------------------------\n")
+        except:
+            print("Cannot open csv file")
 
     '''------------------------------ Listener ---------------------------------'''
 
@@ -113,6 +116,9 @@ class IllnessIdentifier:
         loop_rate = rospy.Rate(0.01)
         loop_rate.sleep()
         while not rospy.is_shutdown():
+            self.status_dict_list = []
+            self.features = []
+            self.gains = {}
             self.receiveData()
             loop_rate.sleep()
 
