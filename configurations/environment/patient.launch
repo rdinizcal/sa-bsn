@@ -2,7 +2,21 @@
     <!-- Blood Oxigenation Measurement Sensor -->    
     <node name="patient" pkg="patient" type="patient" output="screen" />    
 
-    <param name="vitalSigns" value="oxigenation, heart_frequency, temperature, systolic_pressure, diastolic_pressure" />
+    <param name="vitalSigns" value="oxigenation, heart_rate, temperature, systolic_pressure, diastolic_pressure" />
+
+    <!-- Frequency for changes in states of each markov in Hertz -->
+    <param name="oxigenation_Change" value="0.2"/>
+    <param name="heart_rate_Change" value="0.1"/>
+    <param name="temperature_Change" value="0.1"/>
+    <param name="systolic_pressure_Change" value="0.1"/>
+    <param name="diastolic_pressure_Change" value="0.1"/>
+
+    <!-- Offsets for each changes, in seconds -->
+    <param name="oxigenation_Offset" value="10"/>
+    <param name="heart_rate_Offset" value="10"/>
+    <param name="temperature_Offset" value="10"/>
+    <param name="systolic_pressure_Offset" value="10"/>
+    <param name="diastolic_pressure_Offset" value="10"/>
 
     <!-- Markov chain for oxigenation -->
     <param name="oxigenation_State0" value="0,0,0,0,0" />
@@ -19,18 +33,18 @@
     <param name="oxigenation_HighRisk1" value="0,55" />
 
     <!-- Markov chain for heart frequency -->
-    <param name="heart_frequency_State0" value="72,21,4,2,1" />
-    <param name="heart_frequency_State1" value="14,61,19,4,2" />
-    <param name="heart_frequency_State2" value="1,17,60,20,2" />
-    <param name="heart_frequency_State3" value="0,2,15,70,13" />
-    <param name="heart_frequency_State4" value="0,0,2,20,77" />
+    <param name="heart_rate_State0" value="72,21,4,2,1" />
+    <param name="heart_rate_State1" value="14,61,19,4,2" />
+    <param name="heart_rate_State2" value="1,17,60,20,2" />
+    <param name="heart_rate_State3" value="0,2,15,70,13" />
+    <param name="heart_rate_State4" value="0,0,2,20,77" />
 
     <!-- Risk values for heart frequency -->
-    <param name="heart_frequency_HighRisk0" value="0,70" />
-    <param name="heart_frequency_MidRisk0" value="70,85" />
-    <param name="heart_frequency_LowRisk" value="85,97" />
-    <param name="heart_frequency_MidRisk1" value="97,115" />
-    <param name="heart_frequency_HighRisk1" value="115,300" />
+    <param name="heart_rate_HighRisk0" value="0,70" />
+    <param name="heart_rate_MidRisk0" value="70,85" />
+    <param name="heart_rate_LowRisk" value="85,97" />
+    <param name="heart_rate_MidRisk1" value="97,115" />
+    <param name="heart_rate_HighRisk1" value="115,300" />
 
     <!-- Markov chain for temperature -->
     <param name="temperature_State0" value="25,51,21,3,0" />

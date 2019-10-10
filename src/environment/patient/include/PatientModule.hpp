@@ -19,4 +19,9 @@ class PatientModule {
         bsn::generator::DataGenerator configureDataGenerator(const std::string& vitalSign);
 
         std::map<std::string, bsn::generator::DataGenerator> patientData;
+        std::map<std::string, double> vitalSignsFrequencies;
+        std::map<std::string, double> vitalSignsChanges;
+        std::map<std::string, double> vitalSignsOffsets;
+
+        double frequency;
 };

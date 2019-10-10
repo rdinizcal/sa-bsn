@@ -85,7 +85,7 @@ double G3T1_2::collect() {
     ros::ServiceClient client = handle.serviceClient<services::PatientData>("getPatientData");
     services::PatientData srv;
 
-    srv.request.vitalSign = "heart_frequency";
+    srv.request.vitalSign = "heart_rate";
 
     if (client.call(srv)) {
         m_data = srv.response.data;

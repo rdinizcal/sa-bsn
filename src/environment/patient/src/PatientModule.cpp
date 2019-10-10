@@ -6,11 +6,13 @@ PatientModule::~PatientModule() {}
 
 void PatientModule::setUp() {
     srand(time(NULL));
+    frequency = -1e9+7;
 
     // TODO change Operation to static namespace
     bsn::operation::Operation op;
     std::string vitalSigns;
     ros::NodeHandle handle;
+    double aux;
 
     // Get what vital signs this module will simulate
     handle.getParam("vitalSigns", vitalSigns);
@@ -19,6 +21,14 @@ void PatientModule::setUp() {
     vitalSigns.erase(std::remove(vitalSigns.begin(), vitalSigns.end(),' '), vitalSigns.end());
 
     std::vector<std::string> splittedVitalSigns = op.split(vitalSigns, ',');
+
+    for (std::string s : splittedVitalSigns) {
+        vitalSignsFrequencies[s] = 0;
+        handle.getParam(s + "_Change", aux);
+        frequency = std::max(frequency, aux);
+        vitalSignsChanges[s] = 1/aux;
+        handle.getParam(s + "_Offset", vitalSignsOffsets[s]);
+    }
 
     // For each vital sign, build its data generator
     for (const std::string& s : splittedVitalSigns) {
@@ -80,14 +90,33 @@ bool PatientModule::getPatientData(services::PatientData::Request &request,
                                 services::PatientData::Response &response) {
     
     response.data = patientData[request.vitalSign].getValue();
+    
+    std::cout << "Send " + request.vitalSign + " data." << std::endl;
 
     return true;
 }
 
 void PatientModule::run() {
     ros::NodeHandle handle;
+
+    ros::Rate rate(frequency);
     ros::ServiceServer service = handle.advertiseService("getPatientData", &PatientModule::getPatientData, this);
 
-    ros::spin();
+    double period = 1/frequency;
+
+    while (ros::ok()) {
+        for (auto &p : vitalSignsFrequencies) {
+            if (p.second >= (vitalSignsChanges[p.first] + vitalSignsOffsets[p.first])) {
+                patientData[p.first].nextState();
+                p.second = vitalSignsOffsets[p.first];
+                std::cout << "Changed " + p.first + " state." << std::endl;
+            } else {
+                p.second += period;
+            }
+        }     
+
+        ros::spinOnce();
+        rate.sleep();
+    }
 }
 

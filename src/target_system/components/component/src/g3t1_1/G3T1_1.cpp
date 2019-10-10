@@ -76,7 +76,7 @@ void G3T1_1::setUp() {
 
         sensorConfig = SensorConfiguration(0, low_range, midRanges, highRanges, percentages);
     }
-
+    
 }
 
 void G3T1_1::tearDown() {
