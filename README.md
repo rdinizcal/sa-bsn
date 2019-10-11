@@ -2,7 +2,7 @@
 
 This is a Body Sensor Network implementation on ROS. So far, the BSN was used for experimentation on solutions for adaptation on the Self-Adaptive Software Systems domain, refer to https://arxiv.org/pdf/1804.00994.pdf and https://arxiv.org/pdf/1905.02228.pdf for more information.  The following instructions will guide you to to compile, deploy and run the BSN on Linux Ubuntu 18.04 with ROS Melodic distributions. We have not yet tested on other distributions. Also, it is strongly advised to use catkin for managing the ROS packages, refer to http://wiki.ros.org/ROS/Tutorials/InstallingandConfiguringROSEnvironment after installing ROS Melodic.
 
-Dependencies:
+## Dependencies:
 * https://github.com/rdinizcal/lepton
 * https://github.com/rdinizcal/libbsn
 * https://github.com/Microsoft/cpprestsdk
@@ -10,7 +10,7 @@ Dependencies:
 
 Once ALL the dependencies have been successfully installed,
 
-Compile:
+## Compiling
 
 1. Clone the repository inside the 'catkin_ws/src' directory:
 ```
@@ -23,6 +23,7 @@ git clone https://github.com/rdinizcal/bsn_ros
 cd ~/catkin_ws/ && 
 catkin_make
 ``` 
+## Configuration and Execution
 
 3. Configure roslaunch files for personalized execution under '/catkin_ws/src/bsn_ros/configurations';
 
