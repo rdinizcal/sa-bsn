@@ -176,7 +176,9 @@ void G4T1::receiveSensorData(const messages::SensorData::ConstPtr& msg) {
         int32_t sensor_id = get_sensor_id(type);
         data[sensor_id] = msg->data;
     
-        data_list[sensor_id].push_back(risk);
+        if(0 <= risk <= 100.0) {
+            data_list[sensor_id].push_back(risk);
+        }
 
         patient_status = data_fuse(data_list);
 
@@ -210,8 +212,24 @@ void G4T1::receiveSensorData(const messages::SensorData::ConstPtr& msg) {
     content += "cost:,";
     
     content += "risk:";
-    content += ((patient_status>=66)?"CRITICAL STATE":"NORMAL STATE");
-    //content += ((patient_status>=25)?"CRITICAL STATE":"NORMAL STATE");
+
+    std::string patient_risk;
+
+    if(patient_status <= 20) {
+        patient_risk = "VERY LOW RISK";
+    } else if(patient_status > 20 && patient_status <= 40) {
+        patient_risk = "LOW RISK";
+    } else if(patient_status > 40 && patient_status <= 60) {
+        patient_risk = "MODERATE RISK";
+    } else if(patient_status > 60 && patient_status <= 80) {
+        patient_risk = "CRITICAL RISK";
+    } else if(patient_status > 80 && patient_status <= 100) {
+        patient_risk = "VERY CRITICAL RISK";
+    }
+
+    //content += ((patient_status>=66)?"CRITICAL STATE":"NORMAL STATE");
+    content += patient_risk;
+
     infoMsg.source = moduleDescriptor.getName();
     infoMsg.target = "/repository";
     infoMsg.content = content;
@@ -224,7 +242,8 @@ void G4T1::receiveSensorData(const messages::SensorData::ConstPtr& msg) {
     std::cout << "| ECG_RISK: " << ecg_risk << std::endl;
     std::cout << "| OXIM_RISK: " << oxi_risk << std::endl;
     std::cout << "| BPRESS_RISK: " << bpr_risk << std::endl;
-    std::cout << "| PACIENT_STATE:" << ((patient_status>=66)?"CRITICAL STATE":"NORMAL STATE") << std::endl;
+    std::cout << "| PACIENT_RISK:" << patient_risk << std::endl;
+    //std::cout << "| PACIENT_STATE:" << ((patient_status>=66)?"CRITICAL STATE":"NORMAL STATE") << std::endl;
     std::cout << "*****************************************" << std::endl;
 }
 
