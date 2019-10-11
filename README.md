@@ -14,18 +14,21 @@ Compile:
 
 1. Clone the repository inside the 'catkin_ws/src' directory:
 ```
+cd ~/catkin_ws/src/ && 
 git clone https://github.com/rdinizcal/bsn_ros
 ``` 
 
-2. Then, compile:
+2. Then, compile under 'catkin_ws' directory:
 ```
-cd ../ && catkin_make
+cd ~/catkin_ws/ && 
+catkin_make
 ``` 
 
 3. Configure roslaunch files for personalized execution under '/catkin_ws/src/bsn_ros/configurations';
 
 4. Execute the BSN either by executing the pre-set run.sh file, that executes all nodes:
 ```
+cd ~/catkin_ws/src/bsn_ros/ && 
 bash run.sh
 ``` 
 or use roslaunch x.launch to execute a single node.
