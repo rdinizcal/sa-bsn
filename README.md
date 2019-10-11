@@ -8,7 +8,7 @@ This is a Body Sensor Network implementation on ROS. So far, the BSN was used fo
 * https://github.com/Microsoft/cpprestsdk
 * https://github.com/arch
 
-Once ALL the dependencies have been successfully installed,
+Once ALL the dependencies have been successfully installed, you can proceed to the next steps.
 
 ## Compiling
 
@@ -27,12 +27,12 @@ catkin_make
 
 3. Configure roslaunch files for personalized execution under '/catkin_ws/src/bsn_ros/configurations';
 
-4. Execute the BSN either by executing the pre-set run.sh file, that executes all nodes:
+4. Execute the BSN either by executing the pre-set run.sh file, that executes all nodes, 
+or use roslaunch x.launch to execute a single node:
 ```
 cd ~/catkin_ws/src/bsn_ros/ && 
 bash run.sh
 ``` 
-or use roslaunch x.launch to execute a single node.
 
 ## Authors
 
