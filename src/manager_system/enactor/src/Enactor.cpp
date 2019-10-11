@@ -131,12 +131,7 @@ void Enactor::apply_strategy(const std::string &component) {
                     freq[it->first] += (error>0)?((-kp[it->first]/100) * error):((-kp[it->first]/100) * error); 
                     if(freq[(it->first)] <= 0) break;
                     archlib::AdaptationCommand msg;
-                    msg.source = ros::this_node::getName();
-                    std::string node_namespace = ros::this_node::getNamespace();
-                    // std::cout << msg.source << std::endl;
-                    // ROS_INFO("%s", msg.source.c_str());
-                    size_t pos = msg.source.find(node_namespace);
-                    msg.source.replace(pos, node_namespace.length(), "");
+                    msg.source = getRosNodeName(ros::this_node::getName(), ros::this_node::getNamespace());
                     msg.target = it->first;
                     msg.action = "freq=" + std::to_string(freq[(it->first)]);
                     adapt.publish(msg);
@@ -148,12 +143,7 @@ void Enactor::apply_strategy(const std::string &component) {
             replicate_task[component] += (error>0)?ceil(kp[component]*error):floor(kp[component]*error);
             if(replicate_task[component] < 1) replicate_task[component] = 1;
             archlib::AdaptationCommand msg;
-            msg.source = ros::this_node::getName();
-            std::string node_namespace = ros::this_node::getNamespace();
-            // std::cout << msg.source << std::endl;
-            // ROS_INFO("%s", msg.source.c_str());
-            size_t pos = msg.source.find(node_namespace);
-            msg.source.replace(pos, node_namespace.length(), "");
+            msg.source = getRosNodeName(ros::this_node::getName(), ros::this_node::getNamespace());
             msg.target = component;
             msg.action = "replicate_collect=" + std::to_string(replicate_task[(component)]);
             adapt.publish(msg);
@@ -165,24 +155,14 @@ void Enactor::apply_strategy(const std::string &component) {
 
     if(exception_buffer[component]>4){
         archlib::Exception msg;
-        msg.source = ros::this_node::getName();
-        std::string node_namespace = ros::this_node::getNamespace();
-        // std::cout << msg.source << std::endl;
-        // ROS_INFO("%s", msg.source.c_str());
-        size_t pos = msg.source.find(node_namespace);
-        msg.source.replace(pos, node_namespace.length(), "");
+        msg.source = getRosNodeName(ros::this_node::getName(), ros::this_node::getNamespace());
         msg.target = "/engine";
         msg.content = component+"=1";
         except.publish(msg);
         exception_buffer[component] = 0;
     } else if (exception_buffer[component]<-4) {
         archlib::Exception msg;
-        msg.source = ros::this_node::getName();
-        std::string node_namespace = ros::this_node::getNamespace();
-        // std::cout << msg.source << std::endl;
-        // ROS_INFO("%s", msg.source.c_str());
-        size_t pos = msg.source.find(node_namespace);
-        msg.source.replace(pos, node_namespace.length(), "");
+        msg.source = getRosNodeName(ros::this_node::getName(), ros::this_node::getNamespace());
         msg.target = "/engine";
         msg.content = component+"=-1";
         except.publish(msg);
