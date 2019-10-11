@@ -132,6 +132,11 @@ void Enactor::apply_strategy(const std::string &component) {
                     if(freq[(it->first)] <= 0) break;
                     archlib::AdaptationCommand msg;
                     msg.source = ros::this_node::getName();
+                    std::string node_namespace = ros::this_node::getNamespace();
+                    // std::cout << msg.source << std::endl;
+                    // ROS_INFO("%s", msg.source.c_str());
+                    size_t pos = msg.source.find(node_namespace);
+                    msg.source.replace(pos, node_namespace.length(), "");
                     msg.target = it->first;
                     msg.action = "freq=" + std::to_string(freq[(it->first)]);
                     adapt.publish(msg);
@@ -144,6 +149,11 @@ void Enactor::apply_strategy(const std::string &component) {
             if(replicate_task[component] < 1) replicate_task[component] = 1;
             archlib::AdaptationCommand msg;
             msg.source = ros::this_node::getName();
+            std::string node_namespace = ros::this_node::getNamespace();
+            // std::cout << msg.source << std::endl;
+            // ROS_INFO("%s", msg.source.c_str());
+            size_t pos = msg.source.find(node_namespace);
+            msg.source.replace(pos, node_namespace.length(), "");
             msg.target = component;
             msg.action = "replicate_collect=" + std::to_string(replicate_task[(component)]);
             adapt.publish(msg);
@@ -156,6 +166,11 @@ void Enactor::apply_strategy(const std::string &component) {
     if(exception_buffer[component]>4){
         archlib::Exception msg;
         msg.source = ros::this_node::getName();
+        std::string node_namespace = ros::this_node::getNamespace();
+        // std::cout << msg.source << std::endl;
+        // ROS_INFO("%s", msg.source.c_str());
+        size_t pos = msg.source.find(node_namespace);
+        msg.source.replace(pos, node_namespace.length(), "");
         msg.target = "/engine";
         msg.content = component+"=1";
         except.publish(msg);
@@ -163,6 +178,11 @@ void Enactor::apply_strategy(const std::string &component) {
     } else if (exception_buffer[component]<-4) {
         archlib::Exception msg;
         msg.source = ros::this_node::getName();
+        std::string node_namespace = ros::this_node::getNamespace();
+        // std::cout << msg.source << std::endl;
+        // ROS_INFO("%s", msg.source.c_str());
+        size_t pos = msg.source.find(node_namespace);
+        msg.source.replace(pos, node_namespace.length(), "");
         msg.target = "/engine";
         msg.content = component+"=-1";
         except.publish(msg);

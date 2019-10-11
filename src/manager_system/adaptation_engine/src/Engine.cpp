@@ -139,6 +139,11 @@ void Engine::monitor() {
     /*request reliability status for all tasks*/
     archlib::DataAccessRequest r_srv;
     r_srv.request.name = ros::this_node::getName();
+    std::string node_namespace = ros::this_node::getNamespace();
+    // std::cout << r_srv.request.name << std::endl;
+    // ROS_INFO("%s", r_srv.request.name.c_str());
+    size_t pos = r_srv.request.name.find(node_namespace);
+    r_srv.request.name.replace(pos, node_namespace.length(), "");
     r_srv.request.query = "all:status:"+std::to_string(info_quant);
 
     if(!client_module.call(r_srv)) {
@@ -184,6 +189,11 @@ void Engine::monitor() {
     //request context status for all tasks
     archlib::DataAccessRequest c_srv;
     c_srv.request.name = ros::this_node::getName();
+    // std::string node_namespace = ros::this_node::getNamespace();
+    // std::cout << c_srv.request.name << std::endl;
+    // ROS_INFO("%s", c_srv.request.name.c_str());
+    // size_t pos = c_srv.request.name.find(node_namespace);
+    c_srv.request.name.replace(pos, node_namespace.length(), "");
     c_srv.request.query = "all:event:1";
 
     if(!client_module.call(c_srv)) {
@@ -424,6 +434,11 @@ void Engine::execute() {
 
     archlib::Strategy msg;
     msg.source = ros::this_node::getName();
+    std::string node_namespace = ros::this_node::getNamespace();
+    // std::cout << msg.source << std::endl;
+    // ROS_INFO("%s", msg.source.c_str());
+    size_t pos = msg.source.find(node_namespace);
+    msg.source.replace(pos, node_namespace.length(), "");
     msg.target = "/enactor";
     msg.content = content;
 
