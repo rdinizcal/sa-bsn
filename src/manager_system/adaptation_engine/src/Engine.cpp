@@ -138,7 +138,7 @@ void Engine::monitor() {
 
     /*request reliability status for all tasks*/
     archlib::DataAccessRequest r_srv;
-    r_srv.request.name = ros::this_node::getName();
+    r_srv.request.name = getRosNodeName(ros::this_node::getName(), ros::this_node::getNamespace());
     r_srv.request.query = "all:status:"+std::to_string(info_quant);
 
     if(!client_module.call(r_srv)) {
@@ -183,7 +183,7 @@ void Engine::monitor() {
 
     //request context status for all tasks
     archlib::DataAccessRequest c_srv;
-    c_srv.request.name = ros::this_node::getName();
+    c_srv.request.name = getRosNodeName(ros::this_node::getName(), ros::this_node::getNamespace());
     c_srv.request.query = "all:event:1";
 
     if(!client_module.call(c_srv)) {
@@ -423,7 +423,7 @@ void Engine::execute() {
     if(flagO) content.pop_back();
 
     archlib::Strategy msg;
-    msg.source = ros::this_node::getName();
+    msg.source = getRosNodeName(ros::this_node::getName(), ros::this_node::getNamespace());
     msg.target = "/enactor";
     msg.content = content;
 

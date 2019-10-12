@@ -79,7 +79,7 @@ void Injector::body() {
 void Injector::inject(const std::string &component, const std::string &content){
     archlib::Uncertainty msg;
 
-    msg.source = ros::this_node::getName();
+    msg.source = getRosNodeName(ros::this_node::getName(), ros::this_node::getNamespace());
     msg.target = "/"+component;
     msg.content = content;
 

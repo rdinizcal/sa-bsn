@@ -1,7 +1,7 @@
 CMAKE_MINIMUM_REQUIRED (VERSION 2.8.3)
 PROJECT(component)
 
-add_compile_options(-std=c++11)
+add_compile_options(-std=c++11 -g)
 
 ## Find catkin and any catkin packages
 FIND_PACKAGE(catkin REQUIRED COMPONENTS roscpp std_msgs genmsg messages archlib)

@@ -16,12 +16,7 @@ int32_t Sensor::run() {
 
 	setUp();
 
-    std::string node_name = ros::this_node::getName();
-    std::cout << node_name << std::endl;
-    ROS_INFO("%s", node_name);
-    node_name = node_name.replace(node_name.begin(), node_name.begin()+3, "");
-    
-    std::cout << node_name << std::endl;
+    std::string node_name = getRosNodeName(ros::this_node::getName(), ros::this_node::getNamespace());
     ros::NodeHandle nh;
     ros::Subscriber noise_subs = nh.subscribe("uncertainty_"+node_name, 10, &Sensor::injectUncertainty, this);
     ros::Subscriber reconfig_subs = nh.subscribe("reconfigure_"+node_name, 10, &Sensor::reconfigure, this);
