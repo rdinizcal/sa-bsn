@@ -11,7 +11,7 @@ class ComponentData {
     	      virtual ~ComponentData();
 
             ComponentData(const ComponentData &);
-    	      ComponentData &operator=(const ComponentData &);
+    	      void operator=(const ComponentData &);
 
             void setTimestamp(double &timestamp);
             double getTimestamp() const;

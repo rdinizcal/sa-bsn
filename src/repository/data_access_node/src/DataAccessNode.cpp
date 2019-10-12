@@ -49,15 +49,15 @@ void DataAccessNode::run(){
 void DataAccessNode::sendControllerInfo() {
     messages::ControllerInfo info;
 
-    std::map<std::string,std::vector<ComponentData>>::iterator it;
+    std::map<std::string,ComponentData>::iterator it;
 
     int i = 0;
 
     for(it = componentMap.begin();it != componentMap.end();++it) {
-        if(it->second.back().getType() != "centralhub") { //Test purposes, centralhub does not send relevant controller info until now!
+        if(it->second.getType() != "centralhub") { //Test purposes, centralhub does not send relevant controller info until now!
             info.module_name.push_back(it->first);
 
-            ComponentData component = it->second.back();
+            ComponentData component = it->second;
 
             info.battery_level.push_back(component.getBatteryLevel());
             info.cost.push_back(component.getCost());
@@ -79,11 +79,14 @@ void DataAccessNode::sendControllerInfo() {
 
 void DataAccessNode::parse(std::string content, ComponentData& component) {
     std::string aux = "";
+    std::string component_type = "";
     bool isValue = false;
+    bool isType = true;
     int valueCounter = 0;
 
     char separator = ',';
     char delimiter = ':';
+    char type_separator = '_';
 
     double valueHolder;
 
@@ -119,155 +122,124 @@ void DataAccessNode::parse(std::string content, ComponentData& component) {
                         component.setCost(valueHolder);
                         break;
                     case 6:
+                        if(component.getType() != "centralhub") {
+                            component.setRiskStatus(aux);
+                        }
+                }
+
+                /*if(component.getType() != "centralhub" && valueCounter == 6) {
+                    std::cout << "##################################### INFO ######################################" << std::endl;
+                    std::cout << "content: " << content << std::endl;
+                    std::cout << "timestamp: " << component.getTimestamp() << std::endl;
+                    std::cout << "name: " << component.getName() << std::endl;
+                    std::cout << "type: " << component.getType() << std::endl;
+                    std::cout << "battery: " << component.getBatteryLevel() << std::endl;
+                    std::cout << "frequency: " << component.getFrequency() << std::endl;
+                    std::cout << "cost: " << component.getCost() << std::endl;
+                    std::cout << "risk: " << component.getRiskStatus() << std::endl;
+                    std::cout << "#################################################################################" << std::endl;
+                }*/
+
+                if(component.getType() == "centralhub" && valueCounter >= 6) {
+                    if(component_type == "centralhub") {
                         component.setRiskStatus(aux);
+                    }
+
+                    std::map<std::string, std::vector<std::string>>::iterator risks_iterator;
+                    bool no_entry = false;
+
+                    risks_iterator = risks.find(component_type);
+                    
+                    size_t this_size = 0;
+
+                    if(risks_iterator == risks.end()) {
+                        no_entry = true;     
+                    } else {
+                        this_size = risks_iterator->second.size();
+                    }
+
+                    size_t max_size = -1;
+
+                    for(risks_iterator = risks.begin();risks_iterator != risks.end();++risks_iterator) {
+                        if(risks_iterator->second.size() > max_size) {
+                            max_size = risks_iterator->second.size();
+                        }
+                    }
+
+                    if(this_size < max_size - 1) {
+                        int diff = max_size - this_size;
+                        std::string stat = "undefined";
+                        for(int j = 0;j < diff;j++) {
+                            risks[component_type].push_back(stat);
+                        }
+                    }
+
+                    risks[component_type].push_back(aux);
                 }
             }
 
             valueCounter++;
             aux.clear();
+            component_type.clear();
             isValue = false;
+            isType = true;
         }
 
         if(isValue) {
             aux += (*it);
+        } else {
+            if((*it) != separator) {
+                if(isType) {
+                    if((*it) != type_separator) {
+                        component_type += (*it);
+                    } else {
+                        isType = false;
+                    }
+                }
+            }
         }
 
         if((*it) == delimiter) {
             isValue = true;
         }
     }
-} 
-
-void DataAccessNode::finishCycle(double &timestamp) {
-    std::map<std::string,std::vector<ComponentData>>::iterator componentMapIterator;
-    std::vector<std::string>::iterator componentsInCycleIterator;
-
-    for(componentMapIterator = componentMap.begin();componentMapIterator != componentMap.end();++componentMapIterator) {
-        componentsInCycleIterator = std::find(components_in_cycle.begin(), components_in_cycle.end(), componentMapIterator->first);
-
-        if(componentsInCycleIterator == components_in_cycle.end() && componentMapIterator->second.size() > 0) {
-            ComponentData component(componentMapIterator->second.back());
-
-            component.setTimestamp(timestamp);
-        
-            componentMapIterator->second.push_back(component);
-        }
-    }
-
-    components_in_cycle.clear();
 }
 
 void DataAccessNode::receiveInfo(const messages::Info::ConstPtr& msg) {
     ComponentData componentData;
-    std::vector<std::string>::iterator componentsInCycleIterator;
 
     parse(msg->content, componentData);
 
     ROS_INFO("I heard: [%s]", msg->content.c_str());
 
-    int size = componentMap[componentData.getName()].size();
-    
-    if(size == 0) { //Making vector sizes equal
-        int max_size = 0;
-        std::map<std::string,std::vector<ComponentData>>::iterator componentMapIterator;
-        for(componentMapIterator = componentMap.begin();componentMapIterator != componentMap.end();++componentMapIterator) {
-            if(componentMapIterator->second.size() > max_size) {
-                max_size = componentMapIterator->second.size();
-            }
-        }
-
-        if(max_size > 1) {
-            ComponentData dummy_data(componentData);
-
-            for(int i = 0;i < max_size-1;i++) {
-                componentMap[componentData.getName()].push_back(dummy_data);
-            }
-        }
+    if(componentData.getRiskStatus() != "undefined") {
+        componentMap[componentData.getName()] = componentData;
+    } else {
+        std::string actual_risk = componentMap[componentData.getName()].getRiskStatus();
+        componentData.setRiskStatus(actual_risk);
+        componentMap[componentData.getName()] = componentData;
     }
-
-    double timestamp;
-
-    componentsInCycleIterator = std::find(components_in_cycle.begin(), components_in_cycle.end(), componentData.getName());
-
-    if(componentsInCycleIterator != components_in_cycle.end()) {
-        timestamp = componentMap[componentData.getName()][size-1].getTimestamp();
-        finishCycle(timestamp);
-    }
-
-    componentMap[componentData.getName()].push_back(componentData);
-
-    components_in_cycle.push_back(componentData.getName());
 
     logical_clock++;
 
-    if(logical_clock % 300 == 0) { //Maybe change size
-        timestamp = componentData.getTimestamp();
-        finishCycle(timestamp);
+    if(logical_clock % 100 == 0) { //Maybe change size
         persistComponentData();
     }
 }
 
-/*void DataAccessNode::sendLearningInfo() {
-    //Send info to learning block in a specific way
-    std::map<std::string,std::vector<ComponentData>>::iterator componentMapIterator;
-    messages::LearningData learning_data;
-    
-    int i = 0;
-
-    componentMapIterator = componentMap.begin();
-
-    int size = componentMapIterator->second.size();
-
-    std::string aux;
-
-    while(i < size) {
-        for(componentMapIterator = componentMap.begin();componentMapIterator != componentMap.end();++componentMapIterator) {
-            if(componentMapIterator->second.back().getType() != "centralhub") {
-                if(i == 0) {
-                    learning_data.types.push_back(componentMapIterator->second.at(i).getType());
-                }
-
-                learning_data.type.push_back(componentMapIterator->second.at(i).getType());
-
-                learning_data.risk_status.push_back(componentMapIterator->second.at(i).getRiskStatus());
-            } else {
-                aux = componentMapIterator->first;
-            }
-        }
-        
-        componentMapIterator = componentMap.find(aux);
-
-        if(componentMapIterator != componentMap.end()) {
-            if(i == 0) {
-                learning_data.types.push_back(componentMapIterator->second.at(i).getType());
-            }
-
-            learning_data.type.push_back(componentMapIterator->second.at(i).getType());
-            learning_data.risk_status.push_back(componentMapIterator->second.at(i).getRiskStatus());
-        }
-        
-        i++;
-    }
-
-    info_dataaccessnode2learning_pub.publish(learning_data);
-}*/
-
 void DataAccessNode::persistComponentData() {
-    std::map<std::string,std::vector<ComponentData>>::iterator componentMapIterator;
-    std::vector<ComponentData>::iterator componentDataVectorIterator;
-
     sendControllerInfo();
-    //sendLearningInfo();
 
     std::string aux;
 
+    std::map<std::string, std::vector<std::string>>::iterator risks_iterator;
+    
     if(first_persist == false) {
-        for(componentMapIterator = componentMap.begin();componentMapIterator != componentMap.end();++componentMapIterator) {
-            if(componentMapIterator->second.back().getType() != "centralhub") {
-                components_to_persist.push_back(componentMapIterator->first);
-                fp << componentMapIterator->second.back().getType() << "_DATA,";
+        for(risks_iterator = risks.begin();risks_iterator != risks.end();++risks_iterator) {
+            if(risks_iterator->first != "centralhub") {
+                fp << risks_iterator->first << "_DATA,";
             } else {
-                aux = componentMapIterator->first;
+                aux = risks_iterator->first;
             }
         }
 
@@ -277,30 +249,29 @@ void DataAccessNode::persistComponentData() {
         first_persist = true;
     }
 
-    std::vector<std::string>::iterator persistIterator;
+    risks_iterator = risks.begin();
+
+    int size = risks_iterator->second.size();
+
+    std::string r;
 
     int index = 0;
 
-    componentMapIterator = componentMap.begin();
-
-    int size = componentMapIterator->second.size();
-
     while(index < size) {
-        for(persistIterator = components_to_persist.begin();persistIterator != components_to_persist.end();++persistIterator) {
-            componentMapIterator = componentMap.find(*persistIterator);
-            if(componentMapIterator != componentMap.end()) {
-                if(*persistIterator != components_to_persist.back()) {
-                    fp << componentMapIterator->second.at(index).getRiskStatus() << ",";
-                } else {
-                    fp << componentMapIterator->second.at(index).getRiskStatus() << "\n";
-                }
+        for(risks_iterator = risks.begin();risks_iterator != risks.end();++risks_iterator) {
+            if(risks_iterator->first != "centralhub") {
+                fp << risks_iterator->second.at(index) << ",";
+            } else {
+                r = risks_iterator->second.at(index);
             }
         }
+        fp << r << "\n";
         index++;
+
     }
 
-    for(componentMapIterator = componentMap.begin();componentMapIterator != componentMap.end();++componentMapIterator) {
-        componentMap.erase(componentMapIterator);
+    for(risks_iterator = risks.begin();risks_iterator != risks.end();++risks_iterator) {
+        risks.erase(risks_iterator);
     }
 }
 

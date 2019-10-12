@@ -56,6 +56,7 @@ class G4T1 : public SchedulableComponent {
 
         std::array<double, 5> data;
         std::vector<std::list<double>> data_list;
+        std::vector<double> data_vector;
         double patient_status;
         int session;
 
@@ -77,6 +78,7 @@ class G4T1 : public SchedulableComponent {
         ros::Subscriber thermometerSub;
         ros::Subscriber oximeterSub;
         ros::Subscriber ecgSub;
+        ros::Subscriber systolicSub;
         ros::Subscriber diastolicSub;
 };
 

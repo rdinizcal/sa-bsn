@@ -13,6 +13,16 @@ ComponentData::ComponentData(const ComponentData &obj) :
     cost(obj.getCost()),
     risk_status(obj.getRiskStatus()) {}
 
+void ComponentData::operator=(const ComponentData& component) {
+    this->timestamp = component.getTimestamp();
+    this->name = component.getName();
+    this->type = component.getType();
+    this->battery_level = component.getBatteryLevel();
+    this->frequency = component.getFrequency();
+    this->cost = component.getCost();
+    this->risk_status = component.getRiskStatus();
+}
+
 void ComponentData::setTimestamp(double &timestamp) {
     this->timestamp = timestamp;
 }

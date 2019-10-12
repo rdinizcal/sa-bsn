@@ -13,6 +13,7 @@ G4T1::G4T1(const int32_t &argc, char **argv) :
     path("centralhub_output.csv"),
     data(),
     data_list(5),
+    data_vector({-1,-1,-1,-1,-1}),
     patient_status(0.0) {}
 	
 G4T1::~G4T1() {}
@@ -116,9 +117,11 @@ std::vector<std::string> G4T1::getPatientStatus() {
     std::string trm;
     std::string acc;
 
-    for (int i = 0; i < 4; i++) {
-        double sensor_risk = data_list[i].back();
+    double bpr_r = 0.0;
 
+    for (int i = 0; i < 5; i++) {
+        //double sensor_risk = data_list[i].back();
+        double sensor_risk = data_vector.at(i);
 
         if (sensor_risk > 0 && sensor_risk <= 20) {
             sensor_risk_str = "low risk";
@@ -127,7 +130,7 @@ std::vector<std::string> G4T1::getPatientStatus() {
         } else if (sensor_risk > 65 && sensor_risk <= 100) {
             sensor_risk_str = "high risk";
         } else {
-            sensor_risk_str = "unknown";
+            sensor_risk_str = "undefined";
         }
 
         if (i==0) {
@@ -139,14 +142,31 @@ std::vector<std::string> G4T1::getPatientStatus() {
         } else if (i == 2) {
             oxi = sensor_risk_str;
             oxi_risk = std::to_string(sensor_risk);
-        } else if (i == 3) {
-            bpr = sensor_risk_str;
-            bpr_risk = std::to_string(sensor_risk);
+        } else if (i == 3 || i == 4) {
+            if(sensor_risk != -1) {
+                bpr_r += sensor_risk;
+            }
         } else {
             acc = sensor_risk_str;
             acc_risk = std::to_string(sensor_risk);
         }
     }
+
+    //bloodpressure risk calculated as average between systolic and diastolic
+    bpr_r /= 2;
+
+    if (bpr_r > 0 && bpr_r <= 20) {
+        sensor_risk_str = "low risk";
+    } else if (bpr_r > 20 && bpr_r <= 65) {
+        sensor_risk_str = "moderate risk";
+    } else if (bpr_r > 65 && bpr_r <= 100) {
+        sensor_risk_str = "high risk";
+    } else {
+        sensor_risk_str = "undefined";
+    }
+
+    bpr = sensor_risk_str;
+    bpr_risk = std::to_string(bpr_r);
 
     std::vector<std::string> v = {trm, ecg, oxi, bpr, acc};  
     return v;
@@ -160,7 +180,8 @@ void G4T1::receiveSensorData(const messages::SensorData::ConstPtr& msg) {
     web::http::client::http_client client(U(database_url));
     web::json::value json_obj; 
 
-    std::cout << "Received data from " + type << std::endl; 
+    std::cout << "Received data from " + type << std::endl;
+    std::cout << "risk: " << msg->risk << std::endl;
 
     if (type=="thermometer"){
         trm_batt = std::to_string(batt);
@@ -172,15 +193,15 @@ void G4T1::receiveSensorData(const messages::SensorData::ConstPtr& msg) {
         bpr_batt = std::to_string(batt);
     } 
 
-    if(type != "null" && int32_t(risk) != -1) {  
+    //if(type != "null" && int32_t(risk) != -1) {  
+    if(type != "null") {
         int32_t sensor_id = get_sensor_id(type);
         data[sensor_id] = msg->data;
     
-        if(0 <= risk <= 100.0) {
-            data_list[sensor_id].push_back(risk);
-        }
-
-        patient_status = data_fuse(data_list);
+        data_list[sensor_id].push_back(risk);
+        data_vector.at(sensor_id) = risk;
+        //patient_status = data_fuse(data_list);
+        patient_status = data_fuse(data_vector);
 
         if (connect) {
             json_obj["VitalData"] = web::json::value::string(makePacket());
@@ -211,7 +232,7 @@ void G4T1::receiveSensorData(const messages::SensorData::ConstPtr& msg) {
     //content += "cost:"+std::to_string((0.1 + 0.1*filter.getRange() + 0.1 + 0.2))+",";
     content += "cost:,";
     
-    content += "risk:";
+    content += "centralhub_risk:";
 
     std::string patient_risk;
 
@@ -228,7 +249,23 @@ void G4T1::receiveSensorData(const messages::SensorData::ConstPtr& msg) {
     }
 
     //content += ((patient_status>=66)?"CRITICAL STATE":"NORMAL STATE");
-    content += patient_risk;
+    content += patient_risk + ",";
+
+    for(int i = 0;i < risks.size()-1;i++) {
+        switch(i) {
+            case 0:
+                content += "thermometer_risk:" + risks[i] + ",";
+                break;
+            case 1:
+                content += "ecg_risk:" + risks[i] + ",";
+                break;
+            case 2:
+                content += "oximeter_risk:" + risks[i] + ",";
+                break;
+            case 3:
+                content += "bloodpressure_risk:" + risks[i];
+        }
+    }
 
     infoMsg.source = moduleDescriptor.getName();
     infoMsg.target = "/repository";
@@ -257,7 +294,8 @@ void G4T1::body() {
     thermometerSub = nh.subscribe("thermometer_data", 10, &G4T1::receiveSensorData, this);
     oximeterSub = nh.subscribe("oximeter_data", 10, &G4T1::receiveSensorData, this);
     ecgSub = nh.subscribe("ecg_data", 10, &G4T1::receiveSensorData, this);
-    diastolicSub = nh.subscribe("bpm_data", 10, &G4T1::receiveSensorData, this);
+    systolicSub = nh.subscribe("systolic_data", 10, &G4T1::receiveSensorData, this);
+    diastolicSub = nh.subscribe("diastolic_data", 10, &G4T1::receiveSensorData, this);
 
     //ros::spin();
     ros::getGlobalCallbackQueue()->callAvailable();

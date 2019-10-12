@@ -209,7 +209,7 @@ void G3T1_4::transferSystolic(const double &m_data) {
     messages::SensorData msg;
     ros::NodeHandle handle;
 
-    data_pub = handle.advertise<messages::SensorData>("systolic_data", 10);
+    data_pub = handle.advertise<messages::SensorData>("oximeter_data", 10);
 
     systolic_risk = sensorConfigSystolic.evaluateNumber(m_data);
     battery.consume(0.1);
@@ -231,7 +231,7 @@ void G3T1_4::transferDiastolic(const double &m_data) {
     messages::SensorData msg;
     ros::NodeHandle handle;
 
-    data_pub = handle.advertise<messages::SensorData>("diastolic_data", 10);
+    data_pub = handle.advertise<messages::SensorData>("oximeter_data", 10);
 
     diastolic_risk = sensorConfigDiastolic.evaluateNumber(m_data);
     battery.consume(0.1);
@@ -249,7 +249,6 @@ void G3T1_4::transferDiastolic(const double &m_data) {
 }
 
 void G3T1_4::transfer(const double &m_data) {
-
     
     transferSystolic(systolic_data);
     transferDiastolic(diastolic_data);

@@ -38,9 +38,7 @@ class DataAccessNode {
 		void sendControllerInfo();
 
 		void parse(std::string, ComponentData&);
-		void finishCycle(double &timestamp);
 	  	void receiveInfo(const messages::Info::ConstPtr& /*msg*/);
-		//void sendLearningInfo();
 		void persistComponentData();
 
 		int64_t now() const;
@@ -50,7 +48,7 @@ class DataAccessNode {
 
 		ros::NodeHandle handle;
 
-		std::map<std::string, std::vector<ComponentData>> componentMap;
+		std::map<std::string, ComponentData> componentMap;
 		std::vector<std::string> components_in_cycle;
 		std::vector<std::string> components_to_persist;
 
@@ -60,6 +58,8 @@ class DataAccessNode {
 		std::string filepath;
 		int logical_clock;
 		bool first_persist;
+
+		std::map<std::string, std::vector<std::string>> risks;
 };
 
 #endif 
