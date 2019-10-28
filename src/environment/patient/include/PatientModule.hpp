@@ -4,15 +4,18 @@
 #include "bsn/range/Range.hpp"
 #include <string>
 #include "services/PatientData.h"
+#include <ros/console.h>
 
-class PatientModule {
+#include "archlib/ROSComponent.hpp"
+
+class PatientModule : public arch::ROSComponent {
     public:
-        PatientModule();
+        PatientModule(int &argc, char **argv, std::string name);
         ~PatientModule();
 
         void setUp();
         void tearDown();
-        void run();
+        void body();
 
     private:
         bool getPatientData(services::PatientData::Request &request, services::PatientData::Response &response);
@@ -24,4 +27,6 @@ class PatientModule {
         std::map<std::string, double> vitalSignsOffsets;
 
         double frequency;
+        double period;
+        ros::NodeHandle nh;
 };

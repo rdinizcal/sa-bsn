@@ -2,6 +2,8 @@
     <!-- Blood Oxigenation Measurement Sensor -->    
     <node name="patient" pkg="patient" type="patient" output="screen" />    
 
+    <param name="frequency" value="10" />
+
     <param name="vitalSigns" value="oxigenation, heart_rate, temperature, systolic_pressure, diastolic_pressure" />
 
     <!-- Frequency for changes in states of each markov in Hertz -->

@@ -1,12 +1,11 @@
 #include <PatientModule.hpp>
 
-PatientModule::PatientModule() {}
+PatientModule::PatientModule(int  &argc, char **argv, std::string name) : ROSComponent(argc, argv, name) {}
 
 PatientModule::~PatientModule() {}
 
 void PatientModule::setUp() {
     srand(time(NULL));
-    frequency = -1e9+7;
 
     // TODO change Operation to static namespace
     bsn::operation::Operation op;
@@ -15,7 +14,8 @@ void PatientModule::setUp() {
     double aux;
 
     // Get what vital signs this module will simulate
-    handle.getParam("vitalSigns", vitalSigns);
+    nh.getParam("vitalSigns", vitalSigns);
+    nh.getParam("frequency", frequency);
 
     // Removes white spaces from vitalSigns
     vitalSigns.erase(std::remove(vitalSigns.begin(), vitalSigns.end(),' '), vitalSigns.end());
@@ -24,16 +24,17 @@ void PatientModule::setUp() {
 
     for (std::string s : splittedVitalSigns) {
         vitalSignsFrequencies[s] = 0;
-        handle.getParam(s + "_Change", aux);
+        nh.getParam(s + "_Change", aux);
         frequency = std::max(frequency, aux);
         vitalSignsChanges[s] = 1/aux;
-        handle.getParam(s + "_Offset", vitalSignsOffsets[s]);
+        nh.getParam(s + "_Offset", vitalSignsOffsets[s]);
     }
 
     // For each vital sign, build its data generator
     for (const std::string& s : splittedVitalSigns) {
         patientData[s] = configureDataGenerator(s);
     }
+    rosComponentDescriptor.setFreq(frequency);
 }
 
 bsn::generator::DataGenerator PatientModule::configureDataGenerator(const std::string& vitalSign) {
@@ -96,27 +97,20 @@ bool PatientModule::getPatientData(services::PatientData::Request &request,
     return true;
 }
 
-void PatientModule::run() {
-    ros::NodeHandle handle;
+void PatientModule::body() {
+    ros::ServiceServer service = nh.advertiseService("getPatientData", &PatientModule::getPatientData, this);
 
-    ros::Rate rate(frequency);
-    ros::ServiceServer service = handle.advertiseService("getPatientData", &PatientModule::getPatientData, this);
+    period = 1/frequency;
 
-    double period = 1/frequency;
+    for (auto &p : vitalSignsFrequencies) {
+        if (p.second >= (vitalSignsChanges[p.first] + vitalSignsOffsets[p.first])) {
+            patientData[p.first].nextState();
+            p.second = vitalSignsOffsets[p.first];
+            std::cout << "Changed " + p.first + " state." << std::endl;
+        } else {
+            p.second += period;
+        }
+    }     
 
-    while (ros::ok()) {
-        for (auto &p : vitalSignsFrequencies) {
-            if (p.second >= (vitalSignsChanges[p.first] + vitalSignsOffsets[p.first])) {
-                patientData[p.first].nextState();
-                p.second = vitalSignsOffsets[p.first];
-                std::cout << "Changed " + p.first + " state." << std::endl;
-            } else {
-                p.second += period;
-            }
-        }     
-
-        ros::spinOnce();
-        rate.sleep();
-    }
 }
 
