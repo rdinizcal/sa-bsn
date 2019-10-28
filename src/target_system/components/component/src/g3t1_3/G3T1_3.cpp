@@ -15,7 +15,8 @@ G3T1_3::G3T1_3(int &argc, char **argv, const std::string &name) :
     dataGenerator(),
     filter(1),
     sensorConfig(),
-    collected_risk() {}
+    collected_risk(),
+    sensor_id(-1) {}
 
 G3T1_3::~G3T1_3() {}
 
@@ -30,6 +31,7 @@ void G3T1_3::setUp() {
     std::array<float, 25> transitions;
     std::array<bsn::range::Range,5> ranges;
     std::string s;
+    ros::NodeHandle private_handle("~");
 
     for(uint32_t i = 0; i < transitions.size(); i++){
         for(uint32_t j = 0; j < 5; j++){
@@ -92,6 +94,8 @@ void G3T1_3::setUp() {
         std::vector<std::string> high_p = op.split(s, ',');
         percentages[2] = Range(std::stod(high_p[0]), std::stod(high_p[1]));
 
+        private_handle.getParam("instanceID", sensor_id);
+
         sensorConfig = SensorConfiguration(0, low_range, midRanges, highRanges, percentages);
     }
 }
@@ -139,6 +143,7 @@ void G3T1_3::transfer(const double &m_data) {
     msg.data = m_data;
     msg.risk = risk;
     msg.batt = battery.getCurrentLevel();
+    msg.id   = sensor_id;
 
     data_pub.publish(msg);
     

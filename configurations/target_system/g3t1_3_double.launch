@@ -26,13 +26,13 @@
     <param name="data_accuracy" value="90" type="double" />
     <param name="comm_accuracy" value="100" type="double" />
     
-    <!-- Node identification -->
-    <param name="instanceID" value="0" />
-
     <remap from="/thermo_0/collect_event" to="/collect_event" />
     <remap from="/thermo_0/collect_status" to="/collect_status" />
     <remap from="/thermo_0/thermometer_data" to="/thermometer_data" />
-    <node name="g3t1_3" pkg="component" type="g3t1_3" output="screen" />
+    <node name="g3t1_3" pkg="component" type="g3t1_3" output="screen" >
+        <!-- Node identification -->
+        <param name="instanceID" value="0" />
+    </node>
    </group>
 
    <group ns="thermo_1">
@@ -61,12 +61,13 @@
     <param name="data_accuracy" value="90" type="double" />
     <param name="comm_accuracy" value="100" type="double" />
     
-    <!-- Node identification -->
-    <param name="instanceID" value="1" />
     <!-- Remapping topics -->
     <remap from="/thermo_1/collect_event" to="/collect_event" />
     <remap from="/thermo_1/collect_status" to="/collect_status" />
     <remap from="/thermo_1/thermometer_data" to="/thermometer_data" />
-    <node name="g3t1_3" pkg="component" type="g3t1_3" output="screen" />
+    <node name="g3t1_3" pkg="component" type="g3t1_3" output="screen" >
+        <!-- Node identification -->
+        <param name="instanceID" value="1" />
+    </node>
    </group>
 </launch>

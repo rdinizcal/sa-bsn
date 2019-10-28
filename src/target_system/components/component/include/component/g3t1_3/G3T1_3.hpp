@@ -49,6 +49,8 @@ class G3T1_3 : public Sensor {
 
 		double collected_risk;
 
+        int sensor_id;
+
 };
 
 #endif 
