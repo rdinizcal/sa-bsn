@@ -141,24 +141,30 @@ void G4T1::process(){
     oxi_risk = risks[2];
     bpr_risk = risks[3];
 
-    std::cout << std::endl << "*****************************************" << std::endl;
-    std::cout << "PatientStatusInfo#" << std::endl;
-    std::cout << "| THERM_RISK: " << trm_risk << std::endl;
-    std::cout << "| ECG_RISK: " << ecg_risk << std::endl;
-    std::cout << "| OXIM_RISK: " << oxi_risk << std::endl;
-    std::cout << "| BPRESS_RISK: " << bpr_risk << std::endl;
-    std::cout << "| PACIENT_STATE:" << ((patient_status>=66)?"CRITICAL STATE":"NORMAL STATE") << std::endl;
-    std::cout << "*****************************************" << std::endl;
+    // std::cout << std::endl << "*****************************************" << std::endl;
+    // std::cout << "PatientStatusInfo#" << std::endl;
+    // std::cout << "| THERM_RISK: " << trm_risk << std::endl;
+    // std::cout << "| ECG_RISK: " << ecg_risk << std::endl;
+    // std::cout << "| OXIM_RISK: " << oxi_risk << std::endl;
+    // std::cout << "| BPRESS_RISK: " << bpr_risk << std::endl;
+    // std::cout << "| PACIENT_STATE:" << ((patient_status>=66)?"CRITICAL STATE":"NORMAL STATE") << std::endl;
+    // std::cout << "*****************************************" << std::endl;
     
 }    
 
 void G4T1::transfer(){
+    std::cout << "Connect " << connect << std::endl;
     if (connect) {
-    //battery.consume(BATT_UNIT*data_buffer.size()*5);
-    web::http::client::http_client client(U(database_url));
-    web::json::value json_obj; 
-        json_obj["VitalData"] = web::json::value::string(makePacket());
-        client.request(web::http::methods::PUT, U("/sessions/" + std::to_string(session) + ".json") ,json_obj);
+        std::cout << "Getting...\n";
+        //battery.consume(BATT_UNIT*data_buffer.size()*5);
+        web::http::client::http_client client(U("http://localhost:8081"));
+        web::json::value json_obj; 
+        json_obj["vitalData"] = web::json::value::string(makePacket());
+        json_obj["session"] = session;
+        client.request(web::http::methods::POST, U("/sendVitalData"), json_obj);        
+        std::cout << "Request made!\n";
+    
+        
     }
 
     if(lost_packt){
