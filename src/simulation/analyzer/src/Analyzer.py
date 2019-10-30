@@ -20,7 +20,16 @@ from collections import OrderedDict
 
 class Analyzer:
 
-    def __init__(self): pass
+    def __init__(self, argc, argv):
+        self.file_id = argv[1]
+        self.formula_id = argv[2]
+        self.stability_margin = 0.03
+        self.stability = False
+        self.settling_time = 0
+        self.overshoot = 0
+        self.sse = 0
+        self.robustness = 0
+        self.mean = 0
         
     # computes the average for evey truncated (which dependes on the resolution) x value 
     # [38.1, 38.5, 38.7]:[5, 10, 15] returns [38,15]
@@ -47,7 +56,14 @@ class Analyzer:
 
         return [a,b]
 
-    def analyze(self, x, y, setpoint, upper_bound, lower_bound):
+    def analyze(self, x, y, setpoint):
+
+        print('-----------------------------------------------')
+        self.mean = mean(val for val in y[int(3*len(x)/4):]) # last quarter of the curve, lets hope it sufficses
+        print('Converge to: %.2f' % self.mean)
+
+        lower_bound = self.mean*(1-self.stability_margin)
+        upper_bound = self.mean*(1+self.stability_margin)
 
         # calculate stability point
         pos = 0
@@ -60,53 +76,75 @@ class Analyzer:
             else:
                 stability_point = 0
                 flag = False
-
             pos+=1
+        
 
-        print('Stability: %r' % bool(stability_point is not 0))
+        self.stability = bool(stability_point is not 0)
+        print('Stability: %r' % self.stability)
 
         #calculate settling time
-        settling_time = float(x[stability_point] - x[0])/10e9
-        print('Settling Time: %.2fs' % settling_time)
+        self.settling_time = float(x[stability_point] - x[0])/10e8
+        print('Settling Time: %.2fs' % self.settling_time)
 
         #calculate overshoot
-        overshoot = 100*(max(y) - setpoint)/setpoint
-        print('Overshoot: %.2f%%' % overshoot)
+        #y_max = max(yi for yi in y[:stability_point])
+        self.overshoot = 100*(max(y) - self.mean)/self.mean
+        print('Overshoot: %.2f%%' % self.overshoot)
 
         #calculate steady-state error
-        sse = 100*(abs(setpoint - mean(val for val in y[stability_point:]))/setpoint)
-        print('Steady-State Error: %.2f%%' % sse)
+        self.sse = 100*(abs(setpoint - self.mean)/setpoint)
+        print('Steady-State Error: %.2f%%' % self.sse)
 
-        #controller effort, not engough information yet
+        #controller effort, not enough information yet
 
         #robustness
-        robustness = 100*(1 - sum([abs(setpoint - val) for val in y])/len(x))
-        print('Robustness: %.2f%%' % robustness)
+        self.robustness = 100*(1 - sum([abs(setpoint - val) for val in y])/len(x))
+        print('Robustness: %.2f%%' % self.robustness)
+
+        print('-----------------------------------------------')
 
     def run(self): 
         # load formula
-        formula = Formula("../../knowledge_repository/resource/models/reliability.formula")
+        formula = Formula("../../knowledge_repository/resource/models/"+self.formula_id+".formula", "float")
+        b_formula = Formula("../../knowledge_repository/resource/models/b_"+self.formula_id+".formula", "bool")
 
         # build list of participating tasks
         tasks = dict()
         ctxs = dict()
 
         global_reli_timeseries = dict() 
+        local_reli_timeseries = dict()
+        global_status_timeseries = dict()
+        local_status_timeseries = dict()
+        adaptation_triggered = dict()
+        adaptations = dict()
+
+        ################################################################## 
+        #                                                                #
+        #                   Load Registries In Memory                    #
+        #                                                                #
+        ################################################################## 
+
+        ################ load adaptation log ################
+        with open("../../knowledge_repository/resource/logs/adaptation_" + self.file_id + ".log", newline='') as log_file:
+            log_csv = csv.reader(log_file, delimiter=',')
+            log_adaptation = list(log_csv)
+            del log_adaptation[0] # delete first line
 
         ################ load status log ################
-        with open("../../knowledge_repository/resource/logs/status_1569283251138874390.log", newline='') as log_file:
+        with open("../../knowledge_repository/resource/logs/status_" + self.file_id + ".log", newline='') as log_file:
             log_csv = csv.reader(log_file, delimiter=',')
             log_status = list(log_csv)
             del log_status[0] # delete first line
 
         ################ load event log ################
-        with open("../../knowledge_repository/resource/logs/event_1569283251138874390.log", newline='') as log_file:
+        with open("../../knowledge_repository/resource/logs/event_" + self.file_id + ".log", newline='') as log_file:
             log_csv = csv.reader(log_file, delimiter=',')
             log_event = list(log_csv)
             del log_event[0] # delete first line
 
         ################ load uncertainty log ################
-        with open("../../knowledge_repository/resource/logs/uncertainty_1569283251138874390.log", newline='') as log_file:
+        with open("../../knowledge_repository/resource/logs/uncertainty_" + self.file_id + ".log", newline='') as log_file:
             log_csv = csv.reader(log_file, delimiter=',')
             log_uncert = list(log_csv)
             del log_uncert[0] # delete first line
@@ -115,14 +153,30 @@ class Analyzer:
         log = list()
         log.extend(log_status)
         log.extend(log_event)
+        log.extend(log_adaptation)
 
         log = sorted(log, key = lambda x: (int(x[1])))
 
         t0 = int(log[0][2])
 
+
         # read log 
         for reg in log:
-            if(reg[0]=="Status"):
+            # compute time series
+            instant = int(reg[2]) - t0
+
+            if(reg[0]=="Adaptation"):
+                adaptation = AdaptationCommand(str(reg[1]),str(reg[2]),str(reg[3]),str(reg[4]),str(reg[5]))
+
+                tag = adaptation.target.upper().replace(".","_").replace("/","").replace("T","_T")
+
+                if not (tag in adaptations): 
+                    adaptations[tag] = [[adaptation.instant, adaptation.action]]
+                    adaptation_triggered[tag] = int(adaptation.instant)
+                
+                adaptations[tag].append([[adaptation.instant, adaptation.action]])
+
+            elif(reg[0]=="Status"):
                 status = Status(str(reg[1]),str(reg[2]),str(reg[3]),str(reg[4]),str(reg[5]))
 
                 tag = status.source.upper().replace(".","_").replace("/","").replace("T","_T")
@@ -131,12 +185,27 @@ class Analyzer:
                     tsk = Task(tag)
                     tasks[tag] = tsk
 
-                if (status.content == 'success'):
-                    tasks[tag].execute() 
-                    tasks[tag].success()
-                elif (status.content == 'fail'): 
-                    tasks[tag].execute() 
-                    tasks[tag].fail()
+                if (status.content == 'success'): tasks[tag].success(instant)
+                elif (status.content == 'fail'): tasks[tag].fail(instant)
+
+                if (status.content == 'success' or status.content == 'fail'):
+                    if not (tag in local_status_timeseries):
+                        local_status_timeseries[tag] = [[instant,status.content]]
+                    else:
+                        local_status_timeseries[tag].append([instant,status.content])
+
+                    if not (tag in local_reli_timeseries): 
+                        local_reli_timeseries[tag] = [[instant,tasks[tag].reliability()]]
+                    else:
+                        local_reli_timeseries[tag].append([instant,tasks[tag].reliability()])
+
+                    ## compute global formulae
+                    for tag in tasks:
+                        formula.compute('R_'+tag, tasks[tag].reliability())
+                        formula.compute('C_'+tag, tasks[tag].cost())
+                        formula.compute('F_'+tag, tasks[tag].frequency())
+
+                        b_formula.compute('B_'+tag, status.content == 'success')
 
             elif(reg[0]=="Event"):
                 event = Event(str(reg[1]),str(reg[2]),str(reg[3]),str(reg[4]),str(reg[5]))
@@ -150,18 +219,13 @@ class Analyzer:
                 if (event.content == 'deactivate'): ctxs[tag].deactivate()
                 elif (event.content == 'activate'): ctxs[tag].activate()
 
-            # compute time series
-            instant = int(reg[2]) - t0
-            ## global reliability timeseries
-            for task in tasks.values():
-                formula.compute('R_'+task.getName(), task.reliability())
-                formula.compute('C_'+task.getName(), task.cost())
-                formula.compute('F_'+task.getName(), task.frequency())
+                for ctx in ctxs.values():
+                    formula.compute('CTX_'+ctx.getName(), ctx.isActive())
 
-            for ctx in ctxs.values():
-                formula.compute('CTX_'+ctx.getName(), ctx.isActive())
 
-            global_reli_timeseries[instant] = formula.eval()
+            if(reg[0]=="Event" or reg[0]=="Status"):
+                global_status_timeseries[instant] = b_formula.eval()
+                global_reli_timeseries[instant] = formula.eval()
 
         input_timeseries = dict()
         noise_factor = dict()
@@ -182,71 +246,225 @@ class Analyzer:
             input_timeseries[tag].append([instant,noise])
             noise_factor[tag] = noise
 
-        # plot global reli timeseries
+
+        ################################################################## 
+        #                                                                #
+        #         Perform Control Theoretical Analysis Timeseries        #
+        #                                                                #
+        ################################################################## 
+
+        x_triggered = inf
+        for tag in adaptation_triggered: x_triggered = adaptation_triggered[tag] if adaptation_triggered[tag] < x_triggered else x_triggered
+
         x = list(global_reli_timeseries.keys())
         y = list(global_reli_timeseries.values())
 
         ## discretizing the curve
-        [x,y] = self.discretize(x,y,1) #precision in ms
+        #[x,y] = self.discretize(x,y,1) #precision in ms
 
-        ## perform the analysis 
-        setpoint = 0.80+((0.95-0.80)/2)
-        upper_margin = setpoint*1.05
-        lower_margin = setpoint*0.95
-        self.analyze(x, y, setpoint, setpoint*1.05, setpoint*0.95)
+        setpoint = 0.95
+
+        xa = []
+        ya = []
+        i = 0
+        for xi in x:
+            if xi >= x_triggered: 
+                xa.append(x[i])
+                ya.append(y[i])
+            i += 1
+                
+        self.analyze(xa, ya, setpoint)
+
+        ################################################################## 
+        #                                                                #
+        #                         Plot Timeseries                        #
+        #                                                                #
+        ################################################################## 
 
         scale = 10e-10
         ticks = ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(x*scale))
 
-        ## plot timeseries
+        default_colors = ["#17becf", "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#ff7f0e"]
+        colors = dict()
+        i = 0
+        for tag in tasks:
+            colors[tag] = default_colors[i]
+            i+=1
+
+        ##############################################
+        #                 First Plot                 #
+        ############################################## 
+        ## First, plot the global reliability against time
         fig, ax = plt.subplots()
-        ax.plot(x, y)
-        ax.set_ylim(0,1.05)
+        ax.plot(x, y, label='BSN', color = "#1f77b4", linewidth=2)
+        ax.set_ylim(0,(1+self.stability_margin))
         ax.xaxis.set_major_formatter(ticks)
-        #ax.axvline(x=0.7*10e10, linestyle='--', color='red')
-        #ax.axvline(x=0.9*10e10, linestyle='--', color='red')
-        ax.axhline(y=setpoint, linestyle='--', linewidth=1.0, color="black")
-        ax.axhline(y=upper_margin, linestyle='--', linewidth=0.5, color="black")
-        ax.axhline(y=lower_margin, linestyle='--', linewidth=0.5, color="black")
 
-        fig.suptitle('System reliability in time')
-        fig.text(0.04, 0.5, 'Reliability (%)', va='center', rotation='vertical')
-        fig.text(0.5, 0.04, 'Time (s)', ha='center')
+        x_max = 0
+        for tag in local_status_timeseries:
+            last = len(local_status_timeseries[tag]) - 1
+            x_max  = local_status_timeseries[tag][last][0] if local_status_timeseries[tag][last][0] > x_max else x_max
+
+        ## Then, plot the local reliabilities against time (same figure)
+        i = 0
+        for tag in local_reli_timeseries:
+            x = [el[0] for el in local_reli_timeseries[tag]]
+            y = [el[1] for el in local_reli_timeseries[tag]]
+            ax.plot(x, y, label=tag, color=colors[tag])
+
+        ## Plot horizontal lines for setpoint
+        ax.axhline(y=setpoint, linestyle='--', linewidth=0.7, color="black")
+        ax.text(0.9*x_max, setpoint, "setpoint" , fontsize=8)
+        ax.axhline(y=self.mean*(1+self.stability_margin), linestyle='--', linewidth=0.3, color="black")
+        ax.axhline(y=self.mean, linestyle='-.', linewidth=0.5, color="black")
+        ax.axhline(y=self.mean*(1-self.stability_margin), linestyle='--', linewidth=0.3, color="black")
+
+        ## Insert labels, titles, texts, grid...
+        mn = self.mean
+        st = self.settling_time
+        os = self.overshoot
+        sse = self.sse 
+        #fig.suptitle('Parametric Formula vs. Monitored')
+        fig.suptitle('Reliability in time')
+        is_stable = "stable" if self.stability else "not stable" 
+        subtitle = '%s: %s | converges to %.2f | ST = %.2fs | OS = %.2f%% | SSE = %.2f%%' % ("formula",is_stable,mn,st,os,sse)        
+        fig.text(0.5, 0.92, subtitle, ha='center', color = "grey", fontsize=7) # subtitle
+        fig.text(0.04, 0.5, 'Reliability', va='center', rotation='vertical')
+        fig.text(0.5, 0.035, 'Time (s)', ha='center')
+        fig.text(0.8, 0.020, self.file_id + '.log', ha='center', color = "grey", fontsize=6) # files used
+        fig.text(0.8, 0.005, self.formula_id + '.formula', ha='center', color = "grey", fontsize=6) # files used
+        ax.annotate('trigger adaptation', xy=(x_triggered, 0),
+            xytext=(x_triggered/x_max, -0.1), textcoords='axes fraction',
+            arrowprops=dict(facecolor='black', shrink=0.03),
+            horizontalalignment='right', verticalalignment='top',
+            )
         plt.grid()
+        plt.legend()
         
-        fig, axs = plt.subplots(len(input_timeseries),1, sharex='all')
-        fig.suptitle('Noise in sensing')
-        if(len(input_timeseries) > 1):
-            i = 0
-            for tag in input_timeseries:
-                x = [el[0] for el in input_timeseries[tag]]
-                y = [el[1] for el in input_timeseries[tag]]
+        ##############################################
+        #               Second Plot                  #
+        ############################################## 
+        # Second, plot the local uncertainty inputs against time (second figure)
+        #fig, ax = plt.subplots()
+        #ax.set_ylim(0,(1+self.stability_margin))
+        #ax.xaxis.set_major_formatter(ticks)
+        #for tag in input_timeseries:
+        #    x = [el[0] for el in input_timeseries[tag]]
+        #    y = [el[1] for el in input_timeseries[tag]]
+        #    ax.plot(x,y, label=tag, color=colors[tag])
+        #fig.suptitle('Uncertainty injection inputs')
+        #fig.text(0.04, 0.5, 'Noise percentage', va='center', rotation='vertical')
+        #fig.text(0.5, 0.035, 'Time (s)', ha='center')
+        #plt.grid()
+        #plt.legend()
 
-                axs[i].plot(x,y)
-                axs[i].set_ylabel(tag, fontsize=8)
-                axs[i].xaxis.set_visible(False)
-                #axs[i].axvline(x=0.7*10e10, linestyle='--', color='red')
-                #axs[i].axvline(x=0.9*10e10, linestyle='--', color='red')
+        ##############################################
+        #                Third Plot                  #
+        ############################################## 
+        ## Third, plot in horizontal bars the failures and successes of each component at a time (third figure)
+        discretized_status_timeseries = dict()
+        res = 2.5 * 10e9 # resolution in milliseconds
 
-                i += 1
-            axs[len(input_timeseries)-1].xaxis.set_visible(True)
-            axs[len(input_timeseries)-1].xaxis.set_major_formatter(ticks)
-        else:
-            x = [el[0] for el in input_timeseries[tag]]
-            y = [el[1] for el in input_timeseries[tag]]
+        #for tag in local_status_timeseries:
+        #    lst = local_status_timeseries[tag] # a list of pairs [instant,"status"] for that tag
+        #    if not (tag in discretized_status_timeseries): # initialize dict
+        #        discretized_status_timeseries[tag] = [[lst[0][0], 1 if lst[0][1] == 'success' else 0]]
+#
+        #    for pair in lst:
+        #        last_instant = pair[0]
+        #        last_step = last_instant
+        #        before_last_step = last_step - res
+#
+        #        aux = []
+        #        for inv in lst:
+        #            if inv[0] > before_last_step and inv[0] <= last_step:
+        #                aux.append(1 if inv[1] == 'success' else 0)
+#
+        #        discretized_status_timeseries[tag].append([pair[0],(1 if sum(aux)/len(aux) > 0.5 else 0) if len(aux) > 0 else -1])  # status = Success/#Fail+Success
 
-            axs.plot(x,y)
-            axs.set_ylabel(tag, fontsize=8)
-            axs.xaxis.set_major_formatter(ticks)
+        #calculate whole system reliability based on the discretized status timeseries and append
+        #bsn_tag = "BSN"
+        #for instant in global_status_timeseries:
+        #    if not (bsn_tag in discretized_status_timeseries): discretized_status_timeseries[bsn_tag] = [[instant, global_status_timeseries[instant]]]
+        #    else : discretized_status_timeseries[bsn_tag].append([instant, global_status_timeseries[instant]])
+
+        #reli_from_calc = list()
+
+        #for instant in global_status_timeseries:
+        #    before_last_step = instant - res
+        #    aux = []
+        #    for x in global_status_timeseries:
+        #        if x > before_last_step and x <= instant:
+        #            aux.append(int(global_status_timeseries[x]))
+
+        #    reli_from_calc.append([instant, sum(aux)/len(aux) if len(aux) > 0 else 0])
         
-        fig.text(0.04, 0.5, 'Noise factor injected', va='center', rotation='vertical')
-        fig.text(0.5, 0.04, 'Time (s)', ha='center')
+
+        #x = [pair[0] for pair in reli_from_calc]
+        #y = [pair[1] for pair in reli_from_calc]
+
+        #xa = []
+        #ya = []
+        #i = 0
+        #for xi in x:
+        #    if xi >= x_triggered: 
+        #        xa.append(x[i])
+        #        ya.append(y[i])
+        #    i += 1
+                
+        #self.analyze(xa, ya, setpoint)
+
+        ##fig, ax = plt.subplots()
+        #ax.plot(x, y, label='monitored', color = "#ff7f0e", linewidth=2)
+        #mn = self.mean
+        #st = self.settling_time
+        #os = self.overshoot
+        #sse = self.sse 
+        #is_stable = "stable" if self.stability else "not stable" 
+        #subtitle = '%s: %s | converges to %.2f | ST = %.2fs | OS = %.2f%% | SSE = %.2f%%' % ("monitored",is_stable,mn,st,os,sse) 
+        #fig.text(0.5, 0.89, subtitle, ha='center', color = "grey", fontsize=7) # subtitle
+        #plt.grid()
+        #plt.legend()
+        #ax.set_ylim(0,(1+self.stability_margin))
+        #ax.xaxis.set_major_formatter(ticks)
+
+        ##Then plot horizontal lines
+        #scalez = ceil(int(x_max) * 10e-10)
+        #ticksz = ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(x*scalez))
+        #fig, ax = plt.subplots()
+        #ax.xaxis.set_major_formatter(ticksz)
+#
+        #cc = {1:"green", 0:"red", -1:"white"}
+        #for tag in discretized_status_timeseries:
+        #    x = discretized_status_timeseries[tag][0][0]
+        #    for pair in discretized_status_timeseries[tag]:
+        #        ax.axhline(y=tag, xmin=x/x_max, xmax=pair[0]/x_max, linewidth=5.0, color=cc[pair[1]])
+        #        x = pair[0]
+        #
+        ### Insert labels, titles, texts, grid...
+        #mn = self.mean
+        #st = self.settling_time
+        #os = self.overshoot
+        #sse = self.sse 
+        #fig.suptitle('Calculated Reliability')
+        #is_stable = "stable" if self.stability else "not stable" 
+        #subtitle = '%s | converges to %.2f | ST = %.2fs | OS = %.2f%% | SSE = %.2f%%' % (is_stable,mn,st,os,sse)        
+        #fig.text(0.5, 0.90, subtitle, ha='center', color = "grey") # subtitle
+        #fig.text(0.5, 0.035, 'Time (s)', ha='center')
+        #fig.text(0.8, 0.020, 'g4t1 and (g3t1_1 or g3t1_2 or g3t1_3)', ha='center', color = "grey", fontsize=6) # files used
+        #ax.annotate('adapt', xy=(x_triggered, 1),
+        #    xytext=(x_triggered/x_max, 1.1), textcoords='axes fraction',
+        #    arrowprops=dict(facecolor='black', shrink=0.03),
+        #    horizontalalignment='right', verticalalignment='top',
+        #    )
+        #plt.grid()
 
         plt.show()
 
 class Formula:
 
-    def __init__(self, path): 
+    def __init__(self, path, _type): 
+        self.type = _type
         formula_file = open(path, 'r')
         if formula_file.mode == 'r': 
             self.expression = formula_file.read()
@@ -261,22 +479,26 @@ class Formula:
         expr = expr.replace("/"," ")
         expr = expr.replace("("," ")
         expr = expr.replace(")"," ")
+        expr = expr.replace("and"," ")
+        expr = expr.replace("or"," ")
         expr = re.split(' ',expr)
         arguments = list(filter(None, expr))
 
         arg_val = {}
         for argument in arguments :
-            arg_val[argument] = 0
+            if self.type == "bool": arg_val[argument] = False
+            else : arg_val[argument] = 0
 
         return arg_val
 
     def compute(self, arg, value):
-        self.mapping[arg] = float(value)
-
+        if self.type == "bool": self.mapping[arg] = bool(value)
+        else: self.mapping[arg] = float(value)
+    
     def eval(self):
         return eval(self.expression, self.mapping)
 
-class ReconfigurationCommand:
+class AdaptationCommand:
 
     def __init__(self, _logical_instant, _instant, _source, _target, _action): 
         self.source = _source
@@ -307,9 +529,8 @@ class Task:
 
     def __init__(self, _name):
         self.name = _name 
-        self.nexecs = 0
-        self.lstExec = []
-        self.window_size = 20
+        self.lstInvocations = list()
+        self.res = 2.5 * 10e9 #seconds in nanoseconds
     
     def __eq__(self, other):
         if isinstance(other, Task):
@@ -320,27 +541,29 @@ class Task:
         return hash(tuple(sorted(self.__dict__.items())))
 
     def reliability (self):
-        if self.nexecs != 0: return sum(self.lstExec) / self.nexecs # Success/Fail+Success
-        else: return 0
-    
+        last = len(self.lstInvocations)-1
+        if(last <= 0): return 0
+        last_step = self.lstInvocations[last][0]
+        before_last_step = last_step - self.res
+
+        aux = []
+        for inv in self.lstInvocations:
+            if inv[0] > before_last_step and inv[0] <= last_step:
+                aux.append(inv[1])
+
+        return sum(aux)/len(aux) if len(aux) > 0 else 0  # Success/Fail+Success
+
     def cost (self) : return 1
     
     def frequency(self): return 1
-
-    def execute(self) :
-        if(self.nexecs < self.window_size) : self.nexecs += 1
     
-    def success(self) :
-        if(self.nexecs < self.window_size) : self.lstExec.append(1)
-        else: 
-            self.lstExec.append(1)
-            del self.lstExec[0]
+    def success(self, instant) :
+        if(len(self.lstInvocations) == 0) : self.lstInvocations = [[instant,1]]
+        else : self.lstInvocations.append([instant,1])
 
-    def fail(self) : 
-        if(self.nexecs < self.window_size) : self.lstExec.append(0)
-        else: 
-            self.lstExec.append(0)
-            del self.lstExec[0]
+    def fail(self,instant) : 
+        if(len(self.lstInvocations) == 0) : self.lstInvocations = [[instant,0]]
+        else : self.lstInvocations.append([instant,0])
     
     def getName(self) :
         return self.name

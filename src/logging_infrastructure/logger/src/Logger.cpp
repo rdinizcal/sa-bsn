@@ -11,10 +11,10 @@ int64_t Logger::now() const{
 void Logger::setUp() {
     time_ref = this->now();
 
-    adapt = handle.advertise<archlib::AdaptationCommand>("reconfigure", 10);
-    status = handle.advertise<archlib::Status>("status", 10);
-    event = handle.advertise<archlib::Event>("event", 10);
-    persist = handle.advertise<archlib::Persist>("persist", 10);
+    adapt = handle.advertise<archlib::AdaptationCommand>("reconfigure", 1000);
+    persist = handle.advertise<archlib::Persist>("persist", 1000);
+    status = handle.advertise<archlib::Status>("status", 1000);
+    event = handle.advertise<archlib::Event>("event", 1000);
 
     double freq;
 	handle.getParam("frequency", freq);

@@ -35,7 +35,7 @@ class Sensor : public arch::target_system::Component {
         virtual double process(const double &data) = 0;
         virtual void transfer(const double &data) = 0;
 
-    private:
+    protected:
         bool isActive();
         void turnOn();
         void turnOff();

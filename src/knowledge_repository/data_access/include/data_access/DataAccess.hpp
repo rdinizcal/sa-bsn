@@ -3,11 +3,15 @@
 
 #include <fstream>
 #include <chrono>
+#include <deque>
 
 #include "ros/ros.h"
 #include <ros/package.h>
 
+#include "bsn/operation/Operation.hpp"
+
 #include "archlib/Persist.h"
+#include "archlib/DataAccessRequest.h"
 #include "archlib/ROSComponent.hpp"
 
 #include "StatusMessage.hpp"
@@ -40,6 +44,7 @@ class DataAccess : public arch::ROSComponent {
 		virtual void body();
 
 		void receivePersistMessage(const archlib::Persist::ConstPtr& msg);
+		bool processQuery(archlib::DataAccessRequest::Request &req, archlib::DataAccessRequest::Response &res);
 
 	protected:
 		ros::NodeHandle handle;
@@ -48,8 +53,8 @@ class DataAccess : public arch::ROSComponent {
 		std::fstream fp;
 		std::string event_filepath;
 		std::string status_filepath;
-		std::string  uncertainty_filepath;
-		std::string  adaptation_filepath;
+		std::string uncertainty_filepath;
+		std::string adaptation_filepath;
 
 		int64_t logical_clock;
 
@@ -58,6 +63,9 @@ class DataAccess : public arch::ROSComponent {
 		std::vector<UncertaintyMessage> uncertainVec;
 		std::vector<AdaptationMessage> adaptVec;
 
+		std::map<std::string, std::deque<std::string>> status;
+		std::map<std::string, std::deque<std::string>> events;
+		int buffer_size;
 };
 
 #endif 

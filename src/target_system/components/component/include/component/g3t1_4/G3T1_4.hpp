@@ -35,6 +35,7 @@ class G3T1_4 : public Sensor {
 	public:
 		void setUp();
     	void tearDown();
+		void body();
 		
 		double collect();
         double process(const double &data);
