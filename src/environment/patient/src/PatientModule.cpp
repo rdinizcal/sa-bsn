@@ -10,7 +10,7 @@ void PatientModule::setUp() {
     // TODO change Operation to static namespace
     bsn::operation::Operation op;
     std::string vitalSigns;
-    ros::ServiceServer service = nh.advertiseService("getPatientData", &PatientModule::getPatientData, this);
+    service = nh.advertiseService("getPatientData", &PatientModule::getPatientData, this);
     double aux;
 
     frequency = -1e9+7;
@@ -38,7 +38,6 @@ void PatientModule::setUp() {
     }
     rosComponentDescriptor.setFreq(frequency);
     period = 1/frequency;
-
 }
 
 bsn::generator::DataGenerator PatientModule::configureDataGenerator(const std::string& vitalSign) {

@@ -29,4 +29,5 @@ class PatientModule : public arch::ROSComponent {
         double frequency;
         double period;
         ros::NodeHandle nh;
+        ros::ServiceServer service;
 };
