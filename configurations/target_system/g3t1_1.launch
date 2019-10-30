@@ -9,17 +9,12 @@
     <param name="midrisk" value="21,65" />
     <param name="highrisk" value="66,100" />
 
-    <!-- markov chain -->
-    <param name="state0" value="0,0,0,0,0" />
-    <param name="state1" value="0,0,0,0,0" />
-    <param name="state2" value="0,0,90,8,2" />
-    <param name="state3" value="0,0,75,20,5" />
-    <param name="state4" value="0,0,5,35,60" />
-
-    <!-- risk values -->
+    <!-- Risk values for oximeter -->
+    <param name="HighRisk0" value="-1,-1" />
+    <param name="MidRisk0" value="-1,-1" />
     <param name="LowRisk" value="65,100" />
-    <param name="MidRisk" value="55,65" />
-    <param name="HighRisk" value="0,55" />
+    <param name="MidRisk1" value="55,65" />
+    <param name="HighRisk1" value="0,55" />
 
     <!-- accuracy in percentage -->
     <param name="accuracy" value="90" type="double" />
