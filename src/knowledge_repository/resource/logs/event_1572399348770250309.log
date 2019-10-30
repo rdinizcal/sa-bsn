@@ -1,0 +1,7 @@
+
+Event,1,20647990179,g4t1,,activate
+Event,3,26262792657,g3t1_1,,activate
+Event,8,26567807016,g3t1_2,,activate
+Event,15,26869456169,g3t1_4,,activate
+Event,440,57794924198,g4t1,,deactivate
+Event,480,60231092967,g3t1_4,,deactivate
