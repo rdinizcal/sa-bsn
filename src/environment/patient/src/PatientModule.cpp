@@ -10,12 +10,14 @@ void PatientModule::setUp() {
     // TODO change Operation to static namespace
     bsn::operation::Operation op;
     std::string vitalSigns;
-    ros::NodeHandle handle;
     double aux;
+    ros::ServiceServer service = nh.advertiseService("getPatientData", &PatientModule::getPatientData, this);
+
+    frequency = -1e9+7;
 
     // Get what vital signs this module will simulate
     nh.getParam("vitalSigns", vitalSigns);
-    nh.getParam("frequency", frequency);
+//    nh.getParam("frequency", frequency);
 
     // Removes white spaces from vitalSigns
     vitalSigns.erase(std::remove(vitalSigns.begin(), vitalSigns.end(),' '), vitalSigns.end());
@@ -98,8 +100,6 @@ bool PatientModule::getPatientData(services::PatientData::Request &request,
 }
 
 void PatientModule::body() {
-    ros::ServiceServer service = nh.advertiseService("getPatientData", &PatientModule::getPatientData, this);
-
     period = 1/frequency;
 
     for (auto &p : vitalSignsFrequencies) {
