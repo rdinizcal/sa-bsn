@@ -148,7 +148,7 @@ void Engine::monitor() {
     
     //expecting smth like: "/g3t1_1:success,fail,success;/g4t1:success; ..."
     std::string ans = r_srv.response.content;
-    //std::cout << "received=> [" << ans << "]" << std::endl;
+    std::cout << "received=> [" << ans << "]" << std::endl;
     if(ans == ""){
         ROS_ERROR("Received empty answer when asked for status.");
     }
@@ -166,6 +166,7 @@ void Engine::monitor() {
         first.erase(0,1); // G3T1_1
         first.insert(int(first.find('T')),"_"); // G3_T1_1
 
+        std::cout << "first = " + first << std::endl;
         std::vector<std::string> values = op.split(second, ',');
         double sum = 0;
         int len = 0;
