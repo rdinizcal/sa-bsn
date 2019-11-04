@@ -27,32 +27,33 @@
 #include "archlib/Strategy.h"
 #include "archlib/Exception.h"
 #include "archlib/ROSComponent.hpp"
+#include "archlib/system_manager/AdaptationEngine.hpp"
 
 
-class Engine : public arch::ROSComponent {
+class Engine : public arch::system_manager::AdaptationEngine {
 	
 	public: 
 		Engine(int &argc, char **argv, std::string name);
-    	virtual ~Engine();
+		~Engine();
 
-    private:
-      	Engine(const Engine &);
-    	Engine &operator=(const Engine &);
+	private:
+		Engine(const Engine &);
+		Engine &operator=(const Engine &);
 
-  	public:
-        virtual void setUp();
-    	virtual void tearDown();
-		virtual void body();
+	public:
+		void setUp();
+		void tearDown();
+		void body();
 
 		void receiveException(const archlib::Exception::ConstPtr& msg);
+		void propagateStrategy(const archlib::Strategy::ConstPtr& msg);
 
 		void monitor();
-    	void analyze();
-    	void plan();
-    	void execute();
+		void analyze();
+		void plan();
+		void execute();
 
-
-  	private:
+	private:
 	  double calculate_reli();
 	  bool blacklisted(std::map<std::string,double> &);
 
@@ -71,6 +72,7 @@ class Engine : public arch::ROSComponent {
 
 		ros::NodeHandle handle;
 		ros::Publisher enact;
+		ros::Subscriber t_sub;
 
 		int cycles;
 		int counter;

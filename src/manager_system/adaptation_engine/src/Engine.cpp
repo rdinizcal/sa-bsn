@@ -6,14 +6,27 @@ struct comp{
     template<typename T>
     bool operator()(const T& l, const T& r) const
     {
-        if (l.second != r.second)
+        if (l.second != r.second) 
             return l.second < r.second;
  
         return l.first < r.first;
     }
 };
 
-Engine::Engine(int  &argc, char **argv, std::string name): ROSComponent(argc, argv, name), r_ref(0.9), stability_margin(0.02), offset(0), info_quant(0), monitor_freq(1), actuation_freq(1), reliability_expression(), strategy(),  priority(),  Kp(0.01), cycles(0) {}
+Engine::Engine(int  &argc, char **argv, std::string name): 
+    AdaptationEngine(argc, argv, name), 
+    r_ref(0.9), 
+    stability_margin(0.02), 
+    offset(0), 
+    info_quant(0), 
+    monitor_freq(1), 
+    actuation_freq(1), 
+    reliability_expression(), 
+    strategy(),  
+    priority(),  
+    Kp(0.01), 
+    cycles(0) 
+    {}
 
 Engine::~Engine() {}
 
@@ -68,7 +81,8 @@ void Engine::setUp() {
             priority[it->first] = 50;
         }
     }  
-    
+    ros::Subscriber t_sub = handle.subscribe("exception", 1000, &Engine::receiveException, this);
+
 }
 
 void Engine::tearDown() {}
@@ -94,6 +108,8 @@ void Engine::receiveException(const archlib::Exception::ConstPtr& msg){
         ROS_ERROR("COULD NOT FIND COMPONENT IN LIST OF PRIORITIES.");
     }
 }
+
+void Engine::propagateStrategy(const archlib::Strategy::ConstPtr& msg) {}
 
 double Engine::calculate_reli() {
     std::vector<std::string> keys;
@@ -435,15 +451,5 @@ void Engine::execute() {
 }
 
 void Engine::body(){
-    ros::NodeHandle n;
-    ros::Subscriber t_sub = n.subscribe("exception", 1000, &Engine::receiveException, this);
-
-    ros::Rate loop_rate(rosComponentDescriptor.getFreq());
-    while(ros::ok){
-        monitor();
-        ros::spinOnce();
-        loop_rate.sleep();        
-    }   
-
-    return;
+    monitor();
 }
