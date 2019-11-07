@@ -17,27 +17,29 @@
 #include "archlib/AdaptationCommand.h"
 
 #include "archlib/ROSComponent.hpp"
+#include "archlib/system_manager/StrategyEnactor.hpp"
 
-class Enactor : public arch::ROSComponent {
+
+class Enactor : public archlib::system_manager::StrategyEnactor {
 
     public:
-    	Enactor(int &argc, char **argv, std::string name);
-    	virtual ~Enactor();
+    	Enactor(int &argc, char **argv, const std::string &name);
+    	~Enactor();
 
     private:
       	Enactor(const Enactor &);
     	Enactor &operator=(const Enactor &);
 
   	public:
-        virtual void setUp();
-    	virtual void tearDown();
-		virtual void body();
+        void setUp() override;
+    	void tearDown() override;
+		void body() override;
 
-	  	void receiveStatus(const archlib::Status::ConstPtr& msg);
-	  	void receiveEvent(const archlib::Event::ConstPtr& msg);
-	  	void receiveStrategy(const archlib::Strategy::ConstPtr& msg);
+	  	void receiveStatus(const archlib::Status::ConstPtr& msg) override;
+	  	void receiveEvent(const archlib::Event::ConstPtr& msg) override;
+	  	void receiveStrategy(const archlib::Strategy::ConstPtr& msg) override;
 
-		void apply_strategy(const std::string &component);
+		void apply_strategy(const std::string &component) override;
 
 		void print();
 
@@ -52,6 +54,10 @@ class Enactor : public arch::ROSComponent {
 		std::map<std::string, int> replicate_task;
 		std::map<std::string, double> freq;
 		std::map<std::string, int> exception_buffer;
+
+		ros::Subscriber subs_event;
+		ros::Subscriber subs_status;
+		ros::Subscriber subs_strategy;
 
 		int64_t cycles;
 		double stability_margin;

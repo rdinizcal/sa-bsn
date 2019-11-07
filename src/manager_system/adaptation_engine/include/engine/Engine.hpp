@@ -30,10 +30,10 @@
 #include "archlib/system_manager/AdaptationEngine.hpp"
 
 
-class Engine : public arch::system_manager::AdaptationEngine {
+class Engine : public archlib::system_manager::AdaptationEngine {
 	
 	public: 
-		Engine(int &argc, char **argv, std::string name);
+		Engine(int &argc, char **argv, const std::string &name);
 		~Engine();
 
 	private:

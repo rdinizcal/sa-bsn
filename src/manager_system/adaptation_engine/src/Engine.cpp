@@ -13,7 +13,7 @@ struct comp{
     }
 };
 
-Engine::Engine(int  &argc, char **argv, std::string name): 
+Engine::Engine(int  &argc, char **argv, const std::string &name): 
     AdaptationEngine(argc, argv, name), 
     r_ref(0.9), 
     stability_margin(0.02), 

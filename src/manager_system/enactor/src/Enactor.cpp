@@ -1,6 +1,10 @@
 #include "enactor/Enactor.hpp"
 
-Enactor::Enactor(int  &argc, char **argv, std::string name) : ROSComponent(argc, argv, name), cycles(0), stability_margin(0.02) {}
+Enactor::Enactor(int &argc, char **argv, const std::string &name): 
+    StrategyEnactor(argc, argv, name), 
+    cycles(0),
+    stability_margin(0.02)
+    {}
 
 Enactor::~Enactor() {}
 
@@ -15,6 +19,9 @@ void Enactor::setUp() {
 	nh.getParam("frequency", freq);
 	rosComponentDescriptor.setFreq(freq);
 
+    subs_event = nh.subscribe("event", 1000, &Enactor::receiveEvent, this);
+    subs_status = nh.subscribe("status", 1000, &Enactor::receiveStatus, this);
+    subs_strategy = nh.subscribe("strategy", 1000, &Enactor::receiveStrategy, this);
 }
 
 void Enactor::tearDown() {}
@@ -172,19 +179,8 @@ void Enactor::apply_strategy(const std::string &component) {
     invocations[component].clear();
 }
 
-void Enactor::body(){
-    ros::NodeHandle n;
-
-    ros::Subscriber subs_event = n.subscribe("event", 1000, &Enactor::receiveEvent, this);
-    ros::Subscriber subs_status = n.subscribe("status", 1000, &Enactor::receiveStatus, this);
-    ros::Subscriber subs_strategy = n.subscribe("strategy", 1000, &Enactor::receiveStrategy, this);
-
-    ros::Rate loop_rate(rosComponentDescriptor.getFreq());
-    while(ros::ok()){
-        if(cycles <= 60*rosComponentDescriptor.getFreq()) ++cycles;
-        ros::spinOnce();
-        loop_rate.sleep();
-    }
+void Enactor::body(){    
+    if(cycles <= 60*rosComponentDescriptor.getFreq()) ++cycles;
 }
 
 void Enactor::print() {
