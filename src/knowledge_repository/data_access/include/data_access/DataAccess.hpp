@@ -19,6 +19,7 @@
 #include "UncertaintyMessage.hpp"
 #include "AdaptationMessage.hpp"
 
+#include "messages/TargetSystemData.h"
 
 class DataAccess : public arch::ROSComponent {
 
@@ -36,6 +37,7 @@ class DataAccess : public arch::ROSComponent {
 		void persistUncertainty(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content);
 		void persistAdaptation(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content);
 
+
 		void flush();
 
 	public:
@@ -43,6 +45,7 @@ class DataAccess : public arch::ROSComponent {
 		virtual void tearDown();
 		virtual void body();
 
+		void processTargetSystemData(const messages::TargetSystemData::ConstPtr &msg);
 		void receivePersistMessage(const archlib::Persist::ConstPtr& msg);
 		bool processQuery(archlib::DataAccessRequest::Request &req, archlib::DataAccessRequest::Response &res);
 
@@ -66,6 +69,12 @@ class DataAccess : public arch::ROSComponent {
 		std::map<std::string, std::deque<std::string>> status;
 		std::map<std::string, std::deque<std::string>> events;
 		int buffer_size;
+
+		std::map<std::string, double> componentsReliabilities;
+		std::map<std::string, double> componentsBatteries;
+		std::map<std::string, double> componentsCosts;
+
+		bool connected;
 };
 
 #endif 

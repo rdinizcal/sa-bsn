@@ -42,10 +42,30 @@ void DataAccess::setUp() {
 
 void DataAccess::tearDown(){}
 
+void DataAccess::processTargetSystemData(const messages::TargetSystemData::ConstPtr &msg) {
+    if (connected) {
+        if (componentsBatteries["G3T1_1"] > msg.term_batt) {
+            componentsCosts["G3T1_1"] = componentsBatteries["G3T1_1"] - msg.term_batt;
+        }
+        if (componentsBatteries["G3T1_2"] > msg.term_batt) {
+            componentsCosts["G3T1_2"] = componentsBatteries["G3T1_2"] - msg.term_batt;
+        }
+        if (componentsBatteries["G3T1_3"] > msg.term_batt) {
+            componentsCosts["G3T1_3"] = componentsBatteries["G3T1_3"] - msg.term_batt;
+        }
+
+        componentsBatteries["G3T1_1"] = msg.term_batt;
+        componentsBatteries["G3T1_2"] = msg.ecg_batt;
+        componentsBatteries["G3T1_3"] = msg.oxi_batt;
+    }
+}
+
 void DataAccess::body(){
     ros::NodeHandle n;
     ros::Subscriber handle_persist = n.subscribe("persist", 1000, &DataAccess::receivePersistMessage, this);
     ros::ServiceServer server = handle.advertiseService("DataAccessRequest", &DataAccess::processQuery, this);
+
+    ros::Subscriber targetSystemSub = n.subscribe("TargeSystemData", 100, &DataAccess::processTargetSystemData, this);
     ros::spin();
 }
 
@@ -96,13 +116,25 @@ bool DataAccess::processQuery(archlib::DataAccessRequest::Request &req, archlib:
                     std::string aux = it->first;
                     aux += ":";
                     bool flag = false;
-                    for(int i = it->second.size()-num; i < it->second.size(); ++i){
+                    double sum = 0;
+                    uint32_t len = 0;
+                    for(int i = it->second.size()-num; i < it->second.size(); ++i) {
+                        if (it->second[i] == "success") { // calculate reliability
+                            sum +=1;
+                            len++;
+                        } else if (it->second[i] == "fail") {
+                            len++;
+                        }
+                        else {
+                            aux += it->second[i];
+                            aux += ",";
+                        }
+                        
                         flag = true;
-                        aux += it->second[i];
                         //if((i < num) && (i+1 < it->second.size())) 
-                        aux += ",";
                     }
-                    aux += ";";
+                    aux += std::to_string((len > 0) ? sum / len : 0) + ';';
+                    componentsReliabilities[it->first] = (len > 0) ? sum / len : 0;
 
                     if(flag) res.content += aux;
                 }

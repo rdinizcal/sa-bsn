@@ -1,12 +1,12 @@
 bsn=$PWD
 
-mate-terminal -x roscore & sleep 5s
+gnome-terminal -x roscore & sleep 5s
 
 ################# KNOWLEDGE REPOSITORY #################
-mate-terminal --working-directory=${bsn}/configurations/knowledge_repository -e 'roslaunch data_access.launch' & sleep 1s
+gnome-terminal --working-directory=${bsn}/configurations/knowledge_repository -e 'roslaunch data_access.launch' & sleep 1s
 
 ################# MANAGER #################
-mate-terminal --working-directory=${bsn}/configurations/system_manager -e 'roslaunch enactor.launch'
+gnome-terminal --working-directory=${bsn}/configurations/system_manager -e 'roslaunch enactor.launch'
 
 ################# LOGGING INFRASTRUCTURE #################
 gnome-terminal --working-directory=${bsn}/configurations/logging_infrastructure -e 'roslaunch logger.launch' & sleep 1s
@@ -24,6 +24,6 @@ gnome-terminal --working-directory=${bsn}/configurations/environment   -e 'rosla
 #gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g3t1_4.launch'
 
 ################# SIMULATION #################
-gnome-terminal --working-directory=${bsn}/configurations/simulation -e 'roslaunch injector.launch' & sleep 150s
+gnome-terminal --working-directory=${bsn}/configurations/simulation -e 'roslaunch injector.launch' & sleep 30s
 
-gnome-terminal --working-directory=${bsn}/configurations/system_manager -e 'roslaunch engine.launch'
+# terminator --working-directory=${bsn}/configurations/system_manager -e 'roslaunch engine.launch'

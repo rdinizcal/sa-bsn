@@ -29,7 +29,6 @@ int32_t CentralHub::run() {
 }
 
 void CentralHub::body() {
-    
     ros::spinOnce(); //calls collect() if there's data in the topics
 
     if (!isActive() && battery.getCurrentLevel() > 90){
@@ -42,7 +41,7 @@ void CentralHub::body() {
         if(total_buffer_size > 0){
             apply_noise();
             process();
-            transfer();
+            // transfer();
             sendStatus("success");
         }
     } else {

@@ -59,16 +59,16 @@ std::vector<std::string> G4T1::getPatientStatus() {
 
         if (i==0) {
             trm = sensor_risk_str;
-            trm_risk = std::to_string(sensor_risk);
+            trm_risk = sensor_risk;
         } else if (i == 1){
             ecg = sensor_risk_str;
-            ecg_risk = std::to_string(sensor_risk);
+            ecg_risk = sensor_risk;
         } else if (i == 2) {
             oxi = sensor_risk_str;
-            oxi_risk = std::to_string(sensor_risk);
+            oxi_risk = sensor_risk;
         } else if (i == 3) {
             bpr = sensor_risk_str;
-            bpr_risk = std::to_string(sensor_risk);
+            bpr_risk = sensor_risk;
         }
     }
 
@@ -92,6 +92,8 @@ void G4T1::setUp() {
         it != data_buffer.end(); ++it) {
             (*it) = {0.0};
     }
+
+    pub = config.advertise<messages::TargetSystemData>("TargeSystemData", 10);
 }
 
 void G4T1::tearDown() {}
@@ -106,13 +108,13 @@ void G4T1::collect(const messages::SensorData::ConstPtr& msg) {
 
     /*update battery status for received sensor info*/
     if (msg->type=="thermometer"){
-        trm_batt = std::to_string(batt);
+        trm_batt = batt;
     } else if (msg->type=="ecg") {
-        ecg_batt = std::to_string(batt);
+        ecg_batt = batt;
     } else if (msg->type=="oximeter") {
-        oxi_batt = std::to_string(batt);
+        oxi_batt = batt;
     } else if (msg->type=="bpms" || msg->type=="bpmd") {
-        bpr_batt = std::to_string(batt);
+        bpr_batt = batt;
     } 
 
     if(buffer_size[type] < max_size){
@@ -152,23 +154,35 @@ void G4T1::process(){
     
 }    
 
-void G4T1::transfer(){
-    std::cout << "Connect " << connect << std::endl;
-    if (connect) {
-        std::cout << "Getting...\n";
-        //battery.consume(BATT_UNIT*data_buffer.size()*5);
-        web::http::client::http_client client(U("http://localhost:8081"));
-        web::json::value json_obj; 
-        json_obj["vitalData"] = web::json::value::string(makePacket());
-        json_obj["session"] = session;
-        client.request(web::http::methods::POST, U("/sendVitalData"), json_obj);        
-        std::cout << "Request made!\n";
+void G4T1::transfer() {
+    messages::targeSystemData msg;
+
+    msg.trm_batt = trm_batt;
+    msg.ecg_batt = ecg.batt;
+    msg.oxi_batt = oxi_batt;
+    msg.trm_data = trm_risk;
+    msg.ecg_data = ecg_risk;
+    msg.oxi_data = oxi_risk;
+    msg.patient_status = patient_status;
+
+    pub.publish(msg);
+
+    // std::cout << "Connect " << connect << std::endl;
+    // if (connect) {
+    //     std::cout << "Getting...\n";
+    //     //battery.consume(BATT_UNIT*data_buffer.size()*5);
+    //     web::http::client::http_client client(U("http://localhost:8081"));
+    //     web::json::value json_obj; 
+    //     json_obj["vitalData"] = web::json::value::string(makePacket());
+    //     json_obj["session"] = session;
+    //     client.request(web::http::methods::POST, U("/sendVitalData"), json_obj);        
+    //     std::cout << "Request made!\n";
     
         
-    }
+    // }
 
-    if(lost_packt){
-        lost_packt = false;
-        throw std::domain_error("lost data due to package overflow");
-    }
+    // if(lost_packt){
+    //     lost_packt = false;
+    //     throw std::domain_error("lost data due to package overflow");
+    // }
 }

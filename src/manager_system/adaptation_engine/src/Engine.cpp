@@ -139,7 +139,7 @@ void Engine::monitor() {
     /*request reliability status for all tasks*/
     archlib::DataAccessRequest r_srv;
     r_srv.request.name = ros::this_node::getName();
-    r_srv.request.query = "all:status:"+std::to_string(info_quant);
+    r_srv.request.query = "all:status:" + std::to_string(info_quant);
 
     if(!client_module.call(r_srv)) {
         ROS_ERROR("Failed to connect to data access node.");
@@ -170,16 +170,8 @@ void Engine::monitor() {
         std::vector<std::string> values = op.split(second, ',');
         double sum = 0;
         int len = 0;
-        for (std::vector<std::string>::iterator value = values.begin(); value != values.end(); value++) {
-            if (*value == "success") {
-                sum +=1;
-                len++;
-            } else if (*value == "fail") {
-                len++;
-            }
-        }
 
-        strategy["R_"+first] = (len>0)?sum/len:0;
+        strategy["R_"+first] = stod(values[values.size()-1]);
     } 
 
     //request context status for all tasks

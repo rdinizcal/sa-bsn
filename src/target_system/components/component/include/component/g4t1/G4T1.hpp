@@ -20,6 +20,7 @@
 #include "archlib/AdaptationCommand.h"
 
 #include "messages/SensorData.h"
+#include "messages/TargeSystemData.h"
 
 class G4T1 : public CentralHub {
     
@@ -50,15 +51,17 @@ class G4T1 : public CentralHub {
         double patient_status;
         int session;
 
-        std::string bpr_risk;
-        std::string oxi_risk;
-        std::string ecg_risk;
-        std::string trm_risk;
+        double bpr_risk;
+        double oxi_risk;
+        double ecg_risk;
+        double trm_risk;
 
-        std::string bpr_batt;
-        std::string oxi_batt;
-        std::string ecg_batt;
-        std::string trm_batt;
+        double bpr_batt;
+        double oxi_batt;
+        double ecg_batt;
+        double trm_batt;
+
+        ros::Publisher pub;
 };
 
 #endif 
