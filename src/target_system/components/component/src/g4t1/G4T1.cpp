@@ -13,28 +13,28 @@ G4T1::G4T1(int &argc, char **argv, const std::string &name) :
 	
 G4T1::~G4T1() {}
 
-std::string G4T1::makePacket() {
-    //std::string packet = "88,97#10,20,30,40,50&";
-    std::string packet = "";
+// std::string G4T1::makePacket() {
+//     //std::string packet = "88,97#10,20,30,40,50&";
+//     std::string packet = "";
 
-    packet.append(trm_batt).append(",");
-    packet.append(ecg_batt).append(",");
-    packet.append(oxi_batt).append(",");
-    packet.append(bpr_batt).append(",");
-    packet.append(bpr_batt).append("&");
+//     packet.append(trm_batt).append(",");
+//     packet.append(ecg_batt).append(",");
+//     packet.append(oxi_batt).append(",");
+//     packet.append(bpr_batt).append(",");
+//     packet.append(bpr_batt).append("&");
 
-    int i = 0;
-    for (std::list<double> li : data_buffer) {
-        if (!li.empty()) {
-            double element = li.front();
-            packet += std::to_string(element) += "=";
-            packet += std::to_string(li.back()) + "/";
-        }
-        i++;                    
-    }
-    packet += std::to_string(patient_status);
-    return packet;
-}
+//     int i = 0;
+//     for (std::list<double> li : data_buffer) {
+//         if (!li.empty()) {
+//             double element = li.front();
+//             packet += std::to_string(element) += "=";
+//             packet += std::to_string(li.back()) + "/";
+//         }
+//         i++;                    
+//     }
+//     packet += std::to_string(patient_status);
+//     return packet;
+// }
 
 std::vector<std::string> G4T1::getPatientStatus() {
     std::string sensor_risk_str;
@@ -138,10 +138,10 @@ void G4T1::process(){
 
     std::vector<std::string> risks;
     risks = getPatientStatus();
-    trm_risk = risks[0];
-    ecg_risk = risks[1];
-    oxi_risk = risks[2];
-    bpr_risk = risks[3];
+    // trm_risk = risks[0];
+    // ecg_risk = risks[1];
+    // oxi_risk = risks[2];
+    // bpr_risk = risks[3];
 
     // std::cout << std::endl << "*****************************************" << std::endl;
     // std::cout << "PatientStatusInfo#" << std::endl;
@@ -155,10 +155,10 @@ void G4T1::process(){
 }    
 
 void G4T1::transfer() {
-    messages::targeSystemData msg;
+    messages::TargetSystemData msg;
 
     msg.trm_batt = trm_batt;
-    msg.ecg_batt = ecg.batt;
+    msg.ecg_batt = ecg_batt;
     msg.oxi_batt = oxi_batt;
     msg.trm_data = trm_risk;
     msg.ecg_data = ecg_risk;

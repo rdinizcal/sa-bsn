@@ -3,6 +3,8 @@
 DataAccess::DataAccess(int  &argc, char **argv, const std::string &name) : ROSComponent(argc, argv, name), fp(), event_filepath(), status_filepath(), logical_clock(0), statusVec(), eventVec(), status(), buffer_size() {}
 DataAccess::~DataAccess() {}
 
+#define W(x) std::cerr << #x << " " << x << std::endl;
+
 int64_t DataAccess::now() const{
     return std::chrono::high_resolution_clock::now().time_since_epoch().count();
 }
@@ -38,25 +40,29 @@ void DataAccess::setUp() {
 	rosComponentDescriptor.setFreq(freq);
 
     buffer_size = 1000;
+
+    handle.getParam("send_to_srv", connected);
 }
 
 void DataAccess::tearDown(){}
 
 void DataAccess::processTargetSystemData(const messages::TargetSystemData::ConstPtr &msg) {
     if (connected) {
-        if (componentsBatteries["G3T1_1"] > msg.term_batt) {
-            componentsCosts["G3T1_1"] = componentsBatteries["G3T1_1"] - msg.term_batt;
+        if (componentsBatteries["G3T1_1"] > msg->trm_batt) {
+            componentsCosts["G3T1_1"] = componentsBatteries["G3T1_1"] - msg->trm_batt;
         }
-        if (componentsBatteries["G3T1_2"] > msg.term_batt) {
-            componentsCosts["G3T1_2"] = componentsBatteries["G3T1_2"] - msg.term_batt;
+        if (componentsBatteries["G3T1_2"] > msg->ecg_batt) {
+            componentsCosts["G3T1_2"] = componentsBatteries["G3T1_2"] - msg->ecg_batt;
         }
-        if (componentsBatteries["G3T1_3"] > msg.term_batt) {
-            componentsCosts["G3T1_3"] = componentsBatteries["G3T1_3"] - msg.term_batt;
+        if (componentsBatteries["G3T1_3"] > msg->oxi_batt) {
+            componentsCosts["G3T1_3"] = componentsBatteries["G3T1_3"] - msg->oxi_batt;
         }
 
-        componentsBatteries["G3T1_1"] = msg.term_batt;
-        componentsBatteries["G3T1_2"] = msg.ecg_batt;
-        componentsBatteries["G3T1_3"] = msg.oxi_batt;
+        componentsBatteries["G3T1_1"] = msg->trm_batt;
+        componentsBatteries["G3T1_2"] = msg->ecg_batt;
+        componentsBatteries["G3T1_3"] = msg->oxi_batt;
+        W(msg->trm_batt);
+        W(msg->trm_data);
     }
 }
 

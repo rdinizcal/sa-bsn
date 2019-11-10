@@ -41,7 +41,7 @@ void CentralHub::body() {
         if(total_buffer_size > 0){
             apply_noise();
             process();
-            // transfer();
+            transfer();
             sendStatus("success");
         }
     } else {

@@ -20,7 +20,7 @@
 #include "archlib/AdaptationCommand.h"
 
 #include "messages/SensorData.h"
-#include "messages/TargeSystemData.h"
+#include "messages/TargetSystemData.h"
 
 class G4T1 : public CentralHub {
     

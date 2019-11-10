@@ -26,4 +26,4 @@ gnome-terminal --working-directory=${bsn}/configurations/environment   -e 'rosla
 ################# SIMULATION #################
 gnome-terminal --working-directory=${bsn}/configurations/simulation -e 'roslaunch injector.launch' & sleep 30s
 
-# terminator --working-directory=${bsn}/configurations/system_manager -e 'roslaunch engine.launch'
+terminator --working-directory=${bsn}/configurations/system_manager -e 'roslaunch engine.launch'

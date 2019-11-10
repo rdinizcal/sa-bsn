@@ -1,4 +1,5 @@
 <launch> 
     <node name="data_access" pkg="repository" type="data_access" output="screen" />
     <param name="frequency" value="10000" /> <!-- 10KHz  -->
+    <param name="send_to_srv" value="1" /> <!-- 10KHz  -->
 </launch>
