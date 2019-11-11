@@ -175,12 +175,18 @@ void G4T1::process(){
 }    
 
 void G4T1::transfer(){
+    std::cout << "Connect " << connect << std::endl;
     if (connect) {
-    //battery.consume(BATT_UNIT*data_buffer.size()*5);
-    web::http::client::http_client client(U(database_url));
-    web::json::value json_obj; 
-        json_obj["VitalData"] = web::json::value::string(makePacket());
-        client.request(web::http::methods::PUT, U("/sessions/" + std::to_string(session) + ".json") ,json_obj);
+        std::cout << "Getting...\n";
+        //battery.consume(BATT_UNIT*data_buffer.size()*5);
+        web::http::client::http_client client(U("http://localhost:8081"));
+        web::json::value json_obj; 
+        json_obj["vitalData"] = web::json::value::string(makePacket());
+        json_obj["session"] = session;
+        client.request(web::http::methods::POST, U("/sendVitalData"), json_obj);        
+        std::cout << "Request made!\n";
+    
+        
     }
 
     if(lost_packt){

@@ -56,6 +56,9 @@ CATKIN_IGNORE
 # VSCode
 .vscode/*
 
+#remote api
+bsn_remote_control/
+
 # Personal TODO list
 launch1
 test.py
