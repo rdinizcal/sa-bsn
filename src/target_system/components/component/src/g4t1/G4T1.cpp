@@ -6,7 +6,7 @@ using namespace bsn::processor;
 
 G4T1::G4T1(int &argc, char **argv, const std::string &name) :
     CentralHub(argc, argv, name, true, bsn::resource::Battery("ch_batt", 100, 100, 1) ),
-    connect(true),
+    connect(false),
     database_url(),
     lost_packt(false),
     patient_status(0.0) {}
