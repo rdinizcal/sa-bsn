@@ -177,7 +177,6 @@ double DataAccess::calculateReliability() {
         formated_key.insert(int(formated_key.find('T')), "_");
 
         r_key = "R_" + formated_key;
-        W(r_key)
         keys.push_back(r_key);
         values.push_back(x.second);
     }
@@ -230,7 +229,6 @@ void DataAccess::receivePersistMessage(const archlib::Persist::ConstPtr& msg) {
         }
         std::string key = msg->source;
         key = key.substr(1, key.size());
-        W(key)
         contexts[key] = msg->content == "activate" ? 1 : 0;
     } else if(msg->type=="Uncertainty") {
         persistUncertainty(msg->timestamp, msg->source, msg->target, msg->content);
