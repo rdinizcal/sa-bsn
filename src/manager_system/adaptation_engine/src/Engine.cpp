@@ -166,12 +166,10 @@ void Engine::monitor() {
         first.erase(0,1); // G3T1_1
         first.insert(int(first.find('T')),"_"); // G3_T1_1
 
-        std::cout << "first = " + first << std::endl;
         std::vector<std::string> values = op.split(second, ',');
-        double sum = 0;
-        int len = 0;
 
         strategy["R_"+first] = stod(values[values.size()-1]);
+        std::cout << "first = " << strategy["R_" + first] << std::endl;
     } 
 
     //request context status for all tasks

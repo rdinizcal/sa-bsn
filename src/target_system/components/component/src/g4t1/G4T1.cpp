@@ -1,4 +1,5 @@
 #include "component/g4t1/G4T1.hpp"
+#define W(x) std::cerr << #x << " = " << x << std::endl;
 
 #define BATT_UNIT 0.001
 
@@ -6,35 +7,9 @@ using namespace bsn::processor;
 
 G4T1::G4T1(int &argc, char **argv, const std::string &name) :
     CentralHub(argc, argv, name, true, bsn::resource::Battery("ch_batt", 100, 100, 1) ),
-    connect(true),
-    database_url(),
-    lost_packt(false),
     patient_status(0.0) {}
 	
 G4T1::~G4T1() {}
-
-// std::string G4T1::makePacket() {
-//     //std::string packet = "88,97#10,20,30,40,50&";
-//     std::string packet = "";
-
-//     packet.append(trm_batt).append(",");
-//     packet.append(ecg_batt).append(",");
-//     packet.append(oxi_batt).append(",");
-//     packet.append(bpr_batt).append(",");
-//     packet.append(bpr_batt).append("&");
-
-//     int i = 0;
-//     for (std::list<double> li : data_buffer) {
-//         if (!li.empty()) {
-//             double element = li.front();
-//             packet += std::to_string(element) += "=";
-//             packet += std::to_string(li.back()) + "/";
-//         }
-//         i++;                    
-//     }
-//     packet += std::to_string(patient_status);
-//     return packet;
-// }
 
 std::vector<std::string> G4T1::getPatientStatus() {
     std::string sensor_risk_str;
@@ -80,9 +55,6 @@ void G4T1::setUp() {
     Component::setUp();
 
     ros::NodeHandle config;
-    config.getParam("connect", connect);
-    config.getParam("db_url", database_url);
-    config.getParam("session", session);
 
     double freq;
     config.getParam("frequency", freq);
@@ -109,13 +81,17 @@ void G4T1::collect(const messages::SensorData::ConstPtr& msg) {
     /*update battery status for received sensor info*/
     if (msg->type=="thermometer"){
         trm_batt = batt;
+        trm_raw = msg->data;
     } else if (msg->type=="ecg") {
         ecg_batt = batt;
+        ecg_raw = msg->data;
     } else if (msg->type=="oximeter") {
         oxi_batt = batt;
+        oxi_raw = msg->data;
     } else if (msg->type=="bpms" || msg->type=="bpmd") {
         bpr_batt = batt;
-    } 
+        bpr_raw = msg->data;
+    }
 
     if(buffer_size[type] < max_size){
         data_buffer[type].push_back(risk);
@@ -124,7 +100,6 @@ void G4T1::collect(const messages::SensorData::ConstPtr& msg) {
     } else {
         data_buffer[type].push_back(risk);
         data_buffer[type].erase(data_buffer[type].begin());//erase the first element to avoid overflow
-        lost_packt = true;
     }
 }
 
@@ -160,9 +135,12 @@ void G4T1::transfer() {
     msg.trm_batt = trm_batt;
     msg.ecg_batt = ecg_batt;
     msg.oxi_batt = oxi_batt;
-    msg.trm_data = trm_risk;
-    msg.ecg_data = ecg_risk;
-    msg.oxi_data = oxi_risk;
+    msg.trm_risk = trm_risk;
+    msg.ecg_risk = ecg_risk;
+    msg.oxi_risk = oxi_risk;
+    msg.trm_data = trm_raw;
+    msg.ecg_data = ecg_raw;
+    msg.oxi_data = oxi_raw;
     msg.patient_status = patient_status;
 
     pub.publish(msg);

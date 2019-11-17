@@ -7,7 +7,17 @@
 
 #include "ros/ros.h"
 #include <ros/package.h>
+#include <cpprest/http_client.h>
+#include <cpprest/json.h>
 
+#include "bsn/goalmodel/Node.hpp"
+#include "bsn/goalmodel/Goal.hpp"
+#include "bsn/goalmodel/Task.hpp"
+#include "bsn/goalmodel/Property.hpp"
+#include "bsn/goalmodel/LeafTask.hpp"
+#include "bsn/goalmodel/Context.hpp"
+#include "bsn/goalmodel/GoalTree.hpp"
+#include "bsn/model/Formula.hpp"
 #include "bsn/operation/Operation.hpp"
 
 #include "archlib/Persist.h"
@@ -18,6 +28,8 @@
 #include "EventMessage.hpp"
 #include "UncertaintyMessage.hpp"
 #include "AdaptationMessage.hpp"
+
+#include "lepton/Lepton.h"
 
 #include "messages/TargetSystemData.h"
 
@@ -39,6 +51,9 @@ class DataAccess : public arch::ROSComponent {
 
 
 		void flush();
+
+		double calculateCost();
+		double calculateReliability();
 
 	public:
 		virtual void setUp();
@@ -73,6 +88,12 @@ class DataAccess : public arch::ROSComponent {
 		std::map<std::string, double> componentsReliabilities;
 		std::map<std::string, double> componentsBatteries;
 		std::map<std::string, double> componentsCosts;
+		std::map<std::string, uint32_t> contexts;
+
+		bsn::model::Formula reliability_expression;
+		bsn::model::Formula cost_expression;
+
+		std::shared_ptr<web::http::client::http_client> client;
 
 		bool connected;
 };

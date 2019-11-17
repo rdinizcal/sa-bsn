@@ -6,8 +6,6 @@
 #include <memory>
 #include <map>
 
-#include <cpprest/http_client.h>
-#include <cpprest/json.h>
 #include <ros/package.h>
 #include "ros/ros.h"
 
@@ -44,12 +42,7 @@ class G4T1 : public CentralHub {
         virtual void transfer();
 
     private:
-        bool connect;
-        std::string database_url;
-        
-        bool lost_packt;
         double patient_status;
-        int session;
 
         double bpr_risk;
         double oxi_risk;
@@ -60,6 +53,11 @@ class G4T1 : public CentralHub {
         double oxi_batt;
         double ecg_batt;
         double trm_batt;
+
+        double bpr_raw;
+        double oxi_raw;
+        double ecg_raw;
+        double trm_raw;
 
         ros::Publisher pub;
 };

@@ -1,9 +1,9 @@
 #include "data_access/DataAccess.hpp"
 
+#define W(x) std::cerr << #x << " = " << x << std::endl;
+
 DataAccess::DataAccess(int  &argc, char **argv, const std::string &name) : ROSComponent(argc, argv, name), fp(), event_filepath(), status_filepath(), logical_clock(0), statusVec(), eventVec(), status(), buffer_size() {}
 DataAccess::~DataAccess() {}
-
-#define W(x) std::cerr << #x << " " << x << std::endl;
 
 int64_t DataAccess::now() const{
     return std::chrono::high_resolution_clock::now().time_since_epoch().count();
@@ -11,7 +11,7 @@ int64_t DataAccess::now() const{
 
 void DataAccess::setUp() {
     std::string path = ros::package::getPath("repository");
-
+    std::string url;
     std::string now = std::to_string(this->now());
 
     event_filepath = path + "/../resource/logs/event_" + now + ".log";
@@ -39,31 +39,164 @@ void DataAccess::setUp() {
 	handle.getParam("frequency", freq);
 	rosComponentDescriptor.setFreq(freq);
 
+    handle.getParam("server_url", url);
+
     buffer_size = 1000;
 
     handle.getParam("send_to_srv", connected);
+
+    std::ifstream reliability_file, cost_file;
+    std::string reliability_formula, cost_formula;
+
+    try {
+        reliability_file.open(path + "/../resource/models/reliability.formula");
+        std::getline(reliability_file, reliability_formula);
+        reliability_file.close();
+    } catch (std::ifstream::failure e) {
+        std::cerr << "Exception opening/reading/closing file (reliability.formula)\n";
+    }
+
+    try {
+        cost_file.open(path + "/../resource/models/cost.formula");
+        std::getline(cost_file, cost_formula);
+        cost_file.close();
+    } catch (std::ifstream::failure e) {
+        std::cerr << "Exception opening/reading/closing file (cost.formula)\n";
+    }
+
+    cost_expression = bsn::model::Formula(cost_formula);
+    reliability_expression = bsn::model::Formula(reliability_formula);
+
+    // web::http::client::http_client aux(U(url));
+    this->client = std::shared_ptr<web::http::client::http_client>
+        (new web::http::client::http_client(U(url)));
+
+    componentsBatteries["g3t1_1"] = 100;
+    componentsBatteries["g3t1_2"] = 100;
+    componentsBatteries["g3t1_3"] = 100;
+    componentsCosts["g3t1_1"] = 0;
+    componentsCosts["g3t1_2"] = 0;
+    componentsCosts["g3t1_3"] = 0;
+    componentsReliabilities["g3t1_1"] = 1;
+    componentsReliabilities["g3t1_2"] = 1;
+    componentsReliabilities["g3t1_3"] = 1;
 }
 
 void DataAccess::tearDown(){}
 
 void DataAccess::processTargetSystemData(const messages::TargetSystemData::ConstPtr &msg) {
     if (connected) {
-        if (componentsBatteries["G3T1_1"] > msg->trm_batt) {
-            componentsCosts["G3T1_1"] = componentsBatteries["G3T1_1"] - msg->trm_batt;
+        if (componentsBatteries["g3t1_1"] > msg->oxi_batt) {
+            componentsCosts["g3t1_1"] = (componentsBatteries["g3t1_1"] - msg->oxi_batt);
         }
-        if (componentsBatteries["G3T1_2"] > msg->ecg_batt) {
-            componentsCosts["G3T1_2"] = componentsBatteries["G3T1_2"] - msg->ecg_batt;
+        if (componentsBatteries["g3t1_2"] > msg->ecg_batt) {
+            componentsCosts["g3t1_2"] = componentsBatteries["g3t1_2"] - msg->ecg_batt;
         }
-        if (componentsBatteries["G3T1_3"] > msg->oxi_batt) {
-            componentsCosts["G3T1_3"] = componentsBatteries["G3T1_3"] - msg->oxi_batt;
+        if (componentsBatteries["g3t1_3"] > msg->trm_batt) {
+            componentsCosts["g3t1_3"] = componentsBatteries["g3t1_3"] - msg->trm_batt;
         }
 
-        componentsBatteries["G3T1_1"] = msg->trm_batt;
-        componentsBatteries["G3T1_2"] = msg->ecg_batt;
-        componentsBatteries["G3T1_3"] = msg->oxi_batt;
-        W(msg->trm_batt);
-        W(msg->trm_data);
+        componentsBatteries["g3t1_3"] = msg->trm_batt;
+        componentsBatteries["g3t1_2"] = msg->ecg_batt;
+        componentsBatteries["g3t1_1"] = msg->oxi_batt;
+
+        web::json::value json_obj, sensorPacket, patientPacket, reli_costPacket;
+
+        sensorPacket["battery"] = msg->trm_batt;
+        sensorPacket["risk"] = msg->trm_risk;
+        sensorPacket["raw"] = msg->trm_data;
+        json_obj["ThermometerPacket"] = sensorPacket;
+
+        sensorPacket["battery"] = msg->ecg_batt;
+        sensorPacket["risk"] = msg->ecg_risk;
+        sensorPacket["raw"] = msg->ecg_data;
+        json_obj["EcgPacket"] = sensorPacket;
+
+        sensorPacket["battery"] = msg->oxi_batt;
+        sensorPacket["risk"] = msg->oxi_risk;
+        sensorPacket["raw"] = msg->oxi_data;
+        json_obj["OximeterPacket"] = sensorPacket;
+
+        json_obj["PatientRisk"] = msg->patient_status;
+
+        json_obj["Reliability"] = calculateReliability();
+        json_obj["Cost"] = calculateCost();
+        
+        // client->request(web::http::methods::POST, U("/sendVitalData"), json_obj);
     }
+}
+
+double DataAccess::calculateCost() {
+    std::vector<std::string> keys;
+    std::vector<double> values;
+    std::string context_key, formated_key, r_key, w_key, f_key;
+
+    for (auto x : componentsCosts) {
+        formated_key = x.first;
+        std::transform(formated_key.begin(), formated_key.end(), formated_key.begin(), ::toupper);
+        formated_key.insert(int(formated_key.find('T')), "_");
+
+        w_key = "W_" + formated_key;
+        keys.push_back(w_key);
+        values.push_back(x.second);
+    }
+
+    for (auto x : contexts) {
+        formated_key = x.first;
+        std::transform(formated_key.begin(), formated_key.end(), formated_key.begin(), ::toupper);
+        formated_key.insert(int(formated_key.find('T')), "_");
+
+        context_key = "CTX_" + formated_key;
+        keys.push_back(context_key);
+        values.push_back(x.second);
+
+        r_key = "R_" + formated_key;
+        keys.push_back(r_key);
+        values.push_back(1);
+
+        f_key = "F_" + formated_key;
+        keys.push_back(f_key);
+        values.push_back(1);
+    }
+
+    // for (int i = 0; i < values.size(); i++) {
+    //     std::cout << keys[i] << " = " << values[i] << std::endl;
+    // }
+
+    return cost_expression.apply(keys, values);
+}
+
+double DataAccess::calculateReliability() {
+    std::vector<std::string> keys;
+    std::vector<double> values;
+    std::string context_key, formated_key, r_key, f_key;
+
+    for (auto x : componentsReliabilities) {
+        formated_key = x.first;
+        std::transform(formated_key.begin(), formated_key.end(), formated_key.begin(), ::toupper);
+        formated_key.insert(int(formated_key.find('T')), "_");
+
+        r_key = "R_" + formated_key;
+        W(r_key)
+        keys.push_back(r_key);
+        values.push_back(x.second);
+    }
+
+    for (auto x : contexts) {
+        formated_key = x.first;
+        std::transform(formated_key.begin(), formated_key.end(), formated_key.begin(), ::toupper);
+        formated_key.insert(int(formated_key.find('T')), "_");
+
+        context_key = "CTX_" + formated_key;
+        keys.push_back(context_key);
+        values.push_back(x.second);
+
+        f_key = "F_" + formated_key;
+        keys.push_back(f_key);
+        values.push_back(1);
+    }
+
+    return reliability_expression.apply(keys, values);
 }
 
 void DataAccess::body(){
@@ -95,6 +228,10 @@ void DataAccess::receivePersistMessage(const archlib::Persist::ConstPtr& msg) {
             events[msg->source].pop_front();
             events[msg->source].push_back(msg->content);
         }
+        std::string key = msg->source;
+        key = key.substr(1, key.size());
+        W(key)
+        contexts[key] = msg->content == "activate" ? 1 : 0;
     } else if(msg->type=="Uncertainty") {
         persistUncertainty(msg->timestamp, msg->source, msg->target, msg->content);
     } else if(msg->type=="AdaptationCommand") {
@@ -140,7 +277,9 @@ bool DataAccess::processQuery(archlib::DataAccessRequest::Request &req, archlib:
                         //if((i < num) && (i+1 < it->second.size())) 
                     }
                     aux += std::to_string((len > 0) ? sum / len : 0) + ';';
-                    componentsReliabilities[it->first] = (len > 0) ? sum / len : 0;
+                    std::string key = it->first;
+                    key = key.substr(1, key.size());
+                    componentsReliabilities[key] = (len > 0) ? sum / len : 0;
 
                     if(flag) res.content += aux;
                 }
@@ -151,15 +290,22 @@ bool DataAccess::processQuery(archlib::DataAccessRequest::Request &req, archlib:
                     std::string aux = it->first;
                     aux += ":";
                     bool flag = false;
+                    std::string content = "";
                     for(int i = it->second.size()-num; i < it->second.size(); ++i){
                         flag = true;
                         aux += it->second[i];
+                        content += it->second[i];
                         //if(i < num && i+1 < it->second.size()) 
                         aux += ",";
                     }
                     aux += ";";
 
-                    if(flag) res.content += aux;
+                    if(flag) {
+                        std::string key = it->first;
+                        key = key.substr(1, key.size());
+                        contexts[key] = content == "activate" ? 1 : 0;
+                        res.content += aux;
+                    }
                 }
             }
         } 
@@ -176,7 +322,7 @@ void DataAccess::persistEvent(const int64_t &timestamp, const std::string &sourc
     EventMessage obj("Event", timestamp, logical_clock, source, target, content);
     eventVec.push_back(obj);
 
-    if(logical_clock%30==0) flush();
+    if( logical_clock % 30 == 0) flush();
 }
 
 void DataAccess::persistStatus(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content){
@@ -184,7 +330,7 @@ void DataAccess::persistStatus(const int64_t &timestamp, const std::string &sour
     StatusMessage obj("Status", timestamp, logical_clock, source, target, content);
     statusVec.push_back(obj);
 
-    if(logical_clock%30==0) flush();
+    if (logical_clock % 30 == 0) flush();
 }
 
 void DataAccess::persistUncertainty(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content){
@@ -192,7 +338,7 @@ void DataAccess::persistUncertainty(const int64_t &timestamp, const std::string 
     UncertaintyMessage obj("Uncertainty", timestamp, logical_clock, source, target, content);
     uncertainVec.push_back(obj);
 
-    if(logical_clock%30==0) flush();
+    if(logical_clock % 30 == 0) flush();
 }
 
 void DataAccess::persistAdaptation(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content){
@@ -200,7 +346,7 @@ void DataAccess::persistAdaptation(const int64_t &timestamp, const std::string &
     AdaptationMessage obj("Adaptation", timestamp, logical_clock, source, target, content);
     adaptVec.push_back(obj);
 
-    if(logical_clock%30==0) flush();
+    if(logical_clock % 30 == 0) flush();
 }
 
 void DataAccess::flush(){

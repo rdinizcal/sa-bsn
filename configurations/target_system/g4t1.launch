@@ -2,10 +2,4 @@
     <node name="g4t1" pkg="component" type="g4t1" output="screen" />
 
     <param name="frequency" value="1" /> <!-- 1 Hz  -->
-
-    <param name="connect" value="true" type="bool" />
-    <!-- Severver variables -->
-    <param name="db_url" value="https://my-project-1516369881504.firebaseio.com" />
-    <param name="session" value="1" type="int" />
-
 </launch>

@@ -6,6 +6,7 @@ add_compile_options(-std=c++11)
 ###########################################################################
 ## Find catkin and any catkin packages
 FIND_PACKAGE(catkin REQUIRED COMPONENTS roscpp std_msgs genmsg roslib messages archlib)
+FIND_PACKAGE(cpprestsdk REQUIRED NAMES cpprestsdk cpprest)
 
 ###########################################################################
 # Export catkin package.
@@ -23,13 +24,18 @@ INCLUDE_DIRECTORIES(${catkin_INCLUDE_DIRS})
 SET (BSN_INCLUDE_DIRS /usr/local/include/bsn)
 INCLUDE_DIRECTORIES (${BSN_INCLUDE_DIRS})
 
+# Set header files from BSN.
+SET (LEPTON_INCLUDE_DIRS /usr/local/include/lepton)
+INCLUDE_DIRECTORIES (${LEPTON_INCLUDE_DIRS})
+
 # Set include directory.
 INCLUDE_DIRECTORIES(include)
 
 ###########################################################################
-# Add and Set linking libraries to successfully link test suites and binaries.
+# Set external libraries.
 FIND_LIBRARY(BSN_LIBRARY bsn)
-SET (LIBRARIES ${BSN_LIBRARY})
+FIND_LIBRARY(LEPTON_LIBRARY lepton)
+SET (LIBRARIES ${BSN_LIBRARY} ${LEPTON_LIBRARY})
 
 ###########################################################################
 # Build this project.
@@ -37,5 +43,5 @@ FILE(GLOB ${PROJECT_NAME}-src "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 SET(data_access-src "${CMAKE_CURRENT_SOURCE_DIR}/src/DataAccess.cpp")
 ADD_EXECUTABLE (data_access  "${CMAKE_CURRENT_SOURCE_DIR}/apps/data_access.cpp" ${${PROJECT_NAME}-src} ${data_access-src})
-TARGET_LINK_LIBRARIES (data_access ${catkin_LIBRARIES} ${LIBRARIES})
+TARGET_LINK_LIBRARIES (data_access PRIVATE cpprestsdk::cpprest ${catkin_LIBRARIES} ${LIBRARIES})
 ADD_DEPENDENCIES(data_access messages_generate_messages_cpp)
