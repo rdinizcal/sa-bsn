@@ -10,10 +10,11 @@
 
 #include "archlib/Uncertainty.h"
 #include "archlib/ROSComponent.hpp"
+#include "archlib/simulation/UncertaintyInjector.hpp"
 
 #include "bsn/operation/Operation.hpp"
 
-class Injector : public arch::ROSComponent {
+class Injector : public archlib::simulation::UncertaintyInjector {
 
 	public:
     	Injector(int &argc, char **argv, const std::string &name);
