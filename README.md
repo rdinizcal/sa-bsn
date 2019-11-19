@@ -138,7 +138,7 @@ cd ~/catkin_ws/src/bsn_ros/ &&
 bash run.sh
 ``` 
 
-## In case or error due to the ROS path
+#### In case or error due to the ROS path
 
 You might want to source the setup.bash inside the catkin workspace:
 ```
