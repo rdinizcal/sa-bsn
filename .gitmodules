@@ -1,6 +1,3 @@
 [submodule "src/manager/enactor/ROS_Scheduler"]
 	path = src/manager/enactor/ROS_Scheduler
 	url = https://github.com/ericbg27/ROS_Scheduler
-[submodule "src/manager/ROS_Scheduler"]
-	path = src/manager/ROS_Scheduler
-	url = https://github.com/ericbg27/ROS_Scheduler

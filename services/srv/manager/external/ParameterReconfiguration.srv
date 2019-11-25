@@ -1,6 +1,0 @@
-#request constants
-string[] module_names
-float64[] frequencies
-int64[] deadlines
----
-#response constants

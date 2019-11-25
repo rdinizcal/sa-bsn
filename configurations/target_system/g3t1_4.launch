@@ -1,0 +1,34 @@
+<launch> 
+    <!-- Blood Pressure Measurement sensor-->    
+    <node name="g3t1_4" pkg="component" type="g3t1_4" output="screen" />
+
+    <param name="frequency" value="1" /> <!-- 1 Hz  -->
+
+    <!-- Defines the percentages to consider low, moderate or high risk -->
+    <param name="lowrisk" value="0,20" />
+    <param name="midrisk" value="21,65" />
+    <param name="highrisk" value="66,100" />
+
+    <!-- risk values for diastolic -->
+    <param name="diasHighRisk0" value="-1,-1" />
+    <param name="diasMidRisk0" value="-1,-1" />
+    <param name="diasLowRisk" value="0,80" />
+    <param name="diasMidRisk1" value="80,90" />
+    <param name="diasHighRisk1" value="90,300" />
+
+    <!-- risk values for systolic -->
+    <param name="systHighRisk0" value="-1,-1" />
+    <param name="systMidRisk0" value="-1,-1" />
+    <param name="systLowRisk" value="0,120" />
+    <param name="systMidRisk1" value="120,140" />
+    <param name="systHighRisk1" value="140,300" />
+
+    <!-- accuracy in percentage for diastolic -->
+    <param name="diasdata_accuracy" value="90" type="double" />
+    <param name="diascomm_accuracy" value="100" type="double" />
+
+    <!-- accuracy in percentage for systolic -->
+    <param name="systdata_accuracy" value="90" type="double" />
+    <param name="systcomm_accuracy" value="100" type="double" />
+
+</launch>
