@@ -90,6 +90,8 @@ double G3T1_1::collect() {
 
     srv.request.vitalSign = "oxigenation";
 
+    std::cerr << "qualquer coisa" << std::endl;
+
     if (client.call(srv)) {
         m_data = srv.response.data;
         ROS_INFO("new data collected: [%s]", std::to_string(m_data).c_str());

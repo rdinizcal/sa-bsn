@@ -13,7 +13,7 @@ void PatientModule::setUp() {
     service = nh.advertiseService("getPatientData", &PatientModule::getPatientData, this);
     double aux;
 
-    frequency = -1e9+7;
+    frequency = 1000;
 
     // Get what vital signs this module will simulate
     nh.getParam("vitalSigns", vitalSigns);
@@ -27,16 +27,16 @@ void PatientModule::setUp() {
     for (std::string s : splittedVitalSigns) {
         vitalSignsFrequencies[s] = 0;
         nh.getParam(s + "_Change", aux);
-        frequency = std::max(frequency, aux);
         vitalSignsChanges[s] = 1/aux;
         nh.getParam(s + "_Offset", vitalSignsOffsets[s]);
     }
 
-    // For each vital sign, build its data generator
     for (const std::string& s : splittedVitalSigns) {
         patientData[s] = configureDataGenerator(s);
     }
+
     rosComponentDescriptor.setFreq(frequency);
+    
     period = 1/frequency;
 }
 
@@ -101,8 +101,8 @@ bool PatientModule::getPatientData(services::PatientData::Request &request,
 }
 
 void PatientModule::body() {
-    
     for (auto &p : vitalSignsFrequencies) {
+        
         if (p.second >= (vitalSignsChanges[p.first] + vitalSignsOffsets[p.first])) {
             patientData[p.first].nextState();
             p.second = vitalSignsOffsets[p.first];
@@ -110,6 +110,7 @@ void PatientModule::body() {
         } else {
             p.second += period;
         }
+        
     }
 }
 
