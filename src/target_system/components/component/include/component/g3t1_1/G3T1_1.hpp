@@ -18,7 +18,6 @@
 
 #include "services/PatientData.h"
 #include "messages/SensorData.h"
-#include "messages/Info.h"
 
 class G3T1_1 : public Sensor {
 
