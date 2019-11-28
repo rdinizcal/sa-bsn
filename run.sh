@@ -19,6 +19,9 @@ gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'rosla
 gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g3t1_1.launch'
 gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g3t1_2.launch'
 gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g3t1_3_double.launch'
+gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g3t1_3.launch'
+gnome-terminal --working-directory=${bsn}/configurations/environment   -e 'roslaunch patient.launch'
+
 #gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g3t1_4.launch'
 gnome-terminal --working-directory=${bsn}/configurations/environment   -e 'roslaunch patient.launch'
 

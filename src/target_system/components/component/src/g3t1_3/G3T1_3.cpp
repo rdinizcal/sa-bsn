@@ -22,28 +22,13 @@ G3T1_3::~G3T1_3() {}
 
 void G3T1_3::setUp() {
     Component::setUp();
-
-    srand(time(NULL));
-
-    Operation op;    
     
-    std::vector<std::string> t_probs;
-    std::array<float, 25> transitions;
     std::array<bsn::range::Range,5> ranges;
+    Operation op;    
     std::string s;
     ros::NodeHandle private_handle("~");
 
-    for(uint32_t i = 0; i < transitions.size(); i++){
-        for(uint32_t j = 0; j < 5; j++){
-            handle.getParam("state" + std::to_string(j), s);
-            t_probs = op.split(s, ',');
-            for(uint32_t k = 0; k < 5; k++){
-                transitions[i++] = std::stod(t_probs[k]);
-            }
-        }
-    }
-    
-    { // Configure markov chain
+    { // Get ranges
         std::vector<std::string> lrs,mrs0,hrs0,mrs1,hrs1;
 
         handle.getParam("LowRisk", s);
@@ -62,11 +47,6 @@ void G3T1_3::setUp() {
         ranges[2] = Range(std::stod(lrs[0]), std::stod(lrs[1]));
         ranges[3] = Range(std::stod(mrs1[0]), std::stod(mrs1[1]));
         ranges[4] = Range(std::stod(hrs1[0]), std::stod(hrs1[1]));
-
-        markov = Markov(transitions, ranges, 2);
-        bsn::generator::DataGenerator dt(markov);
-        dataGenerator = dt;
-        dataGenerator.setSeed();
     }
 
     { // Configure sensor configuration
@@ -106,11 +86,19 @@ void G3T1_3::tearDown() {
 
 double G3T1_3::collect() {
     double m_data = 0;
+    ros::ServiceClient client = handle.serviceClient<services::PatientData>("getPatientData");
+    services::PatientData srv;
 
-    m_data = dataGenerator.getValue();
+    srv.request.vitalSign = "temperature";
+
+    if (client.call(srv)) {
+        m_data = srv.response.data;
+        ROS_INFO("new data collected: [%s]", std::to_string(m_data).c_str());
+    } else {
+        ROS_INFO("error collecting data");
+    }
+
     //battery.consume(BATT_UNIT);
-
-    ROS_INFO("new data collected: [%s]", std::to_string(m_data).c_str());
 
     collected_risk = sensorConfig.evaluateNumber(m_data);
 

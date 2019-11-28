@@ -4,8 +4,8 @@
     <param name="frequency" value="10" /> <!-- 1 Hz  -->
 
     <param name="connect" value="false" type="bool" />
-    <!-- Firebase Realtime Database -->
+    <!-- Severver variables -->
     <param name="db_url" value="https://my-project-1516369881504.firebaseio.com" />
-    <param name="session" value="25" type="int" />
+    <param name="session" value="1" type="int" />
 
 </launch>
