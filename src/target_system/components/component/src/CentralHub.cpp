@@ -84,15 +84,6 @@ void CentralHub::turnOff() {
     deactivate();
 }
 
-/*  battery will always recover in 20seconds
-    *
-    *  b/s = 100% / 20 seconds = 5 %/s 
-    *      => recovers 5% battery per second
-    *  if we divide by the execution frequency
-    *  we get the amount of battery we need to
-    *  recover per execution cycle to achieve the
-    *  5 %/s battery recovery rate
-    */
 void CentralHub::recharge() {
     if(battery.getCurrentLevel() <= 100) 
         battery.generate((100/20)/rosComponentDescriptor.getFreq());
