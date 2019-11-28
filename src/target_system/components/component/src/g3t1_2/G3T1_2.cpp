@@ -3,6 +3,7 @@
 #define BATT_UNIT 0.01
 
 using namespace bsn::range;
+using namespace bsn::resource;
 using namespace bsn::generator;
 using namespace bsn::operation;
 using namespace bsn::configuration;
@@ -13,17 +14,18 @@ G3T1_2::G3T1_2(int &argc, char **argv, const std::string &name) :
     dataGenerator(),
     filter(1),
     sensorConfig(),
-    collected_risk() {}
+    collected_risk(),
+    sensor_id(-1) {}
 
 G3T1_2::~G3T1_2() {}
 
 void G3T1_2::setUp() {
     Component::setUp();
-            
-    Operation op;
     
-    std::array<bsn::range::Range,5> ranges;
+    std::array<bsn::range::Range,5> ranges;            
+    Operation op;
     std::string s;
+    ros::NodeHandle private_handle("~");
     
     { // Configure markov chain
         std::vector<std::string> lrs,mrs0,hrs0,mrs1,hrs1;
@@ -71,6 +73,8 @@ void G3T1_2::setUp() {
         std::vector<std::string> high_p = op.split(s, ',');
         percentages[2] = Range(std::stod(high_p[0]), std::stod(high_p[1]));
 
+        private_handle.getParam("instanceID", sensor_id);
+        
         sensorConfig = SensorConfiguration(0, low_range, midRanges, highRanges, percentages);
     }
 
@@ -126,6 +130,7 @@ void G3T1_2::transfer(const double &m_data) {
     msg.data = m_data;
     msg.risk = risk;
     msg.batt = battery.getCurrentLevel();
+    msg.id   = sensor_id;
 
     data_pub.publish(msg);
     

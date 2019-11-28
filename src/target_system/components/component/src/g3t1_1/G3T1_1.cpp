@@ -6,6 +6,7 @@
 #include <cmath>
 
 using namespace bsn::range;
+using namespace bsn::resource;
 using namespace bsn::generator;
 using namespace bsn::operation;
 using namespace bsn::configuration;
@@ -16,17 +17,19 @@ G3T1_1::G3T1_1(int &argc, char **argv, const std::string &name) :
     dataGenerator(),
     filter(1),
     sensorConfig(),
-    collected_risk() {}
+    collected_risk(),
+    sensor_id(-1) {}
 
 G3T1_1::~G3T1_1() {}
 
 void G3T1_1::setUp() {
     Component::setUp();
 
+    std::array<bsn::range::Range,5> ranges;
     Operation op;
     std::string s;
-
-    std::array<bsn::range::Range,5> ranges;
+    ros::NodeHandle private_handle("~");
+    
     
     { // Configure markov chain
         std::vector<std::string> lrs,mrs0,hrs0,mrs1,hrs1;
@@ -74,6 +77,8 @@ void G3T1_1::setUp() {
         std::vector<std::string> high_p = op.split(s, ',');
         percentages[2] = Range(std::stod(high_p[0]), std::stod(high_p[1]));
 
+        private_handle.getParam("instanceID", sensor_id);
+
         sensorConfig = SensorConfiguration(0, low_range, midRanges, highRanges, percentages);
     }
     
@@ -89,8 +94,6 @@ double G3T1_1::collect() {
     services::PatientData srv;
 
     srv.request.vitalSign = "oxigenation";
-
-    std::cerr << "qualquer coisa" << std::endl;
 
     if (client.call(srv)) {
         m_data = srv.response.data;
@@ -132,6 +135,7 @@ void G3T1_1::transfer(const double &m_data) {
     msg.data = m_data;
     msg.risk = risk;
     msg.batt = battery.getCurrentLevel();
+    msg.id   = sensor_id;
 
     data_pub.publish(msg);
     //battery.consume(0.2);
