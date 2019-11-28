@@ -1,3 +1,4 @@
+
 #include <list>
 #include "ros/ros.h"
 
@@ -12,4 +13,9 @@ class Monitor_g3t1_3 (){
         ros::NodeHandle serviceInput;
         ros::Publisher serviceValidation;
         std::list<archlib::Status::ConstPtr> input_queue;
+=======
+class M_g3t1_3 : public Monitor {
+
+    
+
 }

@@ -128,7 +128,16 @@ void G4T1::collect(const messages::SensorData::ConstPtr& msg) {
 
 void G4T1::process(){
     //battery.consume(BATT_UNIT*data_buffer.size());
-    patient_status = data_fuse(data_buffer); // consumes 1 packt per sensor (in the buffers that have packages to be processed)
+
+    std::vector<double> current_data;
+
+    for(std::vector<std::list<double>>::iterator it = data_buffer.begin(); it != data_buffer.end(); it++) {
+        double el = it->front();
+        current_data.push_back(el);
+        if(it->size() > 1) it->pop_front();
+    }
+
+    patient_status = data_fuse(current_data); // consumes 1 packt per sensor (in the buffers that have packages to be processed)
     for (int i = 0; i < buffer_size.size(); ++i){ // update buffer sizes
         buffer_size[i] = data_buffer[i].size();
     }
