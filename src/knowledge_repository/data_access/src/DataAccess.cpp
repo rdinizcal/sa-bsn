@@ -19,6 +19,7 @@ void DataAccess::setUp() {
     uncertainty_filepath = path + "/../resource/logs/uncertainty_" + now + ".log";
     adaptation_filepath = path + "/../resource/logs/adaptation_" + now + ".log";
     ctmetrics_filepath = path + "/../resource/logs/ctmetrics_" + now + ".log";
+    engineinfo_filepath = path + "/../resource/logs/engineinfo_" + now + ".log";
 
     fp.open(event_filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
     fp << "\n";
@@ -78,6 +79,8 @@ void DataAccess::receivePersistMessage(const archlib::Persist::ConstPtr& msg) {
         persistAdaptation(msg->timestamp, msg->source, msg->target, msg->content);
     } else if(msg->type=="ControlTheoryMetrics") {
         persistControlTheoryMetrics(msg->timestamp, msg->source, msg->target, msg->content);
+    } else if(msg->type=="EngineInfo") {
+        persistEngineInfo(msg->timestamp, msg->source, msg->target, msg->content);
     } else {
         ROS_INFO("(Could not identify message type!!)");
     }
@@ -182,7 +185,31 @@ void DataAccess::persistControlTheoryMetrics(const int64_t &timestamp, const std
     if(logical_clock%30==0) flush();
 }
 
+void DataAccess::persistEngineInfo(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content) {
+    bsn::operation::Operation op;
+    std::vector<std::string> data = op.split(content, ';');
+
+    EngineInfoMessage obj("EngineInfo", timestamp, logical_clock, source, target, data[0], data[1], data[2]);
+    engineinfoVec.push_back(obj);
+
+    if(logical_clock%30==0) flush();
+}
+
 void DataAccess::flush(){
+    fp.open(engineinfo_filepath, std::fstream::in | std::fstream::out | std::fstream::app);
+    for(std::vector<EngineInfoMessage>::iterator it = engineinfoVec.begin(); it != engineinfoVec.end(); ++it)
+    {
+        fp << (*it).getName() << ",";
+        fp << (*it).getLogicalClock() << ",";
+        fp << (*it).getTimestamp() << ",";
+        fp << (*it).getSource() << ",";
+        fp << (*it).getTarget() << ",";
+        fp << (*it).getEngineKp() << ",";
+        fp << (*it).getEngineOffset() << ",";
+        fp << (*it).getElapsedTime() << "\n";
+        
+    }
+
     fp.open(ctmetrics_filepath, std::fstream::in | std::fstream::out | std::fstream::app);
     for(std::vector<ControlTheoryMetricsMessage>::iterator it = ctmetricsVec.begin(); it != ctmetricsVec.end(); ++it)
     {

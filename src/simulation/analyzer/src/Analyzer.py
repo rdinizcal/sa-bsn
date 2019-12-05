@@ -21,6 +21,8 @@ from collections import OrderedDict
 from archlib.msg import Strategy
 from archlib.msg import Persist
 
+import time
+
 
 class Analyzer:
 
@@ -230,7 +232,9 @@ class Analyzer:
         content += self.settling_time + ";"
         content += self.overshoot + ";"
         content += self.sse
-
+        msg.content = content
+        msg.type = "ControlTheoryMetrics"
+        msg.timestamp = time.time()
         pub.publish(msg)
 
 class Formula:

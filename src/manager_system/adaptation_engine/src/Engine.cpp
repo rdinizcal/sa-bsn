@@ -379,10 +379,12 @@ void Engine::plan() {
 
         msg.source = ros::this_node::getName();
         msg.target = "data_access";
-        msg.content += std::to_string(Kp) + " ";
-        msg.content += std::to_string(offset) + " ";
-        msg.content += std::to_string(elapsed_time);
-
+        std::string content = std::to_string(Kp) + ";";
+        content += std::to_string(offset) + ";";
+        content += std::to_string(elapsed_time);
+        msg.content = content;
+        msg.type = "EngineInfo";
+        msg.timestamp = std::chrono::high_resolution_clock::now().time_since_epoch().count();;
         persist_pub.publish(msg);
 
         if(/*!blacklisted(*it) && */(r_new > r_ref*(1-stability_margin) && r_new < r_ref*(1+stability_margin))){ // if not listed and converges, yay!

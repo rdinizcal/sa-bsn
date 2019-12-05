@@ -19,6 +19,7 @@
 #include "UncertaintyMessage.hpp"
 #include "AdaptationMessage.hpp"
 #include "ControlTheoryMetricsMessage.hpp"
+#include "EngineInfoMessage.hpp"
 
 class DataAccess : public arch::ROSComponent {
 
@@ -36,6 +37,7 @@ class DataAccess : public arch::ROSComponent {
 		void persistUncertainty(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content);
 		void persistAdaptation(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content);
 		void persistControlTheoryMetrics(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content);
+		void persistEngineInfo(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content);
 
 		void flush();
 
@@ -59,6 +61,7 @@ class DataAccess : public arch::ROSComponent {
 		std::string uncertainty_filepath;
 		std::string adaptation_filepath;
 		std::string ctmetrics_filepath;
+		std::string engineinfo_filepath;
 
 		int64_t logical_clock;
 
@@ -67,6 +70,7 @@ class DataAccess : public arch::ROSComponent {
 		std::vector<UncertaintyMessage> uncertainVec;
 		std::vector<AdaptationMessage> adaptVec;
 		std::vector<ControlTheoryMetricsMessage> ctmetricsVec;
+		std::vector<EngineInfoMessage> engineinfoVec; 
 
 		std::map<std::string, std::deque<std::string>> status;
 		std::map<std::string, std::deque<std::string>> events;
