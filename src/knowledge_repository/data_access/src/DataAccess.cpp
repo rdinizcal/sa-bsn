@@ -13,9 +13,12 @@ void DataAccess::setUp() {
     std::string now = std::to_string(this->now());
 
     event_filepath = path + "/../resource/logs/event_" + now + ".log";
+    tmp_event_filepath = path + "/../resource/logs/event_" + now + "_tmp.log";
     status_filepath = path + "/../resource/logs/status_" + now + ".log";
+    tmp_status_filepath = path + "/../resource/logs/status_" + now + "_tmp.log";
     uncertainty_filepath = path + "/../resource/logs/uncertainty_" + now + ".log";
     adaptation_filepath = path + "/../resource/logs/adaptation_" + now + ".log";
+    ctmetrics_filepath = path + "/../resource/logs/ctmetrics_" + now + ".log";
 
     fp.open(event_filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
     fp << "\n";
@@ -73,6 +76,8 @@ void DataAccess::receivePersistMessage(const archlib::Persist::ConstPtr& msg) {
         persistUncertainty(msg->timestamp, msg->source, msg->target, msg->content);
     } else if(msg->type=="AdaptationCommand") {
         persistAdaptation(msg->timestamp, msg->source, msg->target, msg->content);
+    } else if(msg->type=="ControlTheoryMetrics") {
+        persistControlTheoryMetrics(msg->timestamp, msg->source, msg->target, msg->content);
     } else {
         ROS_INFO("(Could not identify message type!!)");
     }
@@ -165,9 +170,46 @@ void DataAccess::persistAdaptation(const int64_t &timestamp, const std::string &
     if(logical_clock%30==0) flush();
 }
 
+void DataAccess::persistControlTheoryMetrics(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content){
+    
+    //parsing
+    bsn::operation::Operation op;
+    std::vector<std::string> metrics = op.split(content, ';');
+
+    ControlTheoryMetricsMessage obj("ControlTheoryMetrics", timestamp, logical_clock, source, target, enactor_kp, metrics[0], metrics[1], metrics[2], metrics[3], metrics[4]);
+    ctmetricsVec.push_back(obj);
+
+    if(logical_clock%30==0) flush();
+}
+
 void DataAccess::flush(){
+    fp.open(ctmetrics_filepath, std::fstream::in | std::fstream::out | std::fstream::app);
+    for(std::vector<ControlTheoryMetricsMessage>::iterator it = ctmetricsVec.begin(); it != ctmetricsVec.end(); ++it)
+    {
+        fp << (*it).getName() << ",";
+        fp << (*it).getLogicalClock() << ",";
+        fp << (*it).getTimestamp() << ",";
+        fp << (*it).getSource() << ",";
+        fp << (*it).getTarget() << ",";
+        fp << (*it).getEnactorKp() << ",";
+        fp << (*it).getStability() << ",";
+        fp << (*it).getConvergencePoint() << ",";
+        fp << (*it).getSettlingTime() << ",";
+        fp << (*it).getOvershoot() << ",";
+        fp << (*it).getSteadyStateError() << "\n";
+    }
 
     fp.open(status_filepath, std::fstream::in | std::fstream::out | std::fstream::app);   
+    for(std::vector<StatusMessage>::iterator it = statusVec.begin(); it != statusVec.end(); ++it) {
+        fp << (*it).getName() << ",";
+        fp << (*it).getLogicalClock() << ",";
+        fp << (*it).getTimestamp() << ",";
+        fp << (*it).getSource() << ",";
+        fp << (*it).getTarget() << ",";
+        fp << (*it).getState() << "\n";
+    }
+    fp.close();
+    fp.open(tmp_status_filepath, std::fstream::in | std::fstream::out | std::fstream::app);   
     for(std::vector<StatusMessage>::iterator it = statusVec.begin(); it != statusVec.end(); ++it) {
         fp << (*it).getName() << ",";
         fp << (*it).getLogicalClock() << ",";
@@ -180,6 +222,16 @@ void DataAccess::flush(){
     statusVec.clear();
 
     fp.open(event_filepath, std::fstream::in | std::fstream::out | std::fstream::app);   
+    for(std::vector<EventMessage>::iterator it = eventVec.begin(); it != eventVec.end(); ++it) {
+        fp << (*it).getName() << ",";
+        fp << (*it).getLogicalClock() << ",";
+        fp << (*it).getTimestamp() << ",";
+        fp << (*it).getSource() << ",";
+        fp << (*it).getTarget() << ",";
+        fp << (*it).getEvent() << "\n";
+    }
+    fp.close();
+    fp.open(tmp_event_filepath, std::fstream::in | std::fstream::out | std::fstream::app);   
     for(std::vector<EventMessage>::iterator it = eventVec.begin(); it != eventVec.end(); ++it) {
         fp << (*it).getName() << ",";
         fp << (*it).getLogicalClock() << ",";
