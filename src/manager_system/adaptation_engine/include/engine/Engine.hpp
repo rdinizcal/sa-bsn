@@ -7,6 +7,7 @@
 #include <map>
 #include <set>
 #include <algorithm>
+#include <chrono>
 
 #include "ros/ros.h"
 #include "ros/package.h"
@@ -24,6 +25,7 @@
 #include "lepton/Lepton.h"
 
 #include "archlib/DataAccessRequest.h"
+#include "archlib/Persist.h"
 #include "archlib/Strategy.h"
 #include "archlib/Exception.h"
 #include "archlib/ROSComponent.hpp"
@@ -70,7 +72,7 @@ class Engine : public arch::ROSComponent {
 		std::map<std::string, int> priority;
 
 		ros::NodeHandle handle;
-		ros::Publisher enact;
+		ros::Publisher enact, persist_pub;
 
 		int cycles;
 		int counter;

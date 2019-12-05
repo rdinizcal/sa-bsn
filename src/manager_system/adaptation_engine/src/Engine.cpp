@@ -29,6 +29,7 @@ void Engine::setUp() {
 	nh.getParam("actuation_freq", actuation_freq);
 
     enact = handle.advertise<archlib::Strategy>("strategy", 10);
+    persist_pub = handle.advertise<archlib::Persist>("persist", 10);
 
     std::string path = ros::package::getPath("adaptation_engine");
 
@@ -256,6 +257,7 @@ void Engine::analyze() {
 */
 void Engine::plan() {
     std::cout << "[plan]" << std::endl;
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
     std::cout << "r_ref= " << r_ref << std::endl;
     double r_curr = calculate_reli();
@@ -368,6 +370,20 @@ void Engine::plan() {
             }
         }
         std::cout << "] = " << r_new << std::endl;
+
+        std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+
+        uint32_t elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+
+        archlib::Persist msg;
+
+        msg.source = ros::this_node::getName();
+        msg.target = "data_access";
+        msg.content += std::to_string(Kp) + " ";
+        msg.content += std::to_string(offset) + " ";
+        msg.content += std::to_string(elapsed_time);
+
+        persist_pub.publish(msg);
 
         if(/*!blacklisted(*it) && */(r_new > r_ref*(1-stability_margin) && r_new < r_ref*(1+stability_margin))){ // if not listed and converges, yay!
             execute();
