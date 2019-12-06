@@ -1,6 +1,10 @@
+#!/usr/bin/env python
+
+import sys
 #for computing formula
 from math import *
 
+import rospy
 #for reading logs
 import csv 
 
@@ -38,7 +42,7 @@ class Analyzer:
         self.robustness = 0
         self.logical_clock = 0
         self.received_command = False
-        self.pub = rospy.Publisher('persist', ControlTheoryMetrics, queue_size=10)
+        self.pub = rospy.Publisher('persist', Persist, queue_size=10)
         
     def analyze(self, x, y, setpoint):
 
@@ -88,7 +92,7 @@ class Analyzer:
         print('-----------------------------------------------')
     
     def callback(self, data):
-        with open("../../knowledge_repository/resource/logs/status_" + self.file_id + "_tmp.log", newline='') as log_file:
+        with open("../../knowledge_repository/resource/logs/status_" + self.file_id + "_tmp.log", 'w') as log_file:
             log_file.truncate()
             log_file.close()
         self.received_command = True
@@ -96,7 +100,7 @@ class Analyzer:
     def run(self): 
 
         rospy.init_node("analyzer")
-        rospy.subscriber("strategy", Strategy, callback)
+        rospy.Subscriber("strategy", Strategy, self.callback)
         loop_rate = rospy.Rate(1)
         loop_rate.sleep()
 
@@ -369,3 +373,7 @@ class Context:
     
     def deactivate(self):
         self.active = 0
+
+if __name__ == "__main__":
+    analyzer = Analyzer(len(sys.argv), sys.argv)
+    analyzer.run()
