@@ -9,9 +9,9 @@ This is a Body Sensor Network implementation on ROS. So far, the BSN was used fo
 * [Bsn Library](https://github.com/rdinizcal/libbsn)  provides the implementation of sensors, data fusers and emergency detection
 * [Bsn arch](https://github.com/rdinizcal/arch)
 
-## Instalation of dependencies: 
+## Install dependencies: 
 #### ROS:
-Firstly it is required Ros Melodic installation. Our development team is sctrictly using Ubuntu 18.04 (Bionic). To install it please follow this [link](http://wiki.ros.org/melodic/Installation/Ubuntu).  
+First it is required to install ROS Melodic. Our development team is strictly using Ubuntu 18.04 (Bionic). To install it please follow this [link](http://wiki.ros.org/melodic/Installation/Ubuntu).  
 Also, it is strongly advised to use catkin for managing the ROS packages, refer to this [link](http://wiki.ros.org/ROS/Tutorials/InstallingandConfiguringROSEnvironment) after installing ROS Melodic. As such you will need to create a catkin workspace. You can do so by following the steps:
 
 ```
@@ -21,36 +21,36 @@ catkin_make
 ```
 
 #### CPP rest sdk:
-In order to use Cpp rest sdk in a Cmake file it is required to build this dependencie source code.  
-Firstly install its dependencies:
+In order to use Cpp rest sdk, it is required to build its dependency source code.  
+First install the dependencies.
 
 ```
 sudo apt-get install g++ git libboost-atomic-dev libboost-thread-dev libboost-system-dev libboost-date-time-dev libboost-regex-dev libboost-filesystem-dev libboost-random-dev libboost-chrono-dev libboost-serialization-dev libwebsocketpp-dev openssl libssl-dev ninja-build
 ```
 
-Clone the repository:
+Then, clone the repository.
 
 ```
 git clone https://github.com/Microsoft/cpprestsdk.git casablanca
 ```
 
-Build it:
+And finally, build it.
 ```
 cd casablanca
 mkdir build.debug
 cd build.debug
 cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Debug
-ninja
+sudo ninja install
 ```
 
 #### Lepton:
-1. Clone the repository in your desired folder cointaining Lepton and its dependencies
+1. Clone the repository in your desired folder cointaining Lepton and its dependencies.
 
 ```
 git clone https://github.com/rdinizcal/lepton
 ``` 
 
-2. Then, create and enter build folder
+2. Then, create and enter build folder.
 ```
 cd lepton
 ``` 
@@ -58,24 +58,24 @@ cd lepton
 mkdir build && cd build
 ``` 
 
-3. Execute cmake from the build folder
+3. Execute cmake from the build folder.
 ``` 
 cmake ..
 ``` 
 
-4. Finally, compile and install lepton library
+4. Finally, compile and install lepton library.
 ``` 
 sudo make install
 ``` 
 
 #### Libbsn:
-1. Clone the repository in your desired folder cointaining Bsn library and its dependencies
+1. Clone the repository in your desired folder cointaining bsn library and its dependencies.
 
 ```
 git clone https://github.com/rdinizcal/libbsn
 ``` 
 
-2. Then, create and enter build folder
+2. Then, create and enter build folder.
 ```
 cd libbsn
 ``` 
@@ -83,29 +83,29 @@ cd libbsn
 mkdir build && cd build
 ``` 
 
-3. Execute cmake from the build folder
+3. Execute cmake from the build folder.
 ``` 
 cmake ..
 ``` 
 
-4. Finally, compile and install lepton library
+4. Finally, compile and install lepton library.
 ``` 
 sudo make install
 ``` 
 
 #### Bsn Arch:
-Firstly enter in catkin workspace:
+First enter in catkin workspace.
 
 ```
 cd ~/catkin_ws/src
 ```
 
-Clone the repository:
+Clone the repository.
 ```
 git clone https://github.com/rdinizcal/arch
 ```
 
-Finally build it:
+And build it.
 
 ```
 cd .. 
@@ -116,13 +116,13 @@ Once ALL the dependencies have been successfully installed, you can proceed to t
 
 ## Compiling
 
-1. Clone the repository inside the 'catkin_ws/src' directory:
+1. Clone the repository inside the 'catkin_ws/src' directory.
 ```
 cd ~/catkin_ws/src
 git clone https://github.com/rdinizcal/bsn_ros
 ``` 
 
-2. Then, compile under 'catkin_ws' directory:
+2. Then, compile under 'catkin_ws' directory.
 ```
 cd ~/catkin_ws/ && 
 catkin_make
@@ -137,6 +137,14 @@ or use roslaunch x.launch to execute a single node:
 cd ~/catkin_ws/src/bsn_ros/ && 
 bash run.sh
 ``` 
+
+#### In case or error due to the ROS path
+
+You might want to source the setup.bash inside the catkin workspace:
+```
+echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
+source ~/.bashrc
+```
 
 ## Authors
 
