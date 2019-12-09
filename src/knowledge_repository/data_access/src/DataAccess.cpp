@@ -245,41 +245,16 @@ bool DataAccess::processQuery(archlib::DataAccessRequest::Request &req, archlib:
 
     try {
 
-        if(req.name == "/engine") {
+        if (req.name == "/engine") {
             bsn::operation::Operation op;
             // wait smth like "all:status:100" -> return the last 100 success and failures of all active modules
             std::vector<std::string> query = op.split(req.query,':');
 
-            if(query[1] == "status"){
+            if (query[1] == "status") {
                 int num = stoi(query[2]);
 
-                for(std::map<std::string, std::deque<std::string>>::iterator it = status.begin(); it != status.end(); it++){
-                    std::string aux = it->first;
-                    aux += ":";
-                    bool flag = false;
-                    double sum = 0;
-                    uint32_t len = 0;
-                    for(int i = it->second.size()-num; i < it->second.size(); ++i) {
-                        if (it->second[i] == "success") { // calculate reliability
-                            sum +=1;
-                            len++;
-                        } else if (it->second[i] == "fail") {
-                            len++;
-                        }
-                        else {
-                            aux += it->second[i];
-                            aux += ",";
-                        }
-                        
-                        flag = true;
-                        //if((i < num) && (i+1 < it->second.size())) 
-                    }
-                    aux += std::to_string((len > 0) ? sum / len : 0) + ';';
-                    std::string key = it->first;
-                    key = key.substr(1, key.size());
-                    componentsReliabilities[key] = (len > 0) ? sum / len : 0;
-
-                    if(flag) res.content += aux;
+                for (auto it : status){
+                    res.content += calculateComponentStatus(it.first);
                 }
             } else if (query[1] == "event") {
                 int num = stoi(query[2]);
@@ -396,4 +371,50 @@ void DataAccess::flush(){
     }
     fp.close();
     adaptVec.clear();
+}
+
+/**
+ * Builds the response string and calculate the reliability
+ * of the component specified as parameter
+*/
+std::string DataAccess::calculateComponentStatus(const std::string& component) {
+    std::string aux = component, content = "";
+    aux += ":";
+    bool flag = false;
+    double sum = 0;
+    uint32_t len = 0;
+    for (std::string value : status[component]) {
+        // reliability = success/(success + fails)
+        if (value == "success") { // calculate reliability
+            sum +=1;
+            len++;
+        } else if (value == "fail") {
+            len++;
+        }
+        else { // it can be other values
+            aux += value;
+            aux += ",";
+        }
+        
+        flag = true;
+    }
+    aux += std::to_string((len > 0) ? sum / len : 0) + ';';
+
+    std::string key = component;
+    key = key.substr(1, key.size());
+
+    if(flag) content += aux;
+
+    componentsReliabilities[key] = (len > 0) ? sum / len : 0;
+
+    return content;
+}
+
+/**
+ * Reset the status of all components
+*/
+void DataAccess::resetStatus() {
+    for (auto component : status) {
+        component.second.clear();
+    }
 }
