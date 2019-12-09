@@ -3,7 +3,7 @@ bsn=$PWD
 gnome-terminal -x roscore & sleep 5s
 
 ################# KNOWLEDGE REPOSITORY #################
-# gnome-terminal --working-directory=${bsn}/configurations/knowledge_repository -e 'roslaunch data_access.launch' & sleep 1s
+gnome-terminal --working-directory=${bsn}/configurations/knowledge_repository -e 'roslaunch data_access.launch' & sleep 1s
 
 ################# MANAGER #################
 gnome-terminal --working-directory=${bsn}/configurations/system_manager -e 'roslaunch enactor.launch'
