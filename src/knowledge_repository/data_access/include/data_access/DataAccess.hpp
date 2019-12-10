@@ -57,6 +57,8 @@ class DataAccess : public arch::ROSComponent {
 
 		std::string calculateComponentStatus(const std::string& component);
 		void resetStatus();
+		void updateBatteries();
+		void updateCosts();
 	public:
 		virtual void setUp();
 		virtual void tearDown();
@@ -70,6 +72,10 @@ class DataAccess : public arch::ROSComponent {
 		ros::NodeHandle handle;
 	
 	private:
+		ros::Subscriber handle_persist;
+		ros::ServiceServer server;
+		ros::Subscriber targetSystemSub;
+
 		std::fstream fp;
 		std::string event_filepath;
 		std::string status_filepath;
@@ -87,9 +93,9 @@ class DataAccess : public arch::ROSComponent {
 		std::map<std::string, std::deque<std::string>> events;
 		int buffer_size;
 
-		std::map<std::string, double> componentsReliabilities;
-		std::map<std::string, double> componentsBatteries;
-		std::map<std::string, double> componentsCosts;
+		std::map<std::string, double> components_reliabilities;
+		std::map<std::string, double> components_batteries, components_last_batteries;
+		std::map<std::string, double> components_costs;
 		std::map<std::string, uint32_t> contexts;
 
 		bsn::model::Formula reliability_expression;
@@ -98,6 +104,11 @@ class DataAccess : public arch::ROSComponent {
 		std::shared_ptr<web::http::client::http_client> client;
 
 		bool connected;
+		double frequency;
+		double system_reliability;
+		double system_cost;
+		int32_t count_to_calc_and_reset;
+		int32_t arrived_status;
 };
 
 #endif 
