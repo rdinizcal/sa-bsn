@@ -1,6 +1,7 @@
 #!/bin/bash
 x=1
 cycles=1
+
 while [ $x -le $cycles ]
 do
 bsn=$PWD
@@ -32,7 +33,7 @@ gnome-terminal --working-directory=${bsn}/configurations/environment   -e 'rosla
 #gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g3t1_4.launch'
 
 ################# SIMULATION #################
-gnome-terminal --working-directory=${bsn}/configurations/simulation -e 'roslaunch --pid=/var/tmp/analyzer.pid analyzer.launch' & sleep 1s
+#gnome-terminal --working-directory=${bsn}/configurations/simulation -e 'roslaunch --pid=/var/tmp/analyzer.pid analyzer.launch' & sleep 1s
 
 gnome-terminal --working-directory=${bsn}/configurations/simulation -e 'roslaunch --pid=/var/tmp/injector.pid injector.launch'
 
@@ -48,7 +49,7 @@ kill $(cat /var/tmp/g3t1_1.pid && rm /var/tmp/g3t1_1.pid) & sleep 1s
 kill $(cat /var/tmp/g3t1_2.pid && rm /var/tmp/g3t1_2.pid) & sleep 1s
 kill $(cat /var/tmp/g3t1_3.pid && rm /var/tmp/g3t1_3.pid) & sleep 1s
 kill $(cat /var/tmp/patient.pid && rm /var/tmp/patient.pid) & sleep 1s
-kill $(cat /var/tmp/analyzer.pid && rm /var/tmp/analyzer.pid) & sleep 1s
+#kill $(cat /var/tmp/analyzer.pid && rm /var/tmp/analyzer.pid) & sleep 1s
 kill $(cat /var/tmp/injector.pid && rm /var/tmp/injector.pid) & sleep 1s
 kill $(cat /var/tmp/engine.pid && rm /var/tmp/engine.pid) & sleep 1s
 

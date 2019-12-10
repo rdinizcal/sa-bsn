@@ -275,7 +275,7 @@ void DataAccess::flush(){
     eventVec.clear();
 
     fp.open(tmp_event_filepath, std::fstream::in | std::fstream::out | std::fstream::app);   
-    for(std::vector<EventMessage>::iterator it = eventVec.begin(); it != eventVec.end(); ++it) {
+    for(std::vector<EventMessage>::iterator it = eventVecTmp.begin(); it != eventVecTmp.end(); ++it) {
         fp << (*it).getName() << ",";
         fp << (*it).getLogicalClock() << ",";
         fp << (*it).getTimestamp() << ",";

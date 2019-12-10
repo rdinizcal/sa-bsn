@@ -106,9 +106,9 @@ class Analyzer:
             log_file.truncate()
             log_file.close()
 
-        with open(self.repository_path + "/../resource/logs/event_" + self.file_id + "_tmp.log", 'w') as log_file:
-            log_file.truncate()
-            log_file.close()
+        #with open(self.repository_path + "/../resource/logs/event_" + self.file_id + "_tmp.log", 'w') as log_file:
+            #log_file.truncate()
+            #log_file.close()
             
         self.received_command = True
 
@@ -149,16 +149,16 @@ class Analyzer:
         ################################################################## 
 
         ################ load status log ################
-        with open(self.repository_path + "/../resource/logs/status_" + self.file_id + "_tmp.log", newline='') as log_file:
+        with open(self.repository_path + "/../resource/logs/status_" + self.file_id + "_tmp.log", mode='rb') as log_file:
             log_csv = csv.reader(log_file, delimiter=',')
             log_status = list(log_csv)
-            del log_status[0] # delete first line (do we need this?)
+            #del log_status[0] # delete first line (do we need this?)
 
-        ################ load event log ################
-        with open(self.repository_path + "/../resource/logs/event_" + self.file_id + "_tmp.log", newline='') as log_file:
+        ################ load event log ################    
+        with open(self.repository_path + "/../resource/logs/event_" + self.file_id + "_tmp.log", mode='rb') as log_file:
             log_csv = csv.reader(log_file, delimiter=',')
             log_event = list(log_csv)
-            del log_event[0] # delete first line (do we need this?)
+            #del log_event[0] # delete first line (do we need this?)
 
         #concatenate lists into one log list
         log = list()
