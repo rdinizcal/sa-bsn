@@ -10,16 +10,16 @@ int64_t DataAccess::now() const{
 void DataAccess::setUp() {
     std::string path = ros::package::getPath("repository");
 
-    std::string now = std::to_string(this->now());
+    file_id = std::to_string(this->now());
 
-    event_filepath = path + "/../resource/logs/event_" + now + ".log";
-    tmp_event_filepath = path + "/../resource/logs/event_" + now + "_tmp.log";
-    status_filepath = path + "/../resource/logs/status_" + now + ".log";
-    tmp_status_filepath = path + "/../resource/logs/status_" + now + "_tmp.log";
-    uncertainty_filepath = path + "/../resource/logs/uncertainty_" + now + ".log";
-    adaptation_filepath = path + "/../resource/logs/adaptation_" + now + ".log";
-    ctmetrics_filepath = path + "/../resource/logs/ctmetrics_" + now + ".log";
-    engineinfo_filepath = path + "/../resource/logs/engineinfo_" + now + ".log";
+    event_filepath = path + "/../resource/logs/event_" + file_id + ".log";
+    tmp_event_filepath = path + "/../resource/logs/event_" + file_id + "_tmp.log";
+    status_filepath = path + "/../resource/logs/status_" + file_id + ".log";
+    tmp_status_filepath = path + "/../resource/logs/status_" + file_id + "_tmp.log";
+    uncertainty_filepath = path + "/../resource/logs/uncertainty_" + file_id + ".log";
+    adaptation_filepath = path + "/../resource/logs/adaptation_" + file_id + ".log";
+    ctmetrics_filepath = path + "/../resource/logs/ctmetrics_" + file_id + ".log";
+    engineinfo_filepath = path + "/../resource/logs/engineinfo_" + file_id + ".log";
 
     fp.open(event_filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
     fp << "\n";
@@ -50,11 +50,12 @@ void DataAccess::body(){
     ros::NodeHandle n;
     ros::Subscriber handle_persist = n.subscribe("persist", 1000, &DataAccess::receivePersistMessage, this);
     ros::ServiceServer server = handle.advertiseService("DataAccessRequest", &DataAccess::processQuery, this);
+    ros::ServiceServer adr_server = handle.advertiseService("address", &DataAccess::sendAddress, this);
     ros::spin();
 }
 
 void DataAccess::receivePersistMessage(const archlib::Persist::ConstPtr& msg) {
-    ROS_INFO("I heard: [%s]", msg->type.c_str());
+    //ROS_INFO("I heard: [%s]", msg->type.c_str());
     ++logical_clock;
 
     if(msg->type=="Status"){
@@ -140,6 +141,11 @@ bool DataAccess::processQuery(archlib::DataAccessRequest::Request &req, archlib:
     return true;
 }
 
+bool DataAccess::sendAddress(services::Address::Request &req, services::Address::Response &res){
+    ROS_INFO("Received address request");
+    res.id = file_id;
+    return true;
+}
 
 void DataAccess::persistEvent(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content){
 

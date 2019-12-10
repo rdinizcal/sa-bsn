@@ -24,15 +24,17 @@ from collections import OrderedDict
 
 from archlib.msg import Strategy
 from archlib.msg import Persist
+from services.srv import Address
 
 import time
-
+import rospkg
 
 class Analyzer:
 
     def __init__(self, argc, argv):
-        self.file_id = argv[1]
-        self.formula_id = argv[2]
+        self.repository_path = rospkg.RosPack().get_path('repository')
+        self.file_id = self.receive_file_id()
+        self.formula_id = "reliability"
         self.stability_margin = 0.03
         self.stability = False
         self.convergence_point = 0
@@ -43,7 +45,8 @@ class Analyzer:
         self.logical_clock = 0
         self.received_command = False
         self.pub = rospy.Publisher('persist', Persist, queue_size=10)
-        
+        self.a = rospy.Subscriber("strategy", Strategy, self.callback)
+    
     def analyze(self, x, y, setpoint):
 
         print('-----------------------------------------------')
@@ -91,16 +94,27 @@ class Analyzer:
 
         print('-----------------------------------------------')
     
+    def receive_file_id(self):
+        rospy.wait_for_service('address')
+        receive_id = rospy.ServiceProxy('address', Address)
+        resp = receive_id()
+        
+        return resp.id
+
     def callback(self, data):
-        with open("../../knowledge_repository/resource/logs/status_" + self.file_id + "_tmp.log", 'w') as log_file:
+        with open(self.repository_path + "/../resource/logs/status_" + self.file_id + "_tmp.log", 'w') as log_file:
             log_file.truncate()
             log_file.close()
+
+        with open(self.repository_path + "/../resource/logs/event_" + self.file_id + "_tmp.log", 'w') as log_file:
+            log_file.truncate()
+            log_file.close()
+            
         self.received_command = True
 
     def run(self): 
-
         rospy.init_node("analyzer")
-        rospy.Subscriber("strategy", Strategy, self.callback)
+        
         loop_rate = rospy.Rate(1)
         loop_rate.sleep()
 
@@ -117,7 +131,7 @@ class Analyzer:
 
     def body(self):
         # load formula
-        formula = Formula("../../knowledge_repository/resource/models/"+self.formula_id+".formula", "float")
+        formula = Formula(self.repository_path + "/../resource/models/"+self.formula_id+".formula", "float")
 
         # build list of participating tasks
         tasks = dict()
@@ -135,13 +149,13 @@ class Analyzer:
         ################################################################## 
 
         ################ load status log ################
-        with open("../../knowledge_repository/resource/logs/status_" + self.file_id + "_tmp.log", newline='') as log_file:
+        with open(self.repository_path + "/../resource/logs/status_" + self.file_id + "_tmp.log", newline='') as log_file:
             log_csv = csv.reader(log_file, delimiter=',')
             log_status = list(log_csv)
             del log_status[0] # delete first line
 
         ################ load event log ################
-        with open("../../knowledge_repository/resource/logs/event_" + self.file_id + "_tmp.log", newline='') as log_file:
+        with open(self.repository_path + "/../resource/logs/event_" + self.file_id + "_tmp.log", newline='') as log_file:
             log_csv = csv.reader(log_file, delimiter=',')
             log_event = list(log_csv)
             del log_event[0] # delete first line

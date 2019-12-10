@@ -24,6 +24,7 @@ FIND_PACKAGE(catkin REQUIRED COMPONENTS std_msgs message_generation)
 ###########################################################################
 # Set message generation.
 ADD_SERVICE_FILES( FILES
+  knowledge_repository/Address.srv
   environment/patient/PatientData.srv
 )
 

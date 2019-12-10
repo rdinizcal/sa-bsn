@@ -10,6 +10,8 @@
 
 #include "bsn/operation/Operation.hpp"
 
+#include "services/Address.h"
+
 #include "archlib/Persist.h"
 #include "archlib/DataAccessRequest.h"
 #include "archlib/ROSComponent.hpp"
@@ -48,6 +50,8 @@ class DataAccess : public arch::ROSComponent {
 
 		void receivePersistMessage(const archlib::Persist::ConstPtr& msg);
 		bool processQuery(archlib::DataAccessRequest::Request &req, archlib::DataAccessRequest::Response &res);
+		bool sendAddress(services::Address::Request &req, services::Address::Response &res);
+
 
 	protected:
 		ros::NodeHandle handle;
@@ -62,6 +66,8 @@ class DataAccess : public arch::ROSComponent {
 		std::string adaptation_filepath;
 		std::string ctmetrics_filepath;
 		std::string engineinfo_filepath;
+
+		std::string file_id;
 
 		int64_t logical_clock;
 
@@ -80,6 +86,8 @@ class DataAccess : public arch::ROSComponent {
 		std::string enactor_kp;
 		std::string engine_kp;
 		std::string engine_offset;
+
+		ros::Publisher log_address_pub;
 };
 
 #endif 
