@@ -122,7 +122,7 @@ class Analyzer:
             if self.received_command:
                 self.logical_clock += 1
 
-            if self.logical_clock == 30:     
+            if self.logical_clock == 150:     
                 self.body()
                 self.received_command = False
                 self.logical_clock = 0
@@ -138,9 +138,7 @@ class Analyzer:
         ctxs = dict()
 
         global_reli_timeseries = dict() 
-        local_reli_timeseries = dict()
         global_status_timeseries = dict()
-        local_status_timeseries = dict()
 
         ################################################################## 
         #                                                                #
@@ -187,16 +185,6 @@ class Analyzer:
                 elif (status.content == 'fail'): tasks[tag].fail(instant)
 
                 if (status.content == 'success' or status.content == 'fail'):
-                    if not (tag in local_status_timeseries):
-                        local_status_timeseries[tag] = [[instant,status.content]]
-                    else:
-                        local_status_timeseries[tag].append([instant,status.content])
-
-                    if not (tag in local_reli_timeseries): 
-                        local_reli_timeseries[tag] = [[instant,tasks[tag].reliability()]]
-                    else:
-                        local_reli_timeseries[tag].append([instant,tasks[tag].reliability()])
-
                     ## compute global formulae
                     for tag in tasks:
                         formula.compute('R_'+tag, tasks[tag].reliability())
@@ -239,17 +227,17 @@ class Analyzer:
             xa.append(x[i])
             ya.append(y[i])
             i += 1
-                
-        self.analyze(xa, ya, setpoint)
+
+        self.analyze(x, y, setpoint)
         
         msg = Persist()
         msg.source = "analyzer"
         msg.target = "data access"
-        content = self.stability + ";" 
-        content += self.convergence_point + ";"
-        content += self.settling_time + ";"
-        content += self.overshoot + ";"
-        content += self.sse
+        content =  str(self.stability) + ";" 
+        content += str(self.convergence_point) + ";"
+        content += str(self.settling_time) + ";"
+        content += str(self.overshoot) + ";"
+        content += str(self.sse)
         msg.content = content
         msg.type = "ControlTheoryMetrics"
         msg.timestamp = time.time()
@@ -324,7 +312,7 @@ class Task:
     def __init__(self, _name):
         self.name = _name 
         self.lstInvocations = list()
-        self.res = 2.5 * 10e9 #seconds in nanoseconds
+        self.res = 1 * 10e9 #seconds in nanoseconds
     
     def __eq__(self, other):
         if isinstance(other, Task):
@@ -345,7 +333,7 @@ class Task:
             if inv[0] > before_last_step and inv[0] <= last_step:
                 aux.append(inv[1])
 
-        return sum(aux)/len(aux) if len(aux) > 0 else 0  # Success/Fail+Success
+        return float(sum(aux))/float(len(aux)) if len(aux) > 0 else 0  # Success/Fail+Success
 
     def cost (self) : return 1
     

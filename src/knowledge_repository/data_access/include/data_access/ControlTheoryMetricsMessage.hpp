@@ -18,7 +18,7 @@ class ControlTheoryMetricsMessage {
         std::string getConvergencePoint() const {return this->convergence_point;};
         std::string getSettlingTime() const {return this->settling_time;};
         std::string getOvershoot() const {return this->overshoot;};
-        std::string getSteadyStateError() const {return this->overshoot;};
+        std::string getSteadyStateError() const {return this->steady_state_error;};
 
 	private:
         std::string name;
