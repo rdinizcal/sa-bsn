@@ -256,6 +256,8 @@ void Engine::analyze() {
  * ***************************************************************
 */
 void Engine::plan() {
+    const uint32_t max_time = 1000;
+    bool converged = true; 
     std::cout << "[plan]" << std::endl;
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
@@ -316,6 +318,12 @@ void Engine::plan() {
         double r_prev=0;
         if(error > 0){
             do {
+                if(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - begin).count() > max_time) {
+                    if(solutions.size() == 0)
+                        converged = false;
+
+                    break;
+                }
                 prev = strategy;
                 r_prev = r_new;
                 strategy[*i] += Kp*error;
@@ -323,12 +331,20 @@ void Engine::plan() {
             } while(r_new < r_ref && r_prev < r_new && strategy[*i] > 0 && strategy[*i] < 1);
         } else if (error < 0){
             do {
+                if(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - begin).count() > max_time) {
+                    if(solutions.size() == 0)
+                        converged = false;
+
+                    break;
+                }
                 prev = strategy;
                 r_prev = r_new;
                 strategy[*i] += Kp*error;
                 r_new = calculate_reli();
             } while(r_new > r_ref && r_prev > r_new && strategy[*i] > 0 && strategy[*i] < 1);
         }
+
+        if(!converged) break;
 
         strategy = prev;
         r_new = calculate_reli();
@@ -339,6 +355,12 @@ void Engine::plan() {
 
             if(error > 0){
                 do {
+                    if(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - begin).count() > max_time) {
+                        if(solutions.size() == 0)
+                            converged = false;
+
+                        break;
+                    }
                     prev = strategy;
                     r_prev = r_new;
                     strategy[*j] += Kp*error;
@@ -346,20 +368,47 @@ void Engine::plan() {
                 } while(r_new < r_ref && r_prev < r_new && strategy[*j] > 0 && strategy[*j] < 1);
             } else if (error < 0) {
                 do {
+                    if(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - begin).count() > max_time) {
+                        if(solutions.size() == 0)
+                            converged = false;
+
+                        break;
+                    }
                     prev = strategy;
                     r_prev = r_new;
                     strategy[*j] += Kp*error;
                     r_new = calculate_reli();
                 } while(r_new > r_ref && r_prev > r_new && strategy[*j] > 0 && strategy[*j] < 1);
             }
+
+            if(!converged) break;
             
             strategy = prev;
             r_new = calculate_reli();
         }
+
+        if(!converged) break;
         solutions.push_back(strategy);
     }
 
+    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+
+    uint32_t elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+
+    archlib::Persist msg;
+
+    msg.source = ros::this_node::getName();
+    msg.target = "data_access";
+    std::string content = std::to_string(Kp) + ";";
+    content += std::to_string(offset) + ";";
+    content += std::to_string(elapsed_time);
+    msg.content = content;
+    msg.type = "EngineInfo";
+    msg.timestamp = std::chrono::high_resolution_clock::now().time_since_epoch().count();;
+    persist_pub.publish(msg);
+
     for (std::vector<std::map<std::string,double>>::iterator it = solutions.begin(); it != solutions.end(); it++){
+ 
         strategy = *it;
         double r_new = calculate_reli();
 
@@ -370,22 +419,6 @@ void Engine::plan() {
             }
         }
         std::cout << "] = " << r_new << std::endl;
-
-        std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-
-        uint32_t elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
-
-        archlib::Persist msg;
-
-        msg.source = ros::this_node::getName();
-        msg.target = "data_access";
-        std::string content = std::to_string(Kp) + ";";
-        content += std::to_string(offset) + ";";
-        content += std::to_string(elapsed_time);
-        msg.content = content;
-        msg.type = "EngineInfo";
-        msg.timestamp = std::chrono::high_resolution_clock::now().time_since_epoch().count();;
-        persist_pub.publish(msg);
 
         if(/*!blacklisted(*it) && */(r_new > r_ref*(1-stability_margin) && r_new < r_ref*(1+stability_margin))){ // if not listed and converges, yay!
             execute();
