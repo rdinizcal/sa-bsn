@@ -151,6 +151,7 @@ void DataAccess::persistEvent(const int64_t &timestamp, const std::string &sourc
 
     EventMessage obj("Event", timestamp, logical_clock, source, target, content);
     eventVec.push_back(obj);
+    eventVecTmp.push_back(obj);
 
     if(logical_clock%30==0) flush();
 }
@@ -159,6 +160,7 @@ void DataAccess::persistStatus(const int64_t &timestamp, const std::string &sour
     
     StatusMessage obj("Status", timestamp, logical_clock, source, target, content);
     statusVec.push_back(obj);
+    statusVecTmp.push_back(obj);
 
     if(logical_clock%30==0) flush();
 }
@@ -215,6 +217,8 @@ void DataAccess::flush(){
         fp << (*it).getElapsedTime() << "\n";
         
     }
+    fp.close();
+    engineinfoVec.clear();
 
     fp.open(ctmetrics_filepath, std::fstream::in | std::fstream::out | std::fstream::app);
     for(std::vector<ControlTheoryMetricsMessage>::iterator it = ctmetricsVec.begin(); it != ctmetricsVec.end(); ++it)
@@ -231,6 +235,8 @@ void DataAccess::flush(){
         fp << (*it).getOvershoot() << ",";
         fp << (*it).getSteadyStateError() << "\n";
     }
+    fp.close();
+    ctmetricsVec.clear();
 
     fp.open(status_filepath, std::fstream::in | std::fstream::out | std::fstream::app);   
     for(std::vector<StatusMessage>::iterator it = statusVec.begin(); it != statusVec.end(); ++it) {
@@ -242,8 +248,10 @@ void DataAccess::flush(){
         fp << (*it).getState() << "\n";
     }
     fp.close();
+    statusVec.clear();
+
     fp.open(tmp_status_filepath, std::fstream::in | std::fstream::out | std::fstream::app);   
-    for(std::vector<StatusMessage>::iterator it = statusVec.begin(); it != statusVec.end(); ++it) {
+    for(std::vector<StatusMessage>::iterator it = statusVecTmp.begin(); it != statusVecTmp.end(); ++it) {
         fp << (*it).getName() << ",";
         fp << (*it).getLogicalClock() << ",";
         fp << (*it).getTimestamp() << ",";
@@ -252,7 +260,7 @@ void DataAccess::flush(){
         fp << (*it).getState() << "\n";
     }
     fp.close();
-    statusVec.clear();
+    statusVecTmp.clear();
 
     fp.open(event_filepath, std::fstream::in | std::fstream::out | std::fstream::app);   
     for(std::vector<EventMessage>::iterator it = eventVec.begin(); it != eventVec.end(); ++it) {
@@ -264,6 +272,8 @@ void DataAccess::flush(){
         fp << (*it).getEvent() << "\n";
     }
     fp.close();
+    eventVec.clear();
+
     fp.open(tmp_event_filepath, std::fstream::in | std::fstream::out | std::fstream::app);   
     for(std::vector<EventMessage>::iterator it = eventVec.begin(); it != eventVec.end(); ++it) {
         fp << (*it).getName() << ",";
@@ -274,7 +284,7 @@ void DataAccess::flush(){
         fp << (*it).getEvent() << "\n";
     }
     fp.close();
-    eventVec.clear();
+    eventVecTmp.clear();
 
     fp.open(uncertainty_filepath, std::fstream::in | std::fstream::out | std::fstream::app);   
     for(std::vector<UncertaintyMessage>::iterator it = uncertainVec.begin(); it != uncertainVec.end(); ++it) {

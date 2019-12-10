@@ -123,7 +123,7 @@ class Analyzer:
                 self.logical_clock += 1
 
             if self.logical_clock == 30:     
-                body()
+                self.body()
                 self.received_command = False
                 self.logical_clock = 0
             

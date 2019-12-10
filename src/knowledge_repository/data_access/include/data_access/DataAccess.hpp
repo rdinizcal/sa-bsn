@@ -72,7 +72,9 @@ class DataAccess : public arch::ROSComponent {
 		int64_t logical_clock;
 
 		std::vector<StatusMessage> statusVec;
+		std::vector<StatusMessage> statusVecTmp;
 		std::vector<EventMessage> eventVec;
+		std::vector<EventMessage> eventVecTmp;
 		std::vector<UncertaintyMessage> uncertainVec;
 		std::vector<AdaptationMessage> adaptVec;
 		std::vector<ControlTheoryMetricsMessage> ctmetricsVec;
