@@ -206,15 +206,13 @@ void DataAccess::body() {
         updateBatteries();
         resetStatus();
         count_to_calc_and_reset = 0;
-        W(system_reliability)
-        W(system_cost)
     }
 
     ros::spinOnce();
 }
 
 void DataAccess::receivePersistMessage(const archlib::Persist::ConstPtr& msg) {
-    // ROS_INFO("I heard: [%s]", msg->type.c_str());
+    ROS_INFO("I heard: [%s]", msg->type.c_str());
     ++logical_clock;
 
     if(msg->type=="Status") {
