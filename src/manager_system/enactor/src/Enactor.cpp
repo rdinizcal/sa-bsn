@@ -124,7 +124,7 @@ void Enactor::apply_strategy(const std::string &component) {
     
     double error = r_ref[component] - r_curr[component]; //error = Rref - Rcurr
     
-    if(error_window.size() < IW) {
+    if(error_window[component].size() < IW) {
         error_window[component].push_back(error);
     } else {
         error_window[component].erase(error_window[component].begin());
