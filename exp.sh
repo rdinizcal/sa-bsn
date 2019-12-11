@@ -11,7 +11,7 @@ gnome-terminal -x roscore & sleep 5s
 ################# KNOWLEDGE REPOSITORY #################
 gnome-terminal --working-directory=${bsn}/configurations/knowledge_repository -e 'roslaunch --pid=/var/tmp/data_access.pid data_access.launch' & sleep 1s
 ################# MANAGER #################
-gnome-terminal --working-directory=${bsn}/configurations/system_manager -e 'roslaunch --pid=/var/tmp/enactor.pid enactor.launch'
+#gnome-terminal --working-directory=${bsn}/configurations/system_manager -e 'roslaunch --pid=/var/tmp/enactor.pid enactor.launch'
 
 ################# LOGGING INFRASTRUCTURE #################
 gnome-terminal --working-directory=${bsn}/configurations/logging_infrastructure -e 'roslaunch --pid=/var/tmp/logger.pid logger.launch' & sleep 1s
@@ -59,6 +59,6 @@ sleep 15s
 
 x=$(( x + 1 ))
 
-python3 updateparameters.py
+#python3 updateparameters.py
 
 done

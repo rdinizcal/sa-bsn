@@ -1,6 +1,6 @@
 #include "enactor/Enactor.hpp"
 
-Enactor::Enactor(int  &argc, char **argv, std::string name) : ROSComponent(argc, argv, name), Kp(200), Ki(10), IW(10), cycles(0), stability_margin(0.02) {}
+Enactor::Enactor(int  &argc, char **argv, std::string name) : ROSComponent(argc, argv, name), Kp(200), Ki(10), Kd(2), IW(10), DW(10), cycles(0), stability_margin(0.02) {}
 
 Enactor::~Enactor() {}
 
@@ -16,6 +16,9 @@ void Enactor::setUp() {
 	rosComponentDescriptor.setFreq(freq);
     nh.getParam("Kp", Kp);
     nh.getParam("Ki", Ki);
+    nh.getParam("Kd", Kd);
+    nh.getParam("IW", IW);
+    nh.getParam("DW", DW);
 
 }
 
@@ -121,14 +124,26 @@ void Enactor::apply_strategy(const std::string &component) {
     //std::cout << "kp[" << component << "] = "<< kp[component] <<std::endl;
     std::cout << "Kp = " << Kp << std::endl;
     std::cout << "Ki = " << Ki << std::endl;
+    std::cout << "Kd = " << Kd << std::endl;
+    std::cout << "IW = " << IW << std::endl;
+    std::cout << "DW = " << DW << std::endl;
     
     double error = r_ref[component] - r_curr[component]; //error = Rref - Rcurr
     
-    if(error_window.size() < IW) {
+    if(error_window[component].size() < IW) {
         error_window[component].push_back(error);
     } else {
         error_window[component].erase(error_window[component].begin());
         error_window[component].push_back(error);
+    }
+
+    if(error_derivative_window[component].size() < DW) {
+        error_derivative_window[component].push_back(error);
+    } else {
+        std::cout << "Erasing..." << std::endl;
+        error_derivative_window[component].erase(error_derivative_window[component].begin());
+        error_derivative_window[component].push_back(error);
+        std::cout << "Erased." << std::endl;
     }
 
     if(error > stability_margin*r_ref[component] || error < stability_margin*r_ref[component]){
@@ -141,7 +156,9 @@ void Enactor::apply_strategy(const std::string &component) {
                 if(it->first != "/g4t1"){
                     //freq[it->first] += (error>0)?((-kp[it->first]/100) * error):((-kp[it->first]/100) * error);
                     double error_sum = std::accumulate(error_window[it->first].begin(), error_window[it->first].end(), 0);
-                    freq[it->first] += (error>0)?((-Kp/100) * error + (-Ki/100) * error_sum):((-Kp/100) * error + (-Ki/100) * error_sum); 
+                    double derivative = (error_derivative_window[component].back() - error_derivative_window[component].at(0))/DW;
+
+                    freq[it->first] += (error>0)?((-Kp/100) * error + (-Ki/100) * error_sum + (-Kd/100) * derivative):((-Kp/100) * error + (-Ki/100) * error_sum + (-Kd/100) * derivative); 
                     if(freq[(it->first)] <= 0) break;
                     archlib::AdaptationCommand msg;
                     msg.source = ros::this_node::getName();
@@ -154,8 +171,12 @@ void Enactor::apply_strategy(const std::string &component) {
 
         } else {
             //replicate_task[component] += (error>0)?ceil(kp[component]*error):floor(kp[component]*error);
+            std::cout << "T1" << std::endl;
             double error_sum = std::accumulate(error_window[component].begin(), error_window[component].end(), 0);
-            replicate_task[component] += (error>0)?ceil(Kp*error + Ki*error_sum):floor(Kp*error + Ki*error_sum); //Ki entraria aqui?
+            double derivative = (error_derivative_window[component].back() - error_derivative_window[component].at(0))/DW;
+            std::cout << "T2" << std::endl;
+            replicate_task[component] += (error>0)?ceil(Kp*error + Ki*error_sum + Kd*derivative):floor(Kp*error + Ki*error_sum + Kd*derivative);
+            std::cout << "T3" << std::endl;
             if(replicate_task[component] < 1) replicate_task[component] = 1;
             archlib::AdaptationCommand msg;
             msg.source = ros::this_node::getName();

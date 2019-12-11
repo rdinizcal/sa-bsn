@@ -48,8 +48,11 @@ class Enactor : public arch::ROSComponent {
 
 		float Kp;
 		float Ki;
+		float Kd;
 		int IW;
+		int DW;
 		std::map<std::string, std::vector<double>> error_window;
+		std::map<std::string, std::vector<double>> error_derivative_window;
 		
 		std::map<std::string, double> r_curr;
 		std::map<std::string, double> r_ref;
