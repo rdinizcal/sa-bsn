@@ -46,8 +46,8 @@ class Enactor : public arch::ROSComponent {
 		ros::Publisher adapt;
 		ros::Publisher except;
 
-		int Kp;
-		int Ki;
+		float Kp;
+		float Ki;
 		int IW;
 		std::map<std::string, std::vector<double>> error_window;
 		
