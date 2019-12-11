@@ -1,6 +1,6 @@
 #include "enactor/Enactor.hpp"
 
-Enactor::Enactor(int  &argc, char **argv, std::string name) : ROSComponent(argc, argv, name), cycles(0), stability_margin(0.02) {}
+Enactor::Enactor(int  &argc, char **argv, std::string name) : ROSComponent(argc, argv, name), Kp(200), Ki(10), IW(10), cycles(0), stability_margin(0.02) {}
 
 Enactor::~Enactor() {}
 
@@ -14,6 +14,8 @@ void Enactor::setUp() {
     double freq;
 	nh.getParam("frequency", freq);
 	rosComponentDescriptor.setFreq(freq);
+    nh.getParam("Kp", Kp);
+    nh.getParam("Ki", Ki);
 
 }
 
@@ -26,7 +28,7 @@ void Enactor::receiveEvent(const archlib::Event::ConstPtr& msg) {
         invocations[msg->source] = {};
         r_curr[msg->source] = 1;
         r_ref[msg->source] = 0.80;
-        kp[msg->source] = 200;
+        //kp[msg->source] = 200;
         replicate_task[msg->source] = 1;
         freq[msg->source] = 20;
         exception_buffer[msg->source] = 0;
@@ -50,7 +52,7 @@ void Enactor::receiveEvent(const archlib::Event::ConstPtr& msg) {
         invocations.erase(msg->source);
         r_curr.erase(msg->source);
         r_ref.erase(msg->source);
-        kp.erase(msg->source);
+        //kp.erase(msg->source);
         replicate_task.erase(msg->source);
         freq.erase(msg->source);
         exception_buffer.erase(msg->source);
@@ -116,9 +118,18 @@ void Enactor::apply_strategy(const std::string &component) {
 
     std::cout << "r_ref[" << component << "] = "<< r_ref[component] <<std::endl;
     std::cout << "r_curr[" << component << "] = "<< r_curr[component] <<std::endl;
-    std::cout << "kp[" << component << "] = "<< kp[component] <<std::endl;
-
+    //std::cout << "kp[" << component << "] = "<< kp[component] <<std::endl;
+    std::cout << "Kp = " << Kp << std::endl;
+    std::cout << "Ki = " << Ki << std::endl;
+    
     double error = r_ref[component] - r_curr[component]; //error = Rref - Rcurr
+    
+    if(error_window.size() < IW) {
+        error_window[component].push_back(error);
+    } else {
+        error_window[component].erase(error_window[component].begin());
+        error_window[component].push_back(error);
+    }
 
     if(error > stability_margin*r_ref[component] || error < stability_margin*r_ref[component]){
 
@@ -128,7 +139,9 @@ void Enactor::apply_strategy(const std::string &component) {
             // g4t1 reliability is inversely proportional to the sensors frequency
             for (std::map<std::string, double>::iterator it = freq.begin(); it != freq.end(); ++it){
                 if(it->first != "/g4t1"){
-                    freq[it->first] += (error>0)?((-kp[it->first]/100) * error):((-kp[it->first]/100) * error); 
+                    //freq[it->first] += (error>0)?((-kp[it->first]/100) * error):((-kp[it->first]/100) * error);
+                    double error_sum = std::accumulate(error_window[it->first].begin(), error_window[it->first].end(), 0);
+                    freq[it->first] += (error>0)?((-Kp/100) * error + (-Ki/100) * error_sum):((-Kp/100) * error + (-Ki/100) * error_sum); 
                     if(freq[(it->first)] <= 0) break;
                     archlib::AdaptationCommand msg;
                     msg.source = ros::this_node::getName();
@@ -140,7 +153,9 @@ void Enactor::apply_strategy(const std::string &component) {
             
 
         } else {
-            replicate_task[component] += (error>0)?ceil(kp[component]*error):floor(kp[component]*error);
+            //replicate_task[component] += (error>0)?ceil(kp[component]*error):floor(kp[component]*error);
+            double error_sum = std::accumulate(error_window[component].begin(), error_window[component].end(), 0);
+            replicate_task[component] += (error>0)?ceil(Kp*error + Ki*error_sum):floor(Kp*error + Ki*error_sum); //Ki entraria aqui?
             if(replicate_task[component] < 1) replicate_task[component] = 1;
             archlib::AdaptationCommand msg;
             msg.source = ros::this_node::getName();

@@ -4,6 +4,7 @@
 #include <map>
 #include <deque>
 #include <math.h>
+#include <numeric>
 
 #include "ros/ros.h"
 #include "ros/package.h"
@@ -45,9 +46,14 @@ class Enactor : public arch::ROSComponent {
 		ros::Publisher adapt;
 		ros::Publisher except;
 
+		int Kp;
+		int Ki;
+		int IW;
+		std::map<std::string, std::vector<double>> error_window;
+		
 		std::map<std::string, double> r_curr;
 		std::map<std::string, double> r_ref;
-		std::map<std::string, double> kp;
+		//std::map<std::string, double> kp;
 		std::map<std::string, std::deque<int>> invocations; //a map of deques where 1s represent successes and 0s represents failures
 		std::map<std::string, int> replicate_task;
 		std::map<std::string, double> freq;
