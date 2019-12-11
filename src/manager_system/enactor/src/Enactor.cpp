@@ -140,10 +140,8 @@ void Enactor::apply_strategy(const std::string &component) {
     if(error_derivative_window[component].size() < DW) {
         error_derivative_window[component].push_back(error);
     } else {
-        std::cout << "Erasing..." << std::endl;
         error_derivative_window[component].erase(error_derivative_window[component].begin());
         error_derivative_window[component].push_back(error);
-        std::cout << "Erased." << std::endl;
     }
 
     if(error > stability_margin*r_ref[component] || error < stability_margin*r_ref[component]){
@@ -171,12 +169,9 @@ void Enactor::apply_strategy(const std::string &component) {
 
         } else {
             //replicate_task[component] += (error>0)?ceil(kp[component]*error):floor(kp[component]*error);
-            std::cout << "T1" << std::endl;
             double error_sum = std::accumulate(error_window[component].begin(), error_window[component].end(), 0);
             double derivative = (error_derivative_window[component].back() - error_derivative_window[component].at(0))/DW;
-            std::cout << "T2" << std::endl;
             replicate_task[component] += (error>0)?ceil(Kp*error + Ki*error_sum + Kd*derivative):floor(Kp*error + Ki*error_sum + Kd*derivative);
-            std::cout << "T3" << std::endl;
             if(replicate_task[component] < 1) replicate_task[component] = 1;
             archlib::AdaptationCommand msg;
             msg.source = ros::this_node::getName();
