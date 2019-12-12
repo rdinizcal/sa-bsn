@@ -1,7 +1,90 @@
 import os
 
 bsn_dir = os.path.dirname(__file__)
-r_file_path = "configurations/system_manager/engine.launch"
+r_file_path = "configurations/system_manager/enactor.launch"
+abs_file_path = os.path.join(bsn_dir,r_file_path)
+
+f = open(abs_file_path, "r")
+
+data = f.readlines()
+
+f.close()
+
+finished_search = False
+Kp_index = -1
+Ki_index = -1
+
+for index,line in enumerate(data):
+	l = line.strip().split(' ')
+	for elem in l:
+		if elem[0:4] == "name":
+			if elem[6:-1] == "Kp":
+				Kp_index = index
+			elif elem[6:-1] == "Ki":
+				Ki_index = index
+				finished_search = True
+
+		if elem[0:5] == "value":
+			if index == Kp_index:
+				Kp = float(elem[7:-1])
+			elif index == Ki_index:
+				Ki = float(elem[7:-1])
+
+	if finished_search == True:
+		break
+
+old_Ki = ""
+old_Kp = ""
+
+i = data[Kp_index].find('"', data[Kp_index].find("v"), len(data[Kp_index])-1)
+i = i+1
+while data[Kp_index][i] != '"':
+	old_Kp += data[Kp_index][i]
+	i += 1
+
+i = data[Ki_index].find('"', data[Ki_index].find("v"), len(data[Ki_index])-1)
+i = i+1
+while data[Ki_index][i] != '"':
+	old_Ki += data[Ki_index][i]
+	i += 1
+
+if int(Kp) == 200:
+	if Ki == 1:
+		Ki += 1
+	else:
+		Ki += 2
+	Ki = round(Ki,2)
+	Kp = 1 
+
+	str_Kp = str(Kp)
+	str_Ki = str(Ki)
+
+	if len(str(Ki)) > 6:
+		str_Ki = str(Ki)[0:6]
+	
+	data[Kp_index] = data[Kp_index].replace(old_Kp, str_Kp)
+	data[Ki_index] = data[Ki_index].replace(old_Ki, str_Ki)
+else:
+	if Kp == 1:
+		Kp += 4
+	else:
+		Kp += 5
+
+	str_Kp = str(Kp)
+
+	if len(str(Kp)) > 6:
+		str_Kp = str(Kp)[0:6]
+
+	data[Kp_index] = data[Kp_index].replace(old_Kp, str_Kp)
+
+fp = open(abs_file_path, "w")
+
+fp.writelines(data)
+
+fp.close()
+
+#Engine update code
+'''r_file_path = "configurations/system_manager/engine.launch"
 abs_file_path = os.path.join(bsn_dir,r_file_path)
 
 f = open(abs_file_path, "r")
@@ -96,4 +179,4 @@ fp = open(abs_file_path, "w")
 
 fp.writelines(data)
 
-fp.close()
+fp.close()'''

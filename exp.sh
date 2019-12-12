@@ -1,6 +1,6 @@
 #!/bin/bash
 x=1
-cycles=220
+cycles=246
 
 while [ $x -le $cycles ]
 do
@@ -37,7 +37,7 @@ gnome-terminal --working-directory=${bsn}/configurations/simulation -e 'roslaunc
 
 gnome-terminal --working-directory=${bsn}/configurations/simulation -e 'roslaunch --pid=/var/tmp/injector.pid injector.launch'
 
-gnome-terminal --working-directory=${bsn}/configurations/system_manager -e 'roslaunch --pid=/var/tmp/engine.pid engine.launch' & sleep 300s
+gnome-terminal --working-directory=${bsn}/configurations/system_manager -e 'roslaunch --pid=/var/tmp/engine.pid engine.launch' & sleep 15s
 
 kill $(cat /var/tmp/data_access.pid && rm /var/tmp/data_access.pid) & sleep 1s
 kill $(cat /var/tmp/enactor.pid && rm /var/tmp/enactor.pid) & sleep 1s

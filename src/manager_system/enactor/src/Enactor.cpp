@@ -16,6 +16,7 @@ void Enactor::setUp() {
 	rosComponentDescriptor.setFreq(freq);
     nh.getParam("Kp", Kp);
     nh.getParam("Ki", Ki);
+    nh.getParam("IW", IW);
 
 }
 
