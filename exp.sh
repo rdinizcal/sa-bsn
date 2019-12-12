@@ -1,6 +1,6 @@
 #!/bin/bash
 x=1
-cycles=220
+cycles=756
 
 while [ $x -le $cycles ]
 do

@@ -3,11 +3,11 @@
 
     <param name="frequency" value="100" /> <!--100 Hz-->
 
-    <param name="Kp" value="10" />
+    <param name="Kp" value="1" />
 
-    <param name="Ki" value="0.5" />
+    <param name="Ki" value="1" />
 
-    <param name="Kd" value="2" />
+    <param name="Kd" value="1" />
 
     <param name="IW" value="4" />
 
