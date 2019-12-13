@@ -136,7 +136,6 @@ void Engine::monitor() {
     }
 
 
-    /*request reliability status for all tasks*/
     archlib::DataAccessRequest r_srv;
     r_srv.request.name = ros::this_node::getName();
     r_srv.request.query = "all:status:" + std::to_string(info_quant);
@@ -144,7 +143,8 @@ void Engine::monitor() {
     if(!client_module.call(r_srv)) {
         ROS_ERROR("Failed to connect to data access node.");
         return;
-    } 
+    } /*request reliability status for all tasks*/
+    
     
     //expecting smth like: "/g3t1_1:success,fail,success;/g4t1:success; ..."
     std::string ans = r_srv.response.content;
@@ -156,7 +156,7 @@ void Engine::monitor() {
     bsn::operation::Operation op;
     std::vector<std::string> pairs = op.split(ans, ';');
     
-    for(std::vector<std::string>::iterator it = pairs.begin(); it != pairs.end(); it++){
+    for (std::vector<std::string>::iterator it = pairs.begin(); it != pairs.end(); it++) {
         std::vector<std::string> pair = op.split(*it, ':');
         std::string first = pair[0];
         std::string second = pair[1];

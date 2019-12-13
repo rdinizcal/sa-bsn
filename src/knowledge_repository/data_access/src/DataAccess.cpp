@@ -248,21 +248,19 @@ bool DataAccess::processQuery(archlib::DataAccessRequest::Request &req, archlib:
     res.content = "";
 
     try {
-        if (req.name == "/engine") {
+        if (req.name == "/engine" || req.name == "/enactor") {
             bsn::operation::Operation op;
             // wait smth like "all:status:100" -> return the last 100 success and failures of all active modules
             std::vector<std::string> query = op.split(req.query,':');
 
             if (query[1] == "status") {
-                int num = stoi(query[2]);
-
                 for (auto it : status){
                     res.content += calculateComponentStatus(it.first);
                 }
             } else if (query[1] == "event") {
                 int num = stoi(query[2]);
 
-                for(std::map<std::string, std::deque<std::string>>::iterator it = events.begin(); it != events.end(); it++){
+                for (std::map<std::string, std::deque<std::string>>::iterator it = events.begin(); it != events.end(); it++){
                     std::string aux = it->first;
                     aux += ":";
                     bool flag = false;
@@ -276,7 +274,7 @@ bool DataAccess::processQuery(archlib::DataAccessRequest::Request &req, archlib:
                     }
                     aux += ";";
 
-                    if(flag) {
+                    if (flag) {
                         std::string key = it->first;
                         key = key.substr(1, key.size());
                         contexts[key] = content == "activate" ? 1 : 0;
@@ -290,7 +288,6 @@ bool DataAccess::processQuery(archlib::DataAccessRequest::Request &req, archlib:
 
     return true;
 }
-
 
 void DataAccess::persistEvent(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content){
     EventMessage obj("Event", timestamp, logical_clock, source, target, content);

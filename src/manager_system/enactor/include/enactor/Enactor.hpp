@@ -16,6 +16,7 @@
 #include "archlib/Exception.h"
 #include "archlib/AdaptationCommand.h"
 
+#include "archlib/DataAccessRequest.h"
 #include "archlib/ROSComponent.hpp"
 
 class Enactor : public arch::ROSComponent {
@@ -33,7 +34,7 @@ class Enactor : public arch::ROSComponent {
     	virtual void tearDown();
 		virtual void body();
 
-	  	void receiveStatus(const archlib::Status::ConstPtr& msg);
+	  	void receiveStatus();
 	  	void receiveEvent(const archlib::Event::ConstPtr& msg);
 	  	void receiveStrategy(const archlib::Strategy::ConstPtr& msg);
 

@@ -1,4 +1,5 @@
 #include "enactor/Enactor.hpp"
+#define W(x) std::cerr << #x << " = " << x << std::endl;
 
 Enactor::Enactor(int  &argc, char **argv, std::string name) : ROSComponent(argc, argv, name), cycles(0), stability_margin(0.02) {}
 
@@ -40,42 +41,38 @@ void Enactor::receiveEvent(const archlib::Event::ConstPtr& msg) {
     }
 }
 
-void Enactor::receiveStatus(const archlib::Status::ConstPtr& msg) {
-     if (msg->content=="success") {
-        
-        if(invocations[msg->source].size() < 50) {
-            invocations[msg->source].push_back(1);
-        } else {
-            invocations[msg->source].pop_front();
-            invocations[msg->source].push_back(1);
+void Enactor::receiveStatus() {
+    ros::NodeHandle client_handler;
+    ros::ServiceClient client_module;
 
-            int sum = 0;
-            for(std::deque<int>::iterator it = invocations[msg->source].begin(); it != invocations[msg->source].end(); ++it) {
-                sum += (*it);
-            }
+    client_module = client_handler.serviceClient<archlib::DataAccessRequest>("DataAccessRequest");
+    archlib::DataAccessRequest r_srv;
+    r_srv.request.name = ros::this_node::getName();
+    r_srv.request.query = "all:status:";
 
-            r_curr[msg->source] = double(sum)/double(invocations[msg->source].size());
+    if (!client_module.call(r_srv)) {
+        ROS_ERROR("Failed to connect to data access node.");
+        return;
+    }
+    
+    std::string ans = r_srv.response.content;
+    // std::cout << "received=> [" << ans << "]" << std::endl;
+    if (ans == "") {
+        ROS_ERROR("Received empty answer when asked for status.");
+    }
 
-            apply_strategy(msg->source);
-        }
+    bsn::operation::Operation op;
+    std::vector<std::string> pairs = op.split(ans, ';');
 
-    } else if (msg->content=="fail") {
-        //apply strategy only if you have at least 10 invocations information
-        if(invocations[msg->source].size() < 50) {
-            invocations[msg->source].push_back(0);
-        } else {
-            invocations[msg->source].pop_front();
-            invocations[msg->source].push_back(0);
+    for (auto s : pairs) {
+        std::vector<std::string> pair = op.split(s, ':');
+        std::string component = pair[0];
+        std::string content = pair[1];
 
-            int sum = 0;
-            for(auto it : invocations[msg->source]) {
-                sum += it;
-            }
+        std::vector<std::string> values = op.split(content, ',');
 
-            r_curr[msg->source] = double(sum)/double(invocations[msg->source].size());
-
-            apply_strategy(msg->source);
-        }
+        r_curr[component] = stod(values[values.size() - 1]);
+        apply_strategy(component);
     }
 }
 
@@ -156,12 +153,12 @@ void Enactor::body(){
     ros::NodeHandle n;
 
     ros::Subscriber subs_event = n.subscribe("event", 1000, &Enactor::receiveEvent, this);
-    ros::Subscriber subs_status = n.subscribe("status", 1000, &Enactor::receiveStatus, this);
     ros::Subscriber subs_strategy = n.subscribe("strategy", 1000, &Enactor::receiveStrategy, this);
 
     ros::Rate loop_rate(rosComponentDescriptor.getFreq());
     while(ros::ok()){
         if(cycles <= 60*rosComponentDescriptor.getFreq()) ++cycles;
+        receiveStatus();
         ros::spinOnce();
         loop_rate.sleep();
     }
