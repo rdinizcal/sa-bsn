@@ -20,9 +20,7 @@ void Enactor::setUp() {
 void Enactor::tearDown() {}
 
 void Enactor::receiveEvent(const archlib::Event::ConstPtr& msg) {
-
     if (msg->content=="activate") {
-
         invocations[msg->source] = {};
         r_curr[msg->source] = 1;
         r_ref[msg->source] = 0.80;
@@ -31,22 +29,7 @@ void Enactor::receiveEvent(const archlib::Event::ConstPtr& msg) {
         freq[msg->source] = 20;
         exception_buffer[msg->source] = 0;
 
-        /*
-        if(msg->source=="/g3t1_1"){
-            r_ref[msg->source] = 0.680054;
-        } else if (msg->source=="/g3t1_2") {
-            r_ref[msg->source] = 0.606458;
-        } else if (msg->source=="/g3t1_3") {
-            r_ref[msg->source] = 0.606458;
-        } else if (msg->source=="/g3t1_4") {
-            r_ref[msg->source] = 1;
-        } else if (msg->source=="/g4t1") {
-            r_ref[msg->source] = 0.999528;
-        }
-        */
-
     } else if (msg->content=="deactivate") {
-
         invocations.erase(msg->source);
         r_curr.erase(msg->source);
         r_ref.erase(msg->source);
@@ -54,12 +37,10 @@ void Enactor::receiveEvent(const archlib::Event::ConstPtr& msg) {
         replicate_task.erase(msg->source);
         freq.erase(msg->source);
         exception_buffer.erase(msg->source);
-
     }
 }
 
 void Enactor::receiveStatus(const archlib::Status::ConstPtr& msg) {
-    
      if (msg->content=="success") {
         
         if(invocations[msg->source].size() < 50) {
@@ -87,8 +68,8 @@ void Enactor::receiveStatus(const archlib::Status::ConstPtr& msg) {
             invocations[msg->source].push_back(0);
 
             int sum = 0;
-            for(std::deque<int>::iterator it = invocations[msg->source].begin(); it != invocations[msg->source].end(); ++it) {
-                sum += (*it);
+            for(auto it : invocations[msg->source]) {
+                sum += it;
             }
 
             r_curr[msg->source] = double(sum)/double(invocations[msg->source].size());
@@ -128,7 +109,7 @@ void Enactor::apply_strategy(const std::string &component) {
             // g4t1 reliability is inversely proportional to the sensors frequency
             for (std::map<std::string, double>::iterator it = freq.begin(); it != freq.end(); ++it){
                 if(it->first != "/g4t1"){
-                    freq[it->first] += (error>0)?((-kp[it->first]/100) * error):((-kp[it->first]/100) * error); 
+                    freq[it->first] += (error>0)?((-kp[it->first]/100) * error):((kp[it->first]/100) * error); 
                     if(freq[(it->first)] <= 0) break;
                     archlib::AdaptationCommand msg;
                     msg.source = ros::this_node::getName();
@@ -147,7 +128,6 @@ void Enactor::apply_strategy(const std::string &component) {
             msg.target = component;
             msg.action = "replicate_collect=" + std::to_string(replicate_task[(component)]);
             adapt.publish(msg);
-            
         }
     } else {
         exception_buffer[component] = (exception_buffer[component] > 0)?0:exception_buffer[component]-1;

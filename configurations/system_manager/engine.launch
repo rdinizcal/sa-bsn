@@ -8,7 +8,7 @@
     <param name="actuation_freq" value="0.02" />    <!-- Hz -->
     <param name="info_quant" value="5" />         <!-- [1,1000] -->
 
-    <param name="offset" value="0.20" />            <!-- % of the current state -->
-    <param name="gain" value="0.1" />              <!-- search granularity -->
+    <param name="offset" value="0.50" />            <!-- % of the current state -->
+    <param name="gain" value="0.01" />              <!-- search granularity -->
 
 </launch>

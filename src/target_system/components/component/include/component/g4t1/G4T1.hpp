@@ -60,6 +60,7 @@ class G4T1 : public CentralHub {
         double trm_raw;
 
         ros::Publisher pub;
+        bool lost_packt;
 };
 
 #endif 

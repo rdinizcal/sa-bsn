@@ -417,6 +417,7 @@ void DataAccess::resetStatus() {
         for (auto it = component.second.rbegin(); it != component.second.rend(); it++) {
             if (i == arrived_status) break;
             aux.push_back(*it);
+            i++;
         }
         std::reverse(aux.begin(), aux.end());
         component.second = aux;

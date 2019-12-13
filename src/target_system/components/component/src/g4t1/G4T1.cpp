@@ -5,7 +5,7 @@
 
 using namespace bsn::processor;
 
-G4T1::G4T1(int &argc, char **argv, const std::string &name) :
+G4T1::G4T1(int &argc, char **argv, const std::string &name) : lost_packt(false),
     CentralHub(argc, argv, name, true, bsn::resource::Battery("ch_batt", 100, 100, 1) ),
     patient_status(0.0) {}
 	
@@ -75,7 +75,7 @@ void G4T1::collect(const messages::SensorData::ConstPtr& msg) {
     double risk = msg->risk;
     double batt = msg->batt;
     
-    //battery.consume(BATT_UNIT);
+    battery.consume(BATT_UNIT);
     if(msg->type == "null" || int32_t(risk) == -1)  throw std::domain_error("risk data out of boundaries");
 
     /*update battery status for received sensor info*/
@@ -100,11 +100,12 @@ void G4T1::collect(const messages::SensorData::ConstPtr& msg) {
     } else {
         data_buffer[type].push_back(risk);
         data_buffer[type].erase(data_buffer[type].begin());//erase the first element to avoid overflow
+        lost_packt = true;
     }
 }
 
 void G4T1::process(){
-    //battery.consume(BATT_UNIT*data_buffer.size());
+    battery.consume(BATT_UNIT*data_buffer.size());
     std::vector<double> current_data;
 
     for(std::vector<std::list<double>>::iterator it = data_buffer.begin(); it != data_buffer.end(); it++) {
@@ -121,10 +122,6 @@ void G4T1::process(){
 
     std::vector<std::string> risks;
     risks = getPatientStatus();
-    // trm_risk = risks[0];
-    // ecg_risk = risks[1];
-    // oxi_risk = risks[2];
-    // bpr_risk = risks[3];
 
     std::string patient_risk;
 
@@ -167,22 +164,8 @@ void G4T1::transfer() {
 
     pub.publish(msg);
 
-    // std::cout << "Connect " << connect << std::endl;
-    // if (connect) {
-    //     std::cout << "Getting...\n";
-    //     //battery.consume(BATT_UNIT*data_buffer.size()*5);
-    //     web::http::client::http_client client(U("http://localhost:8081"));
-    //     web::json::value json_obj; 
-    //     json_obj["vitalData"] = web::json::value::string(makePacket());
-    //     json_obj["session"] = session;
-    //     client.request(web::http::methods::POST, U("/sendVitalData"), json_obj);        
-    //     std::cout << "Request made!\n";
-    
-        
-    // }
-
-    // if(lost_packt){
-    //     lost_packt = false;
-    //     throw std::domain_error("lost data due to package overflow");
-    // }
+    if (lost_packt) {
+        lost_packt = false;
+        throw std::domain_error("lost data due to package overflow");
+    }
 }

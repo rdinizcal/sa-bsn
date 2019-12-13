@@ -1,6 +1,6 @@
 #include "component/CentralHub.hpp"
 
-CentralHub::CentralHub(int &argc, char **argv, const std::string &name, const bool &active, const bsn::resource::Battery &battery) : Component(argc, argv, name), active(active), max_size(5), total_buffer_size(0), buffer_size({0,0,0,0,0}), battery(battery), data_buffer({{0},{0},{0},{0},{0}}) {}
+CentralHub::CentralHub(int &argc, char **argv, const std::string &name, const bool &active, const bsn::resource::Battery &battery) : Component(argc, argv, name), active(active), max_size(20), total_buffer_size(0), buffer_size({0,0,0,0,0}), battery(battery), data_buffer({{0},{0},{0},{0},{0}}) {}
 
 CentralHub::~CentralHub() {}
 
@@ -94,5 +94,5 @@ void CentralHub::turnOff() {
     */
 void CentralHub::recharge() {
     if(battery.getCurrentLevel() <= 100) 
-        battery.generate((100/20)/rosComponentDescriptor.getFreq());
+        battery.generate((100.0/20.0)/rosComponentDescriptor.getFreq());
 }
