@@ -2,7 +2,7 @@
     <node name="engine" pkg="adaptation_engine" type="engine" output="screen" />
 
     <!--<param name="frequency" value="1" /> --> <!--1 Hz the module frequency is the same as the monitors--> 
-    <param name="monitor_freq" value="10" />        <!-- Hz -->
+    <param name="monitor_freq" value="1" />        <!-- Hz -->
 
     <param name="setpoint" value="0.95" />          <!-- -->
     <param name="actuation_freq" value="0.02" />    <!-- Hz -->

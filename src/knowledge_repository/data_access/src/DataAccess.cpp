@@ -9,6 +9,10 @@ int64_t DataAccess::now() const{
     return std::chrono::high_resolution_clock::now().time_since_epoch().count();
 }
 
+std::chrono::high_resolution_clock::time_point DataAccess::nowInSeconds() const {
+    return std::chrono::high_resolution_clock::now();
+}
+
 void DataAccess::setUp() {
     std::string path = ros::package::getPath("repository");
     std::string url;
@@ -196,7 +200,8 @@ void DataAccess::body() {
     count_to_calc_and_reset++;
     frequency = rosComponentDescriptor.getFreq();
 
-    if (count_to_calc_and_reset >= 2*frequency) {
+    if (count_to_calc_and_reset >= frequency) {
+        applyTimeWindow();
         for (auto component : status) {
             calculateComponentStatus(component.first);
         }
@@ -204,7 +209,6 @@ void DataAccess::body() {
         updateCosts();
         system_cost = calculateCost();
         updateBatteries();
-        resetStatus();
         count_to_calc_and_reset = 0;
     }
 
@@ -215,18 +219,13 @@ void DataAccess::receivePersistMessage(const archlib::Persist::ConstPtr& msg) {
     ROS_INFO("I heard: [%s]", msg->type.c_str());
     ++logical_clock;
 
-    if(msg->type=="Status") {
+    if (msg->type == "Status") {
         arrived_status++;
         persistStatus(msg->timestamp, msg->source, msg->target, msg->content);
-        if(status[msg->source].size()<=buffer_size) {
-            status[msg->source].push_back(msg->content);
-        } else {
-            status[msg->source].pop_front();
-            status[msg->source].push_back(msg->content);
-        }
-    } else if(msg->type=="Event") {
+        status[msg->source].push_back({nowInSeconds(), msg->content});
+    } else if (msg->type=="Event") {
         persistEvent(msg->timestamp, msg->source, msg->target, msg->content);
-        if(events[msg->source].size()<=buffer_size) {
+        if (events[msg->source].size()<=buffer_size) {
             events[msg->source].push_back(msg->content);
         } else {
             events[msg->source].pop_front();
@@ -235,9 +234,9 @@ void DataAccess::receivePersistMessage(const archlib::Persist::ConstPtr& msg) {
         std::string key = msg->source;
         key = key.substr(1, key.size());
         contexts[key] = msg->content == "activate" ? 1 : 0;
-    } else if(msg->type=="Uncertainty") {
+    } else if (msg->type=="Uncertainty") {
         persistUncertainty(msg->timestamp, msg->source, msg->target, msg->content);
-    } else if(msg->type=="AdaptationCommand") {
+    } else if (msg->type=="AdaptationCommand") {
         persistAdaptation(msg->timestamp, msg->source, msg->target, msg->content);
     } else {
         ROS_INFO("(Could not identify message type!!)");
@@ -254,7 +253,8 @@ bool DataAccess::processQuery(archlib::DataAccessRequest::Request &req, archlib:
             std::vector<std::string> query = op.split(req.query,':');
 
             if (query[1] == "status") {
-                for (auto it : status){
+                applyTimeWindow();
+                for (auto it : status) {
                     res.content += calculateComponentStatus(it.first);
                 }
             } else if (query[1] == "event") {
@@ -377,16 +377,16 @@ std::string DataAccess::calculateComponentStatus(const std::string& component) {
     bool flag = false;
     double sum = 0;
     uint32_t len = 0;
-    for (std::string value : status[component]) {
+    for (auto value : status[component]) {
         // reliability = success/(success + fails)
-        if (value == "success") { // calculate reliability
+        if (value.second == "success") { // calculate reliability
             sum +=1;
             len++;
-        } else if (value == "fail") {
+        } else if (value.second == "fail") {
             len++;
         }
         else { // it can be other values
-            aux += value;
+            aux += value.second;
             aux += ",";
         }
         
@@ -404,24 +404,6 @@ std::string DataAccess::calculateComponentStatus(const std::string& component) {
     return content;
 }
 
-/**
- * Reset the status of all components
-*/
-void DataAccess::resetStatus() {
-    for (auto& component : status) {
-        std::deque<std::string> aux;
-        int i = 0;
-        for (auto it = component.second.rbegin(); it != component.second.rend(); it++) {
-            if (i == arrived_status) break;
-            aux.push_back(*it);
-            i++;
-        }
-        std::reverse(aux.begin(), aux.end());
-        component.second = aux;
-    }
-    arrived_status = 0;
-}
-
 void DataAccess::updateBatteries() {
     for (auto component : components_batteries) {
         components_last_batteries[component.first] = component.second;
@@ -432,5 +414,23 @@ void DataAccess::updateCosts() {
     for (auto component : components_batteries) {
         components_costs[component.first] = 
             components_last_batteries[component.first] - component.second;
+    }
+}
+
+void DataAccess::applyTimeWindow() {
+    auto now = nowInSeconds();
+
+    for (auto& component : status) {
+        auto& deq = component.second;
+        while (!deq.empty()) {
+            auto time_arrived = deq.front().first;
+            double time_span = std::chrono::duration_cast<std::chrono::duration<double>>(now - time_arrived).count();
+            if (time_span >= 2.1) {
+                deq.pop_front();
+            } else {
+                component.second = deq;
+                break;
+            }
+        }
     }
 }

@@ -43,6 +43,7 @@ class DataAccess : public arch::ROSComponent {
 		DataAccess(const DataAccess &);
 		DataAccess &operator=(const DataAccess &);
 		int64_t now() const;
+		std::chrono::high_resolution_clock::time_point nowInSeconds() const;
 
 		void persistEvent(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content);
 		void persistStatus(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content);
@@ -59,6 +60,7 @@ class DataAccess : public arch::ROSComponent {
 		void resetStatus();
 		void updateBatteries();
 		void updateCosts();
+		void applyTimeWindow();
 	public:
 		virtual void setUp();
 		virtual void tearDown();
@@ -89,7 +91,7 @@ class DataAccess : public arch::ROSComponent {
 		std::vector<UncertaintyMessage> uncertainVec;
 		std::vector<AdaptationMessage> adaptVec;
 
-		std::map<std::string, std::deque<std::string>> status;
+		std::map<std::string, std::deque<std::pair<std::chrono::high_resolution_clock::time_point, std::string>>> status;
 		std::map<std::string, std::deque<std::string>> events;
 		int buffer_size;
 

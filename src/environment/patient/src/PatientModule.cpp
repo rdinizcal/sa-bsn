@@ -17,7 +17,6 @@ void PatientModule::setUp() {
 
     // Get what vital signs this module will simulate
     nh.getParam("vitalSigns", vitalSigns);
-//    nh.getParam("frequency", frequency);
 
     // Removes white spaces from vitalSigns
     vitalSigns.erase(std::remove(vitalSigns.begin(), vitalSigns.end(),' '), vitalSigns.end());

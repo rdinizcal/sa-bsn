@@ -148,7 +148,7 @@ void Engine::monitor() {
     
     //expecting smth like: "/g3t1_1:success,fail,success;/g4t1:success; ..."
     std::string ans = r_srv.response.content;
-    // std::cout << "received=> [" << ans << "]" << std::endl;
+    std::cout << "received=> [" << ans << "]" << std::endl;
     if(ans == ""){
         ROS_ERROR("Received empty answer when asked for status.");
     }

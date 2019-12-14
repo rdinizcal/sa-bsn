@@ -89,24 +89,21 @@ void Enactor::receiveStrategy(const archlib::Strategy::ConstPtr& msg) {
 
 
 void Enactor::apply_strategy(const std::string &component) {
-    //adapt only after at least 60 seconds have passed... (for experiments)
-    if(cycles < 60*rosComponentDescriptor.getFreq()) return;
-
     std::cout << "r_ref[" << component << "] = "<< r_ref[component] <<std::endl;
     std::cout << "r_curr[" << component << "] = "<< r_curr[component] <<std::endl;
     std::cout << "kp[" << component << "] = "<< kp[component] <<std::endl;
 
     double error = r_ref[component] - r_curr[component]; //error = Rref - Rcurr
 
-    if(error > stability_margin*r_ref[component] || error < stability_margin*r_ref[component]){
+    if(error > stability_margin*r_ref[component] || error < stability_margin*r_ref[component]) {
 
-        exception_buffer[component] = (exception_buffer[component] < 0)?0:exception_buffer[component]+1;
+        exception_buffer[component] = (exception_buffer[component] < 0) ? 0 : exception_buffer[component] + 1;
 
         if(component == "/g4t1"){
             // g4t1 reliability is inversely proportional to the sensors frequency
             for (std::map<std::string, double>::iterator it = freq.begin(); it != freq.end(); ++it){
                 if(it->first != "/g4t1"){
-                    freq[it->first] += (error>0)?((-kp[it->first]/100) * error):((kp[it->first]/100) * error); 
+                    freq[it->first] += (error>0) ? ((-kp[it->first]/100) * error) : ((kp[it->first]/100) * error); 
                     if(freq[(it->first)] <= 0) break;
                     archlib::AdaptationCommand msg;
                     msg.source = ros::this_node::getName();
@@ -118,8 +115,8 @@ void Enactor::apply_strategy(const std::string &component) {
             
 
         } else {
-            replicate_task[component] += (error>0)?ceil(kp[component]*error):floor(kp[component]*error);
-            if(replicate_task[component] < 1) replicate_task[component] = 1;
+            replicate_task[component] += (error > 0) ? ceil(kp[component] * error) : floor(kp[component] * error);
+            if (replicate_task[component] < 1) replicate_task[component] = 1;
             archlib::AdaptationCommand msg;
             msg.source = ros::this_node::getName();
             msg.target = component;
@@ -127,7 +124,7 @@ void Enactor::apply_strategy(const std::string &component) {
             adapt.publish(msg);
         }
     } else {
-        exception_buffer[component] = (exception_buffer[component] > 0)?0:exception_buffer[component]-1;
+        exception_buffer[component] = (exception_buffer[component] > 0) ? 0 : exception_buffer[component] - 1;
     }
 
     if(exception_buffer[component]>4){
