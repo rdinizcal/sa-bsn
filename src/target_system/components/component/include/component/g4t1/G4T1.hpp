@@ -44,17 +44,20 @@ class G4T1 : public CentralHub {
     private:
         double patient_status;
 
-        double bpr_risk;
+        double abps_risk;
+        double abpd_risk;
         double oxi_risk;
         double ecg_risk;
         double trm_risk;
 
-        double bpr_batt;
+        double abps_batt;
+        double abpd_batt;
         double oxi_batt;
         double ecg_batt;
         double trm_batt;
 
-        double bpr_raw;
+        double abps_raw;
+        double abpd_raw;
         double oxi_raw;
         double ecg_raw;
         double trm_raw;

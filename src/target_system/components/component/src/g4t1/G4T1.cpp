@@ -13,7 +13,8 @@ G4T1::~G4T1() {}
 
 std::vector<std::string> G4T1::getPatientStatus() {
     std::string sensor_risk_str;
-    std::string bpr;
+    std::string abps;
+    std::string abpd;
     std::string oxi;
     std::string ecg;
     std::string trm;
@@ -32,7 +33,7 @@ std::vector<std::string> G4T1::getPatientStatus() {
             sensor_risk_str = "unknown";
         }
 
-        if (i==0) {
+        if (i == 0) {
             trm = sensor_risk_str;
             trm_risk = sensor_risk;
         } else if (i == 1){
@@ -42,12 +43,12 @@ std::vector<std::string> G4T1::getPatientStatus() {
             oxi = sensor_risk_str;
             oxi_risk = sensor_risk;
         } else if (i == 3) {
-            bpr = sensor_risk_str;
-            bpr_risk = sensor_risk;
+            abps = sensor_risk_str;
+            abps_risk = sensor_risk;
         }
     }
 
-    std::vector<std::string> v = {trm, ecg, oxi, bpr};  
+    std::vector<std::string> v = {trm, ecg, oxi, abps};  
     return v;
 }
 
@@ -60,7 +61,7 @@ void G4T1::setUp() {
     config.getParam("frequency", freq);
     rosComponentDescriptor.setFreq(freq);
 
-    for(std::vector<std::list<double>>::iterator it = data_buffer.begin();
+    for (std::vector<std::list<double>>::iterator it = data_buffer.begin();
         it != data_buffer.end(); ++it) {
             (*it) = {0.0};
     }
@@ -76,24 +77,24 @@ void G4T1::collect(const messages::SensorData::ConstPtr& msg) {
     double batt = msg->batt;
     
     battery.consume(BATT_UNIT);
-    if(msg->type == "null" || int32_t(risk) == -1)  throw std::domain_error("risk data out of boundaries");
+    if (msg->type == "null" || int32_t(risk) == -1)  throw std::domain_error("risk data out of boundaries");
 
     /*update battery status for received sensor info*/
-    if (msg->type=="thermometer"){
+    if (msg->type == "thermometer") {
         trm_batt = batt;
         trm_raw = msg->data;
-    } else if (msg->type=="ecg") {
+    } else if (msg->type == "ecg") {
         ecg_batt = batt;
         ecg_raw = msg->data;
-    } else if (msg->type=="oximeter") {
+    } else if (msg->type == "oximeter") {
         oxi_batt = batt;
         oxi_raw = msg->data;
-    } else if (msg->type=="bpms" || msg->type=="bpmd") {
-        bpr_batt = batt;
-        bpr_raw = msg->data;
+    } else if (msg->type == "glucose") {
+        abps_batt = batt;
+        abps_raw = msg->data;
     }
 
-    if(buffer_size[type] < max_size){
+    if (buffer_size[type] < max_size) {
         data_buffer[type].push_back(risk);
         buffer_size[type] = data_buffer[type].size();
         total_buffer_size = std::accumulate(std::begin(buffer_size), std::end(buffer_size), 0, std::plus<int>());
@@ -105,7 +106,7 @@ void G4T1::collect(const messages::SensorData::ConstPtr& msg) {
 }
 
 void G4T1::process(){
-    battery.consume(BATT_UNIT*data_buffer.size());
+    battery.consume(BATT_UNIT * data_buffer.size());
     std::vector<double> current_data;
 
     for(std::vector<std::list<double>>::iterator it = data_buffer.begin(); it != data_buffer.end(); it++) {
@@ -142,7 +143,8 @@ void G4T1::process(){
     std::cout << "| THERM_RISK: " << trm_risk << std::endl;
     std::cout << "| ECG_RISK: " << ecg_risk << std::endl;
     std::cout << "| OXIM_RISK: " << oxi_risk << std::endl;
-    std::cout << "| BPRESS_RISK: " << bpr_risk << std::endl;
+    std::cout << "| ABPS_RISK: " << abps_risk << std::endl;
+    std::cout << "| ABPD_RISK: " << abpd_risk << std::endl;
     std::cout << "| PATIENT_STATE:" << patient_risk << std::endl;
     std::cout << "*****************************************" << std::endl;
     
@@ -154,12 +156,21 @@ void G4T1::transfer() {
     msg.trm_batt = trm_batt;
     msg.ecg_batt = ecg_batt;
     msg.oxi_batt = oxi_batt;
+    msg.abps_batt = abps_batt;
+    msg.abpd_batt = abps_batt;
+
     msg.trm_risk = trm_risk;
     msg.ecg_risk = ecg_risk;
     msg.oxi_risk = oxi_risk;
+    msg.abps_risk = abps_risk;
+    msg.abpd_risk = abpd_risk;
+    
     msg.trm_data = trm_raw;
     msg.ecg_data = ecg_raw;
     msg.oxi_data = oxi_raw;
+    msg.abps_data = abps_raw;
+    msg.abpd_data = abpd_raw;
+
     msg.patient_status = patient_status;
 
     pub.publish(msg);

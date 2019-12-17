@@ -1,4 +1,4 @@
-#include "component/g3t1_4/G3T1_4.hpp"
+#include "component/g3t1_5/G3T1_5.hpp"
 
 #define BATT_UNIT 0.05
 
@@ -9,17 +9,17 @@ using namespace bsn::operation;
 using namespace bsn::configuration;
 
 
-G3T1_4::G3T1_4(int &argc, char **argv, const std::string &name) :
-    Sensor(argc, argv, name, "abps", true, 1, bsn::resource::Battery("abps_batt", 100, 100, 1)),
+G3T1_5::G3T1_5(int &argc, char **argv, const std::string &name) :
+    Sensor(argc, argv, name, "abpd", true, 1, bsn::resource::Battery("abpd_batt", 100, 100, 1)),
     markov(),
     dataGenerator(),
     filter(1),
     sensorConfig(),
     collected_risk() {}
 
-G3T1_4::~G3T1_4() {}
+G3T1_5::~G3T1_5() {}
 
-void G3T1_4::setUp() {
+void G3T1_5::setUp() {
     Component::setUp();
     
     std::array<bsn::range::Range,5> ranges;
@@ -76,16 +76,16 @@ void G3T1_4::setUp() {
     }
 }
 
-void G3T1_4::tearDown() {
+void G3T1_5::tearDown() {
     Component::tearDown();
 }
 
-double G3T1_4::collect() {
+double G3T1_5::collect() {
     double m_data = 0;
     ros::ServiceClient client = handle.serviceClient<services::PatientData>("getPatientData");
     services::PatientData srv;
 
-    srv.request.vitalSign = "abps";
+    srv.request.vitalSign = "abpd";
 
     if (client.call(srv)) {
         m_data = srv.response.data;
@@ -101,7 +101,7 @@ double G3T1_4::collect() {
     return m_data;
 }
 
-double G3T1_4::process(const double &m_data) {
+double G3T1_5::process(const double &m_data) {
     double filtered_data;
     
     
@@ -113,14 +113,14 @@ double G3T1_4::process(const double &m_data) {
     return filtered_data;
 }
 
-void G3T1_4::transfer(const double &m_data) {
+void G3T1_5::transfer(const double &m_data) {
     double risk;
     risk = sensorConfig.evaluateNumber(m_data);
     if (risk < 0 || risk > 100) throw std::domain_error("risk data out of boundaries");
     if (label(risk) != label(collected_risk)) throw std::domain_error("sensor accuracy fail");
 
     ros::NodeHandle handle;
-    data_pub = handle.advertise<messages::SensorData>("abps_data", 10);
+    data_pub = handle.advertise<messages::SensorData>("abpd_data", 10);
     messages::SensorData msg;
     msg.type = type;
     msg.data = m_data;
@@ -134,7 +134,7 @@ void G3T1_4::transfer(const double &m_data) {
     ROS_INFO("risk calculated and transferred: [%.2f%%]", risk);
 }
 
-std::string G3T1_4::label(double &risk) {
+std::string G3T1_5::label(double &risk) {
     std::string ans;
     if(sensorConfig.isLowRisk(risk)){
         ans = "low";

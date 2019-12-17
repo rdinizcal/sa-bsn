@@ -119,12 +119,22 @@ void DataAccess::processTargetSystemData(const messages::TargetSystemData::Const
         sensorPacket["raw"] = msg->oxi_data;
         json_obj["OximeterPacket"] = sensorPacket;
 
+        sensorPacket["battery"] = msg->abps_batt;
+        sensorPacket["risk"] = msg->abps_risk;
+        sensorPacket["raw"] = msg->abps_data;
+        json_obj["AbpsPacket"] = sensorPacket;
+
+        sensorPacket["battery"] = msg->abpd_batt;
+        sensorPacket["risk"] = msg->abpd_risk;
+        sensorPacket["raw"] = msg->abpd_data;
+        json_obj["AbpdPacket"] = sensorPacket;
+
         json_obj["PatientRisk"] = msg->patient_status;
 
         json_obj["Reliability"] = system_reliability;
         json_obj["Cost"] = system_cost;
         
-        // client->request(web::http::methods::POST, U("/sendVitalData"), json_obj);
+        client->request(web::http::methods::POST, U("/sendVitalData"), json_obj);
     }
 }
 

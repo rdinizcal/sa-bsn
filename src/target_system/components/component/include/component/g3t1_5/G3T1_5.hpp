@@ -1,5 +1,5 @@
-#ifndef G3T1_4_HPP
-#define G3T1_4_HPP
+#ifndef G3T1_5_HPP
+#define G3T1_5_HPP
 
 #include <string>
 #include <exception>
@@ -19,15 +19,15 @@
 #include "messages/SensorData.h"
 #include "services/PatientData.h"
 
-class G3T1_4 : public Sensor {
+class G3T1_5 : public Sensor {
     	
   	public:
-    	G3T1_4(int &argc, char **argv, const std::string &name);
-    	virtual ~G3T1_4();
+    	G3T1_5(int &argc, char **argv, const std::string &name);
+    	virtual ~G3T1_5();
 
 	private:
-      	G3T1_4(const G3T1_4 &);
-    	G3T1_4 &operator=(const G3T1_4 &);
+      	G3T1_5(const G3T1_5 &);
+    	G3T1_5 &operator=(const G3T1_5 &);
 
 		std::string label(double &risk);
     
