@@ -80,12 +80,18 @@ void DataAccess::setUp() {
     components_batteries["g3t1_1"] = 100;
     components_batteries["g3t1_2"] = 100;
     components_batteries["g3t1_3"] = 100;
+    components_batteries["g3t1_4"] = 100;
+    components_batteries["g3t1_5"] = 100;
     components_costs["g3t1_1"] = 0;
     components_costs["g3t1_2"] = 0;
     components_costs["g3t1_3"] = 0;
+    components_costs["g3t1_4"] = 0;
+    components_costs["g3t1_5"] = 0;
     components_reliabilities["g3t1_1"] = 1;
     components_reliabilities["g3t1_2"] = 1;
     components_reliabilities["g3t1_3"] = 1;
+    components_reliabilities["g3t1_4"] = 1;
+    components_reliabilities["g3t1_5"] = 1;
 
     
     handle_persist = handle.subscribe("persist", 1000, &DataAccess::receivePersistMessage, this);
@@ -101,6 +107,8 @@ void DataAccess::processTargetSystemData(const messages::TargetSystemData::Const
         components_batteries["g3t1_3"] = msg->trm_batt;
         components_batteries["g3t1_2"] = msg->ecg_batt;
         components_batteries["g3t1_1"] = msg->oxi_batt;
+        components_batteries["g3t1_4"] = msg->abps_batt;
+        components_batteries["g3t1_5"] = msg->abpd_batt;
 
         web::json::value json_obj, sensorPacket, patientPacket, reli_costPacket;
 

@@ -25,7 +25,6 @@ int32_t Sensor::run() {
 
     while (ros::ok()) {
         ros::Rate loop_rate(rosComponentDescriptor.getFreq());
-        std::cout << "freq  = " << rosComponentDescriptor.getFreq() << std::endl;;
         ros::spinOnce();
         try {
             body();
