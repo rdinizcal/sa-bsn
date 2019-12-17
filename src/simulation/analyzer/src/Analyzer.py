@@ -25,6 +25,7 @@ from collections import OrderedDict
 from archlib.msg import Strategy
 from archlib.msg import Persist
 from services.srv import Address
+from services.srv import EnactorInfo
 
 import time
 import rospkg
@@ -46,6 +47,8 @@ class Analyzer:
         self.received_command = False
         self.pub = rospy.Publisher('persist', Persist, queue_size=10)
         self.a = rospy.Subscriber("strategy", Strategy, self.callback)
+        self.enactor_kp = 0
+        self.enactor_ki = 0
     
     def analyze(self, x, y, setpoint):
 
@@ -101,6 +104,18 @@ class Analyzer:
         
         return resp.id
 
+    def receive_enactor_info(self):
+        print("receive enactor info")
+        rospy.wait_for_service('enactor_info')
+        receive_info = rospy.ServiceProxy('enactor_info', EnactorInfo)
+        resp = receive_info()
+
+        self.enactor_kp = resp.kp
+        self.enactor_ki = resp.ki
+
+        print("Ki: " + self.enactor_ki)
+        print("Kp: " + self.enactor_kp)
+
     def callback(self, data):
         with open(self.repository_path + "/../resource/logs/status_" + self.file_id + "_tmp.log", 'w') as log_file:
             log_file.truncate()
@@ -112,7 +127,8 @@ class Analyzer:
             
         self.received_command = True
 
-    def run(self): 
+    def run(self):
+        self.receive_enactor_info()
         rospy.init_node("analyzer")
         
         loop_rate = rospy.Rate(1)

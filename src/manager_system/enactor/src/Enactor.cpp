@@ -17,10 +17,17 @@ void Enactor::setUp() {
     nh.getParam("Kp", Kp);
     nh.getParam("Ki", Ki);
     nh.getParam("IW", IW);
-
 }
 
 void Enactor::tearDown() {}
+
+bool Enactor::sendInfo(services::EnactorInfo::Request &req, services::EnactorInfo::Response &res){
+    std::cout << "Sending info" << std::endl;
+    res.kp = std::to_string(Kp);
+    res.ki = std::to_string(Ki);
+
+    return true;
+}
 
 void Enactor::receiveEvent(const archlib::Event::ConstPtr& msg) {
 
@@ -194,6 +201,7 @@ void Enactor::body(){
     ros::Subscriber subs_event = n.subscribe("event", 1000, &Enactor::receiveEvent, this);
     ros::Subscriber subs_status = n.subscribe("status", 1000, &Enactor::receiveStatus, this);
     ros::Subscriber subs_strategy = n.subscribe("strategy", 1000, &Enactor::receiveStrategy, this);
+    ros::ServiceServer enactor_info_server = handle.advertiseService("enactor_info", &Enactor::sendInfo, this);
 
     ros::Rate loop_rate(rosComponentDescriptor.getFreq());
     while(ros::ok()){

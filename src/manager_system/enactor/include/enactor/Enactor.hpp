@@ -11,6 +11,8 @@
 
 #include "bsn/operation/Operation.hpp"
 
+#include "services/EnactorInfo.h"
+
 #include "archlib/Status.h"
 #include "archlib/Event.h"
 #include "archlib/Strategy.h"
@@ -34,6 +36,8 @@ class Enactor : public arch::ROSComponent {
     	virtual void tearDown();
 		virtual void body();
 
+		bool sendInfo(services::EnactorInfo::Request &req, services::EnactorInfo::Response &res);
+
 	  	void receiveStatus(const archlib::Status::ConstPtr& msg);
 	  	void receiveEvent(const archlib::Event::ConstPtr& msg);
 	  	void receiveStrategy(const archlib::Strategy::ConstPtr& msg);
@@ -42,6 +46,9 @@ class Enactor : public arch::ROSComponent {
 
 		void print();
 
+	protected:
+		ros::NodeHandle handle;
+	
   	private:
 		ros::Publisher adapt;
 		ros::Publisher except;
