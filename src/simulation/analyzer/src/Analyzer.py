@@ -105,7 +105,6 @@ class Analyzer:
         return resp.id
 
     def receive_enactor_info(self):
-        print("receive enactor info")
         rospy.wait_for_service('enactor_info')
         receive_info = rospy.ServiceProxy('enactor_info', EnactorInfo)
         resp = receive_info()
@@ -113,8 +112,8 @@ class Analyzer:
         self.enactor_kp = resp.kp
         self.enactor_ki = resp.ki
 
-        print("Ki: " + self.enactor_ki)
-        print("Kp: " + self.enactor_kp)
+        print("Enactor Ki: " + self.enactor_ki)
+        print("Enactor Kp: " + self.enactor_kp)
 
     def callback(self, data):
         with open(self.repository_path + "/../resource/logs/status_" + self.file_id + "_tmp.log", 'w') as log_file:
@@ -249,7 +248,9 @@ class Analyzer:
         msg = Persist()
         msg.source = "analyzer"
         msg.target = "data access"
-        content =  str(self.stability) + ";" 
+        content = str(self.enactor_kp) + ";"
+        content += str(self.enactor_ki) + ";"
+        content += str(self.stability) + ";" 
         content += str(self.convergence_point) + ";"
         content += str(self.settling_time) + ";"
         content += str(self.overshoot) + ";"

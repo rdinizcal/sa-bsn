@@ -22,7 +22,6 @@ void Enactor::setUp() {
 void Enactor::tearDown() {}
 
 bool Enactor::sendInfo(services::EnactorInfo::Request &req, services::EnactorInfo::Response &res){
-    std::cout << "Sending info" << std::endl;
     res.kp = std::to_string(Kp);
     res.ki = std::to_string(Ki);
 

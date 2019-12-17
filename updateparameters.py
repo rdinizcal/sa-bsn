@@ -48,13 +48,17 @@ while data[Ki_index][i] != '"':
 	old_Ki += data[Ki_index][i]
 	i += 1
 
-if int(Kp) == 200:
-	if Ki == 1:
+if int(Kp) == 150:
+	if Ki == 0.1:
+		Ki += 0.4
+	elif Ki == 0.5:
+		Ki += 0.5
+	elif Ki == 1:
 		Ki += 1
 	else:
 		Ki += 2
 	Ki = round(Ki,2)
-	Kp = 1 
+	Kp = 0.1 
 
 	str_Kp = str(Kp)
 	str_Ki = str(Ki)
@@ -65,7 +69,11 @@ if int(Kp) == 200:
 	data[Kp_index] = data[Kp_index].replace(old_Kp, str_Kp)
 	data[Ki_index] = data[Ki_index].replace(old_Ki, str_Ki)
 else:
-	if Kp == 1:
+	if Kp == 0.1:
+		Kp += 0.4
+	elif Kp == 0.5:
+		Kp += 0.5
+	elif Kp == 1:
 		Kp += 4
 	else:
 		Kp += 5

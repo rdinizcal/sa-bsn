@@ -85,7 +85,7 @@ class DataAccess : public arch::ROSComponent {
 		int buffer_size;
 
 		//bad smells
-		std::string enactor_kp;
+		//std::string enactor_kp;
 		std::string engine_kp;
 		std::string engine_offset;
 

@@ -18,8 +18,10 @@ void DataAccess::setUp() {
     tmp_status_filepath = path + "/../resource/logs/status_" + file_id + "_tmp.log";
     uncertainty_filepath = path + "/../resource/logs/uncertainty_" + file_id + ".log";
     adaptation_filepath = path + "/../resource/logs/adaptation_" + file_id + ".log";
-    ctmetrics_filepath = path + "/../resource/logs/ctmetrics_" + file_id + ".log";
-    engineinfo_filepath = path + "/../resource/logs/engineinfo_" + file_id + ".log";
+    //ctmetrics_filepath = path + "/../resource/logs/ctmetrics_" + file_id + ".log";
+    //engineinfo_filepath = path + "/../resource/logs/engineinfo_" + file_id + ".log";
+    ctmetrics_filepath = path + "/../resource/logs/ctmetrics.log";
+    engineinfo_filepath = path + "/../resource/logs/engineinfo.log";
 
     fp.open(event_filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
     fp << "\n";
@@ -187,7 +189,7 @@ void DataAccess::persistControlTheoryMetrics(const int64_t &timestamp, const std
     bsn::operation::Operation op;
     std::vector<std::string> metrics = op.split(content, ';');
 
-    ControlTheoryMetricsMessage obj("ControlTheoryMetrics", timestamp, logical_clock, source, target, enactor_kp, metrics[0], metrics[1], metrics[2], metrics[3], metrics[4]);
+    ControlTheoryMetricsMessage obj("ControlTheoryMetrics", timestamp, logical_clock, source, target, metrics[0], metrics[1], metrics[2], metrics[3], metrics[4], metrics[5], metrics[6]);
     ctmetricsVec.push_back(obj);
 
     if(logical_clock%30==0) flush();
@@ -229,6 +231,7 @@ void DataAccess::flush(){
         fp << (*it).getSource() << ",";
         fp << (*it).getTarget() << ",";
         fp << (*it).getEnactorKp() << ",";
+        fp << (*it).getEnactorKi() << ",";
         fp << (*it).getStability() << ",";
         fp << (*it).getConvergencePoint() << ",";
         fp << (*it).getSettlingTime() << ",";
