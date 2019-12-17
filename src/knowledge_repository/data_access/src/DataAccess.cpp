@@ -142,7 +142,7 @@ void DataAccess::processTargetSystemData(const messages::TargetSystemData::Const
         json_obj["Reliability"] = system_reliability;
         json_obj["Cost"] = system_cost;
         
-        client->request(web::http::methods::POST, U("/sendVitalData"), json_obj);
+        //client->request(web::http::methods::POST, U("/sendVitalData"), json_obj);
     }
 }
 
