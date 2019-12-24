@@ -45,7 +45,7 @@ void DataAccess::setUp() {
     handle.getParam("server_url", url);
 
     buffer_size = 1000;
-
+    connected = 0;
     handle.getParam("send_to_srv", connected);
 
     std::ifstream reliability_file, cost_file;
@@ -70,7 +70,6 @@ void DataAccess::setUp() {
     cost_expression = bsn::model::Formula(cost_formula);
     reliability_expression = bsn::model::Formula(reliability_formula);
 
-    // web::http::client::http_client aux(U(url));
     this->client = std::shared_ptr<web::http::client::http_client>
         (new web::http::client::http_client(U(url)));
 
@@ -130,19 +129,20 @@ void DataAccess::processTargetSystemData(const messages::TargetSystemData::Const
         sensorPacket["battery"] = msg->abps_batt;
         sensorPacket["risk"] = msg->abps_risk;
         sensorPacket["raw"] = msg->abps_data;
-        json_obj["AbpsPacket"] = sensorPacket;
+        json_obj["ABPSPacket"] = sensorPacket;
 
         sensorPacket["battery"] = msg->abpd_batt;
         sensorPacket["risk"] = msg->abpd_risk;
         sensorPacket["raw"] = msg->abpd_data;
-        json_obj["AbpdPacket"] = sensorPacket;
+        json_obj["ABPDPacket"] = sensorPacket;
 
         json_obj["PatientRisk"] = msg->patient_status;
 
         json_obj["Reliability"] = system_reliability;
         json_obj["Cost"] = system_cost;
         
-        //client->request(web::http::methods::POST, U("/sendVitalData"), json_obj);
+        client->request(web::http::methods::POST, U("/sendVitalData"), json_obj);
+        ROS_INFO("Sent information to server.");
     }
 }
 

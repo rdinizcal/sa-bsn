@@ -19,7 +19,7 @@ std::vector<std::string> G4T1::getPatientStatus() {
     std::string ecg;
     std::string trm;
 
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 5; i++) {
         double sensor_risk = data_buffer[i].back();
 
 
@@ -36,7 +36,7 @@ std::vector<std::string> G4T1::getPatientStatus() {
         if (i == 0) {
             trm = sensor_risk_str;
             trm_risk = sensor_risk;
-        } else if (i == 1){
+        } else if (i == 1) {
             ecg = sensor_risk_str;
             ecg_risk = sensor_risk;
         } else if (i == 2) {
@@ -45,10 +45,13 @@ std::vector<std::string> G4T1::getPatientStatus() {
         } else if (i == 3) {
             abps = sensor_risk_str;
             abps_risk = sensor_risk;
+        } else if (i == 4) {
+            abpd = sensor_risk_str;
+            abpd_risk = sensor_risk;
         }
     }
 
-    std::vector<std::string> v = {trm, ecg, oxi, abps};  
+    std::vector<std::string> v = {trm, ecg, oxi, abps, abpd};  
     return v;
 }
 
@@ -72,7 +75,7 @@ void G4T1::setUp() {
 void G4T1::tearDown() {}
 
 void G4T1::collect(const messages::SensorData::ConstPtr& msg) {
-    int type = get_sensor_id(msg->type);
+    int type = getSensorId(msg->type);
     double risk = msg->risk;
     double batt = msg->batt;
     
@@ -80,6 +83,7 @@ void G4T1::collect(const messages::SensorData::ConstPtr& msg) {
     if (msg->type == "null" || int32_t(risk) == -1)  throw std::domain_error("risk data out of boundaries");
 
     /*update battery status for received sensor info*/
+    W(msg->type)
     if (msg->type == "thermometer") {
         trm_batt = batt;
         trm_raw = msg->data;
@@ -89,9 +93,12 @@ void G4T1::collect(const messages::SensorData::ConstPtr& msg) {
     } else if (msg->type == "oximeter") {
         oxi_batt = batt;
         oxi_raw = msg->data;
-    } else if (msg->type == "glucose") {
+    } else if (msg->type == "abps") {
         abps_batt = batt;
         abps_raw = msg->data;
+    } else if (msg->type == "abpd") {
+        abpd_batt = batt;
+        abpd_raw = msg->data;
     }
 
     if (buffer_size[type] < max_size) {
@@ -121,8 +128,8 @@ void G4T1::process(){
     }
     total_buffer_size = std::accumulate(std::begin(buffer_size), std::end(buffer_size), 0, std::plus<int>()); //update total buffer size 
 
-    std::vector<std::string> risks;
-    risks = getPatientStatus();
+    // std::vector<std::string> risks;
+    getPatientStatus();
 
     std::string patient_risk;
 
@@ -146,9 +153,25 @@ void G4T1::process(){
     std::cout << "| ABPS_RISK: " << abps_risk << std::endl;
     std::cout << "| ABPD_RISK: " << abpd_risk << std::endl;
     std::cout << "| PATIENT_STATE:" << patient_risk << std::endl;
-    std::cout << "*****************************************" << std::endl;
-    
-}    
+    std::cout << "*****************************************" << std::endl; 
+}
+
+int32_t G4T1::getSensorId(std::string type) {
+    if (type == "thermometer")
+        return 0;
+    else if (type == "ecg")
+        return 1;
+    else if (type == "oximeter")
+        return 2;
+    else if (type == "abps")
+        return 3;
+    else if (type == "abpd")		
+        return 4;
+    else {
+        std::cout << "UNKNOWN TYPE " + type << std::endl;
+        return -1;
+    }
+}
 
 void G4T1::transfer() {
     messages::TargetSystemData msg;
@@ -157,7 +180,7 @@ void G4T1::transfer() {
     msg.ecg_batt = ecg_batt;
     msg.oxi_batt = oxi_batt;
     msg.abps_batt = abps_batt;
-    msg.abpd_batt = abps_batt;
+    msg.abpd_batt = abpd_batt;
 
     msg.trm_risk = trm_risk;
     msg.ecg_risk = ecg_risk;

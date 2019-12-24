@@ -11,17 +11,17 @@ int32_t CentralHub::run() {
     ros::Subscriber thermometerSub = nh.subscribe("thermometer_data", 10, &CentralHub::collect, this);
     ros::Subscriber oximeterSub = nh.subscribe("oximeter_data", 10, &CentralHub::collect, this);
     ros::Subscriber ecgSub = nh.subscribe("ecg_data", 10, &CentralHub::collect, this);
-    ros::Subscriber diastolicSub = nh.subscribe("diastolic_data", 10, &CentralHub::collect, this);
-    ros::Subscriber systolicSub = nh.subscribe("systolic_data", 10, &CentralHub::collect, this);
+    ros::Subscriber abpsSub = nh.subscribe("abps_data", 10, &CentralHub::collect, this);
+    ros::Subscriber abpdSub = nh.subscribe("abpd_data", 10, &CentralHub::collect, this);
 
     while(ros::ok()) {
         ros::Rate loop_rate(rosComponentDescriptor.getFreq());
 
-        try{
+        try {
             body();
         } catch (const std::exception& e) {
             sendStatus("fail");
-        } 
+        }
         loop_rate.sleep();
     }
 

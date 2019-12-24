@@ -32,6 +32,7 @@ class G4T1 : public CentralHub {
 
         std::string makePacket();
         std::vector<std::string> getPatientStatus();
+        int32_t getSensorId(std::string type);
 
     public:
         virtual void setUp();
