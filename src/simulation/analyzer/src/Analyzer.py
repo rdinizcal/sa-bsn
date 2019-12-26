@@ -162,12 +162,18 @@ class Analyzer:
         ################################################################## 
 
         ################ load status log ################
+        with open(self.repository_path + "/../resource/logs/status_" + self.file_id + "_tmp.log", mode='r') as log_file:
+            status_lines = log_file.readlines()
+
         with open(self.repository_path + "/../resource/logs/status_" + self.file_id + "_tmp.log", mode='rb') as log_file:
             log_csv = csv.reader(log_file, delimiter=',')
             log_status = list(log_csv)
             #del log_status[0] # delete first line (do we need this?)
 
         ################ load event log ################    
+        with open(self.repository_path + "/../resource/logs/event_" + self.file_id + "_tmp.log", mode='rb') as log_file:
+            event_lines = log_file.readlines()
+
         with open(self.repository_path + "/../resource/logs/event_" + self.file_id + "_tmp.log", mode='rb') as log_file:
             log_csv = csv.reader(log_file, delimiter=',')
             log_event = list(log_csv)
@@ -259,6 +265,13 @@ class Analyzer:
         msg.type = "ControlTheoryMetrics"
         msg.timestamp = time.time()
         self.pub.publish(msg)
+
+        with open(self.repository_path + "/../resource/logs/analyzed_data_" + self.file_id + ".log", mode='a+') as persist_file:
+            persist_file.write("Events\n")
+            persist_file.writelines(event_lines)
+            persist_file.write("Status\n")
+            persist_file.writelines(status_lines)
+            persist_file.write("\n")
 
 class Formula:
 
