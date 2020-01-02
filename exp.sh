@@ -59,6 +59,8 @@ sleep 15s
 
 x=$(( x + 1 ))
 
-python3 updateparameters.py
+python3 updateparameters2.py
+
+rosclean purge -y
 
 done
