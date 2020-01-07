@@ -73,8 +73,8 @@ void Sensor::body() {
         } else if(int(p*100) % 20 == 1) { //5% chance
             throw std::domain_error("risk data out of boundaries");
         }*/
-        std::cout << "p: " << p << std::endl;
-        std::cout << "aux: " << aux << std::endl;
+        //std::cout << "p: " << p << std::endl;
+        //std::cout << "aux: " << aux << std::endl;
         if(aux <= p) {
             throw std::domain_error("sensor accuracy fail");
         }
@@ -120,16 +120,16 @@ void Sensor::reconfigure(const archlib::AdaptationCommand::ConstPtr& msg) {
 void Sensor::injectUncertainty(const archlib::Uncertainty::ConstPtr& msg) {
     std::string content = msg->content;
 
-    std::cout << "content: " << content << std::endl;
+    //std::cout << "content: " << content << std::endl;
 
     bsn::operation::Operation op;
     std::vector<std::string> pairs = op.split(content, ',');
 
-    std::cout << "pairs: " << pairs.size() << std::endl;
+    //std::cout << "pairs: " << pairs.size() << std::endl;
 
     for (std::vector<std::string>::iterator it = pairs.begin(); it != pairs.end(); ++it){
         std::vector<std::string> param = op.split(*it, '=');
-        std::cout << "param[0]: " << param[0] << std::endl;
+        //std::cout << "param[0]: " << param[0] << std::endl;
         if(param[0]=="noise_factor"){
             noise_factor = stod(param[1]);
         } else if(param[0]=="p") {

@@ -102,7 +102,7 @@ void G4T1::collect(const messages::SensorData::ConstPtr& msg) {
     double batt = msg->batt;
     
     //battery.consume(BATT_UNIT);
-    if(msg->type == "null" || int32_t(risk) == -1)  throw std::domain_error("risk data out of boundaries");
+    //if(msg->type == "null" || int32_t(risk) == -1)  throw std::domain_error("risk data out of boundaries");
 
     /*update battery status for received sensor info*/
     if (msg->type=="thermometer"){
@@ -191,6 +191,6 @@ void G4T1::transfer(){
 
     if(lost_packt){
         lost_packt = false;
-        throw std::domain_error("lost data due to package overflow");
+        //throw std::domain_error("lost data due to package overflow");
     }
 }
