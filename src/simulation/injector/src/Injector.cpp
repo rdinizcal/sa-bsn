@@ -67,7 +67,11 @@ void Injector::body() {
 
             noise_factor[*component] = gen_noise(*component, noise_factor[*component], duration[*component], amplitude[*component], type[*component]);
             p[*component] = gen_noise(*component, p[*component], duration[*component], amplitude[*component], type[*component]);
-            inject(*component, "noise_factor=" + std::to_string(noise_factor[*component]), "p=" + std::to_string(noise_factor[*component]));
+
+            std::string content;
+            content = "noise_factor=" + std::to_string(noise_factor[*component]);
+            content += ",p=" + std::to_string(p[*component]);
+            //inject(*component, "noise_factor=" + std::to_string(noise_factor[*component]), "p=" + std::to_string(noise_factor[*component]));
 
             //update begin and end tags in last cycle
             if(cycles == end[*component]){
