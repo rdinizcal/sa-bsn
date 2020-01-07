@@ -72,7 +72,8 @@ void Injector::body() {
             content = "noise_factor=" + std::to_string(noise_factor[*component]);
             content += ",p=" + std::to_string(p[*component]);
             //inject(*component, "noise_factor=" + std::to_string(noise_factor[*component]), "p=" + std::to_string(noise_factor[*component]));
-
+            inject(*component, content);
+            
             //update begin and end tags in last cycle
             if(cycles == end[*component]){
                 begin[*component] += seconds_in_cycles(1.0/frequency[*component]);
