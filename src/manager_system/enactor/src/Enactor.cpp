@@ -147,8 +147,20 @@ void Enactor::apply_strategy(const std::string &component) {
             for (std::map<std::string, double>::iterator it = freq.begin(); it != freq.end(); ++it){
                 if(it->first != "/g4t1"){
                     //freq[it->first] += (error>0)?((-kp[it->first]/100) * error):((-kp[it->first]/100) * error);
-                    double error_sum = std::accumulate(error_window[it->first].begin(), error_window[it->first].end(), 0);
+                    //double error_sum = std::accumulate(error_window[it->first].begin(), error_window[it->first].end(), 0);
+                    double error_sum = 0;
+                    for(int i=0;i<error_window[it->first].size();i++) {
+                        error_sum += error_window[it->first].at(i);
+                    }
+                    //std::cout << "-----------------------------------------------------------------" << std::endl;
+                    std::cout << "-> Error Sum: " << error_sum << std::endl;
+                    for(int i=0;i<error_window[component].size();i++) {
+                        std::cout << "-> Error " << i << ": " << error_window[component].at(i) << std::endl; 
+                    }
                     freq[it->first] += (error>0)?((-Kp/100) * error + (-Ki/100) * error_sum):((-Kp/100) * error + (-Ki/100) * error_sum); 
+                    //std::cout << "-> (-Kp/100) * error: " << (-Kp/100) * error << std::endl;
+                    //std::cout << "-> (-Ki/100) * error_sum: " << (-Ki/100) * error_sum << std::endl;
+                    //std::cout << "-----------------------------------------------------------------" << std::endl; 
                     if(freq[(it->first)] <= 0) break;
                     archlib::AdaptationCommand msg;
                     msg.source = ros::this_node::getName();
@@ -161,7 +173,12 @@ void Enactor::apply_strategy(const std::string &component) {
 
         } else {
             //replicate_task[component] += (error>0)?ceil(kp[component]*error):floor(kp[component]*error);
-            double error_sum = std::accumulate(error_window[component].begin(), error_window[component].end(), 0);
+            //double error_sum = std::accumulate(error_window[component].begin(), error_window[component].end(), 0);
+            double error_sum = 0;
+            for(int i=0;i<error_window[component].size();i++) {
+                error_sum += error_window[component].at(i);
+            }
+            std::cout << "-> Error Sum: " << error_sum << std::endl;
             replicate_task[component] += (error>0)?ceil(Kp*error + Ki*error_sum):floor(Kp*error + Ki*error_sum); //Ki entraria aqui?
             if(replicate_task[component] < 1) replicate_task[component] = 1;
             archlib::AdaptationCommand msg;
