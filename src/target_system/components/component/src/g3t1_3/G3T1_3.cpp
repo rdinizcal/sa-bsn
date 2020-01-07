@@ -117,8 +117,8 @@ void G3T1_3::transfer(const double &m_data) {
     double risk;
     risk = sensorConfig.evaluateNumber(m_data);
     //battery.consume(BATT_UNIT);
-    if (risk < 0 || risk > 100) throw std::domain_error("risk data out of boundaries");
-    if (label(risk) != label(collected_risk)) throw std::domain_error("sensor accuracy fail");
+    //if (risk < 0 || risk > 100) throw std::domain_error("risk data out of boundaries");
+    //if (label(risk) != label(collected_risk)) throw std::domain_error("sensor accuracy fail");
 
     ros::NodeHandle handle;
     data_pub = handle.advertise<messages::SensorData>("thermometer_data", 10);

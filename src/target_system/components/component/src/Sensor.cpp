@@ -1,6 +1,7 @@
 #include "component/Sensor.hpp"
+#include "stdlib.h"
 
-Sensor::Sensor(int &argc, char **argv, const std::string &name, const std::string &type, const bool &active, const double &noise_factor, const bsn::resource::Battery &battery) : Component(argc, argv, name), type(type), active(active), buffer_size(1), replicate_collect(1), noise_factor(0), battery(battery), data(0.0) {}
+Sensor::Sensor(int &argc, char **argv, const std::string &name, const std::string &type, const bool &active, const double &noise_factor, const bsn::resource::Battery &battery) : Component(argc, argv, name), type(type), active(active), buffer_size(1), replicate_collect(1), noise_factor(0), battery(battery), data(0.0), p(0) {}
 
 Sensor::~Sensor() {}
 
@@ -64,6 +65,19 @@ void Sensor::body() {
         }
 
         data = process(data);
+
+        double aux = ((double) rand() / (RAND_MAX));
+        
+        /*if(int(p*100) % 20 == 0) { //5% chance
+            throw std::domain_error("sensor accuracy fail");
+        } else if(int(p*100) % 20 == 1) { //5% chance
+            throw std::domain_error("risk data out of boundaries");
+        }*/
+
+        if(aux <= p) {
+            throw std::domain_error("sensor accuracy fail");
+        }
+        
         transfer(data);
 		sendStatus("success");
     } else {
@@ -113,6 +127,8 @@ void Sensor::injectUncertainty(const archlib::Uncertainty::ConstPtr& msg) {
 
         if(param[0]=="noise_factor"){
             noise_factor = stod(param[1]);
+        } else if(param[0]=="p") {
+            p = stod(param[1]);
         }
     }
 }

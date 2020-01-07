@@ -49,6 +49,7 @@ class Sensor : public arch::target_system::Component {
 		double noise_factor;
 		bsn::resource::Battery battery;
         double data;
+        double p; //magic number for random exception generation
     
 };
 

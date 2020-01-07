@@ -49,6 +49,7 @@ class Injector : public arch::ROSComponent {
 		std::map<std::string, int> begin;
 		std::map<std::string, int> end;
 		std::map<std::string, std::string> type;
+		std::map<std::string, int> p;
 
 
 

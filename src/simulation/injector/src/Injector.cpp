@@ -30,6 +30,7 @@ void Injector::setUp() {
         config.getParam((*component)+"/begin", beg);
         begin[*component] = seconds_in_cycles(beg);
         end[*component] = begin[*component] + seconds_in_cycles(duration[*component]);
+        config.getParam((*component)+"/p", p[*component]);
     }
 }
 
@@ -65,7 +66,8 @@ void Injector::body() {
         if(begin[*component] <= cycles && cycles <= end[*component]) {
 
             noise_factor[*component] = gen_noise(*component, noise_factor[*component], duration[*component], amplitude[*component], type[*component]);
-            inject(*component, "noise_factor=" + std::to_string(noise_factor[*component]));
+            p[*component] = gen_noise(*component, p[*component], duration[*component], amplitude[*component], type[*component]);
+            inject(*component, "noise_factor=" + std::to_string(noise_factor[*component]), "p=" + std::to_string(noise_factor[*component]));
 
             //update begin and end tags in last cycle
             if(cycles == end[*component]){
