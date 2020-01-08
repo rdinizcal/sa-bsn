@@ -147,6 +147,7 @@ class Analyzer:
     def body(self):
         # load formula
         formula = Formula(self.repository_path + "/../resource/models/"+self.formula_id+".formula", "float")
+        b_formula = Formula(self.repository_path + "/../resource/models/b_" +self.formula_id+".formula", "bool")
 
         # build list of participating tasks
         tasks = dict()
@@ -154,6 +155,8 @@ class Analyzer:
 
         global_reli_timeseries = dict() 
         global_status_timeseries = dict()
+        local_reli_timeseries = dict()
+        local_status_timeseries = dict()
 
         ################################################################## 
         #                                                                #
@@ -206,6 +209,16 @@ class Analyzer:
                 elif (status.content == 'fail'): tasks[tag].fail(instant)
 
                 if (status.content == 'success' or status.content == 'fail'):
+                    if not (tag in local_status_timeseries):
+                        local_status_timeseries[tag] = [[instant,status.content]]
+                    else:
+                        local_status_timeseries[tag].append([instant,status.content])
+
+                    if not (tag in local_reli_timeseries): 
+                        local_reli_timeseries[tag] = [[instant,tasks[tag].reliability()]]
+                    else:
+                        local_reli_timeseries[tag].append([instant,tasks[tag].reliability()])
+                    
                     ## compute global formulae
                     for tag in tasks:
                         formula.compute('R_'+tag, tasks[tag].reliability())
@@ -229,6 +242,7 @@ class Analyzer:
 
 
             if(reg[0]=="Event" or reg[0]=="Status"):
+                global_status_timeseries[instant] = b_formula.eval()
                 global_reli_timeseries[instant] = formula.eval()
 
         ################################################################## 
@@ -250,6 +264,74 @@ class Analyzer:
             i += 1
 
         self.analyze(x, y, setpoint)
+
+        ################################################################## 
+        #                                                                #
+        #                         Plot Timeseries                        #
+        #                                                                #
+        ################################################################## 
+
+        scale = 10e-10
+        ticks = ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(x*scale))
+
+        default_colors = ["#17becf", "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#ff7f0e"]
+        colors = dict()
+        i = 0
+        for tag in tasks:
+            colors[tag] = default_colors[i]
+            i+=1
+
+        ##############################################
+        #                 First Plot                 #
+        ############################################## 
+        ## First, plot the global reliability against time
+        fig, ax = plt.subplots()
+        ax.plot(x, y, label='BSN', color = "#1f77b4", linewidth=2)
+        ax.set_ylim(0,(1+self.stability_margin))
+        ax.xaxis.set_major_formatter(ticks)
+
+        x_max = 0
+        for tag in local_status_timeseries:
+            last = len(local_status_timeseries[tag]) - 1
+            x_max  = local_status_timeseries[tag][last][0] if local_status_timeseries[tag][last][0] > x_max else x_max
+
+        ## Then, plot the local reliabilities against time (same figure)
+        i = 0
+        for tag in local_reli_timeseries:
+            x = [el[0] for el in local_reli_timeseries[tag]]
+            y = [el[1] for el in local_reli_timeseries[tag]]
+            ax.plot(x, y, label=tag, color=colors[tag])
+
+        ## Plot horizontal lines for setpoint
+        ax.axhline(y=setpoint, linestyle='--', linewidth=0.7, color="black")
+        ax.text(0.9*x_max, setpoint, "setpoint" , fontsize=8)
+        ax.axhline(y=self.convergence_point*(1+self.stability_margin), linestyle='--', linewidth=0.3, color="black")
+        ax.axhline(y=self.convergence_point, linestyle='-.', linewidth=0.5, color="black")
+        ax.axhline(y=self.convergence_point*(1-self.stability_margin), linestyle='--', linewidth=0.3, color="black")
+
+        ## Insert labels, titles, texts, grid...
+        mn = self.convergence_point
+        st = self.settling_time
+        os = self.overshoot
+        sse = self.sse 
+        #fig.suptitle('Parametric Formula vs. Monitored')
+        fig.suptitle('Reliability in time')
+        is_stable = "stable" if self.stability else "not stable" 
+        subtitle = '%s: %s | converges to %.2f | ST = %.2fs | OS = %.2f%% | SSE = %.2f%%' % ("formula",is_stable,mn,st,os,sse)        
+        fig.text(0.5, 0.92, subtitle, ha='center', color = "grey", fontsize=7) # subtitle
+        fig.text(0.04, 0.5, 'Reliability', va='center', rotation='vertical')
+        fig.text(0.5, 0.035, 'Time (s)', ha='center')
+        fig.text(0.8, 0.020, self.file_id + '.log', ha='center', color = "grey", fontsize=6) # files used
+        fig.text(0.8, 0.005, self.formula_id + '.formula', ha='center', color = "grey", fontsize=6) # files used
+        #ax.annotate('trigger adaptation', xy=(x_triggered, 0),
+            #xytext=(x_triggered/x_max, -0.1), textcoords='axes fraction',
+            #arrowprops=dict(facecolor='black', shrink=0.03),
+            #horizontalalignment='right', verticalalignment='top',
+            #)
+        plt.grid()
+        plt.legend()
+        plt.show()
+        print("Finished plot")
         
         msg = Persist()
         msg.source = "analyzer"
