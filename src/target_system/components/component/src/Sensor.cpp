@@ -68,13 +68,6 @@ void Sensor::body() {
 
         double aux = ((double) rand() / (RAND_MAX));
         
-        /*if(int(p*100) % 20 == 0) { //5% chance
-            throw std::domain_error("sensor accuracy fail");
-        } else if(int(p*100) % 20 == 1) { //5% chance
-            throw std::domain_error("risk data out of boundaries");
-        }*/
-        //std::cout << "p: " << p << std::endl;
-        //std::cout << "aux: " << aux << std::endl;
         if(aux <= p) {
             throw std::domain_error("sensor accuracy fail");
         }
