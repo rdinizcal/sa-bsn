@@ -138,19 +138,19 @@ void Engine::monitor() {
 
     archlib::DataAccessRequest r_srv;
     r_srv.request.name = ros::this_node::getName();
-    r_srv.request.query = "all:status:" + std::to_string(info_quant);
+    r_srv.request.query = "all:reliability:" + std::to_string(info_quant);
 
     if(!client_module.call(r_srv)) {
         ROS_ERROR("Failed to connect to data access node.");
         return;
-    } /*request reliability status for all tasks*/
+    } /*request reliability for all tasks*/
     
     
     //expecting smth like: "/g3t1_1:success,fail,success;/g4t1:success; ..."
     std::string ans = r_srv.response.content;
-    std::cout << "received=> [" << ans << "]" << std::endl;
+    // std::cout << "received=> [" << ans << "]" << std::endl;
     if(ans == ""){
-        ROS_ERROR("Received empty answer when asked for status.");
+        ROS_ERROR("Received empty answer when asked for reliability.");
     }
 
     bsn::operation::Operation op;
@@ -169,7 +169,7 @@ void Engine::monitor() {
         std::vector<std::string> values = op.split(second, ',');
 
         strategy["R_"+first] = stod(values[values.size()-1]);
-        std::cout << "first = " << strategy["R_" + first] << std::endl;
+        std::cout << "R_" + first + " = " << strategy["R_" + first] << std::endl;
     } 
 
     //request context status for all tasks

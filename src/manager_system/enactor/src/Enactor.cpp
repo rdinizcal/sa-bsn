@@ -48,7 +48,7 @@ void Enactor::receiveStatus() {
     client_module = client_handler.serviceClient<archlib::DataAccessRequest>("DataAccessRequest");
     archlib::DataAccessRequest r_srv;
     r_srv.request.name = ros::this_node::getName();
-    r_srv.request.query = "all:status:";
+    r_srv.request.query = "all:reliability:";
 
     if (!client_module.call(r_srv)) {
         ROS_ERROR("Failed to connect to data access node.");

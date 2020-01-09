@@ -221,7 +221,7 @@ void DataAccess::body() {
     if (count_to_calc_and_reset >= frequency) {
         applyTimeWindow();
         for (auto component : status) {
-            calculateComponentStatus(component.first);
+            calculateComponentReliability(component.first);
         }
         system_reliability = calculateReliability();
         updateCosts();
@@ -270,10 +270,10 @@ bool DataAccess::processQuery(archlib::DataAccessRequest::Request &req, archlib:
             // wait smth like "all:status:100" -> return the last 100 success and failures of all active modules
             std::vector<std::string> query = op.split(req.query,':');
 
-            if (query[1] == "status") {
+            if (query[1] == "reliability") {
                 applyTimeWindow();
                 for (auto it : status) {
-                    res.content += calculateComponentStatus(it.first);
+                    res.content += calculateComponentReliability(it.first);
                 }
             } else if (query[1] == "event") {
                 int num = stoi(query[2]);
@@ -389,7 +389,7 @@ void DataAccess::flush(){
  * Builds the response string and calculate the reliability
  * of the component specified as parameter
 */
-std::string DataAccess::calculateComponentStatus(const std::string& component) {
+std::string DataAccess::calculateComponentReliability(const std::string& component) {
     std::string aux = component, content = "";
     aux += ":";
     bool flag = false;

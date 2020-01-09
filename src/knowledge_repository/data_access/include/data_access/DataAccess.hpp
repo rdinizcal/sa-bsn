@@ -56,7 +56,7 @@ class DataAccess : public arch::ROSComponent {
 		double calculateCost();
 		double calculateReliability();
 
-		std::string calculateComponentStatus(const std::string& component);
+		std::string calculateComponentReliability(const std::string& component);
 		void resetStatus();
 		void updateBatteries();
 		void updateCosts();
