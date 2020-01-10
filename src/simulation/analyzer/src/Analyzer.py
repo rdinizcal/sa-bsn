@@ -117,15 +117,16 @@ class Analyzer:
         print("Enactor Kp: " + self.enactor_kp)
 
     def callback(self, data):
-        with open(self.repository_path + "/../resource/logs/status_" + self.file_id + "_tmp.log", 'w') as log_file:
-            log_file.truncate()
-            log_file.close()
+        if self.received_command == False:
+            with open(self.repository_path + "/../resource/logs/status_" + self.file_id + "_tmp.log", 'w') as log_file:
+                log_file.truncate()
+                log_file.close()
 
-        #with open(self.repository_path + "/../resource/logs/event_" + self.file_id + "_tmp.log", 'w') as log_file:
-            #log_file.truncate()
-            #log_file.close()
-            
-        self.received_command = True
+            self.received_command = True
+
+            #with open(self.repository_path + "/../resource/logs/event_" + self.file_id + "_tmp.log", 'w') as log_file:
+                #log_file.truncate()
+                #log_file.close()
 
     def run(self):
         self.receive_enactor_info()
@@ -152,13 +153,19 @@ class Analyzer:
 
         # build list of participating tasks
         tasks = dict()
+        tasks_tmp = dict()
         ctxs = dict()
+        ctxs_tmp = dict()
 
         #global_reli_timeseries = dict()
         global_reli_timeseries = OrderedDict() 
+        global_reli_timeseries_tmp = OrderedDict()
         global_status_timeseries = dict()
+        global_status_timeseries_tmp = dict()
         local_reli_timeseries = dict()
+        local_reli_timeseries_tmp = dict()
         local_status_timeseries = dict()
+        local_status_timeseries_tmp = dict()
 
         ################################################################## 
         #                                                                #
@@ -170,7 +177,10 @@ class Analyzer:
         with open(self.repository_path + "/../resource/logs/status_" + self.file_id + "_tmp.log", mode='r') as log_file:
             status_lines = log_file.readlines()
 
-        #with open(self.repository_path + "/../resource/logs/status_" + self.file_id + "_tmp.log", mode='rb') as log_file:
+        with open(self.repository_path + "/../resource/logs/status_" + self.file_id + "_tmp.log", mode='rb') as log_file:
+            log_csv_tmp = csv.reader(log_file, delimiter=',')
+            log_status_tmp = list(log_csv_tmp)
+
         with open(self.repository_path + "/../resource/logs/status_" + self.file_id + ".log", mode='rb') as log_file:
             log_csv = csv.reader(log_file, delimiter=',')
             log_status = list(log_csv)
@@ -180,7 +190,10 @@ class Analyzer:
         with open(self.repository_path + "/../resource/logs/event_" + self.file_id + "_tmp.log", mode='rb') as log_file:
             event_lines = log_file.readlines()
 
-        #with open(self.repository_path + "/../resource/logs/event_" + self.file_id + "_tmp.log", mode='rb') as log_file:
+        with open(self.repository_path + "/../resource/logs/event_" + self.file_id + "_tmp.log", mode='rb') as log_file:
+            log_csv_tmp = csv.reader(log_file, delimiter=',')
+            log_event_tmp = list(log_csv_tmp)
+
         with open(self.repository_path + "/../resource/logs/event_" + self.file_id + ".log", mode='rb') as log_file:
             log_csv = csv.reader(log_file, delimiter=',')
             log_event = list(log_csv)
@@ -191,9 +204,15 @@ class Analyzer:
         log.extend(log_status)
         log.extend(log_event)
 
+        log_tmp = list()
+        log_tmp.extend(log_status_tmp)
+        log_tmp.extend(log_event_tmp)
+
         log = sorted(log, key = lambda x: (int(x[1])))
+        log_tmp = sorted(log_tmp, key = lambda x: (int(x[1])))
 
         t0 = int(log[0][2])
+        t0_tmp = int(log_tmp[0][2])
 
         # read log 
         for reg in log:
@@ -249,6 +268,58 @@ class Analyzer:
                 global_status_timeseries[instant] = b_formula.eval()
                 global_reli_timeseries[instant] = formula.eval()
 
+        for reg in log_tmp:
+            # compute time series
+            instant = int(reg[2]) - t0_tmp
+
+            if(reg[0]=="Status"):
+                status = Status(str(reg[1]),str(reg[2]),str(reg[3]),str(reg[4]),str(reg[5]))
+
+                tag = status.source.upper().replace(".","_").replace("/","").replace("T","_T")
+
+                if not (tag in tasks_tmp): 
+                    tsk = Task(tag)
+                    tasks_tmp[tag] = tsk
+
+                if (status.content == 'success'): tasks_tmp[tag].success(instant)
+                elif (status.content == 'fail'): tasks_tmp[tag].fail(instant)
+
+                if (status.content == 'success' or status.content == 'fail'):
+                    if not (tag in local_status_timeseries_tmp):
+                        local_status_timeseries_tmp[tag] = [[instant,status.content]]
+                    else:
+                        local_status_timeseries_tmp[tag].append([instant,status.content])
+
+                    if not (tag in local_reli_timeseries_tmp): 
+                        local_reli_timeseries_tmp[tag] = [[instant,tasks_tmp[tag].reliability()]]
+                    else:
+                        local_reli_timeseries_tmp[tag].append([instant,tasks_tmp[tag].reliability()])
+                    
+                    ## compute global formulae
+                    for tag in tasks_tmp:
+                        formula.compute('R_'+tag, tasks_tmp[tag].reliability())
+                        formula.compute('C_'+tag, tasks_tmp[tag].cost())
+                        formula.compute('F_'+tag, tasks_tmp[tag].frequency())
+
+            elif(reg[0]=="Event"):
+                event = Event(str(reg[1]),str(reg[2]),str(reg[3]),str(reg[4]),str(reg[5]))
+
+                tag = event.source.upper().replace(".","_").replace("/","").replace("T","_T")
+
+                if not (tag in ctxs_tmp): 
+                    ctx = Context(tag)
+                    ctxs_tmp[tag] = ctx
+                
+                if (event.content == 'deactivate'): ctxs_tmp[tag].deactivate()
+                elif (event.content == 'activate'): ctxs_tmp[tag].activate()
+
+                for ctx in ctxs_tmp.values():
+                    formula.compute('CTX_'+ctx.getName(), ctx.isActive())
+
+
+            if(reg[0]=="Event" or reg[0]=="Status"):
+                global_status_timeseries_tmp[instant] = b_formula.eval()
+                global_reli_timeseries_tmp[instant] = formula.eval()
         ################################################################## 
         #                                                                #
         #         Perform Control Theoretical Analysis Timeseries        #
@@ -267,7 +338,12 @@ class Analyzer:
             ya.append(y[i])
             i += 1
 
-        self.analyze(x, y, setpoint)
+        #self.analyze(x, y, setpoint)
+
+        x_tmp = list(global_reli_timeseries_tmp.keys())
+        y_tmp = list(global_reli_timeseries_tmp.values())
+
+        self.analyze(x_tmp, y_tmp, setpoint)
 
         ################################################################## 
         #                                                                #
@@ -338,6 +414,8 @@ class Analyzer:
         plt.grid()
         plt.legend()
         plt.savefig(self.repository_path + "/../resource/plots/plot" + str(self.plots) + "_" + self.file_id + ".png")
+
+        self.plots += 1
         #plt.show()
         #print("Finished plot")
         
