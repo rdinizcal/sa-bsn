@@ -153,10 +153,10 @@ void Enactor::apply_strategy(const std::string &component) {
                         error_sum += error_window[it->first].at(i);
                     }
                     //std::cout << "-----------------------------------------------------------------" << std::endl;
-                    std::cout << "-> Error Sum: " << error_sum << std::endl;
-                    for(int i=0;i<error_window[component].size();i++) {
+                    //std::cout << "-> Error Sum: " << error_sum << std::endl;
+                    /*for(int i=0;i<error_window[component].size();i++) {
                         std::cout << "-> Error " << i << ": " << error_window[component].at(i) << std::endl; 
-                    }
+                    }*/
                     freq[it->first] += (error>0)?((-Kp/100) * error + (-Ki/100) * error_sum):((-Kp/100) * error + (-Ki/100) * error_sum); 
                     //std::cout << "-> (-Kp/100) * error: " << (-Kp/100) * error << std::endl;
                     //std::cout << "-> (-Ki/100) * error_sum: " << (-Ki/100) * error_sum << std::endl;
@@ -178,7 +178,7 @@ void Enactor::apply_strategy(const std::string &component) {
             for(int i=0;i<error_window[component].size();i++) {
                 error_sum += error_window[component].at(i);
             }
-            std::cout << "-> Error Sum: " << error_sum << std::endl;
+            //std::cout << "-> Error Sum: " << error_sum << std::endl;
             replicate_task[component] += (error>0)?ceil(Kp*error + Ki*error_sum):floor(Kp*error + Ki*error_sum); //Ki entraria aqui?
             if(replicate_task[component] < 1) replicate_task[component] = 1;
             archlib::AdaptationCommand msg;

@@ -50,6 +50,7 @@ class Analyzer:
         self.enactor_kp = 0
         self.enactor_ki = 0
         self.plots = 1
+        self.t0_tmp = 0
     
     def analyze(self, x, y, setpoint):
 
@@ -118,6 +119,7 @@ class Analyzer:
 
     def callback(self, data):
         if self.received_command == False:
+            print("\n------------ Received Adaptation Command --------------\n")
             with open(self.repository_path + "/../resource/logs/status_" + self.file_id + "_tmp.log", 'w') as log_file:
                 log_file.truncate()
                 log_file.close()
@@ -141,7 +143,8 @@ class Analyzer:
 
             if self.logical_clock == 150:     
                 self.body()
-                self.received_command = False
+                if self.stability:
+                    self.received_command = False
                 self.logical_clock = 0
 
             loop_rate.sleep()
@@ -177,8 +180,8 @@ class Analyzer:
         with open(self.repository_path + "/../resource/logs/status_" + self.file_id + "_tmp.log", mode='r') as log_file:
             status_lines = log_file.readlines()
 
-        with open(self.repository_path + "/../resource/logs/status_" + self.file_id + "_tmp.log", mode='rb') as log_file:
-            log_csv_tmp = csv.reader(log_file, delimiter=',')
+        with open(self.repository_path + "/../resource/logs/status_" + self.file_id + "_tmp.log", mode='rb') as log_file_tmp:
+            log_csv_tmp = csv.reader(log_file_tmp, delimiter=',')
             log_status_tmp = list(log_csv_tmp)
 
         with open(self.repository_path + "/../resource/logs/status_" + self.file_id + ".log", mode='rb') as log_file:
@@ -190,8 +193,8 @@ class Analyzer:
         with open(self.repository_path + "/../resource/logs/event_" + self.file_id + "_tmp.log", mode='rb') as log_file:
             event_lines = log_file.readlines()
 
-        with open(self.repository_path + "/../resource/logs/event_" + self.file_id + "_tmp.log", mode='rb') as log_file:
-            log_csv_tmp = csv.reader(log_file, delimiter=',')
+        with open(self.repository_path + "/../resource/logs/event_" + self.file_id + "_tmp.log", mode='rb') as log_file_tmp:
+            log_csv_tmp = csv.reader(log_file_tmp, delimiter=',')
             log_event_tmp = list(log_csv_tmp)
 
         with open(self.repository_path + "/../resource/logs/event_" + self.file_id + ".log", mode='rb') as log_file:
@@ -208,11 +211,17 @@ class Analyzer:
         log_tmp.extend(log_status_tmp)
         log_tmp.extend(log_event_tmp)
 
+        #print("log[0][2]: " + str(log[0][2]))
+        #print("log_tmp[0][2]: " + str(log_tmp[0][2]))
+
         log = sorted(log, key = lambda x: (int(x[1])))
-        log_tmp = sorted(log_tmp, key = lambda x: (int(x[1])))
+        log_tmp = sorted(log_tmp, key = lambda x_tmp: (int(x_tmp[1])))
 
         t0 = int(log[0][2])
-        t0_tmp = int(log_tmp[0][2])
+        #t0_tmp = int(log_tmp[0][2])
+        t0_tmp = int(log_status_tmp[0][2])
+
+        #print("t0_tmp: " + str(t0_tmp))
 
         # read log 
         for reg in log:
@@ -317,7 +326,7 @@ class Analyzer:
                     formula.compute('CTX_'+ctx.getName(), ctx.isActive())
 
 
-            if(reg[0]=="Event" or reg[0]=="Status"):
+            if((reg[0]=="Event" or reg[0]=="Status") and instant >= 0):
                 global_status_timeseries_tmp[instant] = b_formula.eval()
                 global_reli_timeseries_tmp[instant] = formula.eval()
         ################################################################## 
