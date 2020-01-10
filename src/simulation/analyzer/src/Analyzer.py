@@ -49,6 +49,7 @@ class Analyzer:
         self.a = rospy.Subscriber("strategy", Strategy, self.callback)
         self.enactor_kp = 0
         self.enactor_ki = 0
+        self.plots = 1
     
     def analyze(self, x, y, setpoint):
 
@@ -289,9 +290,9 @@ class Analyzer:
         ############################################## 
         ## First, plot the global reliability against time
         fig, ax = plt.subplots()
-        for i in range(len(x)):
-            print("key: " + str(x[i]))
-            print("value: " + str(y[i]))
+        #for i in range(len(x)):
+            #print("key: " + str(x[i]))
+            #print("value: " + str(y[i]))
         ax.plot(x, y, label='BSN', color = "#1f77b4", linewidth=2)
         ax.set_ylim(0,(1+self.stability_margin))
         ax.xaxis.set_major_formatter(ticks)
@@ -336,8 +337,9 @@ class Analyzer:
             #)
         plt.grid()
         plt.legend()
-        plt.show()
-        print("Finished plot")
+        plt.savefig(self.repository_path + "/../resource/plots/plot" + str(self.plots) + "_" + self.file_id + ".png")
+        #plt.show()
+        #print("Finished plot")
         
         msg = Persist()
         msg.source = "analyzer"
