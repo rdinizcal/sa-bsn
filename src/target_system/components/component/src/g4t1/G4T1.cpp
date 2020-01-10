@@ -191,6 +191,6 @@ void G4T1::transfer(){
 
     if(lost_packt){
         lost_packt = false;
-        //throw std::domain_error("lost data due to package overflow");
+        throw std::domain_error("lost data due to package overflow");
     }
 }

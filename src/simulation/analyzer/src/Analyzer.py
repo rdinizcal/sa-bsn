@@ -141,7 +141,7 @@ class Analyzer:
                 self.body()
                 self.received_command = False
                 self.logical_clock = 0
-            
+
             loop_rate.sleep()
 
     def body(self):
@@ -153,7 +153,8 @@ class Analyzer:
         tasks = dict()
         ctxs = dict()
 
-        global_reli_timeseries = dict() 
+        #global_reli_timeseries = dict()
+        global_reli_timeseries = OrderedDict() 
         global_status_timeseries = dict()
         local_reli_timeseries = dict()
         local_status_timeseries = dict()
@@ -168,19 +169,21 @@ class Analyzer:
         with open(self.repository_path + "/../resource/logs/status_" + self.file_id + "_tmp.log", mode='r') as log_file:
             status_lines = log_file.readlines()
 
-        with open(self.repository_path + "/../resource/logs/status_" + self.file_id + "_tmp.log", mode='rb') as log_file:
+        #with open(self.repository_path + "/../resource/logs/status_" + self.file_id + "_tmp.log", mode='rb') as log_file:
+        with open(self.repository_path + "/../resource/logs/status_" + self.file_id + ".log", mode='rb') as log_file:
             log_csv = csv.reader(log_file, delimiter=',')
             log_status = list(log_csv)
-            #del log_status[0] # delete first line (do we need this?)
+            del log_status[0] # delete first line (do we need this?)
 
         ################ load event log ################    
         with open(self.repository_path + "/../resource/logs/event_" + self.file_id + "_tmp.log", mode='rb') as log_file:
             event_lines = log_file.readlines()
 
-        with open(self.repository_path + "/../resource/logs/event_" + self.file_id + "_tmp.log", mode='rb') as log_file:
+        #with open(self.repository_path + "/../resource/logs/event_" + self.file_id + "_tmp.log", mode='rb') as log_file:
+        with open(self.repository_path + "/../resource/logs/event_" + self.file_id + ".log", mode='rb') as log_file:
             log_csv = csv.reader(log_file, delimiter=',')
             log_event = list(log_csv)
-            #del log_event[0] # delete first line (do we need this?)
+            del log_event[0] # delete first line (do we need this?)
 
         #concatenate lists into one log list
         log = list()
@@ -249,7 +252,7 @@ class Analyzer:
         #                                                                #
         #         Perform Control Theoretical Analysis Timeseries        #
         #                                                                #
-        ################################################################## 
+        ##################################################################
         x = list(global_reli_timeseries.keys())
         y = list(global_reli_timeseries.values())
 
@@ -286,6 +289,9 @@ class Analyzer:
         ############################################## 
         ## First, plot the global reliability against time
         fig, ax = plt.subplots()
+        for i in range(len(x)):
+            print("key: " + str(x[i]))
+            print("value: " + str(y[i]))
         ax.plot(x, y, label='BSN', color = "#1f77b4", linewidth=2)
         ax.set_ylim(0,(1+self.stability_margin))
         ax.xaxis.set_major_formatter(ticks)
