@@ -1,0 +1,56 @@
+<launch> 
+    <node name="injector" pkg="injector" type="injector" output="screen" />
+
+    <param name="frequency" value="5" type="int" /> <!--Hz-->
+
+    <param name="components" value="g3t1_1,g3t1_2,g3t1_3,g3t1_4,g3t1_5" /> <!--Names of the components in which uncertainty will be injected (separeted per ,) --> 
+
+    <!--Parameters for g3t1_1 uncertainty injection-->
+    <param name="g3t1_1/type" value="random" />                     <!--Could be: step, ramp or random-->
+    <param name="g3t1_1/offset" value="0" />
+    <param name="g3t1_1/amplitude" value="0.40" />
+    <param name="g3t1_1/frequency" value="0.25" />                  <!-- 1 hour = 1/(60*60)-->
+    <param name="g3t1_1/duration" value="3" type="int" />           <!-- 1 hour (s) -->
+    <param name="g3t1_1/begin" value="0" type="int" />              <!-- (s) instant to begin the injection-->
+
+    <!--Parameters for g3t1_2 uncertainty injection-->
+    <param name="g3t1_2/type" value="random" />                     <!--Could be: step, ramp or random-->
+    <param name="g3t1_2/offset" value="0" />
+    <param name="g3t1_2/amplitude" value="0.40" />
+    <param name="g3t1_2/frequency" value="0.25" />                  <!-- 0.25 Hz-->
+    <param name="g3t1_2/duration" value="3" type="int" />           <!-- for long enough input-->
+    <param name="g3t1_2/begin" value="0" type="int" />              <!-- (s) instant to begin the injection-->
+
+    <!--Parameters for g3t1_3 uncertainty injection-->
+    <param name="g3t1_3/type" value="random" />                     <!--Could be: step, ramp or random-->
+    <param name="g3t1_3/offset" value="0" />
+    <param name="g3t1_3/amplitude" value="0.40" />
+    <param name="g3t1_3/frequency" value="0.25" />                  <!-- 0.25 Hz -->
+    <param name="g3t1_3/duration" value="3" type="int" />           <!-- not important for random input -->
+    <param name="g3t1_3/begin" value="0" type="int" />              <!-- (s) instant to begin the injection-->
+
+    <!--Parameters for g3t1_4 uncertainty injection-->
+    <param name="g3t1_4/type" value="random" />                     <!--Could be: step, ramp or random-->
+    <param name="g3t1_4/offset" value="0.2" />
+    <param name="g3t1_4/amplitude" value="0.80" />
+    <param name="g3t1_4/frequency" value="0.25" />                  <!-- 0.25 Hz-->
+    <param name="g3t1_4/duration" value="3" type="int" />           <!-- -->
+    <param name="g3t1_4/begin" value="3" type="int" />              <!-- (s) instant to begin the injection-->
+
+    <!--Parameters for g3t1_5 uncertainty injection-->
+    <param name="g3t1_5/type" value="random" />                     <!--Could be: step, ramp or random-->
+    <param name="g3t1_5/offset" value="0.2" />
+    <param name="g3t1_5/amplitude" value="0.80" />
+    <param name="g3t1_5/frequency" value="0.25" />                  <!-- 0.25 Hz-->
+    <param name="g3t1_5/duration" value="3" type="int" />           <!-- -->
+    <param name="g3t1_5/begin" value="3" type="int" />              <!-- (s) instant to begin the injection-->
+
+    <!--Parameters for g4t1 uncertainty injection-->
+    <param name="g4t1/type" value="step" />                         <!--Could be: step, ramp or random-->
+    <param name="g4t1/offset" value="0.2" />
+    <param name="g4t1/amplitude" value="0.51" />
+    <param name="g4t1/frequency" value="0.0000011574" />            <!-- 0.01 Hz-->
+    <param name="g4t1/duration" value="6000" type="int" />          <!-- -->
+    <param name="g4t1/begin" value="10" type="int" />               <!-- (s) instant to begin the injection-->
+
+</launch>

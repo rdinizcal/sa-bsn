@@ -1,0 +1,6 @@
+<launch> 
+    <node name="data_access" pkg="repository" type="data_access" output="screen" />
+    <param name="frequency" value="10000" /> <!-- 10KHz  -->
+    <param name="connect" value="1" type="int"/> 
+    <param name="server_url" value="http://bsnapi.herokuapp.com/" type="string"/>
+</launch>
