@@ -136,27 +136,27 @@ void Engine::monitor() {
     }
 
 
-    /*request reliability status for all tasks*/
     archlib::DataAccessRequest r_srv;
     r_srv.request.name = ros::this_node::getName();
-    r_srv.request.query = "all:status:"+std::to_string(info_quant);
+    r_srv.request.query = "all:reliability:" + std::to_string(info_quant);
 
     if(!client_module.call(r_srv)) {
         ROS_ERROR("Failed to connect to data access node.");
         return;
-    } 
+    } /*request reliability for all tasks*/
+    
     
     //expecting smth like: "/g3t1_1:success,fail,success;/g4t1:success; ..."
     std::string ans = r_srv.response.content;
-    //std::cout << "received=> [" << ans << "]" << std::endl;
+    // std::cout << "received=> [" << ans << "]" << std::endl;
     if(ans == ""){
-        ROS_ERROR("Received empty answer when asked for status.");
+        ROS_ERROR("Received empty answer when asked for reliability.");
     }
 
     bsn::operation::Operation op;
     std::vector<std::string> pairs = op.split(ans, ';');
     
-    for(std::vector<std::string>::iterator it = pairs.begin(); it != pairs.end(); it++){
+    for (std::vector<std::string>::iterator it = pairs.begin(); it != pairs.end(); it++) {
         std::vector<std::string> pair = op.split(*it, ':');
         std::string first = pair[0];
         std::string second = pair[1];
@@ -167,18 +167,9 @@ void Engine::monitor() {
         first.insert(int(first.find('T')),"_"); // G3_T1_1
 
         std::vector<std::string> values = op.split(second, ',');
-        double sum = 0;
-        int len = 0;
-        for (std::vector<std::string>::iterator value = values.begin(); value != values.end(); value++) {
-            if (*value == "success") {
-                sum +=1;
-                len++;
-            } else if (*value == "fail") {
-                len++;
-            }
-        }
 
-        strategy["R_"+first] = (len>0)?sum/len:0;
+        strategy["R_"+first] = stod(values[values.size()-1]);
+        std::cout << "R_" + first + " = " << strategy["R_" + first] << std::endl;
     } 
 
     //request context status for all tasks

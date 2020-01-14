@@ -6,8 +6,6 @@
 #include <memory>
 #include <map>
 
-#include <cpprest/http_client.h>
-#include <cpprest/json.h>
 #include <ros/package.h>
 #include "ros/ros.h"
 
@@ -20,6 +18,7 @@
 #include "archlib/AdaptationCommand.h"
 
 #include "messages/SensorData.h"
+#include "messages/TargetSystemData.h"
 
 class G4T1 : public CentralHub {
     
@@ -33,6 +32,7 @@ class G4T1 : public CentralHub {
 
         std::string makePacket();
         std::vector<std::string> getPatientStatus();
+        int32_t getSensorId(std::string type);
 
     public:
         virtual void setUp();
@@ -43,22 +43,28 @@ class G4T1 : public CentralHub {
         virtual void transfer();
 
     private:
-        bool connect;
-        std::string database_url;
-        
-        bool lost_packt;
         double patient_status;
-        int session;
 
-        std::string bpr_risk;
-        std::string oxi_risk;
-        std::string ecg_risk;
-        std::string trm_risk;
+        double abps_risk;
+        double abpd_risk;
+        double oxi_risk;
+        double ecg_risk;
+        double trm_risk;
 
-        std::string bpr_batt;
-        std::string oxi_batt;
-        std::string ecg_batt;
-        std::string trm_batt;
+        double abps_batt;
+        double abpd_batt;
+        double oxi_batt;
+        double ecg_batt;
+        double trm_batt;
+
+        double abps_raw;
+        double abpd_raw;
+        double oxi_raw;
+        double ecg_raw;
+        double trm_raw;
+
+        ros::Publisher pub;
+        bool lost_packt;
 };
 
 #endif 

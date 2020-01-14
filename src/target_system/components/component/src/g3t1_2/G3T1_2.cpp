@@ -1,6 +1,6 @@
 #include "component/g3t1_2/G3T1_2.hpp"
 
-#define BATT_UNIT 0.01
+#define BATT_UNIT 0.3
 
 using namespace bsn::range;
 using namespace bsn::generator;
@@ -94,7 +94,7 @@ double G3T1_2::collect() {
         ROS_INFO("error collecting data");
     }
 
-    //battery.consume(BATT_UNIT);
+    battery.consume(BATT_UNIT);
     collected_risk = sensorConfig.evaluateNumber(m_data);
 
     return m_data;
@@ -106,7 +106,7 @@ double G3T1_2::process(const double &m_data) {
     
     filter.insert(m_data);
     filtered_data = filter.getValue();
-    //battery.consume(BATT_UNIT*filter.getRange());
+    battery.consume(BATT_UNIT*filter.getRange());
 
     ROS_INFO("filtered data: [%s]", std::to_string(filtered_data).c_str());
     return filtered_data;
@@ -115,7 +115,7 @@ double G3T1_2::process(const double &m_data) {
 void G3T1_2::transfer(const double &m_data) {
     double risk;
     risk = sensorConfig.evaluateNumber(m_data);
-    //battery.consume(BATT_UNIT);
+
     if (risk < 0 || risk > 100) throw std::domain_error("risk data out of boundaries");
     if (label(risk) != label(collected_risk)) throw std::domain_error("sensor accuracy fail");
 
@@ -129,7 +129,7 @@ void G3T1_2::transfer(const double &m_data) {
 
     data_pub.publish(msg);
     
-    //battery.consume(BATT_UNIT);
+    battery.consume(BATT_UNIT);
 
     ROS_INFO("risk calculated and transferred: [%.2f%%]", risk);
     

@@ -1,6 +1,6 @@
 #include "component/g3t1_1/G3T1_1.hpp"
 
-#define BATT_UNIT 0.1
+#define BATT_UNIT 0.2
 
 #include <algorithm>
 #include <cmath>
@@ -90,8 +90,6 @@ double G3T1_1::collect() {
 
     srv.request.vitalSign = "oxigenation";
 
-    std::cerr << "qualquer coisa" << std::endl;
-
     if (client.call(srv)) {
         m_data = srv.response.data;
         ROS_INFO("new data collected: [%s]", std::to_string(m_data).c_str());
@@ -99,7 +97,7 @@ double G3T1_1::collect() {
         ROS_INFO("error collecting data");
     }
 
-    //battery.consume(BATT_UNIT);
+    battery.consume(BATT_UNIT);
 
     collected_risk = sensorConfig.evaluateNumber(m_data);
 
@@ -112,7 +110,7 @@ double G3T1_1::process(const double &m_data) {
     
     filter.insert(m_data);
     filtered_data = filter.getValue();
-    //battery.consume(BATT_UNIT*filter.getRange());
+    battery.consume(BATT_UNIT*filter.getRange());
 
     ROS_INFO("filtered data: [%s]", std::to_string(filtered_data).c_str());
     return filtered_data;
@@ -121,7 +119,7 @@ double G3T1_1::process(const double &m_data) {
 void G3T1_1::transfer(const double &m_data) {
     double risk;
     risk = sensorConfig.evaluateNumber(m_data);
-    //battery.consume(BATT_UNIT);
+
     if (risk < 0 || risk > 100) throw std::domain_error("risk data out of boundaries");
     if (label(risk) != label(collected_risk)) throw std::domain_error("sensor accuracy fail");
 
@@ -134,7 +132,7 @@ void G3T1_1::transfer(const double &m_data) {
     msg.batt = battery.getCurrentLevel();
 
     data_pub.publish(msg);
-    //battery.consume(0.2);
+    battery.consume(BATT_UNIT);
 
     ROS_INFO("risk calculated and transferred: [%.2f%%]", risk);
 }
