@@ -44,13 +44,7 @@ sudo ninja install
 ```
 
 #### Lepton:
-1. Clone the repository in your desired folder cointaining Lepton and its dependencies.
-
-```
-git clone https://github.com/rdinizcal/lepton
-``` 
-
-2. Then, create and enter build folder.
+1. First, create and enter build folder.
 ```
 cd lepton
 ``` 
@@ -69,13 +63,7 @@ sudo make install
 ``` 
 
 #### Libbsn:
-1. Clone the repository in your desired folder cointaining bsn library and its dependencies.
-
-```
-git clone https://github.com/rdinizcal/libbsn
-``` 
-
-2. Then, create and enter build folder.
+1. reate and enter build folder.
 ```
 cd libbsn
 ``` 
@@ -92,34 +80,14 @@ cmake ..
 ``` 
 sudo make install
 ``` 
-
-#### Bsn Arch:
-First enter in catkin workspace.
-
-```
-cd ~/catkin_ws/src
-```
-
-Clone the repository.
-```
-git clone https://github.com/rdinizcal/arch
-```
-
-And build it.
-
-```
-cd .. 
-catkin_make
-```
-
 Once ALL the dependencies have been successfully installed, you can proceed to the next steps.
 
-## Compiling
+## Compiling BSN and arch lib
 
 1. Clone the repository inside the 'catkin_ws/src' directory.
 ```
 cd ~/catkin_ws/src
-git clone https://github.com/rdinizcal/bsn_ros
+git clone https://github.com/lesunb/bsn
 ``` 
 
 2. Then, compile under 'catkin_ws' directory.
@@ -129,12 +97,12 @@ catkin_make
 ``` 
 ## Configuration and Execution
 
-3. Configure roslaunch files for personalized execution under '/catkin_ws/src/bsn_ros/configurations';
+3. Configure roslaunch files for personalized execution under '/catkin_ws/src/bsn/configurations';
 
 4. Execute the BSN either by executing the pre-set run.sh file, that executes all nodes, 
 or use roslaunch x.launch to execute a single node:
 ```
-cd ~/catkin_ws/src/bsn_ros/ && 
+cd ~/catkin_ws/src/bsn/ && 
 bash run.sh
 ``` 
 
