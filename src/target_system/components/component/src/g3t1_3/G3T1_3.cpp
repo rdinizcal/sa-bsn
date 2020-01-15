@@ -28,7 +28,6 @@ void G3T1_3::setUp() {
         std::vector<std::string> lrs,mrs0,hrs0,mrs1,hrs1;
 
         handle.getParam("LowRisk", s);
-        lrs = bsn::utils::split(s, ',');
         handle.getParam("MidRisk0", s);
         mrs0 = bsn::utils::split(s, ',');
         handle.getParam("HighRisk0", s);
@@ -38,17 +37,6 @@ void G3T1_3::setUp() {
         handle.getParam("HighRisk1", s);
         hrs1 = bsn::utils::split(s, ',');
 
-        ranges[0] = Range(std::stod(hrs0[0]), std::stod(hrs0[1]));
-        ranges[1] = Range(std::stod(mrs0[0]), std::stod(mrs0[1]));
-        ranges[2] = Range(std::stod(lrs[0]), std::stod(lrs[1]));
-        ranges[3] = Range(std::stod(mrs1[0]), std::stod(mrs1[1]));
-        ranges[4] = Range(std::stod(hrs1[0]), std::stod(hrs1[1]));
-    }
-
-    { // Configure sensor configuration
-        Range low_range = ranges[2];
-        
-        std::array<Range,2> midRanges;
         midRanges[0] = ranges[1];
         midRanges[1] = ranges[3];
         

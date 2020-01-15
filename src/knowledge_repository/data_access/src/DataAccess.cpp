@@ -102,7 +102,6 @@ void DataAccess::setUp() {
 void DataAccess::tearDown(){}
 
 void DataAccess::processTargetSystemData(const messages::TargetSystemData::ConstPtr &msg) {
-    W(connected)
     if (connected) {
         components_batteries["g3t1_3"] = msg->trm_batt;
         components_batteries["g3t1_2"] = msg->ecg_batt;
