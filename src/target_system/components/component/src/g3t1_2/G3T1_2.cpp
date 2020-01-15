@@ -4,7 +4,6 @@
 
 using namespace bsn::range;
 using namespace bsn::generator;
-using namespace bsn::operation;
 using namespace bsn::configuration;
 
 G3T1_2::G3T1_2(int &argc, char **argv, const std::string &name) :
@@ -19,8 +18,6 @@ G3T1_2::~G3T1_2() {}
 
 void G3T1_2::setUp() {
     Component::setUp();
-            
-    Operation op;
     
     std::array<bsn::range::Range,5> ranges;
     std::string s;
@@ -29,15 +26,15 @@ void G3T1_2::setUp() {
         std::vector<std::string> lrs,mrs0,hrs0,mrs1,hrs1;
 
         handle.getParam("LowRisk", s);
-        lrs = op.split(s, ',');
+        lrs = bsn::utils::split(s, ',');
         handle.getParam("MidRisk0", s);
-        mrs0 = op.split(s, ',');
+        mrs0 = bsn::utils::split(s, ',');
         handle.getParam("HighRisk0", s);
-        hrs0 = op.split(s, ',');
+        hrs0 = bsn::utils::split(s, ',');
         handle.getParam("MidRisk1", s);
-        mrs1 = op.split(s, ',');
+        mrs1 = bsn::utils::split(s, ',');
         handle.getParam("HighRisk1", s);
-        hrs1 = op.split(s, ',');
+        hrs1 = bsn::utils::split(s, ',');
 
         ranges[0] = Range(std::stod(hrs0[0]), std::stod(hrs0[1]));
         ranges[1] = Range(std::stod(mrs0[0]), std::stod(mrs0[1]));
@@ -60,15 +57,15 @@ void G3T1_2::setUp() {
         std::array<Range,3> percentages;
 
         handle.getParam("lowrisk", s);
-        std::vector<std::string> low_p = op.split(s, ',');
+        std::vector<std::string> low_p = bsn::utils::split(s, ',');
         percentages[0] = Range(std::stod(low_p[0]), std::stod(low_p[1]));
 
         handle.getParam("midrisk", s);
-        std::vector<std::string> mid_p = op.split(s, ',');
+        std::vector<std::string> mid_p = bsn::utils::split(s, ',');
         percentages[1] = Range(std::stod(mid_p[0]), std::stod(mid_p[1]));
 
         handle.getParam("highrisk", s);
-        std::vector<std::string> high_p = op.split(s, ',');
+        std::vector<std::string> high_p = bsn::utils::split(s, ',');
         percentages[2] = Range(std::stod(high_p[0]), std::stod(high_p[1]));
 
         sensorConfig = SensorConfiguration(0, low_range, midRanges, highRanges, percentages);

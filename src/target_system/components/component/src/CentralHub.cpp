@@ -56,11 +56,10 @@ void CentralHub::apply_noise() {}
 void CentralHub::reconfigure(const archlib::AdaptationCommand::ConstPtr& msg) {
     std::string action = msg->action.c_str();
 
-    bsn::operation::Operation op;
-    std::vector<std::string> pairs = op.split(action, ',');
+    std::vector<std::string> pairs = bsn::utils::split(action, ',');
 
     for (std::vector<std::string>::iterator it = pairs.begin(); it != pairs.end(); ++it){
-        std::vector<std::string> param = op.split(action, '=');
+        std::vector<std::string> param = bsn::utils::split(action, '=');
 
         if(param[0]=="replicate_collect"){
             rosComponentDescriptor.setFreq(rosComponentDescriptor.getFreq()+stoi(param[1]));

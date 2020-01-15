@@ -9,7 +9,6 @@ void Injector::setUp() {
     log_uncertainty = handle.advertise<archlib::Uncertainty>("log_uncertainty", 10);
 
     ros::NodeHandle config;
-    bsn::operation::Operation op;
     
     double freq;
     config.getParam("frequency", freq);
@@ -17,7 +16,7 @@ void Injector::setUp() {
 
     std::string comps;
     config.getParam("components", comps);
-    components = op.split(comps, ',');
+    components = bsn::utils::split(comps, ',');
 
     for (std::vector<std::string>::iterator component = components.begin(); component != components.end(); ++component){
         uncertainty_pub[*component] = handle.advertise<archlib::Uncertainty>("uncertainty_/"+(*component), 1000);

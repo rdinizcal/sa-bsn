@@ -52,8 +52,7 @@ void Engine::setUp() {
     std::replace(reliability_formula.begin(), reliability_formula.end(), '/',' ');
     std::replace(reliability_formula.begin(), reliability_formula.end(), '(',' ');
     std::replace(reliability_formula.begin(), reliability_formula.end(), ')',' ');
-    bsn::operation::Operation op;
-    std::vector<std::string> terms = op.split(reliability_formula, ' ');
+    std::vector<std::string> terms = bsn::utils::split(reliability_formula, ' ');
 
     for (std::vector<std::string>::iterator it = terms.begin(); it != terms.end(); ++it) {
         strategy[*it] = 1;
@@ -76,8 +75,7 @@ void Engine::tearDown() {}
 void Engine::receiveException(const archlib::Exception::ConstPtr& msg){
     std::string content = msg->content.c_str();
 
-    bsn::operation::Operation op;
-    std::vector<std::string> param = op.split(content, '=');
+    std::vector<std::string> param = bsn::utils::split(content, '=');
 
     // /g3t1_1
     std::string first = param[0];
@@ -153,11 +151,10 @@ void Engine::monitor() {
         ROS_ERROR("Received empty answer when asked for reliability.");
     }
 
-    bsn::operation::Operation op;
-    std::vector<std::string> pairs = op.split(ans, ';');
+    std::vector<std::string> pairs = bsn::utils::split(ans, ';');
     
     for (std::vector<std::string>::iterator it = pairs.begin(); it != pairs.end(); it++) {
-        std::vector<std::string> pair = op.split(*it, ':');
+        std::vector<std::string> pair = bsn::utils::split(*it, ':');
         std::string first = pair[0];
         std::string second = pair[1];
 
@@ -166,7 +163,7 @@ void Engine::monitor() {
         first.erase(0,1); // G3T1_1
         first.insert(int(first.find('T')),"_"); // G3_T1_1
 
-        std::vector<std::string> values = op.split(second, ',');
+        std::vector<std::string> values = bsn::utils::split(second, ',');
 
         strategy["R_"+first] = stod(values[values.size()-1]);
         std::cout << "R_" + first + " = " << strategy["R_" + first] << std::endl;
@@ -190,10 +187,10 @@ void Engine::monitor() {
         ROS_ERROR("Received empty answer when asked for event.");
     }
 
-    std::vector<std::string> ctx_pairs = op.split(ans, ';');
+    std::vector<std::string> ctx_pairs = bsn::utils::split(ans, ';');
     
     for(std::vector<std::string>::iterator it = ctx_pairs.begin(); it != ctx_pairs.end(); it++){
-        std::vector<std::string> pair = op.split(*it, ':');
+        std::vector<std::string> pair = bsn::utils::split(*it, ':');
         std::string first = pair[0];
         std::string second = pair[1];
 
@@ -202,7 +199,7 @@ void Engine::monitor() {
         first.erase(0,1); // G3T1_1
         first.insert(int(first.find('T')),"_"); // G3_T1_1
 
-        std::vector<std::string> values = op.split(second, ',');
+        std::vector<std::string> values = bsn::utils::split(second, ',');
         for (std::vector<std::string>::iterator value = values.begin(); value != values.end(); value++) {
             if(*value=="activate"){
                 strategy["CTX_"+first] = 1;
@@ -380,7 +377,6 @@ void Engine::execute() {
 
     std::string content = "";
     size_t index = 0;
-    bsn::operation::Operation op;
     bool flag = false;  //nasty
     bool flagO = false; //uber nasty
     //get the reliabilities in the formula and send!
@@ -391,7 +387,7 @@ void Engine::execute() {
             aux += it->first;
             std::transform(aux.begin(), aux.end(), aux.begin(), ::tolower);
 
-            std::vector<std::string> str = op.split(aux, '_');
+            std::vector<std::string> str = bsn::utils::split(aux, '_');
             content += "/";
             content += str[1]; //g3
             content += str[2] ; //t1

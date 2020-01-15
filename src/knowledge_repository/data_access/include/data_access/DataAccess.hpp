@@ -18,7 +18,7 @@
 #include "bsn/goalmodel/Context.hpp"
 #include "bsn/goalmodel/GoalTree.hpp"
 #include "bsn/model/Formula.hpp"
-#include "bsn/operation/Operation.hpp"
+#include "bsn/utils/utils.hpp"
 
 #include "archlib/Persist.h"
 #include "archlib/DataAccessRequest.h"

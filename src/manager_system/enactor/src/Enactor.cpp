@@ -61,28 +61,26 @@ void Enactor::receiveStatus() {
         ROS_ERROR("Received empty answer when asked for status.");
     }
 
-    bsn::operation::Operation op;
-    std::vector<std::string> pairs = op.split(ans, ';');
+    std::vector<std::string> pairs = bsn::utils::split(ans, ';');
 
     for (auto s : pairs) {
-        std::vector<std::string> pair = op.split(s, ':');
+        std::vector<std::string> pair = bsn::utils::split(s, ':');
         std::string component = pair[0];
         std::string content = pair[1];
 
-        std::vector<std::string> values = op.split(content, ',');
+        std::vector<std::string> values = bsn::utils::split(content, ',');
 
         r_curr[component] = stod(values[values.size() - 1]);
         apply_strategy(component);
     }
 }
 
-void Enactor::receiveStrategy(const archlib::Strategy::ConstPtr& msg) {
-    bsn::operation::Operation op;     
+void Enactor::receiveStrategy(const archlib::Strategy::ConstPtr& msg) {     
 
-    std::vector<std::string> refs = op.split(msg->content, ';');
+    std::vector<std::string> refs = bsn::utils::split(msg->content, ';');
 
     for(std::vector<std::string>::iterator ref = refs.begin(); ref != refs.end(); ref++){
-        std::vector<std::string> pair = op.split(*ref, ':'); 
+        std::vector<std::string> pair = bsn::utils::split(*ref, ':'); 
         r_ref[pair[0]] = stod(pair[1]);
     }
 }

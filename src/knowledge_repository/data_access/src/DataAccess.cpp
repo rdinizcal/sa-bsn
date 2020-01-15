@@ -267,9 +267,8 @@ bool DataAccess::processQuery(archlib::DataAccessRequest::Request &req, archlib:
 
     try {
         if (req.name == "/engine" || req.name == "/enactor") {
-            bsn::operation::Operation op;
             // wait smth like "all:status:100" -> return the last 100 success and failures of all active modules
-            std::vector<std::string> query = op.split(req.query,':');
+            std::vector<std::string> query = bsn::utils::split(req.query,':');
 
             if (query[1] == "reliability") {
                 applyTimeWindow();

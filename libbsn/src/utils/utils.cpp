@@ -1,14 +1,11 @@
-#include "operation/Operation.hpp"
+#include "utils/utils.hpp"
 
 using namespace std;
 
 namespace bsn {
-    namespace operation {
-
-        Operation::Operation() {};
-        Operation::~Operation() {};
-
-        const vector<string> Operation::split(const string& s, const char& c) {    
+    namespace utils {
+        
+        const vector<string> split(const string& s, const char& c) {    
 	        string buff{""};
 	        vector<string> v;
 	
