@@ -20,6 +20,11 @@ void PatientModule::setUp() {
     // Removes white spaces from vitalSigns
     vitalSigns.erase(std::remove(vitalSigns.begin(), vitalSigns.end(),' '), vitalSigns.end());
 
+    std::vector<std::string> splittedVitalSigns = bsn::utils::split(vitalSigns, ',');
+
+    for (std::string s : splittedVitalSigns) {
+        vitalSignsFrequencies[s] = 0;
+        nh.getParam(s + "_Change", aux);
         vitalSignsChanges[s] = 1/aux;
         nh.getParam(s + "_Offset", vitalSignsOffsets[s]);
     }
