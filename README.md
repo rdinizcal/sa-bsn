@@ -63,7 +63,7 @@ sudo make install
 ``` 
 
 #### Libbsn:
-1. reate and enter build folder.
+1. Create and enter build folder.
 ```
 cd libbsn
 ``` 
@@ -76,7 +76,7 @@ mkdir build && cd build
 cmake ..
 ``` 
 
-4. Finally, compile and install lepton library.
+4. Finally, compile and install libbsn library.
 ``` 
 sudo make install
 ``` 
@@ -84,13 +84,7 @@ Once ALL the dependencies have been successfully installed, you can proceed to t
 
 ## Compiling BSN and arch lib
 
-1. Clone the repository inside the 'catkin_ws/src' directory.
-```
-cd ~/catkin_ws/src
-git clone https://github.com/lesunb/bsn
-``` 
-
-2. Then, compile under 'catkin_ws' directory.
+1. Compile under 'catkin_ws' directory.
 ```
 cd ~/catkin_ws/ && 
 catkin_make
