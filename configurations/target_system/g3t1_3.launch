@@ -2,7 +2,7 @@
     <!-- Temperature Measurement Sensor -->
     <node name="g3t1_3" pkg="component" type="g3t1_3" output="screen" />
 
-    <param name="frequency" value="1" /> <!-- 1 Hz  -->
+    <param name="frequency" value="0.6" /> <!-- 1 Hz  -->
 
     <!-- Defines the percentages to consider low, moderate or high risk -->
     <param name="lowrisk" value="0,20" />

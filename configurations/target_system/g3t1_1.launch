@@ -2,7 +2,7 @@
     <!-- Blood Oxigenation Measurement Sensor -->    
     <node name="g3t1_1" pkg="component" type="g3t1_1" output="screen" />
 
-    <param name="frequency" value="1" /> <!-- 0.2 Hz  -->
+    <param name="frequency" value="1.3" /> <!-- 0.2 Hz  -->
 
     <!-- Defines the percentages to consider low, moderate or high risk -->
     <param name="lowrisk" value="0,20" />
