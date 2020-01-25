@@ -1,6 +1,6 @@
 # BSN implementation on ROS
 
-This is a Body Sensor Network implementation on ROS. So far, the BSN was used for experimentation on solutions for adaptation on the Self-Adaptive Software Systems domain, refer to https://arxiv.org/pdf/1804.00994.pdf and https://arxiv.org/pdf/1905.02228.pdf for more information.  The following instructions will guide you to to compile, deploy and run the BSN on Linux Ubuntu 18.04 with ROS Melodic distributions. We have not yet tested on other distributions.
+This is a Body Sensor Network implementation on ROS. So far, the BSN was used for experimentation on solutions for adaptation on the Self-Adaptive Software Systems domain, refer to https://doi.org/10.1145/3194133.3194147 and https://doi.org/10.1109/SEAMS.2019.00020 for more information.  Moreover, information regarding the prototype behaviour and how to develop your own manager is provided in the https://bodysensornetwork.herokuapp.com/ website, which contains an executable instance of the BSN. The following instructions will guide you to to compile, deploy and run the BSN on Linux Ubuntu 18.04 with ROS Melodic distributions. We have not yet tested on other distributions.
 
 ## Dependencies:
 * [Ros Melodic](http://wiki.ros.org/melodic) which provides software libraries for BSN engines.
@@ -108,13 +108,11 @@ echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
 source ~/.bashrc
 ```
 
-## Authors
+## Main Authors
 
 * **Ricardo D. Caldas** - https://github.com/rdinizcal
 * **Eric B. Gil** - https://github.com/ericbg27/
 * **Gabriel Levi** - https://github.com/gabrielevi10
-* **Léo Moraes** - https://github.com/leooleo 
-* **Samuel Couto** - https://github.com/SCouto97
-* **Jorge Mendes** - https://github.com/luzmendesj 
+* **Léo Moraes** - https://github.com/leooleo  
 
-Adviser: **Dr. Genaína Nunes Rodrigues** - https://cic.unb.br/~genaina/
+Adviser: **Genaína N. Rodrigues** - https://cic.unb.br/~genaina/
