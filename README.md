@@ -111,8 +111,8 @@ source ~/.bashrc
 ## Main Authors
 
 * **Ricardo D. Caldas** - https://github.com/rdinizcal
-* **Eric B. Gil** - https://github.com/ericbg27/
 * **Gabriel Levi** - https://github.com/gabrielevi10
 * **Léo Moraes** - https://github.com/leooleo  
+* **Eric B. Gil** - https://github.com/ericbg27/
 
 Adviser: **Genaína N. Rodrigues** - https://cic.unb.br/~genaina/
