@@ -138,9 +138,9 @@ void DataAccess::processTargetSystemData(const messages::TargetSystemData::Const
 
         json_obj["PatientRisk"] = msg->patient_status;
 
-        json_obj["Reliability"] = system_reliability;
+        json_obj["Reliability"] = system_reliability * 100;
         json_obj["Cost"] = system_cost;
-        
+
         client->request(web::http::methods::POST, U("/sendVitalData"), json_obj);
         ROS_INFO("Sent information to server.");
     }
@@ -431,6 +431,8 @@ void DataAccess::updateCosts() {
     for (auto component : components_batteries) {
         components_costs[component.first] = 
             components_last_batteries[component.first] - component.second;
+    
+        W(components_costs[component.first])
     }
 }
 
