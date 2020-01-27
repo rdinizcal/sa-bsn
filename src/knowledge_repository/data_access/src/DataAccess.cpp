@@ -431,8 +431,6 @@ void DataAccess::updateCosts() {
     for (auto component : components_batteries) {
         components_costs[component.first] = 
             components_last_batteries[component.first] - component.second;
-    
-        W(components_costs[component.first])
     }
 }
 
