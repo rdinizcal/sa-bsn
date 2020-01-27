@@ -442,7 +442,7 @@ void DataAccess::applyTimeWindow() {
         while (!deq.empty()) {
             auto time_arrived = deq.front().first;
             double time_span = std::chrono::duration_cast<std::chrono::duration<double>>(now - time_arrived).count();
-            if (time_span >= 2.1) {
+            if (time_span >= 10.1) {
                 deq.pop_front();
             } else {
                 component.second = deq;
