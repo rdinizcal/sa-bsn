@@ -137,6 +137,8 @@ void Sensor::turnOff() {
 *  0.2 %/s battery recovery rate
 */
 void Sensor::recharge() {
-    if(battery.getCurrentLevel() <= 100) 
-        battery.generate((100/2000)/rosComponentDescriptor.getFreq());
+    if(battery.getCurrentLevel() <= 100) {
+        battery.generate(1);
+        // battery.generate((100/2000)/rosComponentDescriptor.getFreq());
+    }
 }
