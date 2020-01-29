@@ -5,7 +5,6 @@ add_compile_options(-std=c++11)
 
 ## Find catkin and any catkin packages
 FIND_PACKAGE(catkin REQUIRED COMPONENTS roscpp std_msgs genmsg messages archlib)
-FIND_PACKAGE(cpprestsdk REQUIRED NAMES cpprestsdk cpprest)
 
 # Export catkin package.
 CATKIN_PACKAGE(
@@ -55,9 +54,14 @@ ADD_EXECUTABLE (g3t1_4  "${CMAKE_CURRENT_SOURCE_DIR}/apps/g3t1_4.cpp" ${${PROJEC
 TARGET_LINK_LIBRARIES (g3t1_4 ${catkin_LIBRARIES} ${LIBRARIES})
 ADD_DEPENDENCIES(g3t1_4 messages_generate_messages_cpp)
 
+SET(g3t1_5-src "${CMAKE_CURRENT_SOURCE_DIR}/src/g3t1_5/G3T1_5.cpp")
+ADD_EXECUTABLE (g3t1_5  "${CMAKE_CURRENT_SOURCE_DIR}/apps/g3t1_5.cpp" ${${PROJECT_NAME}-src} ${g3t1_5-src})
+TARGET_LINK_LIBRARIES (g3t1_5 ${catkin_LIBRARIES} ${LIBRARIES})
+ADD_DEPENDENCIES(g3t1_5 messages_generate_messages_cpp)
+
 SET(g4t1-src "${CMAKE_CURRENT_SOURCE_DIR}/src/g4t1/G4T1.cpp")
 ADD_EXECUTABLE (g4t1 "${CMAKE_CURRENT_SOURCE_DIR}/apps/g4t1.cpp" ${${PROJECT_NAME}-src} ${g4t1-src})
-TARGET_LINK_LIBRARIES (g4t1 PRIVATE cpprestsdk::cpprest ${catkin_LIBRARIES} ${LIBRARIES})
+TARGET_LINK_LIBRARIES (g4t1 ${catkin_LIBRARIES} ${LIBRARIES})
 ADD_DEPENDENCIES(g4t1 messages_generate_messages_cpp)
 
 ###########################################################################

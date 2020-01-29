@@ -1,13 +1,12 @@
 #include "component/g3t1_1/G3T1_1.hpp"
 
-#define BATT_UNIT 0.1
+#define BATT_UNIT 0.2
 
 #include <algorithm>
 #include <cmath>
 
 using namespace bsn::range;
 using namespace bsn::generator;
-using namespace bsn::operation;
 using namespace bsn::configuration;
 
 G3T1_1::G3T1_1(int &argc, char **argv, const std::string &name) :
@@ -23,7 +22,6 @@ G3T1_1::~G3T1_1() {}
 void G3T1_1::setUp() {
     Component::setUp();
 
-    Operation op;
     std::string s;
 
     std::array<bsn::range::Range,5> ranges;
@@ -32,15 +30,15 @@ void G3T1_1::setUp() {
         std::vector<std::string> lrs,mrs0,hrs0,mrs1,hrs1;
 
         handle.getParam("LowRisk", s);
-        lrs = op.split(s, ',');
+        lrs = bsn::utils::split(s, ',');
         handle.getParam("MidRisk0", s);
-        mrs0 = op.split(s, ',');
+        mrs0 = bsn::utils::split(s, ',');
         handle.getParam("HighRisk0", s);
-        hrs0 = op.split(s, ',');
+        hrs0 = bsn::utils::split(s, ',');
         handle.getParam("MidRisk1", s);
-        mrs1 = op.split(s, ',');
+        mrs1 = bsn::utils::split(s, ',');
         handle.getParam("HighRisk1", s);
-        hrs1 = op.split(s, ',');
+        hrs1 = bsn::utils::split(s, ',');
 
         ranges[0] = Range(std::stod(hrs0[0]), std::stod(hrs0[1]));
         ranges[1] = Range(std::stod(mrs0[0]), std::stod(mrs0[1]));
@@ -63,15 +61,15 @@ void G3T1_1::setUp() {
         std::array<Range,3> percentages;
 
         handle.getParam("lowrisk", s);
-        std::vector<std::string> low_p = op.split(s, ',');
+        std::vector<std::string> low_p = bsn::utils::split(s, ',');
         percentages[0] = Range(std::stod(low_p[0]), std::stod(low_p[1]));
 
         handle.getParam("midrisk", s);
-        std::vector<std::string> mid_p = op.split(s, ',');
+        std::vector<std::string> mid_p = bsn::utils::split(s, ',');
         percentages[1] = Range(std::stod(mid_p[0]), std::stod(mid_p[1]));
 
         handle.getParam("highrisk", s);
-        std::vector<std::string> high_p = op.split(s, ',');
+        std::vector<std::string> high_p = bsn::utils::split(s, ',');
         percentages[2] = Range(std::stod(high_p[0]), std::stod(high_p[1]));
 
         sensorConfig = SensorConfiguration(0, low_range, midRanges, highRanges, percentages);
@@ -90,8 +88,6 @@ double G3T1_1::collect() {
 
     srv.request.vitalSign = "oxigenation";
 
-    std::cerr << "qualquer coisa" << std::endl;
-
     if (client.call(srv)) {
         m_data = srv.response.data;
         ROS_INFO("new data collected: [%s]", std::to_string(m_data).c_str());
@@ -99,7 +95,7 @@ double G3T1_1::collect() {
         ROS_INFO("error collecting data");
     }
 
-    //battery.consume(BATT_UNIT);
+    battery.consume(BATT_UNIT);
 
     collected_risk = sensorConfig.evaluateNumber(m_data);
 
@@ -112,7 +108,7 @@ double G3T1_1::process(const double &m_data) {
     
     filter.insert(m_data);
     filtered_data = filter.getValue();
-    //battery.consume(BATT_UNIT*filter.getRange());
+    battery.consume(BATT_UNIT*filter.getRange());
 
     ROS_INFO("filtered data: [%s]", std::to_string(filtered_data).c_str());
     return filtered_data;
@@ -121,7 +117,7 @@ double G3T1_1::process(const double &m_data) {
 void G3T1_1::transfer(const double &m_data) {
     double risk;
     risk = sensorConfig.evaluateNumber(m_data);
-    //battery.consume(BATT_UNIT);
+
     if (risk < 0 || risk > 100) throw std::domain_error("risk data out of boundaries");
     if (label(risk) != label(collected_risk)) throw std::domain_error("sensor accuracy fail");
 
@@ -134,7 +130,7 @@ void G3T1_1::transfer(const double &m_data) {
     msg.batt = battery.getCurrentLevel();
 
     data_pub.publish(msg);
-    //battery.consume(0.2);
+    battery.consume(BATT_UNIT);
 
     ROS_INFO("risk calculated and transferred: [%.2f%%]", risk);
 }

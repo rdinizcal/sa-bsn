@@ -9,7 +9,6 @@ void Injector::setUp() {
     log_uncertainty = handle.advertise<archlib::Uncertainty>("log_uncertainty", 10);
 
     ros::NodeHandle config;
-    bsn::operation::Operation op;
     
     double freq;
     config.getParam("frequency", freq);
@@ -17,17 +16,17 @@ void Injector::setUp() {
 
     std::string comps;
     config.getParam("components", comps);
-    components = op.split(comps, ',');
+    components = bsn::utils::split(comps, ',');
 
-    for(std::vector<std::string>::iterator component = components.begin(); component != components.end(); ++component){
+    for (std::vector<std::string>::iterator component = components.begin(); component != components.end(); ++component){
         uncertainty_pub[*component] = handle.advertise<archlib::Uncertainty>("uncertainty_/"+(*component), 1000);
-        config.getParam((*component)+"/type", type[*component]);
-        config.getParam((*component)+"/offset", noise_factor[*component]);
-        config.getParam((*component)+"/amplitude", amplitude[*component]);
-        config.getParam((*component)+"/frequency", frequency[*component]);
-        config.getParam((*component)+"/duration", duration[*component]);
+        config.getParam((*component) + "/type", type[*component]);
+        config.getParam((*component) + "/offset", noise_factor[*component]);
+        config.getParam((*component) + "/amplitude", amplitude[*component]);
+        config.getParam((*component) + "/frequency", frequency[*component]);
+        config.getParam((*component) + "/duration", duration[*component]);
         int beg;
-        config.getParam((*component)+"/begin", beg);
+        config.getParam((*component) + "/begin", beg);
         begin[*component] = seconds_in_cycles(beg);
         end[*component] = begin[*component] + seconds_in_cycles(duration[*component]);
     }
@@ -47,11 +46,11 @@ double Injector::gen_noise(const std::string &component, double &noise, int &dur
 
     bool is_last_cycle = (cycles == end[component])?true:false;
 
-    if(type=="step" && !is_last_cycle){
+    if (type=="step" && !is_last_cycle){
         return amplitude;
-    } else if(type=="ramp" && !is_last_cycle) {
+    } else if (type=="ramp" && !is_last_cycle) {
         return noise + amplitude/seconds_in_cycles(duration);
-    } else if(type=="random") {
+    } else if (type=="random") {
         return ((double) rand() / (RAND_MAX)) * amplitude;
     } 
     
@@ -61,14 +60,14 @@ double Injector::gen_noise(const std::string &component, double &noise, int &dur
 void Injector::body() {
     ++cycles;
 
-    for(std::vector<std::string>::iterator component = components.begin(); component != components.end(); ++component){
-        if(begin[*component] <= cycles && cycles <= end[*component]) {
+    for (std::vector<std::string>::iterator component = components.begin(); component != components.end(); ++component){
+        if (begin[*component] <= cycles && cycles <= end[*component]) {
 
             noise_factor[*component] = gen_noise(*component, noise_factor[*component], duration[*component], amplitude[*component], type[*component]);
             inject(*component, "noise_factor=" + std::to_string(noise_factor[*component]));
 
             //update begin and end tags in last cycle
-            if(cycles == end[*component]){
+            if (cycles == end[*component]){
                 begin[*component] += seconds_in_cycles(1.0/frequency[*component]);
                 end[*component]   += seconds_in_cycles(1.0/frequency[*component]);
             }

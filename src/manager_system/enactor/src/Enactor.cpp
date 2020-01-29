@@ -1,4 +1,5 @@
 #include "enactor/Enactor.hpp"
+#define W(x) std::cerr << #x << " = " << x << std::endl;
 
 Enactor::Enactor(int  &argc, char **argv, std::string name) : ROSComponent(argc, argv, name), cycles(0), stability_margin(0.02) {}
 
@@ -20,9 +21,7 @@ void Enactor::setUp() {
 void Enactor::tearDown() {}
 
 void Enactor::receiveEvent(const archlib::Event::ConstPtr& msg) {
-
     if (msg->content=="activate") {
-
         invocations[msg->source] = {};
         r_curr[msg->source] = 1;
         r_ref[msg->source] = 0.80;
@@ -31,22 +30,7 @@ void Enactor::receiveEvent(const archlib::Event::ConstPtr& msg) {
         freq[msg->source] = 20;
         exception_buffer[msg->source] = 0;
 
-        /*
-        if(msg->source=="/g3t1_1"){
-            r_ref[msg->source] = 0.680054;
-        } else if (msg->source=="/g3t1_2") {
-            r_ref[msg->source] = 0.606458;
-        } else if (msg->source=="/g3t1_3") {
-            r_ref[msg->source] = 0.606458;
-        } else if (msg->source=="/g3t1_4") {
-            r_ref[msg->source] = 1;
-        } else if (msg->source=="/g4t1") {
-            r_ref[msg->source] = 0.999528;
-        }
-        */
-
     } else if (msg->content=="deactivate") {
-
         invocations.erase(msg->source);
         r_curr.erase(msg->source);
         r_ref.erase(msg->source);
@@ -54,81 +38,70 @@ void Enactor::receiveEvent(const archlib::Event::ConstPtr& msg) {
         replicate_task.erase(msg->source);
         freq.erase(msg->source);
         exception_buffer.erase(msg->source);
-
     }
 }
 
-void Enactor::receiveStatus(const archlib::Status::ConstPtr& msg) {
+void Enactor::receiveStatus() {
+    ros::NodeHandle client_handler;
+    ros::ServiceClient client_module;
+
+    client_module = client_handler.serviceClient<archlib::DataAccessRequest>("DataAccessRequest");
+    archlib::DataAccessRequest r_srv;
+    r_srv.request.name = ros::this_node::getName();
+    r_srv.request.query = "all:reliability:";
+
+    if (!client_module.call(r_srv)) {
+        ROS_ERROR("Failed to connect to data access node.");
+        return;
+    }
     
-     if (msg->content=="success") {
-        
-        if(invocations[msg->source].size() < 50) {
-            invocations[msg->source].push_back(1);
-        } else {
-            invocations[msg->source].pop_front();
-            invocations[msg->source].push_back(1);
+    std::string ans = r_srv.response.content;
+    // std::cout << "received=> [" << ans << "]" << std::endl;
+    if (ans == "") {
+        ROS_ERROR("Received empty answer when asked for status.");
+    }
 
-            int sum = 0;
-            for(std::deque<int>::iterator it = invocations[msg->source].begin(); it != invocations[msg->source].end(); ++it) {
-                sum += (*it);
-            }
+    std::vector<std::string> pairs = bsn::utils::split(ans, ';');
 
-            r_curr[msg->source] = double(sum)/double(invocations[msg->source].size());
+    for (auto s : pairs) {
+        std::vector<std::string> pair = bsn::utils::split(s, ':');
+        std::string component = pair[0];
+        std::string content = pair[1];
 
-            apply_strategy(msg->source);
-        }
+        std::vector<std::string> values = bsn::utils::split(content, ',');
 
-    } else if (msg->content=="fail") {
-        //apply strategy only if you have at least 10 invocations information
-        if(invocations[msg->source].size() < 50) {
-            invocations[msg->source].push_back(0);
-        } else {
-            invocations[msg->source].pop_front();
-            invocations[msg->source].push_back(0);
-
-            int sum = 0;
-            for(std::deque<int>::iterator it = invocations[msg->source].begin(); it != invocations[msg->source].end(); ++it) {
-                sum += (*it);
-            }
-
-            r_curr[msg->source] = double(sum)/double(invocations[msg->source].size());
-
-            apply_strategy(msg->source);
-        }
+        r_curr[component] = stod(values[values.size() - 1]);
+        apply_strategy(component);
     }
 }
 
-void Enactor::receiveStrategy(const archlib::Strategy::ConstPtr& msg) {
-    bsn::operation::Operation op;     
+void Enactor::receiveStrategy(const archlib::Strategy::ConstPtr& msg) {     
 
-    std::vector<std::string> refs = op.split(msg->content, ';');
+    std::vector<std::string> refs = bsn::utils::split(msg->content, ';');
 
     for(std::vector<std::string>::iterator ref = refs.begin(); ref != refs.end(); ref++){
-        std::vector<std::string> pair = op.split(*ref, ':'); 
+        std::vector<std::string> pair = bsn::utils::split(*ref, ':'); 
         r_ref[pair[0]] = stod(pair[1]);
     }
 }
 
 
 void Enactor::apply_strategy(const std::string &component) {
-    //adapt only after at least 60 seconds have passed... (for experiments)
-    if(cycles < 60*rosComponentDescriptor.getFreq()) return;
-
     std::cout << "r_ref[" << component << "] = "<< r_ref[component] <<std::endl;
     std::cout << "r_curr[" << component << "] = "<< r_curr[component] <<std::endl;
     std::cout << "kp[" << component << "] = "<< kp[component] <<std::endl;
 
     double error = r_ref[component] - r_curr[component]; //error = Rref - Rcurr
 
-    if(error > stability_margin*r_ref[component] || error < stability_margin*r_ref[component]){
+    if(error > stability_margin*r_ref[component] || error < stability_margin*r_ref[component]) {
 
-        exception_buffer[component] = (exception_buffer[component] < 0)?0:exception_buffer[component]+1;
+        exception_buffer[component] = (exception_buffer[component] < 0) ? 0 : exception_buffer[component] + 1;
 
         if(component == "/g4t1"){
             // g4t1 reliability is inversely proportional to the sensors frequency
             for (std::map<std::string, double>::iterator it = freq.begin(); it != freq.end(); ++it){
                 if(it->first != "/g4t1"){
-                    freq[it->first] += (error>0)?((-kp[it->first]/100) * error):((-kp[it->first]/100) * error); 
+                    freq[it->first] += (error>0) ? ((-kp[it->first]/100) * error) : ((kp[it->first]/100) * error); 
                     if(freq[(it->first)] <= 0) break;
                     archlib::AdaptationCommand msg;
                     msg.source = ros::this_node::getName();
@@ -140,17 +113,16 @@ void Enactor::apply_strategy(const std::string &component) {
             
 
         } else {
-            replicate_task[component] += (error>0)?ceil(kp[component]*error):floor(kp[component]*error);
-            if(replicate_task[component] < 1) replicate_task[component] = 1;
+            replicate_task[component] += (error > 0) ? ceil(kp[component] * error) : floor(kp[component] * error);
+            if (replicate_task[component] < 1) replicate_task[component] = 1;
             archlib::AdaptationCommand msg;
             msg.source = ros::this_node::getName();
             msg.target = component;
             msg.action = "replicate_collect=" + std::to_string(replicate_task[(component)]);
             adapt.publish(msg);
-            
         }
     } else {
-        exception_buffer[component] = (exception_buffer[component] > 0)?0:exception_buffer[component]-1;
+        exception_buffer[component] = (exception_buffer[component] > 0) ? 0 : exception_buffer[component] - 1;
     }
 
     if(exception_buffer[component]>4){
@@ -176,12 +148,12 @@ void Enactor::body(){
     ros::NodeHandle n;
 
     ros::Subscriber subs_event = n.subscribe("event", 1000, &Enactor::receiveEvent, this);
-    ros::Subscriber subs_status = n.subscribe("status", 1000, &Enactor::receiveStatus, this);
     ros::Subscriber subs_strategy = n.subscribe("strategy", 1000, &Enactor::receiveStrategy, this);
 
     ros::Rate loop_rate(rosComponentDescriptor.getFreq());
     while(ros::ok()){
         if(cycles <= 60*rosComponentDescriptor.getFreq()) ++cycles;
+        receiveStatus();
         ros::spinOnce();
         loop_rate.sleep();
     }

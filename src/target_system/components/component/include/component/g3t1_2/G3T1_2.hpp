@@ -11,7 +11,7 @@
 #include "bsn/resource/Battery.hpp"
 #include "bsn/generator/Markov.hpp"
 #include "bsn/filters/MovingAverage.hpp"
-#include "bsn/operation/Operation.hpp"
+#include "bsn/utils/utils.hpp"
 #include "bsn/configuration/SensorConfiguration.hpp"
 
 #include "component/Sensor.hpp"

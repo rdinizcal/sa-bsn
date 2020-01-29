@@ -1,0 +1,6 @@
+#request constants
+string name
+bool connection
+---
+#response constants
+bool ACK

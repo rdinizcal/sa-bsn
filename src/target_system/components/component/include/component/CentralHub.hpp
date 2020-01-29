@@ -10,7 +10,7 @@
 #include "messages/SensorData.h"
 
 #include "bsn/resource/Battery.hpp"
-#include "bsn/operation/Operation.hpp"
+#include "bsn/utils/utils.hpp"
 
 
 class CentralHub : public arch::target_system::Component {

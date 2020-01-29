@@ -10,7 +10,7 @@
 #include "archlib/Uncertainty.h"
 
 #include "bsn/resource/Battery.hpp"
-#include "bsn/operation/Operation.hpp"
+#include "bsn/utils/utils.hpp"
 
 class Sensor : public arch::target_system::Component {
 

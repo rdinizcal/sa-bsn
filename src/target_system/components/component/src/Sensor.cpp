@@ -86,11 +86,10 @@ void Sensor::apply_noise(double &data) {
 void Sensor::reconfigure(const archlib::AdaptationCommand::ConstPtr& msg) {
     std::string action = msg->action.c_str();
 
-    bsn::operation::Operation op;
-    std::vector<std::string> pairs = op.split(action, ',');
+    std::vector<std::string> pairs = bsn::utils::split(action, ',');
 
     for (std::vector<std::string>::iterator it = pairs.begin(); it != pairs.end(); ++it){
-        std::vector<std::string> param = op.split(action, '=');
+        std::vector<std::string> param = bsn::utils::split(action, '=');
 
         if(param[0]=="freq"){
             double new_freq =  stod(param[1]);
@@ -105,11 +104,10 @@ void Sensor::reconfigure(const archlib::AdaptationCommand::ConstPtr& msg) {
 void Sensor::injectUncertainty(const archlib::Uncertainty::ConstPtr& msg) {
     std::string content = msg->content;
 
-    bsn::operation::Operation op;
-    std::vector<std::string> pairs = op.split(content, ',');
+    std::vector<std::string> pairs = bsn::utils::split(content, ',');
 
     for (std::vector<std::string>::iterator it = pairs.begin(); it != pairs.end(); ++it){
-        std::vector<std::string> param = op.split(content, '=');
+        std::vector<std::string> param = bsn::utils::split(content, '=');
 
         if(param[0]=="noise_factor"){
             noise_factor = stod(param[1]);
@@ -139,6 +137,8 @@ void Sensor::turnOff() {
 *  0.2 %/s battery recovery rate
 */
 void Sensor::recharge() {
-    if(battery.getCurrentLevel() <= 100) 
-        battery.generate((100/2000)/rosComponentDescriptor.getFreq());
+    if(battery.getCurrentLevel() <= 100) {
+        battery.generate(1);
+        // battery.generate((100/2000)/rosComponentDescriptor.getFreq());
+    }
 }

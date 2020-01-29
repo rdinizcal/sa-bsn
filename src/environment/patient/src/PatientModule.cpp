@@ -7,8 +7,7 @@ PatientModule::~PatientModule() {}
 void PatientModule::setUp() {
     srand(time(NULL));
 
-    // TODO change Operation to static namespace
-    bsn::operation::Operation op;
+    // TODO change Operation to static
     std::string vitalSigns;
     service = nh.advertiseService("getPatientData", &PatientModule::getPatientData, this);
     double aux;
@@ -17,12 +16,11 @@ void PatientModule::setUp() {
 
     // Get what vital signs this module will simulate
     nh.getParam("vitalSigns", vitalSigns);
-//    nh.getParam("frequency", frequency);
 
     // Removes white spaces from vitalSigns
     vitalSigns.erase(std::remove(vitalSigns.begin(), vitalSigns.end(),' '), vitalSigns.end());
 
-    std::vector<std::string> splittedVitalSigns = op.split(vitalSigns, ',');
+    std::vector<std::string> splittedVitalSigns = bsn::utils::split(vitalSigns, ',');
 
     for (std::string s : splittedVitalSigns) {
         vitalSignsFrequencies[s] = 0;
@@ -42,8 +40,6 @@ void PatientModule::setUp() {
 
 bsn::generator::DataGenerator PatientModule::configureDataGenerator(const std::string& vitalSign) {
     srand(time(NULL));
-
-    bsn::operation::Operation op;    
     
     std::vector<std::string> t_probs;
     std::array<float, 25> transitions;
@@ -55,7 +51,7 @@ bsn::generator::DataGenerator PatientModule::configureDataGenerator(const std::s
     for(uint32_t i = 0; i < transitions.size(); i++){
         for(uint32_t j = 0; j < 5; j++){
             handle.getParam(vitalSign + "_State" + std::to_string(j), s);
-            t_probs = op.split(s, ',');
+            t_probs = bsn::utils::split(s, ',');
             for(uint32_t k = 0; k < 5; k++){
                 transitions[i++] = std::stod(t_probs[k]);
             }
@@ -65,15 +61,15 @@ bsn::generator::DataGenerator PatientModule::configureDataGenerator(const std::s
     std::vector<std::string> lrs,mrs0,hrs0,mrs1,hrs1;
 
     handle.getParam(vitalSign + "_LowRisk", s);
-    lrs = op.split(s, ',');
+    lrs = bsn::utils::split(s, ',');
     handle.getParam(vitalSign + "_MidRisk0", s);
-    mrs0 = op.split(s, ',');
+    mrs0 = bsn::utils::split(s, ',');
     handle.getParam(vitalSign + "_HighRisk0", s);
-    hrs0 = op.split(s, ',');
+    hrs0 = bsn::utils::split(s, ',');
     handle.getParam(vitalSign + "_MidRisk1", s);
-    mrs1 = op.split(s, ',');
+    mrs1 = bsn::utils::split(s, ',');
     handle.getParam(vitalSign + "_HighRisk1", s);
-    hrs1 = op.split(s, ',');
+    hrs1 = bsn::utils::split(s, ',');
 
     ranges[0] = bsn::range::Range(std::stod(hrs0[0]), std::stod(hrs0[1]));
     ranges[1] = bsn::range::Range(std::stod(mrs0[0]), std::stod(mrs0[1]));
