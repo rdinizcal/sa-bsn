@@ -1,12 +1,13 @@
 CMAKE_MINIMUM_REQUIRED (VERSION 2.8.3)
 PROJECT(repository)
 
-add_compile_options(-std=c++11)
+add_compile_options(-std=c++11 -lcrypto -lssl)
 
 ###########################################################################
 ## Find catkin and any catkin packages
 FIND_PACKAGE(catkin REQUIRED COMPONENTS roscpp std_msgs genmsg roslib messages archlib)
 FIND_PACKAGE(cpprestsdk REQUIRED NAMES cpprestsdk cpprest)
+FIND_PACKAGE(OpenSSL REQUIRED)
 
 ###########################################################################
 # Export catkin package.
@@ -45,3 +46,4 @@ SET(data_access-src "${CMAKE_CURRENT_SOURCE_DIR}/src/DataAccess.cpp")
 ADD_EXECUTABLE (data_access  "${CMAKE_CURRENT_SOURCE_DIR}/apps/data_access.cpp" ${${PROJECT_NAME}-src} ${data_access-src})
 TARGET_LINK_LIBRARIES (data_access PRIVATE cpprestsdk::cpprest ${catkin_LIBRARIES} ${LIBRARIES})
 ADD_DEPENDENCIES(data_access messages_generate_messages_cpp)
+TARGET_LINK_LIBRARIES(data_access OpenSSL::Crypto)
