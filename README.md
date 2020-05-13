@@ -2,6 +2,8 @@
 
 This is a Body Sensor Network implementation on ROS. So far, the BSN was used for experimentation on solutions for adaptation on the Self-Adaptive Software Systems domain, refer to https://doi.org/10.1145/3194133.3194147 and https://doi.org/10.1109/SEAMS.2019.00020 for more information.  Moreover, information regarding the prototype behaviour and how to develop your own manager is provided in the https://bodysensornetwork.herokuapp.com/ website, which contains an executable instance of the BSN. The following instructions will guide you to to compile, deploy and run the BSN on Linux Ubuntu 18.04 with ROS Melodic distributions. We have not yet tested on other distributions.
 
+Virtual machine with bsn: https://drive.google.com/file/d/1G1A5_VIuqTvzTUchiGsM7bAMVYl6eE15/view
+
 ## Dependencies:
 * [Ros Melodic](http://wiki.ros.org/melodic) which provides software libraries for BSN engines.
 * [Cpp rest Sdk](https://github.com/Microsoft/cpprestsdk) which implements HTTP protocols on C++ (get, post...)
