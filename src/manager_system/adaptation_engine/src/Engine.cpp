@@ -29,6 +29,7 @@ void Engine::setUp() {
 	nh.getParam("actuation_freq", actuation_freq);
 
     enact = handle.advertise<archlib::Strategy>("strategy", 10);
+    persist_pub = handle.advertise<archlib::Persist>("persist", 10);
 
     std::string path = ros::package::getPath("adaptation_engine");
 
@@ -251,6 +252,8 @@ void Engine::plan() {
     double error = r_ref - r_curr;
     std::cout << "error= " << error << std::endl;
 
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+
     //reset the formula
     std::vector<std::string> r_vec;
     for (std::map<std::string,double>::iterator it = strategy.begin(); it != strategy.end(); ++it) {
@@ -344,6 +347,21 @@ void Engine::plan() {
         }
         solutions.push_back(strategy);
     }
+
+    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+
+    uint32_t elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+    archlib::Persist msg;
+
+    msg.source = ros::this_node::getName();
+    msg.target = "data_access";
+    std::string content = std::to_string(Kp) + ";";
+    content += std::to_string(offset) + ";";
+    content += std::to_string(elapsed_time);
+    msg.content = content;
+    msg.type = "EngineInfo";
+    msg.timestamp = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+    persist_pub.publish(msg);
 
     for (std::vector<std::map<std::string,double>>::iterator it = solutions.begin(); it != solutions.end(); it++){
         strategy = *it;

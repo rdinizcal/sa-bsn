@@ -28,6 +28,8 @@
 #include "EventMessage.hpp"
 #include "UncertaintyMessage.hpp"
 #include "AdaptationMessage.hpp"
+#include "ControlTheoryMetricsMessage.hpp"
+#include "EngineInfoMessage.hpp"
 
 #include "lepton/Lepton.h"
 
@@ -49,6 +51,8 @@ class DataAccess : public arch::ROSComponent {
 		void persistStatus(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content);
 		void persistUncertainty(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content);
 		void persistAdaptation(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content);
+		void persistControlTheoryMetrics(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content);
+		void persistEngineInfo(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content);
 
 
 		void flush();
@@ -90,6 +94,8 @@ class DataAccess : public arch::ROSComponent {
 		std::vector<EventMessage> eventVec;
 		std::vector<UncertaintyMessage> uncertainVec;
 		std::vector<AdaptationMessage> adaptVec;
+		std::vector<ControlTheoryMetricsMessage> ctmetricsVec;
+		std::vector<EngineInfoMessage> engineinfoVec; 
 
 		std::map<std::string, std::deque<std::pair<std::chrono::high_resolution_clock::time_point, std::string>>> status;
 		std::map<std::string, std::deque<std::string>> events;

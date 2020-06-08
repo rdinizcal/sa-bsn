@@ -256,6 +256,10 @@ void DataAccess::receivePersistMessage(const archlib::Persist::ConstPtr& msg) {
         persistUncertainty(msg->timestamp, msg->source, msg->target, msg->content);
     } else if (msg->type=="AdaptationCommand") {
         persistAdaptation(msg->timestamp, msg->source, msg->target, msg->content);
+    } else if(msg->type=="EngineInfo") {
+        persistEngineInfo(msg->timestamp, msg->source, msg->target, msg->content);
+    } else if (msg->type=="ControlTheoryMetrics") {
+        persistControlTheoryMetrics(msg->timestamp, msg->source, msg->target, msg->content);
     } else {
         ROS_INFO("(Could not identify message type!!)");
     }
@@ -332,6 +336,26 @@ void DataAccess::persistAdaptation(const int64_t &timestamp, const std::string &
     adaptVec.push_back(obj);
 
     if(logical_clock % 30 == 0) flush();
+}
+
+void DataAccess::persistControlTheoryMetrics(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content){
+    
+    std::vector<std::string> metrics = bsn::utils::split(content, ';');
+
+    ControlTheoryMetricsMessage obj("ControlTheoryMetrics", timestamp, logical_clock, source, target, metrics[0], metrics[1], metrics[2], metrics[3], metrics[4], metrics[5]);
+    ctmetricsVec.push_back(obj);
+
+    if(logical_clock % 30 == 0) flush();
+}
+
+void DataAccess::persistEngineInfo(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content) {
+ 
+    std::vector<std::string> data = bsn::utils::split(content, ';');
+
+    EngineInfoMessage obj("EngineInfo", timestamp, logical_clock, source, target, data[0], data[1], data[2]);
+    engineinfoVec.push_back(obj);
+
+    if(logical_clock%30==0) flush();
 }
 
 void DataAccess::flush(){

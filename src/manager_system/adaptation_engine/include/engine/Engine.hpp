@@ -7,6 +7,7 @@
 #include <map>
 #include <set>
 #include <algorithm>
+#include <chrono>
 
 #include "ros/ros.h"
 #include "ros/package.h"
@@ -27,7 +28,7 @@
 #include "archlib/Strategy.h"
 #include "archlib/Exception.h"
 #include "archlib/ROSComponent.hpp"
-
+#include "archlib/Persist.h"
 
 class Engine : public arch::ROSComponent {
 	
@@ -71,6 +72,7 @@ class Engine : public arch::ROSComponent {
 
 		ros::NodeHandle handle;
 		ros::Publisher enact;
+		ros::Publisher persist_pub;
 
 		int cycles;
 		int counter;

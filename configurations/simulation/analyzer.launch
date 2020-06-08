@@ -1,0 +1,3 @@
+<launch> 
+    <node name="analyzer" pkg="analyzer" type="Analyzer.py" output="screen" />
+</launch>
