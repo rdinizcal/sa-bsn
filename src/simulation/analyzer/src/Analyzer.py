@@ -25,6 +25,7 @@ from collections import OrderedDict
 from archlib.msg import Strategy
 from archlib.msg import Persist
 from services.srv import Address
+from services.srv import EnactorInfo
 
 import time
 import rospkg
@@ -46,6 +47,9 @@ class Analyzer:
         self.received_command = False
         self.pub = rospy.Publisher('persist', Persist, queue_size=10)
         self.a = rospy.Subscriber("strategy", Strategy, self.callback)
+        self.enactor_kp = 0
+        self.plots = 1
+        self.t0_tmp = 0
     
     def analyze(self, x, y, setpoint):
 
@@ -101,18 +105,30 @@ class Analyzer:
         
         return resp.id
 
+    def receive_enactor_info(self):
+        rospy.wait_for_service('enactor_info')
+        receive_info = rospy.ServiceProxy('enactor_info', EnactorInfo)
+        resp = receive_info()
+
+        self.enactor_kp = resp.kp
+        
+        print("Enactor Kp: " + self.enactor_kp)
+
     def callback(self, data):
-        with open(self.repository_path + "/../resource/logs/status_" + self.file_id + "_tmp.log", 'w') as log_file:
-            log_file.truncate()
-            log_file.close()
+        if self.received_command == False:
+            print("\n------------ Received Adaptation Command --------------\n")
+            with open(self.repository_path + "/../resource/logs/status_" + self.file_id + "_tmp.log", 'w') as log_file:
+                log_file.truncate()
+                log_file.close()
 
-        #with open(self.repository_path + "/../resource/logs/event_" + self.file_id + "_tmp.log", 'w') as log_file:
-            #log_file.truncate()
-            #log_file.close()
-            
-        self.received_command = True
+            self.received_command = True
 
-    def run(self): 
+            #with open(self.repository_path + "/../resource/logs/event_" + self.file_id + "_tmp.log", 'w') as log_file:
+                #log_file.truncate()
+                #log_file.close()
+
+    def run(self):
+        self.receive_enactor_info()
         rospy.init_node("analyzer")
         
         loop_rate = rospy.Rate(1)
@@ -124,21 +140,32 @@ class Analyzer:
 
             if self.logical_clock == 150:     
                 self.body()
-                self.received_command = False
+                if self.stability:
+                    self.received_command = False
                 self.logical_clock = 0
-            
+
             loop_rate.sleep()
 
     def body(self):
         # load formula
         formula = Formula(self.repository_path + "/../resource/models/"+self.formula_id+".formula", "float")
+        b_formula = Formula(self.repository_path + "/../resource/models/b_" +self.formula_id+".formula", "bool")
 
         # build list of participating tasks
         tasks = dict()
+        tasks_tmp = dict()
         ctxs = dict()
+        ctxs_tmp = dict()
 
-        global_reli_timeseries = dict() 
+        #global_reli_timeseries = dict()
+        global_reli_timeseries = OrderedDict() 
+        global_reli_timeseries_tmp = OrderedDict()
         global_status_timeseries = dict()
+        global_status_timeseries_tmp = dict()
+        local_reli_timeseries = dict()
+        local_reli_timeseries_tmp = dict()
+        local_status_timeseries = dict()
+        local_status_timeseries_tmp = dict()
 
         ################################################################## 
         #                                                                #
@@ -147,25 +174,51 @@ class Analyzer:
         ################################################################## 
 
         ################ load status log ################
-        with open(self.repository_path + "/../resource/logs/status_" + self.file_id + "_tmp.log", mode='rb') as log_file:
+        with open(self.repository_path + "/../resource/logs/status_" + self.file_id + "_tmp.log", mode='r') as log_file:
+            status_lines = log_file.readlines()
+
+        with open(self.repository_path + "/../resource/logs/status_" + self.file_id + "_tmp.log", mode='rb') as log_file_tmp:
+            log_csv_tmp = csv.reader(log_file_tmp, delimiter=',')
+            log_status_tmp = list(log_csv_tmp)
+
+        with open(self.repository_path + "/../resource/logs/status_" + self.file_id + ".log", mode='rb') as log_file:
             log_csv = csv.reader(log_file, delimiter=',')
             log_status = list(log_csv)
-            #del log_status[0] # delete first line (do we need this?)
+            del log_status[0] # delete first line (do we need this?)
 
         ################ load event log ################    
         with open(self.repository_path + "/../resource/logs/event_" + self.file_id + "_tmp.log", mode='rb') as log_file:
+            event_lines = log_file.readlines()
+
+        with open(self.repository_path + "/../resource/logs/event_" + self.file_id + "_tmp.log", mode='rb') as log_file_tmp:
+            log_csv_tmp = csv.reader(log_file_tmp, delimiter=',')
+            log_event_tmp = list(log_csv_tmp)
+
+        with open(self.repository_path + "/../resource/logs/event_" + self.file_id + ".log", mode='rb') as log_file:
             log_csv = csv.reader(log_file, delimiter=',')
             log_event = list(log_csv)
-            #del log_event[0] # delete first line (do we need this?)
+            del log_event[0] # delete first line (do we need this?)
 
         #concatenate lists into one log list
         log = list()
         log.extend(log_status)
         log.extend(log_event)
 
+        log_tmp = list()
+        log_tmp.extend(log_status_tmp)
+        log_tmp.extend(log_event_tmp)
+
+        #print("log[0][2]: " + str(log[0][2]))
+        #print("log_tmp[0][2]: " + str(log_tmp[0][2]))
+
         log = sorted(log, key = lambda x: (int(x[1])))
+        log_tmp = sorted(log_tmp, key = lambda x_tmp: (int(x_tmp[1])))
 
         t0 = int(log[0][2])
+        #t0_tmp = int(log_tmp[0][2])
+        t0_tmp = int(log_status_tmp[0][2])
+
+        #print("t0_tmp: " + str(t0_tmp))
 
         # read log 
         for reg in log:
@@ -185,6 +238,16 @@ class Analyzer:
                 elif (status.content == 'fail'): tasks[tag].fail(instant)
 
                 if (status.content == 'success' or status.content == 'fail'):
+                    if not (tag in local_status_timeseries):
+                        local_status_timeseries[tag] = [[instant,status.content]]
+                    else:
+                        local_status_timeseries[tag].append([instant,status.content])
+
+                    if not (tag in local_reli_timeseries): 
+                        local_reli_timeseries[tag] = [[instant,tasks[tag].reliability()]]
+                    else:
+                        local_reli_timeseries[tag].append([instant,tasks[tag].reliability()])
+                    
                     ## compute global formulae
                     for tag in tasks:
                         formula.compute('R_'+tag, tasks[tag].reliability())
@@ -208,13 +271,66 @@ class Analyzer:
 
 
             if(reg[0]=="Event" or reg[0]=="Status"):
+                global_status_timeseries[instant] = b_formula.eval()
                 global_reli_timeseries[instant] = formula.eval()
 
+        for reg in log_tmp:
+            # compute time series
+            instant = int(reg[2]) - t0_tmp
+
+            if(reg[0]=="Status"):
+                status = Status(str(reg[1]),str(reg[2]),str(reg[3]),str(reg[4]),str(reg[5]))
+
+                tag = status.source.upper().replace(".","_").replace("/","").replace("T","_T")
+
+                if not (tag in tasks_tmp): 
+                    tsk = Task(tag)
+                    tasks_tmp[tag] = tsk
+
+                if (status.content == 'success'): tasks_tmp[tag].success(instant)
+                elif (status.content == 'fail'): tasks_tmp[tag].fail(instant)
+
+                if (status.content == 'success' or status.content == 'fail'):
+                    if not (tag in local_status_timeseries_tmp):
+                        local_status_timeseries_tmp[tag] = [[instant,status.content]]
+                    else:
+                        local_status_timeseries_tmp[tag].append([instant,status.content])
+
+                    if not (tag in local_reli_timeseries_tmp): 
+                        local_reli_timeseries_tmp[tag] = [[instant,tasks_tmp[tag].reliability()]]
+                    else:
+                        local_reli_timeseries_tmp[tag].append([instant,tasks_tmp[tag].reliability()])
+                    
+                    ## compute global formulae
+                    for tag in tasks_tmp:
+                        formula.compute('R_'+tag, tasks_tmp[tag].reliability())
+                        formula.compute('C_'+tag, tasks_tmp[tag].cost())
+                        formula.compute('F_'+tag, tasks_tmp[tag].frequency())
+
+            elif(reg[0]=="Event"):
+                event = Event(str(reg[1]),str(reg[2]),str(reg[3]),str(reg[4]),str(reg[5]))
+
+                tag = event.source.upper().replace(".","_").replace("/","").replace("T","_T")
+
+                if not (tag in ctxs_tmp): 
+                    ctx = Context(tag)
+                    ctxs_tmp[tag] = ctx
+                
+                if (event.content == 'deactivate'): ctxs_tmp[tag].deactivate()
+                elif (event.content == 'activate'): ctxs_tmp[tag].activate()
+
+                for ctx in ctxs_tmp.values():
+                    formula.compute('CTX_'+ctx.getName(), ctx.isActive())
+
+
+            if((reg[0]=="Event" or reg[0]=="Status") and instant >= 0):
+                global_status_timeseries_tmp[instant] = b_formula.eval()
+                global_reli_timeseries_tmp[instant] = formula.eval()
         ################################################################## 
         #                                                                #
         #         Perform Control Theoretical Analysis Timeseries        #
         #                                                                #
-        ################################################################## 
+        ##################################################################
         x = list(global_reli_timeseries.keys())
         y = list(global_reli_timeseries.values())
 
@@ -228,12 +344,92 @@ class Analyzer:
             ya.append(y[i])
             i += 1
 
-        self.analyze(x, y, setpoint)
+        #self.analyze(x, y, setpoint)
+
+        x_tmp = list(global_reli_timeseries_tmp.keys())
+        y_tmp = list(global_reli_timeseries_tmp.values())
+
+        self.analyze(x_tmp, y_tmp, setpoint)
+
+        ################################################################## 
+        #                                                                #
+        #                         Plot Timeseries                        #
+        #                                                                #
+        ################################################################## 
+
+        scale = 10e-10
+        ticks = ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(x*scale))
+
+        default_colors = ["#17becf", "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#ff7f0e"]
+        colors = dict()
+        i = 0
+        for tag in tasks:
+            colors[tag] = default_colors[i]
+            i+=1
+
+        ##############################################
+        #                 First Plot                 #
+        ############################################## 
+        ## First, plot the global reliability against time
+        fig, ax = plt.subplots()
+        #for i in range(len(x)):
+            #print("key: " + str(x[i]))
+            #print("value: " + str(y[i]))
+        ax.plot(x, y, label='BSN', color = "#1f77b4", linewidth=2)
+        ax.set_ylim(0,(1+self.stability_margin))
+        ax.xaxis.set_major_formatter(ticks)
+
+        x_max = 0
+        for tag in local_status_timeseries:
+            last = len(local_status_timeseries[tag]) - 1
+            x_max  = local_status_timeseries[tag][last][0] if local_status_timeseries[tag][last][0] > x_max else x_max
+
+        ## Then, plot the local reliabilities against time (same figure)
+        i = 0
+        for tag in local_reli_timeseries:
+            x = [el[0] for el in local_reli_timeseries[tag]]
+            y = [el[1] for el in local_reli_timeseries[tag]]
+            ax.plot(x, y, label=tag, color=colors[tag])
+
+        ## Plot horizontal lines for setpoint
+        ax.axhline(y=setpoint, linestyle='--', linewidth=0.7, color="black")
+        ax.text(0.9*x_max, setpoint, "setpoint" , fontsize=8)
+        ax.axhline(y=self.convergence_point*(1+self.stability_margin), linestyle='--', linewidth=0.3, color="black")
+        ax.axhline(y=self.convergence_point, linestyle='-.', linewidth=0.5, color="black")
+        ax.axhline(y=self.convergence_point*(1-self.stability_margin), linestyle='--', linewidth=0.3, color="black")
+
+        ## Insert labels, titles, texts, grid...
+        mn = self.convergence_point
+        st = self.settling_time
+        os = self.overshoot
+        sse = self.sse 
+        #fig.suptitle('Parametric Formula vs. Monitored')
+        fig.suptitle('Reliability in time')
+        is_stable = "stable" if self.stability else "not stable" 
+        subtitle = '%s: %s | converges to %.2f | ST = %.2fs | OS = %.2f%% | SSE = %.2f%%' % ("formula",is_stable,mn,st,os,sse)        
+        fig.text(0.5, 0.92, subtitle, ha='center', color = "grey", fontsize=7) # subtitle
+        fig.text(0.04, 0.5, 'Reliability', va='center', rotation='vertical')
+        fig.text(0.5, 0.035, 'Time (s)', ha='center')
+        fig.text(0.8, 0.020, self.file_id + '.log', ha='center', color = "grey", fontsize=6) # files used
+        fig.text(0.8, 0.005, self.formula_id + '.formula', ha='center', color = "grey", fontsize=6) # files used
+        #ax.annotate('trigger adaptation', xy=(x_triggered, 0),
+            #xytext=(x_triggered/x_max, -0.1), textcoords='axes fraction',
+            #arrowprops=dict(facecolor='black', shrink=0.03),
+            #horizontalalignment='right', verticalalignment='top',
+            #)
+        plt.grid()
+        plt.legend()
+        plt.savefig(self.repository_path + "/../resource/plots/plot" + str(self.plots) + "_" + self.file_id + ".png")
+
+        self.plots += 1
+        #plt.show()
+        #print("Finished plot")
         
         msg = Persist()
         msg.source = "analyzer"
         msg.target = "data access"
-        content =  str(self.stability) + ";" 
+        content = str(self.enactor_kp) + ";"
+        content += str(self.stability) + ";" 
         content += str(self.convergence_point) + ";"
         content += str(self.settling_time) + ";"
         content += str(self.overshoot) + ";"
@@ -242,6 +438,13 @@ class Analyzer:
         msg.type = "ControlTheoryMetrics"
         msg.timestamp = time.time()
         self.pub.publish(msg)
+
+        with open(self.repository_path + "/../resource/logs/analyzed_data_" + self.file_id + ".log", mode='a+') as persist_file:
+            persist_file.write("Events\n")
+            persist_file.writelines(event_lines)
+            persist_file.write("Status\n")
+            persist_file.writelines(status_lines)
+            persist_file.write("\n")
 
 class Formula:
 
