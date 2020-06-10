@@ -11,9 +11,11 @@ void Enactor::setUp() {
     adapt = nh.advertise<archlib::AdaptationCommand>("log_adapt", 10);
 
     except = nh.advertise<archlib::Exception>("exception", 10);
+    enactor_info_server = handle.advertiseService("enactor_info", &Enactor::sendInfo, this);
 
     double freq;
 	nh.getParam("frequency", freq);
+    nh.getParam("kp", Kp);
 	rosComponentDescriptor.setFreq(freq);
 
 }
@@ -142,6 +144,12 @@ void Enactor::apply_strategy(const std::string &component) {
     }
     
     invocations[component].clear();
+}
+
+bool Enactor::sendInfo(services::EnactorInfo::Request &req, services::EnactorInfo::Response &res){
+    res.kp = std::to_string(Kp);
+
+    return true;
 }
 
 void Enactor::body(){

@@ -431,11 +431,9 @@ void Engine::execute() {
     msg.source = ros::this_node::getName();
     msg.target = "/enactor";
     msg.content = content;
-
     enact.publish(msg);
 
     std::cout << "[ " << content << "]" << std::endl;
-
     return;
 }
 

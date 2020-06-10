@@ -16,12 +16,16 @@ std::chrono::high_resolution_clock::time_point DataAccess::nowInSeconds() const 
 void DataAccess::setUp() {
     std::string path = ros::package::getPath("repository");
     std::string url;
-    std::string now = std::to_string(this->now());
+    file_id = std::to_string(this->now());
 
-    event_filepath = path + "/../resource/logs/event_" + now + ".log";
-    status_filepath = path + "/../resource/logs/status_" + now + ".log";
-    uncertainty_filepath = path + "/../resource/logs/uncertainty_" + now + ".log";
-    adaptation_filepath = path + "/../resource/logs/adaptation_" + now + ".log";
+    event_filepath = path + "/../resource/logs/event_" + file_id + ".log";
+    tmp_event_filepath = path + "/../resource/logs/event_" + file_id + "_tmp.log";
+    status_filepath = path + "/../resource/logs/status_" + file_id + ".log";
+    tmp_status_filepath = path + "/../resource/logs/status_" + file_id + "_tmp.log";
+    uncertainty_filepath = path + "/../resource/logs/uncertainty_" + file_id + ".log";
+    adaptation_filepath = path + "/../resource/logs/adaptation_" + file_id + ".log";
+    ctmetrics_filepath = path + "/../resource/logs/ctmetrics.log";
+    engineinfo_filepath = path + "/../resource/logs/engineinfo.log";
 
     fp.open(event_filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
     fp << "\n";
@@ -95,7 +99,8 @@ void DataAccess::setUp() {
     
     handle_persist = handle.subscribe("persist", 1000, &DataAccess::receivePersistMessage, this);
     server = handle.advertiseService("DataAccessRequest", &DataAccess::processQuery, this);
-
+    adr_server = handle.advertiseService("address", &DataAccess::sendAddress, this);
+   
     targetSystemSub = handle.subscribe("TargeSystemData", 100, &DataAccess::processTargetSystemData, this);
 }
 
@@ -180,6 +185,12 @@ double DataAccess::calculateCost() {
     }
 
     return cost_expression.apply(keys, values);
+}
+
+bool DataAccess::sendAddress(services::Address::Request &req, services::Address::Response &res){
+    ROS_INFO("Received address request--------------------------------");
+    res.id = file_id;
+    return true;
 }
 
 double DataAccess::calculateReliability() {
@@ -313,6 +324,7 @@ bool DataAccess::processQuery(archlib::DataAccessRequest::Request &req, archlib:
 void DataAccess::persistEvent(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content){
     EventMessage obj("Event", timestamp, logical_clock, source, target, content);
     eventVec.push_back(obj);
+    eventVecTmp.push_back(obj);
 
     if( logical_clock % 30 == 0) flush();
 }
@@ -320,6 +332,7 @@ void DataAccess::persistEvent(const int64_t &timestamp, const std::string &sourc
 void DataAccess::persistStatus(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content){
     StatusMessage obj("Status", timestamp, logical_clock, source, target, content);
     statusVec.push_back(obj);
+    statusVecTmp.push_back(obj);
 
     if (logical_clock % 30 == 0) flush();
 }
@@ -371,6 +384,18 @@ void DataAccess::flush(){
     fp.close();
     statusVec.clear();
 
+    fp.open(tmp_status_filepath, std::fstream::in | std::fstream::out | std::fstream::app);   
+    for(std::vector<StatusMessage>::iterator it = statusVecTmp.begin(); it != statusVecTmp.end(); ++it) {
+        fp << (*it).getName() << ",";
+        fp << (*it).getLogicalClock() << ",";
+        fp << (*it).getTimestamp() << ",";
+        fp << (*it).getSource() << ",";
+        fp << (*it).getTarget() << ",";
+        fp << (*it).getState() << "\n";
+    }
+    fp.close();
+    statusVecTmp.clear();
+
     fp.open(event_filepath, std::fstream::in | std::fstream::out | std::fstream::app);   
     for(std::vector<EventMessage>::iterator it = eventVec.begin(); it != eventVec.end(); ++it) {
         fp << (*it).getName() << ",";
@@ -382,6 +407,18 @@ void DataAccess::flush(){
     }
     fp.close();
     eventVec.clear();
+
+    fp.open(tmp_event_filepath, std::fstream::in | std::fstream::out | std::fstream::app);   
+    for(std::vector<EventMessage>::iterator it = eventVecTmp.begin(); it != eventVecTmp.end(); ++it) {
+        fp << (*it).getName() << ",";
+        fp << (*it).getLogicalClock() << ",";
+        fp << (*it).getTimestamp() << ",";
+        fp << (*it).getSource() << ",";
+        fp << (*it).getTarget() << ",";
+        fp << (*it).getEvent() << "\n";
+    }
+    fp.close();
+    eventVecTmp.clear();
 
     fp.open(uncertainty_filepath, std::fstream::in | std::fstream::out | std::fstream::app);   
     for(std::vector<UncertaintyMessage>::iterator it = uncertainVec.begin(); it != uncertainVec.end(); ++it) {

@@ -10,6 +10,8 @@
 #include <cpprest/http_client.h>
 #include <cpprest/json.h>
 
+#include "services/Address.h"
+
 #include "bsn/goalmodel/Node.hpp"
 #include "bsn/goalmodel/Goal.hpp"
 #include "bsn/goalmodel/Task.hpp"
@@ -53,7 +55,8 @@ class DataAccess : public arch::ROSComponent {
 		void persistAdaptation(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content);
 		void persistControlTheoryMetrics(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content);
 		void persistEngineInfo(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content);
-
+		bool sendAddress(services::Address::Request &req, services::Address::Response &res);
+ 
 
 		void flush();
 
@@ -80,18 +83,27 @@ class DataAccess : public arch::ROSComponent {
 	private:
 		ros::Subscriber handle_persist;
 		ros::ServiceServer server;
+		ros::ServiceServer adr_server;
 		ros::Subscriber targetSystemSub;
 
 		std::fstream fp;
 		std::string event_filepath;
+		std::string tmp_event_filepath;
 		std::string status_filepath;
+		std::string tmp_status_filepath;
 		std::string uncertainty_filepath;
 		std::string adaptation_filepath;
+		std::string ctmetrics_filepath;
+		std::string engineinfo_filepath;
+
+		std::string file_id;
 
 		int64_t logical_clock;
 
 		std::vector<StatusMessage> statusVec;
+		std::vector<StatusMessage> statusVecTmp;
 		std::vector<EventMessage> eventVec;
+		std::vector<EventMessage> eventVecTmp;
 		std::vector<UncertaintyMessage> uncertainVec;
 		std::vector<AdaptationMessage> adaptVec;
 		std::vector<ControlTheoryMetricsMessage> ctmetricsVec;

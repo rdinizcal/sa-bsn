@@ -3,4 +3,6 @@
 
     <param name="frequency" value="100" /> <!--100 Hz-->
 
+    <param name="kp" value="0.1" /> 
+
 </launch>

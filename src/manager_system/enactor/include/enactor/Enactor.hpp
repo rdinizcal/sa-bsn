@@ -8,6 +8,8 @@
 #include "ros/ros.h"
 #include "ros/package.h"
 
+#include "services/EnactorInfo.h"
+
 #include "bsn/utils/utils.hpp"
 
 #include "archlib/Status.h"
@@ -37,14 +39,20 @@ class Enactor : public arch::ROSComponent {
 	  	void receiveStatus();
 	  	void receiveEvent(const archlib::Event::ConstPtr& msg);
 	  	void receiveStrategy(const archlib::Strategy::ConstPtr& msg);
+		bool sendInfo(services::EnactorInfo::Request &req, services::EnactorInfo::Response &res);
 
 		void apply_strategy(const std::string &component);
 
 		void print();
 
   	private:
+
+	  	float Kp;
+
+	  	ros::NodeHandle handle;
 		ros::Publisher adapt;
 		ros::Publisher except;
+		ros::ServiceServer enactor_info_server;
 
 		std::map<std::string, double> r_curr;
 		std::map<std::string, double> r_ref;

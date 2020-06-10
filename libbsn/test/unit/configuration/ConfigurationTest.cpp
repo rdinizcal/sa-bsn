@@ -5,7 +5,7 @@ using namespace std;
 using namespace bsn::range;
 using namespace bsn::configuration;
 
-
+ 
 class ConfigurationTest : public testing::Test {
     protected:
         Range l;
