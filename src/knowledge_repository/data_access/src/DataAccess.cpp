@@ -372,6 +372,42 @@ void DataAccess::persistEngineInfo(const int64_t &timestamp, const std::string &
 }
 
 void DataAccess::flush(){
+
+    fp.open(engineinfo_filepath, std::fstream::in | std::fstream::out | std::fstream::app);
+    for(std::vector<EngineInfoMessage>::iterator it = engineinfoVec.begin(); it != engineinfoVec.end(); ++it)
+    {
+        fp << (*it).getName() << ",";
+        fp << (*it).getLogicalClock() << ",";
+        fp << (*it).getTimestamp() << ",";
+        fp << (*it).getSource() << ",";
+        fp << (*it).getTarget() << ",";
+        fp << (*it).getEngineKp() << ",";
+        fp << (*it).getEngineOffset() << ",";
+        fp << (*it).getElapsedTime() << "\n";
+        
+    }
+    fp.close();
+    engineinfoVec.clear();
+
+
+    fp.open(ctmetrics_filepath, std::fstream::in | std::fstream::out | std::fstream::app);
+    for(std::vector<ControlTheoryMetricsMessage>::iterator it = ctmetricsVec.begin(); it != ctmetricsVec.end(); ++it)
+    {
+        fp << (*it).getName() << ",";
+        fp << (*it).getLogicalClock() << ",";
+        fp << (*it).getTimestamp() << ",";
+        fp << (*it).getSource() << ",";
+        fp << (*it).getTarget() << ",";
+        fp << (*it).getEnactorKp() << ",";
+        fp << (*it).getStability() << ",";
+        fp << (*it).getConvergencePoint() << ",";
+        fp << (*it).getSettlingTime() << ",";
+        fp << (*it).getOvershoot() << ",";
+        fp << (*it).getSteadyStateError() << "\n";
+    }
+    fp.close();
+    ctmetricsVec.clear();
+
     fp.open(status_filepath, std::fstream::in | std::fstream::out | std::fstream::app);   
     for(std::vector<StatusMessage>::iterator it = statusVec.begin(); it != statusVec.end(); ++it) {
         fp << (*it).getName() << ",";

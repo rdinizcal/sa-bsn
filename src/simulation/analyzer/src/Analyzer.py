@@ -130,7 +130,6 @@ class Analyzer:
         loop_rate.sleep()
 
         while not rospy.is_shutdown():
-            print(self.logical_clock)
             if self.received_command:
                 self.logical_clock += 1
             
