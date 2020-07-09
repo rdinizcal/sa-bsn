@@ -1,6 +1,6 @@
 #include "component/CentralHub.hpp"
 
-CentralHub::CentralHub(int &argc, char **argv, const std::string &name, const bool &active, const bsn::resource::Battery &battery) : Component(argc, argv, name), active(active), max_size(20), total_buffer_size(0), buffer_size({0,0,0,0,0}), battery(battery), data_buffer({{0},{0},{0},{0},{0}}) {}
+CentralHub::CentralHub(int &argc, char **argv, const std::string &name, const bool &active, const bsn::resource::Battery &battery) : Component(argc, argv, name), active(active), max_size(20), total_buffer_size(0), buffer_size({0,0,0,0,0,0}), battery(battery), data_buffer({{0},{0},{0},{0},{0},{0}}) {}
 
 CentralHub::~CentralHub() {}
 
@@ -13,6 +13,7 @@ int32_t CentralHub::run() {
     ros::Subscriber ecgSub = nh.subscribe("ecg_data", 10, &CentralHub::collect, this);
     ros::Subscriber abpsSub = nh.subscribe("abps_data", 10, &CentralHub::collect, this);
     ros::Subscriber abpdSub = nh.subscribe("abpd_data", 10, &CentralHub::collect, this);
+    ros::Subscriber glucosemeterSub = nh.subscribe("glucosemeter_data", 10, &CentralHub::collect, this);
 
     while(ros::ok()) {
         ros::Rate loop_rate(rosComponentDescriptor.getFreq());
