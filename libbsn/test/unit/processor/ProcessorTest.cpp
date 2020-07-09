@@ -27,6 +27,7 @@ TEST_F(ProcessorTest, GetSensorId) {
     ASSERT_EQ(2, get_sensor_id("oximeter"));
     ASSERT_EQ(3, get_sensor_id("bpms"));
     ASSERT_EQ(4, get_sensor_id("bpmd"));
+    ASSERT_EQ(5, get_sensor_id("glucosemeter"));
     ASSERT_EQ(-1, get_sensor_id("unknown"));
 }
 
