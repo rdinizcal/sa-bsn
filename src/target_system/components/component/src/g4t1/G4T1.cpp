@@ -18,8 +18,9 @@ std::vector<std::string> G4T1::getPatientStatus() {
     std::string oxi;
     std::string ecg;
     std::string trm;
+    std::string glc;
 
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 6; i++) {
         double sensor_risk = data_buffer[i].back();
 
 
@@ -48,10 +49,13 @@ std::vector<std::string> G4T1::getPatientStatus() {
         } else if (i == 4) {
             abpd = sensor_risk_str;
             abpd_risk = sensor_risk;
+        } else if (i == 5) {
+            glc = sensor_risk_str;
+            glc_risk = sensor_risk;
         }
     }
 
-    std::vector<std::string> v = {trm, ecg, oxi, abps, abpd};  
+    std::vector<std::string> v = {trm, ecg, oxi, abps, abpd, glc};  
     return v;
 }
 
@@ -99,6 +103,9 @@ void G4T1::collect(const messages::SensorData::ConstPtr& msg) {
     } else if (msg->type == "abpd") {
         abpd_batt = batt;
         abpd_raw = msg->data;
+    } else if (msg->type == "glucosemeter") {
+        glc_batt = batt;
+        glc_raw = msg->data;
     }
 
     if (buffer_size[type] < max_size) {
@@ -152,6 +159,7 @@ void G4T1::process(){
     std::cout << "| OXIM_RISK: " << oxi_risk << std::endl;
     std::cout << "| ABPS_RISK: " << abps_risk << std::endl;
     std::cout << "| ABPD_RISK: " << abpd_risk << std::endl;
+    std::cout << "| GLC_RISK: " << glc_risk << std::endl;
     std::cout << "| PATIENT_STATE:" << patient_risk << std::endl;
     std::cout << "*****************************************" << std::endl; 
 }
@@ -167,6 +175,8 @@ int32_t G4T1::getSensorId(std::string type) {
         return 3;
     else if (type == "abpd")		
         return 4;
+    else if (type == "glucosemeter")        
+        return 5;
     else {
         std::cout << "UNKNOWN TYPE " + type << std::endl;
         return -1;
@@ -181,18 +191,21 @@ void G4T1::transfer() {
     msg.oxi_batt = oxi_batt;
     msg.abps_batt = abps_batt;
     msg.abpd_batt = abpd_batt;
+    msg.glc_batt = glc_batt;
 
     msg.trm_risk = trm_risk;
     msg.ecg_risk = ecg_risk;
     msg.oxi_risk = oxi_risk;
     msg.abps_risk = abps_risk;
     msg.abpd_risk = abpd_risk;
+    msg.glc_risk = glc_risk;
     
     msg.trm_data = trm_raw;
     msg.ecg_data = ecg_raw;
     msg.oxi_data = oxi_raw;
     msg.abps_data = abps_raw;
     msg.abpd_data = abpd_raw;
+    msg.glc_data = glc_raw;
 
     msg.patient_status = patient_status;
 

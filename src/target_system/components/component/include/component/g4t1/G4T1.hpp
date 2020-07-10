@@ -50,18 +50,21 @@ class G4T1 : public CentralHub {
         double oxi_risk;
         double ecg_risk;
         double trm_risk;
+        double glc_risk;
 
         double abps_batt;
         double abpd_batt;
         double oxi_batt;
         double ecg_batt;
         double trm_batt;
+        double glc_batt;
 
         double abps_raw;
         double abpd_raw;
         double oxi_raw;
         double ecg_raw;
         double trm_raw;
+        double glc_raw;
 
         ros::Publisher pub;
         bool lost_packt;
