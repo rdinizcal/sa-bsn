@@ -25,15 +25,15 @@ void G3T1_2::setUp() {
     { // Configure markov chain
         std::vector<std::string> lrs,mrs0,hrs0,mrs1,hrs1;
 
-        handle.getParam("LowRisk", s);
+        handle.getParam("heart_rate_LowRisk", s);
         lrs = bsn::utils::split(s, ',');
-        handle.getParam("MidRisk0", s);
+        handle.getParam("heart_rate_MidRisk0", s);
         mrs0 = bsn::utils::split(s, ',');
-        handle.getParam("HighRisk0", s);
+        handle.getParam("heart_rate_HighRisk0", s);
         hrs0 = bsn::utils::split(s, ',');
-        handle.getParam("MidRisk1", s);
+        handle.getParam("heart_rate_MidRisk1", s);
         mrs1 = bsn::utils::split(s, ',');
-        handle.getParam("HighRisk1", s);
+        handle.getParam("heart_rate_HighRisk1", s);
         hrs1 = bsn::utils::split(s, ',');
 
         ranges[0] = Range(std::stod(hrs0[0]), std::stod(hrs0[1]));
