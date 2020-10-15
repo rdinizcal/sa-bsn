@@ -1,0 +1,415 @@
+\hypertarget{classbsn_1_1configuration_1_1SensorConfiguration}{}\doxysection{bsn\+::configuration\+::Sensor\+Configuration Class Reference}
+\label{classbsn_1_1configuration_1_1SensorConfiguration}\index{bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}}
+
+
+{\ttfamily \#include $<$Sensor\+Configuration.\+hpp$>$}
+
+
+
+Collaboration diagram for bsn\+::configuration\+::Sensor\+Configuration\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=214pt]{classbsn_1_1configuration_1_1SensorConfiguration__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classbsn_1_1configuration_1_1SensorConfiguration_a17f3cbbab72c23bae4aafa86789db509}{Sensor\+Configuration}} ()
+\item 
+\mbox{\hyperlink{classbsn_1_1configuration_1_1SensorConfiguration_a803a3b49f6089d753ddaf27d331d2b4d}{Sensor\+Configuration}} (int32\+\_\+t i, \mbox{\hyperlink{classbsn_1_1range_1_1Range}{bsn\+::range\+::\+Range}}, std\+::array$<$ \mbox{\hyperlink{classbsn_1_1range_1_1Range}{bsn\+::range\+::\+Range}}, 2 $>$, std\+::array$<$ \mbox{\hyperlink{classbsn_1_1range_1_1Range}{bsn\+::range\+::\+Range}}, 2 $>$, std\+::array$<$ \mbox{\hyperlink{classbsn_1_1range_1_1Range}{bsn\+::range\+::\+Range}}, 3 $>$)
+\item 
+\mbox{\hyperlink{classbsn_1_1configuration_1_1SensorConfiguration_a0f355f6a8201854b703c2ecf62e46cf4}{Sensor\+Configuration}} (const \mbox{\hyperlink{classbsn_1_1configuration_1_1SensorConfiguration}{Sensor\+Configuration}} \&)
+\item 
+\mbox{\hyperlink{classbsn_1_1configuration_1_1SensorConfiguration}{Sensor\+Configuration}} \& \mbox{\hyperlink{classbsn_1_1configuration_1_1SensorConfiguration_a4e7f120c65314cf58e2ef487ba57dd63}{operator=}} (const \mbox{\hyperlink{classbsn_1_1configuration_1_1SensorConfiguration}{Sensor\+Configuration}} \&)
+\item 
+double \mbox{\hyperlink{classbsn_1_1configuration_1_1SensorConfiguration_a74040e24635beeffd7067a23c5bb91ab}{evaluate\+Number}} (double number)
+\item 
+double \mbox{\hyperlink{classbsn_1_1configuration_1_1SensorConfiguration_aab092b8b249eda7ee53a38ec45ba9421}{get\+Displacement}} (\mbox{\hyperlink{classbsn_1_1range_1_1Range}{bsn\+::range\+::\+Range}}, double, std\+::string)
+\item 
+double \mbox{\hyperlink{classbsn_1_1configuration_1_1SensorConfiguration_aeb452f9154ebbc75bd54564fa0f94430}{convert\+Real\+Percentage}} (\mbox{\hyperlink{classbsn_1_1range_1_1Range}{bsn\+::range\+::\+Range}} range, double number)
+\item 
+bool \mbox{\hyperlink{classbsn_1_1configuration_1_1SensorConfiguration_ad634307e717a32be46cbf83f5bb64dd6}{is\+Low\+Risk}} (double)
+\item 
+bool \mbox{\hyperlink{classbsn_1_1configuration_1_1SensorConfiguration_a03fedce8669b42a6b9b85a5118e1b1c7}{is\+Medium\+Risk}} (double)
+\item 
+bool \mbox{\hyperlink{classbsn_1_1configuration_1_1SensorConfiguration_a10edc69659fac13589698a7f2f4f529b}{is\+High\+Risk}} (double)
+\item 
+int32\+\_\+t \mbox{\hyperlink{classbsn_1_1configuration_1_1SensorConfiguration_a5cbb1f6ecadc4bbda6ac273cb4d4e5f5}{get\+Id}} () const
+\item 
+void \mbox{\hyperlink{classbsn_1_1configuration_1_1SensorConfiguration_ae89e7fd872467dba154397389e432a5a}{set\+Id}} (const int32\+\_\+t)
+\item 
+\mbox{\hyperlink{classbsn_1_1range_1_1Range}{bsn\+::range\+::\+Range}} \mbox{\hyperlink{classbsn_1_1configuration_1_1SensorConfiguration_a8670643b8a6f0e51ef28858c42ef1330}{get\+Low\+Risk}} () const
+\item 
+void \mbox{\hyperlink{classbsn_1_1configuration_1_1SensorConfiguration_a62b42b1f5f7fecb9f4c198f1f8c2880c}{set\+Low\+Risk}} (const \mbox{\hyperlink{classbsn_1_1range_1_1Range}{bsn\+::range\+::\+Range}})
+\item 
+std\+::array$<$ \mbox{\hyperlink{classbsn_1_1range_1_1Range}{bsn\+::range\+::\+Range}}, 2 $>$ \mbox{\hyperlink{classbsn_1_1configuration_1_1SensorConfiguration_ace2305e7f554676344e3d6dc15c59c08}{get\+Medium\+Risk}} () const
+\item 
+void \mbox{\hyperlink{classbsn_1_1configuration_1_1SensorConfiguration_a3d67705908e159fe7e22fe8da3c6459d}{set\+Medium\+Risk}} (const std\+::array$<$ \mbox{\hyperlink{classbsn_1_1range_1_1Range}{bsn\+::range\+::\+Range}}, 2 $>$)
+\item 
+std\+::array$<$ \mbox{\hyperlink{classbsn_1_1range_1_1Range}{bsn\+::range\+::\+Range}}, 2 $>$ \mbox{\hyperlink{classbsn_1_1configuration_1_1SensorConfiguration_acdfcb71e90acbca6036e0d93a9f7ef8e}{get\+High\+Risk}} () const
+\item 
+void \mbox{\hyperlink{classbsn_1_1configuration_1_1SensorConfiguration_a90b348d540e0ecadc78eee3535506b9c}{set\+High\+Risk}} (const std\+::array$<$ \mbox{\hyperlink{classbsn_1_1range_1_1Range}{bsn\+::range\+::\+Range}}, 2 $>$)
+\item 
+\mbox{\hyperlink{classbsn_1_1range_1_1Range}{bsn\+::range\+::\+Range}} \mbox{\hyperlink{classbsn_1_1configuration_1_1SensorConfiguration_acc1264bd8739fdc4d9ddaf0f00552a12}{get\+Low\+Percentage}} () const
+\item 
+void \mbox{\hyperlink{classbsn_1_1configuration_1_1SensorConfiguration_a234427e4eafc20d2c17449b083735d9a}{set\+Low\+Percentage}} (const \mbox{\hyperlink{classbsn_1_1range_1_1Range}{bsn\+::range\+::\+Range}})
+\item 
+\mbox{\hyperlink{classbsn_1_1range_1_1Range}{bsn\+::range\+::\+Range}} \mbox{\hyperlink{classbsn_1_1configuration_1_1SensorConfiguration_a84047430dc4ca3d5efc65f454feebf1c}{get\+Mid\+Percentage}} () const
+\item 
+void \mbox{\hyperlink{classbsn_1_1configuration_1_1SensorConfiguration_a00960001bdeb1905c03b8fb9c6cec556}{set\+Mid\+Percentage}} (const \mbox{\hyperlink{classbsn_1_1range_1_1Range}{bsn\+::range\+::\+Range}})
+\item 
+\mbox{\hyperlink{classbsn_1_1range_1_1Range}{bsn\+::range\+::\+Range}} \mbox{\hyperlink{classbsn_1_1configuration_1_1SensorConfiguration_a44ff7709db274eaa05ea8d41c6028e16}{get\+High\+Percentage}} () const
+\item 
+void \mbox{\hyperlink{classbsn_1_1configuration_1_1SensorConfiguration_ad877e9ac2d6a98476ef8ac47f7414390}{set\+High\+Percentage}} (const \mbox{\hyperlink{classbsn_1_1range_1_1Range}{bsn\+::range\+::\+Range}})
+\item 
+const std\+::string \mbox{\hyperlink{classbsn_1_1configuration_1_1SensorConfiguration_af51e385f3664a67a9459d3efc32175d0}{to\+String}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classbsn_1_1configuration_1_1SensorConfiguration_a17f3cbbab72c23bae4aafa86789db509}\label{classbsn_1_1configuration_1_1SensorConfiguration_a17f3cbbab72c23bae4aafa86789db509}} 
+\index{bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}!SensorConfiguration@{SensorConfiguration}}
+\index{SensorConfiguration@{SensorConfiguration}!bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}}
+\doxysubsubsection{\texorpdfstring{SensorConfiguration()}{SensorConfiguration()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily bsn\+::configuration\+::\+Sensor\+Configuration\+::\+Sensor\+Configuration (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classbsn_1_1configuration_1_1SensorConfiguration_a803a3b49f6089d753ddaf27d331d2b4d}\label{classbsn_1_1configuration_1_1SensorConfiguration_a803a3b49f6089d753ddaf27d331d2b4d}} 
+\index{bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}!SensorConfiguration@{SensorConfiguration}}
+\index{SensorConfiguration@{SensorConfiguration}!bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}}
+\doxysubsubsection{\texorpdfstring{SensorConfiguration()}{SensorConfiguration()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily bsn\+::configuration\+::\+Sensor\+Configuration\+::\+Sensor\+Configuration (\begin{DoxyParamCaption}\item[{int32\+\_\+t}]{i,  }\item[{\mbox{\hyperlink{classbsn_1_1range_1_1Range}{bsn\+::range\+::\+Range}}}]{l,  }\item[{std\+::array$<$ \mbox{\hyperlink{classbsn_1_1range_1_1Range}{bsn\+::range\+::\+Range}}, 2 $>$}]{m,  }\item[{std\+::array$<$ \mbox{\hyperlink{classbsn_1_1range_1_1Range}{bsn\+::range\+::\+Range}}, 2 $>$}]{h,  }\item[{std\+::array$<$ \mbox{\hyperlink{classbsn_1_1range_1_1Range}{bsn\+::range\+::\+Range}}, 3 $>$}]{p }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classbsn_1_1configuration_1_1SensorConfiguration_a0f355f6a8201854b703c2ecf62e46cf4}\label{classbsn_1_1configuration_1_1SensorConfiguration_a0f355f6a8201854b703c2ecf62e46cf4}} 
+\index{bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}!SensorConfiguration@{SensorConfiguration}}
+\index{SensorConfiguration@{SensorConfiguration}!bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}}
+\doxysubsubsection{\texorpdfstring{SensorConfiguration()}{SensorConfiguration()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily bsn\+::configuration\+::\+Sensor\+Configuration\+::\+Sensor\+Configuration (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classbsn_1_1configuration_1_1SensorConfiguration}{Sensor\+Configuration}} \&}]{obj }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classbsn_1_1configuration_1_1SensorConfiguration_aeb452f9154ebbc75bd54564fa0f94430}\label{classbsn_1_1configuration_1_1SensorConfiguration_aeb452f9154ebbc75bd54564fa0f94430}} 
+\index{bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}!convertRealPercentage@{convertRealPercentage}}
+\index{convertRealPercentage@{convertRealPercentage}!bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}}
+\doxysubsubsection{\texorpdfstring{convertRealPercentage()}{convertRealPercentage()}}
+{\footnotesize\ttfamily double bsn\+::configuration\+::\+Sensor\+Configuration\+::convert\+Real\+Percentage (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classbsn_1_1range_1_1Range}{bsn\+::range\+::\+Range}}}]{range,  }\item[{double}]{number }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=344pt]{classbsn_1_1configuration_1_1SensorConfiguration_aeb452f9154ebbc75bd54564fa0f94430_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classbsn_1_1configuration_1_1SensorConfiguration_aeb452f9154ebbc75bd54564fa0f94430_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classbsn_1_1configuration_1_1SensorConfiguration_a74040e24635beeffd7067a23c5bb91ab}\label{classbsn_1_1configuration_1_1SensorConfiguration_a74040e24635beeffd7067a23c5bb91ab}} 
+\index{bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}!evaluateNumber@{evaluateNumber}}
+\index{evaluateNumber@{evaluateNumber}!bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}}
+\doxysubsubsection{\texorpdfstring{evaluateNumber()}{evaluateNumber()}}
+{\footnotesize\ttfamily double bsn\+::configuration\+::\+Sensor\+Configuration\+::evaluate\+Number (\begin{DoxyParamCaption}\item[{double}]{number }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classbsn_1_1configuration_1_1SensorConfiguration_a74040e24635beeffd7067a23c5bb91ab_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=317pt]{classbsn_1_1configuration_1_1SensorConfiguration_a74040e24635beeffd7067a23c5bb91ab_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classbsn_1_1configuration_1_1SensorConfiguration_aab092b8b249eda7ee53a38ec45ba9421}\label{classbsn_1_1configuration_1_1SensorConfiguration_aab092b8b249eda7ee53a38ec45ba9421}} 
+\index{bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}!getDisplacement@{getDisplacement}}
+\index{getDisplacement@{getDisplacement}!bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}}
+\doxysubsubsection{\texorpdfstring{getDisplacement()}{getDisplacement()}}
+{\footnotesize\ttfamily double bsn\+::configuration\+::\+Sensor\+Configuration\+::get\+Displacement (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classbsn_1_1range_1_1Range}{bsn\+::range\+::\+Range}}}]{range,  }\item[{double}]{number,  }\item[{std\+::string}]{logic = {\ttfamily \char`\"{}crescent\char`\"{}} }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=330pt]{classbsn_1_1configuration_1_1SensorConfiguration_aab092b8b249eda7ee53a38ec45ba9421_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classbsn_1_1configuration_1_1SensorConfiguration_aab092b8b249eda7ee53a38ec45ba9421_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classbsn_1_1configuration_1_1SensorConfiguration_a44ff7709db274eaa05ea8d41c6028e16}\label{classbsn_1_1configuration_1_1SensorConfiguration_a44ff7709db274eaa05ea8d41c6028e16}} 
+\index{bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}!getHighPercentage@{getHighPercentage}}
+\index{getHighPercentage@{getHighPercentage}!bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}}
+\doxysubsubsection{\texorpdfstring{getHighPercentage()}{getHighPercentage()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classbsn_1_1range_1_1Range}{Range}} bsn\+::configuration\+::\+Sensor\+Configuration\+::get\+High\+Percentage (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=338pt]{classbsn_1_1configuration_1_1SensorConfiguration_a44ff7709db274eaa05ea8d41c6028e16_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classbsn_1_1configuration_1_1SensorConfiguration_acdfcb71e90acbca6036e0d93a9f7ef8e}\label{classbsn_1_1configuration_1_1SensorConfiguration_acdfcb71e90acbca6036e0d93a9f7ef8e}} 
+\index{bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}!getHighRisk@{getHighRisk}}
+\index{getHighRisk@{getHighRisk}!bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}}
+\doxysubsubsection{\texorpdfstring{getHighRisk()}{getHighRisk()}}
+{\footnotesize\ttfamily array$<$ \mbox{\hyperlink{classbsn_1_1range_1_1Range}{Range}}, 2 $>$ bsn\+::configuration\+::\+Sensor\+Configuration\+::get\+High\+Risk (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=338pt]{classbsn_1_1configuration_1_1SensorConfiguration_acdfcb71e90acbca6036e0d93a9f7ef8e_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classbsn_1_1configuration_1_1SensorConfiguration_a5cbb1f6ecadc4bbda6ac273cb4d4e5f5}\label{classbsn_1_1configuration_1_1SensorConfiguration_a5cbb1f6ecadc4bbda6ac273cb4d4e5f5}} 
+\index{bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}!getId@{getId}}
+\index{getId@{getId}!bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}}
+\doxysubsubsection{\texorpdfstring{getId()}{getId()}}
+{\footnotesize\ttfamily int32\+\_\+t bsn\+::configuration\+::\+Sensor\+Configuration\+::get\+Id (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=338pt]{classbsn_1_1configuration_1_1SensorConfiguration_a5cbb1f6ecadc4bbda6ac273cb4d4e5f5_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classbsn_1_1configuration_1_1SensorConfiguration_acc1264bd8739fdc4d9ddaf0f00552a12}\label{classbsn_1_1configuration_1_1SensorConfiguration_acc1264bd8739fdc4d9ddaf0f00552a12}} 
+\index{bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}!getLowPercentage@{getLowPercentage}}
+\index{getLowPercentage@{getLowPercentage}!bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}}
+\doxysubsubsection{\texorpdfstring{getLowPercentage()}{getLowPercentage()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classbsn_1_1range_1_1Range}{Range}} bsn\+::configuration\+::\+Sensor\+Configuration\+::get\+Low\+Percentage (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=338pt]{classbsn_1_1configuration_1_1SensorConfiguration_acc1264bd8739fdc4d9ddaf0f00552a12_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classbsn_1_1configuration_1_1SensorConfiguration_a8670643b8a6f0e51ef28858c42ef1330}\label{classbsn_1_1configuration_1_1SensorConfiguration_a8670643b8a6f0e51ef28858c42ef1330}} 
+\index{bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}!getLowRisk@{getLowRisk}}
+\index{getLowRisk@{getLowRisk}!bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}}
+\doxysubsubsection{\texorpdfstring{getLowRisk()}{getLowRisk()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classbsn_1_1range_1_1Range}{Range}} bsn\+::configuration\+::\+Sensor\+Configuration\+::get\+Low\+Risk (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=338pt]{classbsn_1_1configuration_1_1SensorConfiguration_a8670643b8a6f0e51ef28858c42ef1330_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classbsn_1_1configuration_1_1SensorConfiguration_ace2305e7f554676344e3d6dc15c59c08}\label{classbsn_1_1configuration_1_1SensorConfiguration_ace2305e7f554676344e3d6dc15c59c08}} 
+\index{bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}!getMediumRisk@{getMediumRisk}}
+\index{getMediumRisk@{getMediumRisk}!bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}}
+\doxysubsubsection{\texorpdfstring{getMediumRisk()}{getMediumRisk()}}
+{\footnotesize\ttfamily array$<$ \mbox{\hyperlink{classbsn_1_1range_1_1Range}{Range}}, 2 $>$ bsn\+::configuration\+::\+Sensor\+Configuration\+::get\+Medium\+Risk (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=338pt]{classbsn_1_1configuration_1_1SensorConfiguration_ace2305e7f554676344e3d6dc15c59c08_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classbsn_1_1configuration_1_1SensorConfiguration_a84047430dc4ca3d5efc65f454feebf1c}\label{classbsn_1_1configuration_1_1SensorConfiguration_a84047430dc4ca3d5efc65f454feebf1c}} 
+\index{bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}!getMidPercentage@{getMidPercentage}}
+\index{getMidPercentage@{getMidPercentage}!bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}}
+\doxysubsubsection{\texorpdfstring{getMidPercentage()}{getMidPercentage()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classbsn_1_1range_1_1Range}{Range}} bsn\+::configuration\+::\+Sensor\+Configuration\+::get\+Mid\+Percentage (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=338pt]{classbsn_1_1configuration_1_1SensorConfiguration_a84047430dc4ca3d5efc65f454feebf1c_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classbsn_1_1configuration_1_1SensorConfiguration_a10edc69659fac13589698a7f2f4f529b}\label{classbsn_1_1configuration_1_1SensorConfiguration_a10edc69659fac13589698a7f2f4f529b}} 
+\index{bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}!isHighRisk@{isHighRisk}}
+\index{isHighRisk@{isHighRisk}!bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}}
+\doxysubsubsection{\texorpdfstring{isHighRisk()}{isHighRisk()}}
+{\footnotesize\ttfamily bool bsn\+::configuration\+::\+Sensor\+Configuration\+::is\+High\+Risk (\begin{DoxyParamCaption}\item[{double}]{val }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classbsn_1_1configuration_1_1SensorConfiguration_ad634307e717a32be46cbf83f5bb64dd6}\label{classbsn_1_1configuration_1_1SensorConfiguration_ad634307e717a32be46cbf83f5bb64dd6}} 
+\index{bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}!isLowRisk@{isLowRisk}}
+\index{isLowRisk@{isLowRisk}!bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}}
+\doxysubsubsection{\texorpdfstring{isLowRisk()}{isLowRisk()}}
+{\footnotesize\ttfamily bool bsn\+::configuration\+::\+Sensor\+Configuration\+::is\+Low\+Risk (\begin{DoxyParamCaption}\item[{double}]{val }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=330pt]{classbsn_1_1configuration_1_1SensorConfiguration_ad634307e717a32be46cbf83f5bb64dd6_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classbsn_1_1configuration_1_1SensorConfiguration_a03fedce8669b42a6b9b85a5118e1b1c7}\label{classbsn_1_1configuration_1_1SensorConfiguration_a03fedce8669b42a6b9b85a5118e1b1c7}} 
+\index{bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}!isMediumRisk@{isMediumRisk}}
+\index{isMediumRisk@{isMediumRisk}!bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}}
+\doxysubsubsection{\texorpdfstring{isMediumRisk()}{isMediumRisk()}}
+{\footnotesize\ttfamily bool bsn\+::configuration\+::\+Sensor\+Configuration\+::is\+Medium\+Risk (\begin{DoxyParamCaption}\item[{double}]{val }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classbsn_1_1configuration_1_1SensorConfiguration_a4e7f120c65314cf58e2ef487ba57dd63}\label{classbsn_1_1configuration_1_1SensorConfiguration_a4e7f120c65314cf58e2ef487ba57dd63}} 
+\index{bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}!operator=@{operator=}}
+\index{operator=@{operator=}!bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classbsn_1_1configuration_1_1SensorConfiguration}{Sensor\+Configuration}} \& bsn\+::configuration\+::\+Sensor\+Configuration\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classbsn_1_1configuration_1_1SensorConfiguration}{Sensor\+Configuration}} \&}]{obj }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=338pt]{classbsn_1_1configuration_1_1SensorConfiguration_a4e7f120c65314cf58e2ef487ba57dd63_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classbsn_1_1configuration_1_1SensorConfiguration_ad877e9ac2d6a98476ef8ac47f7414390}\label{classbsn_1_1configuration_1_1SensorConfiguration_ad877e9ac2d6a98476ef8ac47f7414390}} 
+\index{bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}!setHighPercentage@{setHighPercentage}}
+\index{setHighPercentage@{setHighPercentage}!bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}}
+\doxysubsubsection{\texorpdfstring{setHighPercentage()}{setHighPercentage()}}
+{\footnotesize\ttfamily void bsn\+::configuration\+::\+Sensor\+Configuration\+::set\+High\+Percentage (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classbsn_1_1range_1_1Range}{bsn\+::range\+::\+Range}}}]{hp }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=327pt]{classbsn_1_1configuration_1_1SensorConfiguration_ad877e9ac2d6a98476ef8ac47f7414390_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classbsn_1_1configuration_1_1SensorConfiguration_a90b348d540e0ecadc78eee3535506b9c}\label{classbsn_1_1configuration_1_1SensorConfiguration_a90b348d540e0ecadc78eee3535506b9c}} 
+\index{bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}!setHighRisk@{setHighRisk}}
+\index{setHighRisk@{setHighRisk}!bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}}
+\doxysubsubsection{\texorpdfstring{setHighRisk()}{setHighRisk()}}
+{\footnotesize\ttfamily void bsn\+::configuration\+::\+Sensor\+Configuration\+::set\+High\+Risk (\begin{DoxyParamCaption}\item[{const std\+::array$<$ \mbox{\hyperlink{classbsn_1_1range_1_1Range}{bsn\+::range\+::\+Range}}, 2 $>$}]{h }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=327pt]{classbsn_1_1configuration_1_1SensorConfiguration_a90b348d540e0ecadc78eee3535506b9c_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classbsn_1_1configuration_1_1SensorConfiguration_ae89e7fd872467dba154397389e432a5a}\label{classbsn_1_1configuration_1_1SensorConfiguration_ae89e7fd872467dba154397389e432a5a}} 
+\index{bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}!setId@{setId}}
+\index{setId@{setId}!bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}}
+\doxysubsubsection{\texorpdfstring{setId()}{setId()}}
+{\footnotesize\ttfamily void bsn\+::configuration\+::\+Sensor\+Configuration\+::set\+Id (\begin{DoxyParamCaption}\item[{const int32\+\_\+t}]{id }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=327pt]{classbsn_1_1configuration_1_1SensorConfiguration_ae89e7fd872467dba154397389e432a5a_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classbsn_1_1configuration_1_1SensorConfiguration_a234427e4eafc20d2c17449b083735d9a}\label{classbsn_1_1configuration_1_1SensorConfiguration_a234427e4eafc20d2c17449b083735d9a}} 
+\index{bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}!setLowPercentage@{setLowPercentage}}
+\index{setLowPercentage@{setLowPercentage}!bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}}
+\doxysubsubsection{\texorpdfstring{setLowPercentage()}{setLowPercentage()}}
+{\footnotesize\ttfamily void bsn\+::configuration\+::\+Sensor\+Configuration\+::set\+Low\+Percentage (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classbsn_1_1range_1_1Range}{bsn\+::range\+::\+Range}}}]{lp }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=327pt]{classbsn_1_1configuration_1_1SensorConfiguration_a234427e4eafc20d2c17449b083735d9a_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classbsn_1_1configuration_1_1SensorConfiguration_a62b42b1f5f7fecb9f4c198f1f8c2880c}\label{classbsn_1_1configuration_1_1SensorConfiguration_a62b42b1f5f7fecb9f4c198f1f8c2880c}} 
+\index{bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}!setLowRisk@{setLowRisk}}
+\index{setLowRisk@{setLowRisk}!bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}}
+\doxysubsubsection{\texorpdfstring{setLowRisk()}{setLowRisk()}}
+{\footnotesize\ttfamily void bsn\+::configuration\+::\+Sensor\+Configuration\+::set\+Low\+Risk (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classbsn_1_1range_1_1Range}{bsn\+::range\+::\+Range}}}]{l }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=327pt]{classbsn_1_1configuration_1_1SensorConfiguration_a62b42b1f5f7fecb9f4c198f1f8c2880c_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classbsn_1_1configuration_1_1SensorConfiguration_a3d67705908e159fe7e22fe8da3c6459d}\label{classbsn_1_1configuration_1_1SensorConfiguration_a3d67705908e159fe7e22fe8da3c6459d}} 
+\index{bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}!setMediumRisk@{setMediumRisk}}
+\index{setMediumRisk@{setMediumRisk}!bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}}
+\doxysubsubsection{\texorpdfstring{setMediumRisk()}{setMediumRisk()}}
+{\footnotesize\ttfamily void bsn\+::configuration\+::\+Sensor\+Configuration\+::set\+Medium\+Risk (\begin{DoxyParamCaption}\item[{const std\+::array$<$ \mbox{\hyperlink{classbsn_1_1range_1_1Range}{bsn\+::range\+::\+Range}}, 2 $>$}]{m }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=327pt]{classbsn_1_1configuration_1_1SensorConfiguration_a3d67705908e159fe7e22fe8da3c6459d_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classbsn_1_1configuration_1_1SensorConfiguration_a00960001bdeb1905c03b8fb9c6cec556}\label{classbsn_1_1configuration_1_1SensorConfiguration_a00960001bdeb1905c03b8fb9c6cec556}} 
+\index{bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}!setMidPercentage@{setMidPercentage}}
+\index{setMidPercentage@{setMidPercentage}!bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}}
+\doxysubsubsection{\texorpdfstring{setMidPercentage()}{setMidPercentage()}}
+{\footnotesize\ttfamily void bsn\+::configuration\+::\+Sensor\+Configuration\+::set\+Mid\+Percentage (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classbsn_1_1range_1_1Range}{bsn\+::range\+::\+Range}}}]{mp }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=327pt]{classbsn_1_1configuration_1_1SensorConfiguration_a00960001bdeb1905c03b8fb9c6cec556_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classbsn_1_1configuration_1_1SensorConfiguration_af51e385f3664a67a9459d3efc32175d0}\label{classbsn_1_1configuration_1_1SensorConfiguration_af51e385f3664a67a9459d3efc32175d0}} 
+\index{bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}!toString@{toString}}
+\index{toString@{toString}!bsn::configuration::SensorConfiguration@{bsn::configuration::SensorConfiguration}}
+\doxysubsubsection{\texorpdfstring{toString()}{toString()}}
+{\footnotesize\ttfamily const string bsn\+::configuration\+::\+Sensor\+Configuration\+::to\+String (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=330pt]{classbsn_1_1configuration_1_1SensorConfiguration_af51e385f3664a67a9459d3efc32175d0_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libbsn/include/configuration/\mbox{\hyperlink{SensorConfiguration_8hpp}{Sensor\+Configuration.\+hpp}}\item 
+libbsn/src/configuration/\mbox{\hyperlink{SensorConfiguration_8cpp}{Sensor\+Configuration.\+cpp}}\end{DoxyCompactItemize}

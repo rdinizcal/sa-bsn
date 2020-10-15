@@ -1,0 +1,238 @@
+\hypertarget{classLepton_1_1ParsedExpression}{}\doxysection{Lepton\+::Parsed\+Expression Class Reference}
+\label{classLepton_1_1ParsedExpression}\index{Lepton::ParsedExpression@{Lepton::ParsedExpression}}
+
+
+{\ttfamily \#include $<$Parsed\+Expression.\+h$>$}
+
+
+
+Collaboration diagram for Lepton\+::Parsed\+Expression\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=229pt]{classLepton_1_1ParsedExpression__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classLepton_1_1ParsedExpression_a36da7947c83855e3cde5d8eaff202aa7}{Parsed\+Expression}} ()
+\item 
+\mbox{\hyperlink{classLepton_1_1ParsedExpression_a66bc7c1ea25de51294b65a866455dc8c}{Parsed\+Expression}} (const \mbox{\hyperlink{classLepton_1_1ExpressionTreeNode}{Expression\+Tree\+Node}} \&root\+Node)
+\item 
+const \mbox{\hyperlink{classLepton_1_1ExpressionTreeNode}{Expression\+Tree\+Node}} \& \mbox{\hyperlink{classLepton_1_1ParsedExpression_a5f3df57885604220c0e9bd28d3eac21d}{get\+Root\+Node}} () const
+\item 
+double \mbox{\hyperlink{classLepton_1_1ParsedExpression_acd9d7fbbbe5fbde7d1206c9089861420}{evaluate}} () const
+\item 
+double \mbox{\hyperlink{classLepton_1_1ParsedExpression_aa9ed39ef2faf17eb906494095dd2d930}{evaluate}} (const std\+::map$<$ std\+::string, double $>$ \&variables) const
+\item 
+\mbox{\hyperlink{classLepton_1_1ParsedExpression}{Parsed\+Expression}} \mbox{\hyperlink{classLepton_1_1ParsedExpression_a7aeb0646ea0b8d046b26e0e614dd7bf5}{optimize}} () const
+\item 
+\mbox{\hyperlink{classLepton_1_1ParsedExpression}{Parsed\+Expression}} \mbox{\hyperlink{classLepton_1_1ParsedExpression_aa0b9a3a245b55161b22d3bb3e9edd78f}{optimize}} (const std\+::map$<$ std\+::string, double $>$ \&variables) const
+\item 
+\mbox{\hyperlink{classLepton_1_1ParsedExpression}{Parsed\+Expression}} \mbox{\hyperlink{classLepton_1_1ParsedExpression_a0ed0e7e8c6ad3d593e90f911160a724a}{differentiate}} (const std\+::string \&variable) const
+\item 
+\mbox{\hyperlink{classLepton_1_1ExpressionProgram}{Expression\+Program}} \mbox{\hyperlink{classLepton_1_1ParsedExpression_abb138355240382c2d10c04e3cc179e22}{create\+Program}} () const
+\item 
+\mbox{\hyperlink{classLepton_1_1CompiledExpression}{Compiled\+Expression}} \mbox{\hyperlink{classLepton_1_1ParsedExpression_a7248eef38508e2852e14a11fc54a10ee}{create\+Compiled\+Expression}} () const
+\item 
+\mbox{\hyperlink{classLepton_1_1ParsedExpression}{Parsed\+Expression}} \mbox{\hyperlink{classLepton_1_1ParsedExpression_a7c76c71544e4458de39a5e537fb6b1cb}{rename\+Variables}} (const std\+::map$<$ std\+::string, std\+::string $>$ \&replacements) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+This class represents the result of parsing an expression. It provides methods for working with the expression in various ways, such as evaluating it, getting the tree representation of the expresson, etc. 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classLepton_1_1ParsedExpression_a36da7947c83855e3cde5d8eaff202aa7}\label{classLepton_1_1ParsedExpression_a36da7947c83855e3cde5d8eaff202aa7}} 
+\index{Lepton::ParsedExpression@{Lepton::ParsedExpression}!ParsedExpression@{ParsedExpression}}
+\index{ParsedExpression@{ParsedExpression}!Lepton::ParsedExpression@{Lepton::ParsedExpression}}
+\doxysubsubsection{\texorpdfstring{ParsedExpression()}{ParsedExpression()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily Parsed\+Expression\+::\+Parsed\+Expression (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Create an uninitialized \mbox{\hyperlink{classLepton_1_1ParsedExpression}{Parsed\+Expression}}. This exists so that Parsed\+Expressions can be put in STL containers. Doing anything with it will produce an exception. Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classLepton_1_1ParsedExpression_a36da7947c83855e3cde5d8eaff202aa7_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classLepton_1_1ParsedExpression_a66bc7c1ea25de51294b65a866455dc8c}\label{classLepton_1_1ParsedExpression_a66bc7c1ea25de51294b65a866455dc8c}} 
+\index{Lepton::ParsedExpression@{Lepton::ParsedExpression}!ParsedExpression@{ParsedExpression}}
+\index{ParsedExpression@{ParsedExpression}!Lepton::ParsedExpression@{Lepton::ParsedExpression}}
+\doxysubsubsection{\texorpdfstring{ParsedExpression()}{ParsedExpression()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Parsed\+Expression\+::\+Parsed\+Expression (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classLepton_1_1ExpressionTreeNode}{Expression\+Tree\+Node}} \&}]{root\+Node }\end{DoxyParamCaption})}
+
+Create a \mbox{\hyperlink{classLepton_1_1ParsedExpression}{Parsed\+Expression}}. Normally you will not call this directly. Instead, use the \mbox{\hyperlink{classLepton_1_1Parser}{Parser}} class to parse expression. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classLepton_1_1ParsedExpression_a7248eef38508e2852e14a11fc54a10ee}\label{classLepton_1_1ParsedExpression_a7248eef38508e2852e14a11fc54a10ee}} 
+\index{Lepton::ParsedExpression@{Lepton::ParsedExpression}!createCompiledExpression@{createCompiledExpression}}
+\index{createCompiledExpression@{createCompiledExpression}!Lepton::ParsedExpression@{Lepton::ParsedExpression}}
+\doxysubsubsection{\texorpdfstring{createCompiledExpression()}{createCompiledExpression()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classLepton_1_1CompiledExpression}{Compiled\+Expression}} Parsed\+Expression\+::create\+Compiled\+Expression (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+Create a \mbox{\hyperlink{classLepton_1_1CompiledExpression}{Compiled\+Expression}} that represents the same calculation as this expression. Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classLepton_1_1ParsedExpression_a7248eef38508e2852e14a11fc54a10ee_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classLepton_1_1ParsedExpression_abb138355240382c2d10c04e3cc179e22}\label{classLepton_1_1ParsedExpression_abb138355240382c2d10c04e3cc179e22}} 
+\index{Lepton::ParsedExpression@{Lepton::ParsedExpression}!createProgram@{createProgram}}
+\index{createProgram@{createProgram}!Lepton::ParsedExpression@{Lepton::ParsedExpression}}
+\doxysubsubsection{\texorpdfstring{createProgram()}{createProgram()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classLepton_1_1ExpressionProgram}{Expression\+Program}} Parsed\+Expression\+::create\+Program (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+Create an \mbox{\hyperlink{classLepton_1_1ExpressionProgram}{Expression\+Program}} that represents the same calculation as this expression. \mbox{\Hypertarget{classLepton_1_1ParsedExpression_a0ed0e7e8c6ad3d593e90f911160a724a}\label{classLepton_1_1ParsedExpression_a0ed0e7e8c6ad3d593e90f911160a724a}} 
+\index{Lepton::ParsedExpression@{Lepton::ParsedExpression}!differentiate@{differentiate}}
+\index{differentiate@{differentiate}!Lepton::ParsedExpression@{Lepton::ParsedExpression}}
+\doxysubsubsection{\texorpdfstring{differentiate()}{differentiate()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classLepton_1_1ParsedExpression}{Parsed\+Expression}} Parsed\+Expression\+::differentiate (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{variable }\end{DoxyParamCaption}) const}
+
+Create a new \mbox{\hyperlink{classLepton_1_1ParsedExpression}{Parsed\+Expression}} which is the analytic derivative of this expression with respect to a particular variable.
+
+
+\begin{DoxyParams}{Parameters}
+{\em variable} & the variable with respect to which the derivate should be taken \\
+\hline
+\end{DoxyParams}
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classLepton_1_1ParsedExpression_a0ed0e7e8c6ad3d593e90f911160a724a_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classLepton_1_1ParsedExpression_acd9d7fbbbe5fbde7d1206c9089861420}\label{classLepton_1_1ParsedExpression_acd9d7fbbbe5fbde7d1206c9089861420}} 
+\index{Lepton::ParsedExpression@{Lepton::ParsedExpression}!evaluate@{evaluate}}
+\index{evaluate@{evaluate}!Lepton::ParsedExpression@{Lepton::ParsedExpression}}
+\doxysubsubsection{\texorpdfstring{evaluate()}{evaluate()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily double Parsed\+Expression\+::evaluate (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+Evaluate the expression. If the expression involves any variables, this method will throw an exception. Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classLepton_1_1ParsedExpression_acd9d7fbbbe5fbde7d1206c9089861420_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classLepton_1_1ParsedExpression_acd9d7fbbbe5fbde7d1206c9089861420_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classLepton_1_1ParsedExpression_aa9ed39ef2faf17eb906494095dd2d930}\label{classLepton_1_1ParsedExpression_aa9ed39ef2faf17eb906494095dd2d930}} 
+\index{Lepton::ParsedExpression@{Lepton::ParsedExpression}!evaluate@{evaluate}}
+\index{evaluate@{evaluate}!Lepton::ParsedExpression@{Lepton::ParsedExpression}}
+\doxysubsubsection{\texorpdfstring{evaluate()}{evaluate()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily double Parsed\+Expression\+::evaluate (\begin{DoxyParamCaption}\item[{const std\+::map$<$ std\+::string, double $>$ \&}]{variables }\end{DoxyParamCaption}) const}
+
+Evaluate the expression.
+
+
+\begin{DoxyParams}{Parameters}
+{\em variables} & a map specifying the values of all variables that appear in the expression. If any variable appears in the expression but is not included in this map, an exception will be thrown. \\
+\hline
+\end{DoxyParams}
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classLepton_1_1ParsedExpression_aa9ed39ef2faf17eb906494095dd2d930_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classLepton_1_1ParsedExpression_a5f3df57885604220c0e9bd28d3eac21d}\label{classLepton_1_1ParsedExpression_a5f3df57885604220c0e9bd28d3eac21d}} 
+\index{Lepton::ParsedExpression@{Lepton::ParsedExpression}!getRootNode@{getRootNode}}
+\index{getRootNode@{getRootNode}!Lepton::ParsedExpression@{Lepton::ParsedExpression}}
+\doxysubsubsection{\texorpdfstring{getRootNode()}{getRootNode()}}
+{\footnotesize\ttfamily const \mbox{\hyperlink{classLepton_1_1ExpressionTreeNode}{Expression\+Tree\+Node}} \& Parsed\+Expression\+::get\+Root\+Node (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+Get the root node of the expression\textquotesingle{}s abstract syntax tree. Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classLepton_1_1ParsedExpression_a5f3df57885604220c0e9bd28d3eac21d_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classLepton_1_1ParsedExpression_a5f3df57885604220c0e9bd28d3eac21d_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classLepton_1_1ParsedExpression_a7aeb0646ea0b8d046b26e0e614dd7bf5}\label{classLepton_1_1ParsedExpression_a7aeb0646ea0b8d046b26e0e614dd7bf5}} 
+\index{Lepton::ParsedExpression@{Lepton::ParsedExpression}!optimize@{optimize}}
+\index{optimize@{optimize}!Lepton::ParsedExpression@{Lepton::ParsedExpression}}
+\doxysubsubsection{\texorpdfstring{optimize()}{optimize()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classLepton_1_1ParsedExpression}{Parsed\+Expression}} Parsed\+Expression\+::optimize (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+Create a new \mbox{\hyperlink{classLepton_1_1ParsedExpression}{Parsed\+Expression}} which produces the same result as this one, but is faster to evaluate. Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classLepton_1_1ParsedExpression_a7aeb0646ea0b8d046b26e0e614dd7bf5_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classLepton_1_1ParsedExpression_aa0b9a3a245b55161b22d3bb3e9edd78f}\label{classLepton_1_1ParsedExpression_aa0b9a3a245b55161b22d3bb3e9edd78f}} 
+\index{Lepton::ParsedExpression@{Lepton::ParsedExpression}!optimize@{optimize}}
+\index{optimize@{optimize}!Lepton::ParsedExpression@{Lepton::ParsedExpression}}
+\doxysubsubsection{\texorpdfstring{optimize()}{optimize()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classLepton_1_1ParsedExpression}{Parsed\+Expression}} Parsed\+Expression\+::optimize (\begin{DoxyParamCaption}\item[{const std\+::map$<$ std\+::string, double $>$ \&}]{variables }\end{DoxyParamCaption}) const}
+
+Create a new \mbox{\hyperlink{classLepton_1_1ParsedExpression}{Parsed\+Expression}} which produces the same result as this one, but is faster to evaluate.
+
+
+\begin{DoxyParams}{Parameters}
+{\em variables} & a map specifying values for a subset of variables that appear in the expression. All occurrences of these variables in the expression are replaced with the values specified. \\
+\hline
+\end{DoxyParams}
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classLepton_1_1ParsedExpression_aa0b9a3a245b55161b22d3bb3e9edd78f_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classLepton_1_1ParsedExpression_a7c76c71544e4458de39a5e537fb6b1cb}\label{classLepton_1_1ParsedExpression_a7c76c71544e4458de39a5e537fb6b1cb}} 
+\index{Lepton::ParsedExpression@{Lepton::ParsedExpression}!renameVariables@{renameVariables}}
+\index{renameVariables@{renameVariables}!Lepton::ParsedExpression@{Lepton::ParsedExpression}}
+\doxysubsubsection{\texorpdfstring{renameVariables()}{renameVariables()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classLepton_1_1ParsedExpression}{Parsed\+Expression}} Parsed\+Expression\+::rename\+Variables (\begin{DoxyParamCaption}\item[{const std\+::map$<$ std\+::string, std\+::string $>$ \&}]{replacements }\end{DoxyParamCaption}) const}
+
+Create a new \mbox{\hyperlink{classLepton_1_1ParsedExpression}{Parsed\+Expression}} which is identical to this one, except that the names of some variables have been changed.
+
+
+\begin{DoxyParams}{Parameters}
+{\em replacements} & a map whose keys are the names of variables, and whose values are the new names to replace them with \\
+\hline
+\end{DoxyParams}
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classLepton_1_1ParsedExpression_a7c76c71544e4458de39a5e537fb6b1cb_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+lepton/include/\mbox{\hyperlink{ParsedExpression_8h}{Parsed\+Expression.\+h}}\item 
+lepton/src/\mbox{\hyperlink{ParsedExpression_8cpp}{Parsed\+Expression.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,124 @@
+\hypertarget{classarch_1_1target__system_1_1Effector}{}\doxysection{arch\+::target\+\_\+system\+::Effector Class Reference}
+\label{classarch_1_1target__system_1_1Effector}\index{arch::target\_system::Effector@{arch::target\_system::Effector}}
+
+
+{\ttfamily \#include $<$Effector.\+hpp$>$}
+
+
+
+Inheritance diagram for arch\+::target\+\_\+system\+::Effector\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=235pt]{classarch_1_1target__system_1_1Effector__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for arch\+::target\+\_\+system\+::Effector\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=319pt]{classarch_1_1target__system_1_1Effector__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classarch_1_1target__system_1_1Effector_a51cb64c0d697093680523952b2457847}{Effector}} (int \&argc, char $\ast$$\ast$argv, const std\+::string \&name)
+\item 
+virtual \mbox{\hyperlink{classarch_1_1target__system_1_1Effector_a76d432f197f73d7233db6ca977464dd6}{$\sim$\+Effector}} ()
+\item 
+virtual void \mbox{\hyperlink{classarch_1_1target__system_1_1Effector_a1af5c14648d7da1d22600914a0dd714e}{set\+Up}} ()
+\item 
+virtual void \mbox{\hyperlink{classarch_1_1target__system_1_1Effector_a149b6881ceb74fc890a46a274581a1e4}{tear\+Down}} ()
+\item 
+virtual void \mbox{\hyperlink{classarch_1_1target__system_1_1Effector_a7547143ad58200c01b1dde0559ab9241}{receive\+Adaptation\+Command}} (const archlib\+::\+Adaptation\+Command\+::\+Const\+Ptr \&msg)=0
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+ros\+::\+Node\+Handle \mbox{\hyperlink{classarch_1_1target__system_1_1Effector_a3f45e7f674c011c949719864a29fd869}{handle}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Additional Inherited Members}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classarch_1_1target__system_1_1Effector_a51cb64c0d697093680523952b2457847}\label{classarch_1_1target__system_1_1Effector_a51cb64c0d697093680523952b2457847}} 
+\index{arch::target\_system::Effector@{arch::target\_system::Effector}!Effector@{Effector}}
+\index{Effector@{Effector}!arch::target\_system::Effector@{arch::target\_system::Effector}}
+\doxysubsubsection{\texorpdfstring{Effector()}{Effector()}}
+{\footnotesize\ttfamily arch\+::target\+\_\+system\+::\+Effector\+::\+Effector (\begin{DoxyParamCaption}\item[{int \&}]{argc,  }\item[{char $\ast$$\ast$}]{argv,  }\item[{const std\+::string \&}]{name }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classarch_1_1target__system_1_1Effector_a76d432f197f73d7233db6ca977464dd6}\label{classarch_1_1target__system_1_1Effector_a76d432f197f73d7233db6ca977464dd6}} 
+\index{arch::target\_system::Effector@{arch::target\_system::Effector}!````~Effector@{$\sim$Effector}}
+\index{````~Effector@{$\sim$Effector}!arch::target\_system::Effector@{arch::target\_system::Effector}}
+\doxysubsubsection{\texorpdfstring{$\sim$Effector()}{~Effector()}}
+{\footnotesize\ttfamily arch\+::target\+\_\+system\+::\+Effector\+::$\sim$\+Effector (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classarch_1_1target__system_1_1Effector_a7547143ad58200c01b1dde0559ab9241}\label{classarch_1_1target__system_1_1Effector_a7547143ad58200c01b1dde0559ab9241}} 
+\index{arch::target\_system::Effector@{arch::target\_system::Effector}!receiveAdaptationCommand@{receiveAdaptationCommand}}
+\index{receiveAdaptationCommand@{receiveAdaptationCommand}!arch::target\_system::Effector@{arch::target\_system::Effector}}
+\doxysubsubsection{\texorpdfstring{receiveAdaptationCommand()}{receiveAdaptationCommand()}}
+{\footnotesize\ttfamily virtual void arch\+::target\+\_\+system\+::\+Effector\+::receive\+Adaptation\+Command (\begin{DoxyParamCaption}\item[{const archlib\+::\+Adaptation\+Command\+::\+Const\+Ptr \&}]{msg }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classParamAdapter_acc7db9351d4bd7411c589c0aefd318b5}{Param\+Adapter}}.
+
+\mbox{\Hypertarget{classarch_1_1target__system_1_1Effector_a1af5c14648d7da1d22600914a0dd714e}\label{classarch_1_1target__system_1_1Effector_a1af5c14648d7da1d22600914a0dd714e}} 
+\index{arch::target\_system::Effector@{arch::target\_system::Effector}!setUp@{setUp}}
+\index{setUp@{setUp}!arch::target\_system::Effector@{arch::target\_system::Effector}}
+\doxysubsubsection{\texorpdfstring{setUp()}{setUp()}}
+{\footnotesize\ttfamily void arch\+::target\+\_\+system\+::\+Effector\+::set\+Up (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classarch_1_1ROSComponent_ab134ea71604829a9e520a03bcae4bb8d}{arch\+::\+ROSComponent}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{classParamAdapter_a7c0398f646d90dfe7f017a7e972e0eab}{Param\+Adapter}}.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classarch_1_1target__system_1_1Effector_a1af5c14648d7da1d22600914a0dd714e_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classarch_1_1target__system_1_1Effector_a149b6881ceb74fc890a46a274581a1e4}\label{classarch_1_1target__system_1_1Effector_a149b6881ceb74fc890a46a274581a1e4}} 
+\index{arch::target\_system::Effector@{arch::target\_system::Effector}!tearDown@{tearDown}}
+\index{tearDown@{tearDown}!arch::target\_system::Effector@{arch::target\_system::Effector}}
+\doxysubsubsection{\texorpdfstring{tearDown()}{tearDown()}}
+{\footnotesize\ttfamily void arch\+::target\+\_\+system\+::\+Effector\+::tear\+Down (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classarch_1_1ROSComponent_a0069d6f5e45a9daf0bdbefd773973bba}{arch\+::\+ROSComponent}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{classParamAdapter_ad829271c4d5731ce1c375b99f88e3d10}{Param\+Adapter}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\mbox{\Hypertarget{classarch_1_1target__system_1_1Effector_a3f45e7f674c011c949719864a29fd869}\label{classarch_1_1target__system_1_1Effector_a3f45e7f674c011c949719864a29fd869}} 
+\index{arch::target\_system::Effector@{arch::target\_system::Effector}!handle@{handle}}
+\index{handle@{handle}!arch::target\_system::Effector@{arch::target\_system::Effector}}
+\doxysubsubsection{\texorpdfstring{handle}{handle}}
+{\footnotesize\ttfamily ros\+::\+Node\+Handle arch\+::target\+\_\+system\+::\+Effector\+::handle\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+archlib/include/archlib/target\+\_\+system/\mbox{\hyperlink{Effector_8hpp}{Effector.\+hpp}}\item 
+archlib/src/target\+\_\+system/\mbox{\hyperlink{Effector_8cpp}{Effector.\+cpp}}\end{DoxyCompactItemize}

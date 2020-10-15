@@ -1,0 +1,230 @@
+\hypertarget{classLepton_1_1ExpressionTreeNode}{}\doxysection{Lepton\+::Expression\+Tree\+Node Class Reference}
+\label{classLepton_1_1ExpressionTreeNode}\index{Lepton::ExpressionTreeNode@{Lepton::ExpressionTreeNode}}
+
+
+{\ttfamily \#include $<$Expression\+Tree\+Node.\+h$>$}
+
+
+
+Collaboration diagram for Lepton\+::Expression\+Tree\+Node\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=223pt]{classLepton_1_1ExpressionTreeNode__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classLepton_1_1ExpressionTreeNode_af89ea6bebc7ddafd94b8883b53e1917b}{Expression\+Tree\+Node}} (\mbox{\hyperlink{classLepton_1_1Operation}{Operation}} $\ast$operation, const std\+::vector$<$ \mbox{\hyperlink{classLepton_1_1ExpressionTreeNode}{Expression\+Tree\+Node}} $>$ \&children)
+\item 
+\mbox{\hyperlink{classLepton_1_1ExpressionTreeNode_a5b6108295697692fb17ac0671de620b0}{Expression\+Tree\+Node}} (\mbox{\hyperlink{classLepton_1_1Operation}{Operation}} $\ast$operation, const \mbox{\hyperlink{classLepton_1_1ExpressionTreeNode}{Expression\+Tree\+Node}} \&child1, const \mbox{\hyperlink{classLepton_1_1ExpressionTreeNode}{Expression\+Tree\+Node}} \&child2)
+\item 
+\mbox{\hyperlink{classLepton_1_1ExpressionTreeNode_a30c02b0cd49aa1ceb269bb7ab15e45ff}{Expression\+Tree\+Node}} (\mbox{\hyperlink{classLepton_1_1Operation}{Operation}} $\ast$operation, const \mbox{\hyperlink{classLepton_1_1ExpressionTreeNode}{Expression\+Tree\+Node}} \&child)
+\item 
+\mbox{\hyperlink{classLepton_1_1ExpressionTreeNode_a8afb90786edb4946d03887c058b0f6b9}{Expression\+Tree\+Node}} (\mbox{\hyperlink{classLepton_1_1Operation}{Operation}} $\ast$operation)
+\item 
+\mbox{\hyperlink{classLepton_1_1ExpressionTreeNode_a6771633bd592e91e6f3b6c87835df895}{Expression\+Tree\+Node}} (const \mbox{\hyperlink{classLepton_1_1ExpressionTreeNode}{Expression\+Tree\+Node}} \&node)
+\item 
+\mbox{\hyperlink{classLepton_1_1ExpressionTreeNode_a7a17cb3e5d6971c107f3d2c4807dbf4a}{Expression\+Tree\+Node}} ()
+\item 
+\mbox{\hyperlink{classLepton_1_1ExpressionTreeNode_a935e915bd561d8ff28ffe99f294f2bd6}{$\sim$\+Expression\+Tree\+Node}} ()
+\item 
+bool \mbox{\hyperlink{classLepton_1_1ExpressionTreeNode_a38e7bc3193fd16808b011ba632268dce}{operator==}} (const \mbox{\hyperlink{classLepton_1_1ExpressionTreeNode}{Expression\+Tree\+Node}} \&node) const
+\item 
+bool \mbox{\hyperlink{classLepton_1_1ExpressionTreeNode_a310d6d3162c2d7ccfbb64623b0899ba6}{operator!=}} (const \mbox{\hyperlink{classLepton_1_1ExpressionTreeNode}{Expression\+Tree\+Node}} \&node) const
+\item 
+\mbox{\hyperlink{classLepton_1_1ExpressionTreeNode}{Expression\+Tree\+Node}} \& \mbox{\hyperlink{classLepton_1_1ExpressionTreeNode_a9e8086d628a0997e6e30eaf731fd7d9e}{operator=}} (const \mbox{\hyperlink{classLepton_1_1ExpressionTreeNode}{Expression\+Tree\+Node}} \&node)
+\item 
+const \mbox{\hyperlink{classLepton_1_1Operation}{Operation}} \& \mbox{\hyperlink{classLepton_1_1ExpressionTreeNode_a779a783ff48104642ccbce6e01a822c4}{get\+Operation}} () const
+\item 
+const std\+::vector$<$ \mbox{\hyperlink{classLepton_1_1ExpressionTreeNode}{Expression\+Tree\+Node}} $>$ \& \mbox{\hyperlink{classLepton_1_1ExpressionTreeNode_ad3a8c112ab1cf0ef6fcdc336cf099368}{get\+Children}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+This class represents a node in the abstract syntax tree representation of an expression. Each node is defined by an \mbox{\hyperlink{classLepton_1_1Operation}{Operation}} and a set of children. When the expression is evaluated, each child is first evaluated in order, then the resulting values are passed as the arguments to the \mbox{\hyperlink{classLepton_1_1Operation}{Operation}}\textquotesingle{}s evaluate() method. 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classLepton_1_1ExpressionTreeNode_af89ea6bebc7ddafd94b8883b53e1917b}\label{classLepton_1_1ExpressionTreeNode_af89ea6bebc7ddafd94b8883b53e1917b}} 
+\index{Lepton::ExpressionTreeNode@{Lepton::ExpressionTreeNode}!ExpressionTreeNode@{ExpressionTreeNode}}
+\index{ExpressionTreeNode@{ExpressionTreeNode}!Lepton::ExpressionTreeNode@{Lepton::ExpressionTreeNode}}
+\doxysubsubsection{\texorpdfstring{ExpressionTreeNode()}{ExpressionTreeNode()}\hspace{0.1cm}{\footnotesize\ttfamily [1/6]}}
+{\footnotesize\ttfamily Expression\+Tree\+Node\+::\+Expression\+Tree\+Node (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classLepton_1_1Operation}{Operation}} $\ast$}]{operation,  }\item[{const std\+::vector$<$ \mbox{\hyperlink{classLepton_1_1ExpressionTreeNode}{Expression\+Tree\+Node}} $>$ \&}]{children }\end{DoxyParamCaption})}
+
+Create a new \mbox{\hyperlink{classLepton_1_1ExpressionTreeNode}{Expression\+Tree\+Node}}.
+
+
+\begin{DoxyParams}{Parameters}
+{\em operation} & the operation for this node. The \mbox{\hyperlink{classLepton_1_1ExpressionTreeNode}{Expression\+Tree\+Node}} takes over ownership of this object, and deletes it when the node is itself deleted. \\
+\hline
+{\em children} & the children of this node \\
+\hline
+\end{DoxyParams}
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classLepton_1_1ExpressionTreeNode_af89ea6bebc7ddafd94b8883b53e1917b_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classLepton_1_1ExpressionTreeNode_a5b6108295697692fb17ac0671de620b0}\label{classLepton_1_1ExpressionTreeNode_a5b6108295697692fb17ac0671de620b0}} 
+\index{Lepton::ExpressionTreeNode@{Lepton::ExpressionTreeNode}!ExpressionTreeNode@{ExpressionTreeNode}}
+\index{ExpressionTreeNode@{ExpressionTreeNode}!Lepton::ExpressionTreeNode@{Lepton::ExpressionTreeNode}}
+\doxysubsubsection{\texorpdfstring{ExpressionTreeNode()}{ExpressionTreeNode()}\hspace{0.1cm}{\footnotesize\ttfamily [2/6]}}
+{\footnotesize\ttfamily Expression\+Tree\+Node\+::\+Expression\+Tree\+Node (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classLepton_1_1Operation}{Operation}} $\ast$}]{operation,  }\item[{const \mbox{\hyperlink{classLepton_1_1ExpressionTreeNode}{Expression\+Tree\+Node}} \&}]{child1,  }\item[{const \mbox{\hyperlink{classLepton_1_1ExpressionTreeNode}{Expression\+Tree\+Node}} \&}]{child2 }\end{DoxyParamCaption})}
+
+Create a new \mbox{\hyperlink{classLepton_1_1ExpressionTreeNode}{Expression\+Tree\+Node}} with two children.
+
+
+\begin{DoxyParams}{Parameters}
+{\em operation} & the operation for this node. The \mbox{\hyperlink{classLepton_1_1ExpressionTreeNode}{Expression\+Tree\+Node}} takes over ownership of this object, and deletes it when the node is itself deleted. \\
+\hline
+{\em child1} & the first child of this node \\
+\hline
+{\em child2} & the second child of this node \\
+\hline
+\end{DoxyParams}
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classLepton_1_1ExpressionTreeNode_a5b6108295697692fb17ac0671de620b0_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classLepton_1_1ExpressionTreeNode_a30c02b0cd49aa1ceb269bb7ab15e45ff}\label{classLepton_1_1ExpressionTreeNode_a30c02b0cd49aa1ceb269bb7ab15e45ff}} 
+\index{Lepton::ExpressionTreeNode@{Lepton::ExpressionTreeNode}!ExpressionTreeNode@{ExpressionTreeNode}}
+\index{ExpressionTreeNode@{ExpressionTreeNode}!Lepton::ExpressionTreeNode@{Lepton::ExpressionTreeNode}}
+\doxysubsubsection{\texorpdfstring{ExpressionTreeNode()}{ExpressionTreeNode()}\hspace{0.1cm}{\footnotesize\ttfamily [3/6]}}
+{\footnotesize\ttfamily Expression\+Tree\+Node\+::\+Expression\+Tree\+Node (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classLepton_1_1Operation}{Operation}} $\ast$}]{operation,  }\item[{const \mbox{\hyperlink{classLepton_1_1ExpressionTreeNode}{Expression\+Tree\+Node}} \&}]{child }\end{DoxyParamCaption})}
+
+Create a new \mbox{\hyperlink{classLepton_1_1ExpressionTreeNode}{Expression\+Tree\+Node}} with one child.
+
+
+\begin{DoxyParams}{Parameters}
+{\em operation} & the operation for this node. The \mbox{\hyperlink{classLepton_1_1ExpressionTreeNode}{Expression\+Tree\+Node}} takes over ownership of this object, and deletes it when the node is itself deleted. \\
+\hline
+{\em child} & the child of this node \\
+\hline
+\end{DoxyParams}
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classLepton_1_1ExpressionTreeNode_a30c02b0cd49aa1ceb269bb7ab15e45ff_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classLepton_1_1ExpressionTreeNode_a8afb90786edb4946d03887c058b0f6b9}\label{classLepton_1_1ExpressionTreeNode_a8afb90786edb4946d03887c058b0f6b9}} 
+\index{Lepton::ExpressionTreeNode@{Lepton::ExpressionTreeNode}!ExpressionTreeNode@{ExpressionTreeNode}}
+\index{ExpressionTreeNode@{ExpressionTreeNode}!Lepton::ExpressionTreeNode@{Lepton::ExpressionTreeNode}}
+\doxysubsubsection{\texorpdfstring{ExpressionTreeNode()}{ExpressionTreeNode()}\hspace{0.1cm}{\footnotesize\ttfamily [4/6]}}
+{\footnotesize\ttfamily Expression\+Tree\+Node\+::\+Expression\+Tree\+Node (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classLepton_1_1Operation}{Operation}} $\ast$}]{operation }\end{DoxyParamCaption})}
+
+Create a new \mbox{\hyperlink{classLepton_1_1ExpressionTreeNode}{Expression\+Tree\+Node}} with no children.
+
+
+\begin{DoxyParams}{Parameters}
+{\em operation} & the operation for this node. The \mbox{\hyperlink{classLepton_1_1ExpressionTreeNode}{Expression\+Tree\+Node}} takes over ownership of this object, and deletes it when the node is itself deleted. \\
+\hline
+\end{DoxyParams}
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classLepton_1_1ExpressionTreeNode_a8afb90786edb4946d03887c058b0f6b9_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classLepton_1_1ExpressionTreeNode_a6771633bd592e91e6f3b6c87835df895}\label{classLepton_1_1ExpressionTreeNode_a6771633bd592e91e6f3b6c87835df895}} 
+\index{Lepton::ExpressionTreeNode@{Lepton::ExpressionTreeNode}!ExpressionTreeNode@{ExpressionTreeNode}}
+\index{ExpressionTreeNode@{ExpressionTreeNode}!Lepton::ExpressionTreeNode@{Lepton::ExpressionTreeNode}}
+\doxysubsubsection{\texorpdfstring{ExpressionTreeNode()}{ExpressionTreeNode()}\hspace{0.1cm}{\footnotesize\ttfamily [5/6]}}
+{\footnotesize\ttfamily Expression\+Tree\+Node\+::\+Expression\+Tree\+Node (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classLepton_1_1ExpressionTreeNode}{Expression\+Tree\+Node}} \&}]{node }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classLepton_1_1ExpressionTreeNode_a7a17cb3e5d6971c107f3d2c4807dbf4a}\label{classLepton_1_1ExpressionTreeNode_a7a17cb3e5d6971c107f3d2c4807dbf4a}} 
+\index{Lepton::ExpressionTreeNode@{Lepton::ExpressionTreeNode}!ExpressionTreeNode@{ExpressionTreeNode}}
+\index{ExpressionTreeNode@{ExpressionTreeNode}!Lepton::ExpressionTreeNode@{Lepton::ExpressionTreeNode}}
+\doxysubsubsection{\texorpdfstring{ExpressionTreeNode()}{ExpressionTreeNode()}\hspace{0.1cm}{\footnotesize\ttfamily [6/6]}}
+{\footnotesize\ttfamily Expression\+Tree\+Node\+::\+Expression\+Tree\+Node (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classLepton_1_1ExpressionTreeNode_a935e915bd561d8ff28ffe99f294f2bd6}\label{classLepton_1_1ExpressionTreeNode_a935e915bd561d8ff28ffe99f294f2bd6}} 
+\index{Lepton::ExpressionTreeNode@{Lepton::ExpressionTreeNode}!````~ExpressionTreeNode@{$\sim$ExpressionTreeNode}}
+\index{````~ExpressionTreeNode@{$\sim$ExpressionTreeNode}!Lepton::ExpressionTreeNode@{Lepton::ExpressionTreeNode}}
+\doxysubsubsection{\texorpdfstring{$\sim$ExpressionTreeNode()}{~ExpressionTreeNode()}}
+{\footnotesize\ttfamily Expression\+Tree\+Node\+::$\sim$\+Expression\+Tree\+Node (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classLepton_1_1ExpressionTreeNode_ad3a8c112ab1cf0ef6fcdc336cf099368}\label{classLepton_1_1ExpressionTreeNode_ad3a8c112ab1cf0ef6fcdc336cf099368}} 
+\index{Lepton::ExpressionTreeNode@{Lepton::ExpressionTreeNode}!getChildren@{getChildren}}
+\index{getChildren@{getChildren}!Lepton::ExpressionTreeNode@{Lepton::ExpressionTreeNode}}
+\doxysubsubsection{\texorpdfstring{getChildren()}{getChildren()}}
+{\footnotesize\ttfamily const vector$<$ \mbox{\hyperlink{classLepton_1_1ExpressionTreeNode}{Expression\+Tree\+Node}} $>$ \& Expression\+Tree\+Node\+::get\+Children (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+Get this node\textquotesingle{}s child nodes. Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classLepton_1_1ExpressionTreeNode_ad3a8c112ab1cf0ef6fcdc336cf099368_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classLepton_1_1ExpressionTreeNode_a779a783ff48104642ccbce6e01a822c4}\label{classLepton_1_1ExpressionTreeNode_a779a783ff48104642ccbce6e01a822c4}} 
+\index{Lepton::ExpressionTreeNode@{Lepton::ExpressionTreeNode}!getOperation@{getOperation}}
+\index{getOperation@{getOperation}!Lepton::ExpressionTreeNode@{Lepton::ExpressionTreeNode}}
+\doxysubsubsection{\texorpdfstring{getOperation()}{getOperation()}}
+{\footnotesize\ttfamily const \mbox{\hyperlink{classLepton_1_1Operation}{Operation}} \& Expression\+Tree\+Node\+::get\+Operation (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+Get the \mbox{\hyperlink{classLepton_1_1Operation}{Operation}} performed by this node. Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classLepton_1_1ExpressionTreeNode_a779a783ff48104642ccbce6e01a822c4_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classLepton_1_1ExpressionTreeNode_a310d6d3162c2d7ccfbb64623b0899ba6}\label{classLepton_1_1ExpressionTreeNode_a310d6d3162c2d7ccfbb64623b0899ba6}} 
+\index{Lepton::ExpressionTreeNode@{Lepton::ExpressionTreeNode}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!Lepton::ExpressionTreeNode@{Lepton::ExpressionTreeNode}}
+\doxysubsubsection{\texorpdfstring{operator"!=()}{operator!=()}}
+{\footnotesize\ttfamily bool Expression\+Tree\+Node\+::operator!= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classLepton_1_1ExpressionTreeNode}{Expression\+Tree\+Node}} \&}]{node }\end{DoxyParamCaption}) const}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classLepton_1_1ExpressionTreeNode_a310d6d3162c2d7ccfbb64623b0899ba6_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classLepton_1_1ExpressionTreeNode_a9e8086d628a0997e6e30eaf731fd7d9e}\label{classLepton_1_1ExpressionTreeNode_a9e8086d628a0997e6e30eaf731fd7d9e}} 
+\index{Lepton::ExpressionTreeNode@{Lepton::ExpressionTreeNode}!operator=@{operator=}}
+\index{operator=@{operator=}!Lepton::ExpressionTreeNode@{Lepton::ExpressionTreeNode}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classLepton_1_1ExpressionTreeNode}{Expression\+Tree\+Node}} \& Expression\+Tree\+Node\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classLepton_1_1ExpressionTreeNode}{Expression\+Tree\+Node}} \&}]{node }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classLepton_1_1ExpressionTreeNode_a9e8086d628a0997e6e30eaf731fd7d9e_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classLepton_1_1ExpressionTreeNode_a38e7bc3193fd16808b011ba632268dce}\label{classLepton_1_1ExpressionTreeNode_a38e7bc3193fd16808b011ba632268dce}} 
+\index{Lepton::ExpressionTreeNode@{Lepton::ExpressionTreeNode}!operator==@{operator==}}
+\index{operator==@{operator==}!Lepton::ExpressionTreeNode@{Lepton::ExpressionTreeNode}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}}
+{\footnotesize\ttfamily bool Expression\+Tree\+Node\+::operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classLepton_1_1ExpressionTreeNode}{Expression\+Tree\+Node}} \&}]{node }\end{DoxyParamCaption}) const}
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+lepton/include/\mbox{\hyperlink{ExpressionTreeNode_8h}{Expression\+Tree\+Node.\+h}}\item 
+lepton/src/\mbox{\hyperlink{ExpressionTreeNode_8cpp}{Expression\+Tree\+Node.\+cpp}}\end{DoxyCompactItemize}

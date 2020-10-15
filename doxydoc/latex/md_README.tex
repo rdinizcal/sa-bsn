@@ -1,0 +1,140 @@
+This is a Body \mbox{\hyperlink{classSensor}{Sensor}} Network implementation on ROS. So far, the BSN was used for experimentation on solutions for adaptation on the Self-\/\+Adaptive Software Systems domain, refer to \href{https://doi.org/10.1145/3194133.3194147}{\texttt{ https\+://doi.\+org/10.\+1145/3194133.\+3194147}} and \href{https://doi.org/10.1109/SEAMS.2019.00020}{\texttt{ https\+://doi.\+org/10.\+1109/\+SEAMS.\+2019.\+00020}} for more information. Moreover, information regarding the prototype behaviour and how to develop your own manager is provided in the \href{https://bodysensornetwork.herokuapp.com/}{\texttt{ https\+://bodysensornetwork.\+herokuapp.\+com/}} website, which contains an executable instance of the BSN. The following instructions will guide you to to compile, deploy and run the BSN on Linux Ubuntu 18.\+04 with ROS Melodic distributions. We have not yet tested on other distributions.\hypertarget{md_README_autotoc_md4}{}\doxysection{Dependencies\+:}\label{md_README_autotoc_md4}
+
+\begin{DoxyItemize}
+\item \href{http://wiki.ros.org/melodic}{\texttt{ Ros Melodic}} which provides software libraries for BSN engines.
+\item \href{https://github.com/Microsoft/cpprestsdk}{\texttt{ Cpp rest Sdk}} which implements HTTP protocols on C++ (get, post...)
+\item \href{https://github.com/rdinizcal/lepton}{\texttt{ Lepton}} (\char`\"{}lightweight expression parser\char`\"{}) is a small C++ library for parsing, evaluating, differentiating, and analyzing mathematical expressions.
+\item \href{https://github.com/rdinizcal/libbsn}{\texttt{ Bsn Library}} provides the implementation of sensors, data fusers and emergency detection
+\item \href{https://github.com/rdinizcal/arch}{\texttt{ Bsn arch}}
+\end{DoxyItemize}\hypertarget{md_README_autotoc_md5}{}\doxysection{Install dependencies\+:}\label{md_README_autotoc_md5}
+\hypertarget{md_README_autotoc_md6}{}\doxysubsubsection{ROS\+:}\label{md_README_autotoc_md6}
+First it is required to install ROS Melodic. Our development team is strictly using Ubuntu 18.\+04 (Bionic). To install it please follow this \href{http://wiki.ros.org/melodic/Installation/Ubuntu}{\texttt{ link}}. ~\newline
+ Also, it is strongly advised to use catkin for managing the ROS packages, refer to this \href{http://wiki.ros.org/ROS/Tutorials/InstallingandConfiguringROSEnvironment}{\texttt{ link}} after installing ROS Melodic. As such you will need to create a catkin workspace. You can do so by following the steps\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{mkdir -\/p \string~/catkin\_ws/src}
+\DoxyCodeLine{cd \string~/catkin\_ws/}
+\DoxyCodeLine{catkin\_make}
+
+\end{DoxyCode}
+\hypertarget{md_README_autotoc_md7}{}\doxysubsubsection{CPP rest sdk\+:}\label{md_README_autotoc_md7}
+In order to use Cpp rest sdk, it is required to build its dependency source code. ~\newline
+ First install the dependencies.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{sudo apt-\/get install g++ git libboost-\/atomic-\/dev libboost-\/thread-\/dev libboost-\/system-\/dev libboost-\/date-\/time-\/dev libboost-\/regex-\/dev libboost-\/filesystem-\/dev libboost-\/random-\/dev libboost-\/chrono-\/dev libboost-\/serialization-\/dev libwebsocketpp-\/dev openssl libssl-\/dev ninja-\/build}
+
+\end{DoxyCode}
+
+
+Then, clone the repository.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{git clone https://github.com/Microsoft/cpprestsdk.git casablanca}
+
+\end{DoxyCode}
+
+
+And finally, build it. 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{cd casablanca}
+\DoxyCodeLine{mkdir build.debug}
+\DoxyCodeLine{cd build.debug}
+\DoxyCodeLine{cmake -\/G Ninja .. -\/DCMAKE\_BUILD\_TYPE=Debug}
+\DoxyCodeLine{sudo ninja install}
+
+\end{DoxyCode}
+\hypertarget{md_README_autotoc_md8}{}\doxysubsubsection{Lepton\+:}\label{md_README_autotoc_md8}
+
+\begin{DoxyEnumerate}
+\item First, create and enter build folder. 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{cd lepton}
+
+\end{DoxyCode}
+ 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{mkdir build \&\& cd build}
+
+\end{DoxyCode}
+
+\item Execute cmake from the build folder. 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{cmake ..}
+
+\end{DoxyCode}
+
+\item Finally, compile and install lepton library. 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{sudo make install}
+
+\end{DoxyCode}
+
+\end{DoxyEnumerate}\hypertarget{md_README_autotoc_md9}{}\doxysubsubsection{Libbsn\+:}\label{md_README_autotoc_md9}
+
+\begin{DoxyEnumerate}
+\item Create and enter build folder. 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{cd libbsn}
+
+\end{DoxyCode}
+ 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{mkdir build \&\& cd build}
+
+\end{DoxyCode}
+
+\item Execute cmake from the build folder. 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{cmake ..}
+
+\end{DoxyCode}
+
+\item Finally, compile and install libbsn library. 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{sudo make install}
+
+\end{DoxyCode}
+ Once ALL the dependencies have been successfully installed, you can proceed to the next steps.
+\end{DoxyEnumerate}\hypertarget{md_README_autotoc_md10}{}\doxysection{Compiling BSN and arch lib}\label{md_README_autotoc_md10}
+
+\begin{DoxyEnumerate}
+\item Compile under \textquotesingle{}catkin\+\_\+ws\textquotesingle{} directory. 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{cd \string~/catkin\_ws/ \&\& }
+\DoxyCodeLine{catkin\_make}
+
+\end{DoxyCode}
+ 
+\end{DoxyEnumerate}\hypertarget{md_README_autotoc_md11}{}\doxysection{Configuration and Execution}\label{md_README_autotoc_md11}
+
+\begin{DoxyEnumerate}
+\item Configure roslaunch files for personalized execution under \textquotesingle{}/catkin\+\_\+ws/src/bsn/configurations\textquotesingle{};
+\item Execute the BSN either by executing the pre-\/set run.\+sh file, that executes all nodes, or use roslaunch x.\+launch to execute a single node\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{cd \string~/catkin\_ws/src/bsn/ \&\& }
+\DoxyCodeLine{bash run.sh}
+
+\end{DoxyCode}
+
+\end{DoxyEnumerate}\hypertarget{md_README_autotoc_md12}{}\doxysubsubsection{In case or error due to the ROS path}\label{md_README_autotoc_md12}
+You might want to source the setup.\+bash inside the catkin workspace\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{echo "{}source \string~/catkin\_ws/devel/setup.bash"{} >> \string~/.bashrc}
+\DoxyCodeLine{source \string~/.bashrc}
+
+\end{DoxyCode}
+\hypertarget{md_README_autotoc_md13}{}\doxysection{Main Authors}\label{md_README_autotoc_md13}
+
+\begin{DoxyItemize}
+\item {\bfseries{Ricardo D. Caldas}} -\/ \href{https://github.com/rdinizcal}{\texttt{ https\+://github.\+com/rdinizcal}}
+\item {\bfseries{Gabriel Levi}} -\/ \href{https://github.com/gabrielevi10}{\texttt{ https\+://github.\+com/gabrielevi10}}
+\item {\bfseries{Léo Moraes}} -\/ \href{https://github.com/leooleo}{\texttt{ https\+://github.\+com/leooleo}} ~\newline
+
+\item {\bfseries{Eric B. Gil}} -\/ \href{https://github.com/ericbg27/}{\texttt{ https\+://github.\+com/ericbg27/}}
+\end{DoxyItemize}
+
+Adviser\+: {\bfseries{Genaína N. Rodrigues}} -\/ \href{https://cic.unb.br/~genaina/}{\texttt{ https\+://cic.\+unb.\+br/$\sim$genaina/}} 

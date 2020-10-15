@@ -1,0 +1,419 @@
+\hypertarget{classSensor}{}\doxysection{Sensor Class Reference}
+\label{classSensor}\index{Sensor@{Sensor}}
+
+
+{\ttfamily \#include $<$Sensor.\+hpp$>$}
+
+
+
+Inheritance diagram for Sensor\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{classSensor__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Sensor\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classSensor__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classSensor_a6299b68992bc41c56a0045ba48896819}{Sensor}} (int \&argc, char $\ast$$\ast$argv, const std\+::string \&name, const std\+::string \&\mbox{\hyperlink{classSensor_a6fe1dbe1e72b79e52eb42afe07c976b7}{type}}, const bool \&\mbox{\hyperlink{classSensor_a24fd0c86c714edf603aac94428e96a01}{active}}, const double \&\mbox{\hyperlink{classSensor_afa3d793843256b107d3dff7abb283a6b}{noise\+\_\+factor}}, const \mbox{\hyperlink{classbsn_1_1resource_1_1Battery}{bsn\+::resource\+::\+Battery}} \&\mbox{\hyperlink{classSensor_a8a7cfe86933e5942fdeaa847a604c8be}{battery}})
+\item 
+\mbox{\hyperlink{classSensor_aee8c70e7ef05ce65e7ee33686b5d7db2}{$\sim$\+Sensor}} ()
+\item 
+virtual void \mbox{\hyperlink{classSensor_a46b45c4ec9d0675d2424ff2bb5df26ab}{set\+Up}} ()=0
+\item 
+virtual void \mbox{\hyperlink{classSensor_ad816b983559e220a9c360f57433f28de}{tear\+Down}} ()=0
+\item 
+virtual int32\+\_\+t \mbox{\hyperlink{classSensor_a1a664cdb090cb4295bbdedcffb1c8499}{run}} ()
+\item 
+void \mbox{\hyperlink{classSensor_a043dabb8b92f70fc247d585b8d66e133}{body}} ()
+\item 
+void \mbox{\hyperlink{classSensor_a865bbaf085db8217e4d0c02e12e8a2a1}{apply\+\_\+noise}} (double \&\mbox{\hyperlink{classSensor_a3ec114499fe9c744e21e18dc3e8b2987}{data}})
+\item 
+void \mbox{\hyperlink{classSensor_a476760a7dd4be51136bf165e183526cf}{reconfigure}} (const archlib\+::\+Adaptation\+Command\+::\+Const\+Ptr \&msg)
+\item 
+void \mbox{\hyperlink{classSensor_a941f539d5f022334095705710338469c}{inject\+Uncertainty}} (const archlib\+::\+Uncertainty\+::\+Const\+Ptr \&msg)
+\item 
+virtual double \mbox{\hyperlink{classSensor_ab89214185c2da031e0f78b0f4dc031e8}{collect}} ()=0
+\item 
+virtual double \mbox{\hyperlink{classSensor_a209530c83c3299a6587e1c87277dcd1e}{process}} (const double \&\mbox{\hyperlink{classSensor_a3ec114499fe9c744e21e18dc3e8b2987}{data}})=0
+\item 
+virtual void \mbox{\hyperlink{classSensor_afa34e334fc608034f8aeb8cb3d34abc9}{transfer}} (const double \&\mbox{\hyperlink{classSensor_a3ec114499fe9c744e21e18dc3e8b2987}{data}})=0
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{classSensor_aeb95c3006f7155be956658f0b951b9db}{is\+Active}} ()
+\item 
+void \mbox{\hyperlink{classSensor_ab687b1dd4e4ecb1d806bf947cedc9b76}{turn\+On}} ()
+\item 
+void \mbox{\hyperlink{classSensor_a7e0dadfc3dcde4c6c7b20d0c0ae09082}{turn\+Off}} ()
+\item 
+void \mbox{\hyperlink{classSensor_aa2c5c0b7c6f69e6e25cf56bab5fc822b}{recharge}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{classSensor_a6fe1dbe1e72b79e52eb42afe07c976b7}{type}}
+\item 
+bool \mbox{\hyperlink{classSensor_a24fd0c86c714edf603aac94428e96a01}{active}}
+\item 
+int \mbox{\hyperlink{classSensor_a70688e69c2a29191801550d1230b0807}{buffer\+\_\+size}}
+\item 
+int \mbox{\hyperlink{classSensor_a082ef8f59c9bc47232309780f8b07c70}{replicate\+\_\+collect}}
+\item 
+double \mbox{\hyperlink{classSensor_afa3d793843256b107d3dff7abb283a6b}{noise\+\_\+factor}}
+\item 
+\mbox{\hyperlink{classbsn_1_1resource_1_1Battery}{bsn\+::resource\+::\+Battery}} \mbox{\hyperlink{classSensor_a8a7cfe86933e5942fdeaa847a604c8be}{battery}}
+\item 
+double \mbox{\hyperlink{classSensor_a3ec114499fe9c744e21e18dc3e8b2987}{data}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Additional Inherited Members}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classSensor_a6299b68992bc41c56a0045ba48896819}\label{classSensor_a6299b68992bc41c56a0045ba48896819}} 
+\index{Sensor@{Sensor}!Sensor@{Sensor}}
+\index{Sensor@{Sensor}!Sensor@{Sensor}}
+\doxysubsubsection{\texorpdfstring{Sensor()}{Sensor()}}
+{\footnotesize\ttfamily Sensor\+::\+Sensor (\begin{DoxyParamCaption}\item[{int \&}]{argc,  }\item[{char $\ast$$\ast$}]{argv,  }\item[{const std\+::string \&}]{name,  }\item[{const std\+::string \&}]{type,  }\item[{const bool \&}]{active,  }\item[{const double \&}]{noise\+\_\+factor,  }\item[{const \mbox{\hyperlink{classbsn_1_1resource_1_1Battery}{bsn\+::resource\+::\+Battery}} \&}]{battery }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classSensor_aee8c70e7ef05ce65e7ee33686b5d7db2}\label{classSensor_aee8c70e7ef05ce65e7ee33686b5d7db2}} 
+\index{Sensor@{Sensor}!````~Sensor@{$\sim$Sensor}}
+\index{````~Sensor@{$\sim$Sensor}!Sensor@{Sensor}}
+\doxysubsubsection{\texorpdfstring{$\sim$Sensor()}{~Sensor()}}
+{\footnotesize\ttfamily Sensor\+::$\sim$\+Sensor (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classSensor_a865bbaf085db8217e4d0c02e12e8a2a1}\label{classSensor_a865bbaf085db8217e4d0c02e12e8a2a1}} 
+\index{Sensor@{Sensor}!apply\_noise@{apply\_noise}}
+\index{apply\_noise@{apply\_noise}!Sensor@{Sensor}}
+\doxysubsubsection{\texorpdfstring{apply\_noise()}{apply\_noise()}}
+{\footnotesize\ttfamily void Sensor\+::apply\+\_\+noise (\begin{DoxyParamCaption}\item[{double \&}]{data }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classSensor_a865bbaf085db8217e4d0c02e12e8a2a1_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classSensor_a043dabb8b92f70fc247d585b8d66e133}\label{classSensor_a043dabb8b92f70fc247d585b8d66e133}} 
+\index{Sensor@{Sensor}!body@{body}}
+\index{body@{body}!Sensor@{Sensor}}
+\doxysubsubsection{\texorpdfstring{body()}{body()}}
+{\footnotesize\ttfamily void Sensor\+::body (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classarch_1_1target__system_1_1Component_ac473539ffdccdef20318a6c4bfea0b22}{arch\+::target\+\_\+system\+::\+Component}}.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classSensor_a043dabb8b92f70fc247d585b8d66e133_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=331pt]{classSensor_a043dabb8b92f70fc247d585b8d66e133_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classSensor_ab89214185c2da031e0f78b0f4dc031e8}\label{classSensor_ab89214185c2da031e0f78b0f4dc031e8}} 
+\index{Sensor@{Sensor}!collect@{collect}}
+\index{collect@{collect}!Sensor@{Sensor}}
+\doxysubsubsection{\texorpdfstring{collect()}{collect()}}
+{\footnotesize\ttfamily virtual double Sensor\+::collect (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classG3T1__5_a1aa8fb64b30b7263df5c2189fb5995dc}{G3\+T1\+\_\+5}}, \mbox{\hyperlink{classG3T1__4_aac00c133f2199079b671b3094496fb33}{G3\+T1\+\_\+4}}, \mbox{\hyperlink{classG3T1__3_a3519014bd56d810164d86d9756169c44}{G3\+T1\+\_\+3}}, \mbox{\hyperlink{classG3T1__2_af0d9cc4619906329eeb799c5a35e142a}{G3\+T1\+\_\+2}}, and \mbox{\hyperlink{classG3T1__1_a4696c0b3b423e6d0efe2a6f3f6e84cfa}{G3\+T1\+\_\+1}}.
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classSensor_ab89214185c2da031e0f78b0f4dc031e8_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classSensor_a941f539d5f022334095705710338469c}\label{classSensor_a941f539d5f022334095705710338469c}} 
+\index{Sensor@{Sensor}!injectUncertainty@{injectUncertainty}}
+\index{injectUncertainty@{injectUncertainty}!Sensor@{Sensor}}
+\doxysubsubsection{\texorpdfstring{injectUncertainty()}{injectUncertainty()}}
+{\footnotesize\ttfamily void Sensor\+::inject\+Uncertainty (\begin{DoxyParamCaption}\item[{const archlib\+::\+Uncertainty\+::\+Const\+Ptr \&}]{msg }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=323pt]{classSensor_a941f539d5f022334095705710338469c_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classSensor_a941f539d5f022334095705710338469c_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classSensor_aeb95c3006f7155be956658f0b951b9db}\label{classSensor_aeb95c3006f7155be956658f0b951b9db}} 
+\index{Sensor@{Sensor}!isActive@{isActive}}
+\index{isActive@{isActive}!Sensor@{Sensor}}
+\doxysubsubsection{\texorpdfstring{isActive()}{isActive()}}
+{\footnotesize\ttfamily bool Sensor\+::is\+Active (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classSensor_aeb95c3006f7155be956658f0b951b9db_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classSensor_a209530c83c3299a6587e1c87277dcd1e}\label{classSensor_a209530c83c3299a6587e1c87277dcd1e}} 
+\index{Sensor@{Sensor}!process@{process}}
+\index{process@{process}!Sensor@{Sensor}}
+\doxysubsubsection{\texorpdfstring{process()}{process()}}
+{\footnotesize\ttfamily virtual double Sensor\+::process (\begin{DoxyParamCaption}\item[{const double \&}]{data }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classG3T1__5_acef5ff056ed22c930ae583f87cf1f03a}{G3\+T1\+\_\+5}}, \mbox{\hyperlink{classG3T1__4_ab743af6fc3e6ad0f64ef2520b811bb63}{G3\+T1\+\_\+4}}, \mbox{\hyperlink{classG3T1__3_a82334e4d79cb9a4b4a757a96c60fe4ce}{G3\+T1\+\_\+3}}, \mbox{\hyperlink{classG3T1__2_a971571b3baee620f4fc36b31579db6ca}{G3\+T1\+\_\+2}}, and \mbox{\hyperlink{classG3T1__1_aff514b4de85780777a8326e353148fe1}{G3\+T1\+\_\+1}}.
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classSensor_a209530c83c3299a6587e1c87277dcd1e_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classSensor_aa2c5c0b7c6f69e6e25cf56bab5fc822b}\label{classSensor_aa2c5c0b7c6f69e6e25cf56bab5fc822b}} 
+\index{Sensor@{Sensor}!recharge@{recharge}}
+\index{recharge@{recharge}!Sensor@{Sensor}}
+\doxysubsubsection{\texorpdfstring{recharge()}{recharge()}}
+{\footnotesize\ttfamily void Sensor\+::recharge (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=320pt]{classSensor_aa2c5c0b7c6f69e6e25cf56bab5fc822b_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classSensor_aa2c5c0b7c6f69e6e25cf56bab5fc822b_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classSensor_a476760a7dd4be51136bf165e183526cf}\label{classSensor_a476760a7dd4be51136bf165e183526cf}} 
+\index{Sensor@{Sensor}!reconfigure@{reconfigure}}
+\index{reconfigure@{reconfigure}!Sensor@{Sensor}}
+\doxysubsubsection{\texorpdfstring{reconfigure()}{reconfigure()}}
+{\footnotesize\ttfamily void Sensor\+::reconfigure (\begin{DoxyParamCaption}\item[{const archlib\+::\+Adaptation\+Command\+::\+Const\+Ptr \&}]{msg }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classarch_1_1target__system_1_1Component_ac3b38b32e446d2ae63ea8cd0796810ac}{arch\+::target\+\_\+system\+::\+Component}}.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classSensor_a476760a7dd4be51136bf165e183526cf_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classSensor_a476760a7dd4be51136bf165e183526cf_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classSensor_a1a664cdb090cb4295bbdedcffb1c8499}\label{classSensor_a1a664cdb090cb4295bbdedcffb1c8499}} 
+\index{Sensor@{Sensor}!run@{run}}
+\index{run@{run}!Sensor@{Sensor}}
+\doxysubsubsection{\texorpdfstring{run()}{run()}}
+{\footnotesize\ttfamily int32\+\_\+t Sensor\+::run (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classarch_1_1target__system_1_1Component_ac590323763a5ea9e7edf1a5e67f8a94f}{arch\+::target\+\_\+system\+::\+Component}}.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classSensor_a1a664cdb090cb4295bbdedcffb1c8499_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=221pt]{classSensor_a1a664cdb090cb4295bbdedcffb1c8499_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classSensor_a46b45c4ec9d0675d2424ff2bb5df26ab}\label{classSensor_a46b45c4ec9d0675d2424ff2bb5df26ab}} 
+\index{Sensor@{Sensor}!setUp@{setUp}}
+\index{setUp@{setUp}!Sensor@{Sensor}}
+\doxysubsubsection{\texorpdfstring{setUp()}{setUp()}}
+{\footnotesize\ttfamily virtual void Sensor\+::set\+Up (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classarch_1_1target__system_1_1Component_a6a7bf2a65bcc78fc61167205509091a5}{arch\+::target\+\_\+system\+::\+Component}}.
+
+
+
+Implemented in \mbox{\hyperlink{classG3T1__5_a3978c48f730a640b8af43d100144ed71}{G3\+T1\+\_\+5}}, \mbox{\hyperlink{classG3T1__4_a0c30d795add04bf4e459650f28ab8de5}{G3\+T1\+\_\+4}}, \mbox{\hyperlink{classG3T1__3_a9dc06dbfd79fe9186c2583d3427bd349}{G3\+T1\+\_\+3}}, \mbox{\hyperlink{classG3T1__2_adf0bd406c544363148fdedc04638c327}{G3\+T1\+\_\+2}}, and \mbox{\hyperlink{classG3T1__1_afc0406d8cf445068c7f9ffea7293e99c}{G3\+T1\+\_\+1}}.
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=337pt]{classSensor_a46b45c4ec9d0675d2424ff2bb5df26ab_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classSensor_ad816b983559e220a9c360f57433f28de}\label{classSensor_ad816b983559e220a9c360f57433f28de}} 
+\index{Sensor@{Sensor}!tearDown@{tearDown}}
+\index{tearDown@{tearDown}!Sensor@{Sensor}}
+\doxysubsubsection{\texorpdfstring{tearDown()}{tearDown()}}
+{\footnotesize\ttfamily virtual void Sensor\+::tear\+Down (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classarch_1_1target__system_1_1Component_af8115ceb5653f47f04537fb0eb7dfff2}{arch\+::target\+\_\+system\+::\+Component}}.
+
+
+
+Implemented in \mbox{\hyperlink{classG3T1__5_a022690dfe3fee702e20ea3f16c050ad5}{G3\+T1\+\_\+5}}, \mbox{\hyperlink{classG3T1__4_a831e3082fad1d5982eb0392bfb6e93fb}{G3\+T1\+\_\+4}}, \mbox{\hyperlink{classG3T1__3_ac850ab0dc5d7380d79dbbcc19e0a162b}{G3\+T1\+\_\+3}}, \mbox{\hyperlink{classG3T1__2_a0c2d128e18b1cc9b0f75e8ac17c7479e}{G3\+T1\+\_\+2}}, and \mbox{\hyperlink{classG3T1__1_a26fe42a954281b0cc6a8cef9b5b88c57}{G3\+T1\+\_\+1}}.
+
+\mbox{\Hypertarget{classSensor_afa34e334fc608034f8aeb8cb3d34abc9}\label{classSensor_afa34e334fc608034f8aeb8cb3d34abc9}} 
+\index{Sensor@{Sensor}!transfer@{transfer}}
+\index{transfer@{transfer}!Sensor@{Sensor}}
+\doxysubsubsection{\texorpdfstring{transfer()}{transfer()}}
+{\footnotesize\ttfamily virtual void Sensor\+::transfer (\begin{DoxyParamCaption}\item[{const double \&}]{data }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classG3T1__5_ae9918da7342a4fb88c6f633db43b9fe8}{G3\+T1\+\_\+5}}, \mbox{\hyperlink{classG3T1__4_a20ad5272beba24e4879fb29985b85f69}{G3\+T1\+\_\+4}}, \mbox{\hyperlink{classG3T1__3_a4bd1c419743c7c128fd1c3cf4fa5e434}{G3\+T1\+\_\+3}}, \mbox{\hyperlink{classG3T1__2_ac437972ecabb9e234c8717101d51eac8}{G3\+T1\+\_\+2}}, and \mbox{\hyperlink{classG3T1__1_a58277c46b8319bd35e3ffabd52805874}{G3\+T1\+\_\+1}}.
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classSensor_afa34e334fc608034f8aeb8cb3d34abc9_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classSensor_a7e0dadfc3dcde4c6c7b20d0c0ae09082}\label{classSensor_a7e0dadfc3dcde4c6c7b20d0c0ae09082}} 
+\index{Sensor@{Sensor}!turnOff@{turnOff}}
+\index{turnOff@{turnOff}!Sensor@{Sensor}}
+\doxysubsubsection{\texorpdfstring{turnOff()}{turnOff()}}
+{\footnotesize\ttfamily void Sensor\+::turn\+Off (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classSensor_a7e0dadfc3dcde4c6c7b20d0c0ae09082_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classSensor_ab687b1dd4e4ecb1d806bf947cedc9b76}\label{classSensor_ab687b1dd4e4ecb1d806bf947cedc9b76}} 
+\index{Sensor@{Sensor}!turnOn@{turnOn}}
+\index{turnOn@{turnOn}!Sensor@{Sensor}}
+\doxysubsubsection{\texorpdfstring{turnOn()}{turnOn()}}
+{\footnotesize\ttfamily void Sensor\+::turn\+On (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classSensor_ab687b1dd4e4ecb1d806bf947cedc9b76_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\mbox{\Hypertarget{classSensor_a24fd0c86c714edf603aac94428e96a01}\label{classSensor_a24fd0c86c714edf603aac94428e96a01}} 
+\index{Sensor@{Sensor}!active@{active}}
+\index{active@{active}!Sensor@{Sensor}}
+\doxysubsubsection{\texorpdfstring{active}{active}}
+{\footnotesize\ttfamily bool Sensor\+::active\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{classSensor_a8a7cfe86933e5942fdeaa847a604c8be}\label{classSensor_a8a7cfe86933e5942fdeaa847a604c8be}} 
+\index{Sensor@{Sensor}!battery@{battery}}
+\index{battery@{battery}!Sensor@{Sensor}}
+\doxysubsubsection{\texorpdfstring{battery}{battery}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classbsn_1_1resource_1_1Battery}{bsn\+::resource\+::\+Battery}} Sensor\+::battery\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{classSensor_a70688e69c2a29191801550d1230b0807}\label{classSensor_a70688e69c2a29191801550d1230b0807}} 
+\index{Sensor@{Sensor}!buffer\_size@{buffer\_size}}
+\index{buffer\_size@{buffer\_size}!Sensor@{Sensor}}
+\doxysubsubsection{\texorpdfstring{buffer\_size}{buffer\_size}}
+{\footnotesize\ttfamily int Sensor\+::buffer\+\_\+size\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{classSensor_a3ec114499fe9c744e21e18dc3e8b2987}\label{classSensor_a3ec114499fe9c744e21e18dc3e8b2987}} 
+\index{Sensor@{Sensor}!data@{data}}
+\index{data@{data}!Sensor@{Sensor}}
+\doxysubsubsection{\texorpdfstring{data}{data}}
+{\footnotesize\ttfamily double Sensor\+::data\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{classSensor_afa3d793843256b107d3dff7abb283a6b}\label{classSensor_afa3d793843256b107d3dff7abb283a6b}} 
+\index{Sensor@{Sensor}!noise\_factor@{noise\_factor}}
+\index{noise\_factor@{noise\_factor}!Sensor@{Sensor}}
+\doxysubsubsection{\texorpdfstring{noise\_factor}{noise\_factor}}
+{\footnotesize\ttfamily double Sensor\+::noise\+\_\+factor\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{classSensor_a082ef8f59c9bc47232309780f8b07c70}\label{classSensor_a082ef8f59c9bc47232309780f8b07c70}} 
+\index{Sensor@{Sensor}!replicate\_collect@{replicate\_collect}}
+\index{replicate\_collect@{replicate\_collect}!Sensor@{Sensor}}
+\doxysubsubsection{\texorpdfstring{replicate\_collect}{replicate\_collect}}
+{\footnotesize\ttfamily int Sensor\+::replicate\+\_\+collect\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{classSensor_a6fe1dbe1e72b79e52eb42afe07c976b7}\label{classSensor_a6fe1dbe1e72b79e52eb42afe07c976b7}} 
+\index{Sensor@{Sensor}!type@{type}}
+\index{type@{type}!Sensor@{Sensor}}
+\doxysubsubsection{\texorpdfstring{type}{type}}
+{\footnotesize\ttfamily std\+::string Sensor\+::type\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/target\+\_\+system/components/component/include/component/\mbox{\hyperlink{Sensor_8hpp}{Sensor.\+hpp}}\item 
+src/target\+\_\+system/components/component/src/\mbox{\hyperlink{Sensor_8cpp}{Sensor.\+cpp}}\end{DoxyCompactItemize}

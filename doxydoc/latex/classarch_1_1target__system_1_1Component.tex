@@ -1,0 +1,305 @@
+\hypertarget{classarch_1_1target__system_1_1Component}{}\doxysection{arch\+::target\+\_\+system\+::Component Class Reference}
+\label{classarch_1_1target__system_1_1Component}\index{arch::target\_system::Component@{arch::target\_system::Component}}
+
+
+{\ttfamily \#include $<$Component.\+hpp$>$}
+
+
+
+Inheritance diagram for arch\+::target\+\_\+system\+::Component\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classarch_1_1target__system_1_1Component__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for arch\+::target\+\_\+system\+::Component\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{classarch_1_1target__system_1_1Component__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classarch_1_1target__system_1_1Component_a27f9ae94922bb114edb7b23f9b4f6a2b}{Component}} (int \&argc, char $\ast$$\ast$argv, const std\+::string \&name)
+\item 
+virtual \mbox{\hyperlink{classarch_1_1target__system_1_1Component_a03fb9686f10067a21816e80f0024d7c5}{$\sim$\+Component}} ()
+\item 
+virtual void \mbox{\hyperlink{classarch_1_1target__system_1_1Component_a6a7bf2a65bcc78fc61167205509091a5}{set\+Up}} ()
+\item 
+virtual void \mbox{\hyperlink{classarch_1_1target__system_1_1Component_af8115ceb5653f47f04537fb0eb7dfff2}{tear\+Down}} ()
+\item 
+virtual int32\+\_\+t \mbox{\hyperlink{classarch_1_1target__system_1_1Component_ac590323763a5ea9e7edf1a5e67f8a94f}{run}} ()
+\item 
+virtual void \mbox{\hyperlink{classarch_1_1target__system_1_1Component_ac473539ffdccdef20318a6c4bfea0b22}{body}} ()=0
+\item 
+void \mbox{\hyperlink{classarch_1_1target__system_1_1Component_a9d793970d5fbdef5c31e5ab901b98030}{send\+Event}} (const std\+::string \&content)
+\item 
+void \mbox{\hyperlink{classarch_1_1target__system_1_1Component_adc6ecb4090656eeac2289ec147a20f81}{send\+Status}} (const std\+::string \&content)
+\item 
+virtual void \mbox{\hyperlink{classarch_1_1target__system_1_1Component_ac3b38b32e446d2ae63ea8cd0796810ac}{reconfigure}} (const archlib\+::\+Adaptation\+Command\+::\+Const\+Ptr \&msg)
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classarch_1_1target__system_1_1Component_a766a2494155aaa42b3c8162cefb11b77}{activate}} ()
+\item 
+void \mbox{\hyperlink{classarch_1_1target__system_1_1Component_a7e504b0c12531376d3cca170a23b18e3}{deactivate}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{classarch_1_1target__system_1_1Component_a859fdc651315139921d2b2c5fa75be76}{sig\+Int\+Handler}} (int signal)
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+ros\+::\+Node\+Handle \mbox{\hyperlink{classarch_1_1target__system_1_1Component_a36f854f0a56f6c9bf5e8b0df3a0c61a9}{handle}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classarch_1_1target__system_1_1Component_a27f9ae94922bb114edb7b23f9b4f6a2b}\label{classarch_1_1target__system_1_1Component_a27f9ae94922bb114edb7b23f9b4f6a2b}} 
+\index{arch::target\_system::Component@{arch::target\_system::Component}!Component@{Component}}
+\index{Component@{Component}!arch::target\_system::Component@{arch::target\_system::Component}}
+\doxysubsubsection{\texorpdfstring{Component()}{Component()}}
+{\footnotesize\ttfamily arch\+::target\+\_\+system\+::\+Component\+::\+Component (\begin{DoxyParamCaption}\item[{int \&}]{argc,  }\item[{char $\ast$$\ast$}]{argv,  }\item[{const std\+::string \&}]{name }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classarch_1_1target__system_1_1Component_a03fb9686f10067a21816e80f0024d7c5}\label{classarch_1_1target__system_1_1Component_a03fb9686f10067a21816e80f0024d7c5}} 
+\index{arch::target\_system::Component@{arch::target\_system::Component}!````~Component@{$\sim$Component}}
+\index{````~Component@{$\sim$Component}!arch::target\_system::Component@{arch::target\_system::Component}}
+\doxysubsubsection{\texorpdfstring{$\sim$Component()}{~Component()}}
+{\footnotesize\ttfamily arch\+::target\+\_\+system\+::\+Component\+::$\sim$\+Component (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classarch_1_1target__system_1_1Component_a766a2494155aaa42b3c8162cefb11b77}\label{classarch_1_1target__system_1_1Component_a766a2494155aaa42b3c8162cefb11b77}} 
+\index{arch::target\_system::Component@{arch::target\_system::Component}!activate@{activate}}
+\index{activate@{activate}!arch::target\_system::Component@{arch::target\_system::Component}}
+\doxysubsubsection{\texorpdfstring{activate()}{activate()}}
+{\footnotesize\ttfamily void arch\+::target\+\_\+system\+::\+Component\+::activate (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classarch_1_1target__system_1_1Component_a766a2494155aaa42b3c8162cefb11b77_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classarch_1_1target__system_1_1Component_a766a2494155aaa42b3c8162cefb11b77_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classarch_1_1target__system_1_1Component_ac473539ffdccdef20318a6c4bfea0b22}\label{classarch_1_1target__system_1_1Component_ac473539ffdccdef20318a6c4bfea0b22}} 
+\index{arch::target\_system::Component@{arch::target\_system::Component}!body@{body}}
+\index{body@{body}!arch::target\_system::Component@{arch::target\_system::Component}}
+\doxysubsubsection{\texorpdfstring{body()}{body()}}
+{\footnotesize\ttfamily virtual void arch\+::target\+\_\+system\+::\+Component\+::body (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classarch_1_1ROSComponent_ad59a3de60bed73bf6d37f0da4775a2d9}{arch\+::\+ROSComponent}}.
+
+
+
+Implemented in \mbox{\hyperlink{classSensor_a043dabb8b92f70fc247d585b8d66e133}{Sensor}}, and \mbox{\hyperlink{classCentralHub_a48b13d52b79864e84eae5012108d3211}{Central\+Hub}}.
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=333pt]{classarch_1_1target__system_1_1Component_ac473539ffdccdef20318a6c4bfea0b22_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classarch_1_1target__system_1_1Component_a7e504b0c12531376d3cca170a23b18e3}\label{classarch_1_1target__system_1_1Component_a7e504b0c12531376d3cca170a23b18e3}} 
+\index{arch::target\_system::Component@{arch::target\_system::Component}!deactivate@{deactivate}}
+\index{deactivate@{deactivate}!arch::target\_system::Component@{arch::target\_system::Component}}
+\doxysubsubsection{\texorpdfstring{deactivate()}{deactivate()}}
+{\footnotesize\ttfamily void arch\+::target\+\_\+system\+::\+Component\+::deactivate (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classarch_1_1target__system_1_1Component_a7e504b0c12531376d3cca170a23b18e3_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classarch_1_1target__system_1_1Component_ac3b38b32e446d2ae63ea8cd0796810ac}\label{classarch_1_1target__system_1_1Component_ac3b38b32e446d2ae63ea8cd0796810ac}} 
+\index{arch::target\_system::Component@{arch::target\_system::Component}!reconfigure@{reconfigure}}
+\index{reconfigure@{reconfigure}!arch::target\_system::Component@{arch::target\_system::Component}}
+\doxysubsubsection{\texorpdfstring{reconfigure()}{reconfigure()}}
+{\footnotesize\ttfamily void arch\+::target\+\_\+system\+::\+Component\+::reconfigure (\begin{DoxyParamCaption}\item[{const archlib\+::\+Adaptation\+Command\+::\+Const\+Ptr \&}]{msg }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classSensor_a476760a7dd4be51136bf165e183526cf}{Sensor}}, and \mbox{\hyperlink{classCentralHub_a72336916ee15e722ee0b9f2c7c3747b6}{Central\+Hub}}.
+
+\mbox{\Hypertarget{classarch_1_1target__system_1_1Component_ac590323763a5ea9e7edf1a5e67f8a94f}\label{classarch_1_1target__system_1_1Component_ac590323763a5ea9e7edf1a5e67f8a94f}} 
+\index{arch::target\_system::Component@{arch::target\_system::Component}!run@{run}}
+\index{run@{run}!arch::target\_system::Component@{arch::target\_system::Component}}
+\doxysubsubsection{\texorpdfstring{run()}{run()}}
+{\footnotesize\ttfamily int32\+\_\+t arch\+::target\+\_\+system\+::\+Component\+::run (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classarch_1_1ROSComponent_acb85f671d782a1c628fcbf9b36abf21d}{arch\+::\+ROSComponent}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{classSensor_a1a664cdb090cb4295bbdedcffb1c8499}{Sensor}}, and \mbox{\hyperlink{classCentralHub_a388e947318a28cf7cac762ac8b1cf3d4}{Central\+Hub}}.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classarch_1_1target__system_1_1Component_ac590323763a5ea9e7edf1a5e67f8a94f_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classarch_1_1target__system_1_1Component_a9d793970d5fbdef5c31e5ab901b98030}\label{classarch_1_1target__system_1_1Component_a9d793970d5fbdef5c31e5ab901b98030}} 
+\index{arch::target\_system::Component@{arch::target\_system::Component}!sendEvent@{sendEvent}}
+\index{sendEvent@{sendEvent}!arch::target\_system::Component@{arch::target\_system::Component}}
+\doxysubsubsection{\texorpdfstring{sendEvent()}{sendEvent()}}
+{\footnotesize\ttfamily void arch\+::target\+\_\+system\+::\+Component\+::send\+Event (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{content }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classarch_1_1target__system_1_1Component_a9d793970d5fbdef5c31e5ab901b98030_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classarch_1_1target__system_1_1Component_a9d793970d5fbdef5c31e5ab901b98030_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classarch_1_1target__system_1_1Component_adc6ecb4090656eeac2289ec147a20f81}\label{classarch_1_1target__system_1_1Component_adc6ecb4090656eeac2289ec147a20f81}} 
+\index{arch::target\_system::Component@{arch::target\_system::Component}!sendStatus@{sendStatus}}
+\index{sendStatus@{sendStatus}!arch::target\_system::Component@{arch::target\_system::Component}}
+\doxysubsubsection{\texorpdfstring{sendStatus()}{sendStatus()}}
+{\footnotesize\ttfamily void arch\+::target\+\_\+system\+::\+Component\+::send\+Status (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{content }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classarch_1_1target__system_1_1Component_adc6ecb4090656eeac2289ec147a20f81_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classarch_1_1target__system_1_1Component_adc6ecb4090656eeac2289ec147a20f81_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classarch_1_1target__system_1_1Component_a6a7bf2a65bcc78fc61167205509091a5}\label{classarch_1_1target__system_1_1Component_a6a7bf2a65bcc78fc61167205509091a5}} 
+\index{arch::target\_system::Component@{arch::target\_system::Component}!setUp@{setUp}}
+\index{setUp@{setUp}!arch::target\_system::Component@{arch::target\_system::Component}}
+\doxysubsubsection{\texorpdfstring{setUp()}{setUp()}}
+{\footnotesize\ttfamily void arch\+::target\+\_\+system\+::\+Component\+::set\+Up (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classarch_1_1ROSComponent_ab134ea71604829a9e520a03bcae4bb8d}{arch\+::\+ROSComponent}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{classSensor_a46b45c4ec9d0675d2424ff2bb5df26ab}{Sensor}}, \mbox{\hyperlink{classCentralHub_a91be8b44d7c4075c20434723c75fc6f9}{Central\+Hub}}, \mbox{\hyperlink{classG4T1_ad02634c3bf56a245b99bb30f520628c5}{G4\+T1}}, \mbox{\hyperlink{classG3T1__5_a3978c48f730a640b8af43d100144ed71}{G3\+T1\+\_\+5}}, \mbox{\hyperlink{classG3T1__4_a0c30d795add04bf4e459650f28ab8de5}{G3\+T1\+\_\+4}}, \mbox{\hyperlink{classG3T1__3_a9dc06dbfd79fe9186c2583d3427bd349}{G3\+T1\+\_\+3}}, \mbox{\hyperlink{classG3T1__2_adf0bd406c544363148fdedc04638c327}{G3\+T1\+\_\+2}}, and \mbox{\hyperlink{classG3T1__1_afc0406d8cf445068c7f9ffea7293e99c}{G3\+T1\+\_\+1}}.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classarch_1_1target__system_1_1Component_a6a7bf2a65bcc78fc61167205509091a5_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=325pt]{classarch_1_1target__system_1_1Component_a6a7bf2a65bcc78fc61167205509091a5_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classarch_1_1target__system_1_1Component_a859fdc651315139921d2b2c5fa75be76}\label{classarch_1_1target__system_1_1Component_a859fdc651315139921d2b2c5fa75be76}} 
+\index{arch::target\_system::Component@{arch::target\_system::Component}!sigIntHandler@{sigIntHandler}}
+\index{sigIntHandler@{sigIntHandler}!arch::target\_system::Component@{arch::target\_system::Component}}
+\doxysubsubsection{\texorpdfstring{sigIntHandler()}{sigIntHandler()}}
+{\footnotesize\ttfamily void arch\+::target\+\_\+system\+::\+Component\+::sig\+Int\+Handler (\begin{DoxyParamCaption}\item[{int}]{signal }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [protected]}}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classarch_1_1target__system_1_1Component_a859fdc651315139921d2b2c5fa75be76_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classarch_1_1target__system_1_1Component_a859fdc651315139921d2b2c5fa75be76_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classarch_1_1target__system_1_1Component_af8115ceb5653f47f04537fb0eb7dfff2}\label{classarch_1_1target__system_1_1Component_af8115ceb5653f47f04537fb0eb7dfff2}} 
+\index{arch::target\_system::Component@{arch::target\_system::Component}!tearDown@{tearDown}}
+\index{tearDown@{tearDown}!arch::target\_system::Component@{arch::target\_system::Component}}
+\doxysubsubsection{\texorpdfstring{tearDown()}{tearDown()}}
+{\footnotesize\ttfamily void arch\+::target\+\_\+system\+::\+Component\+::tear\+Down (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classarch_1_1ROSComponent_a0069d6f5e45a9daf0bdbefd773973bba}{arch\+::\+ROSComponent}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{classSensor_ad816b983559e220a9c360f57433f28de}{Sensor}}, \mbox{\hyperlink{classCentralHub_a33ab84e2d47f41966b7a2c6c8763c755}{Central\+Hub}}, \mbox{\hyperlink{classG4T1_a3027f9c8027d8fe09ae6ca7df2f6ab04}{G4\+T1}}, \mbox{\hyperlink{classG3T1__5_a022690dfe3fee702e20ea3f16c050ad5}{G3\+T1\+\_\+5}}, \mbox{\hyperlink{classG3T1__4_a831e3082fad1d5982eb0392bfb6e93fb}{G3\+T1\+\_\+4}}, \mbox{\hyperlink{classG3T1__3_ac850ab0dc5d7380d79dbbcc19e0a162b}{G3\+T1\+\_\+3}}, \mbox{\hyperlink{classG3T1__2_a0c2d128e18b1cc9b0f75e8ac17c7479e}{G3\+T1\+\_\+2}}, and \mbox{\hyperlink{classG3T1__1_a26fe42a954281b0cc6a8cef9b5b88c57}{G3\+T1\+\_\+1}}.
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=341pt]{classarch_1_1target__system_1_1Component_af8115ceb5653f47f04537fb0eb7dfff2_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\mbox{\Hypertarget{classarch_1_1target__system_1_1Component_a36f854f0a56f6c9bf5e8b0df3a0c61a9}\label{classarch_1_1target__system_1_1Component_a36f854f0a56f6c9bf5e8b0df3a0c61a9}} 
+\index{arch::target\_system::Component@{arch::target\_system::Component}!handle@{handle}}
+\index{handle@{handle}!arch::target\_system::Component@{arch::target\_system::Component}}
+\doxysubsubsection{\texorpdfstring{handle}{handle}}
+{\footnotesize\ttfamily ros\+::\+Node\+Handle arch\+::target\+\_\+system\+::\+Component\+::handle\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+archlib/include/archlib/target\+\_\+system/\mbox{\hyperlink{Component_8hpp}{Component.\+hpp}}\item 
+archlib/src/target\+\_\+system/\mbox{\hyperlink{Component_8cpp}{Component.\+cpp}}\end{DoxyCompactItemize}

@@ -37,7 +37,7 @@ class Enactor : public arch::ROSComponent {
 		virtual void body();
 
 	  	void receiveStatus();
-	  	void receiveEvent(const archlib::Event::ConstPtr& msg);
+		void receiveEvent(const archlib::Event::ConstPtr& msg);
 	  	void receiveStrategy(const archlib::Strategy::ConstPtr& msg);
 		bool sendInfo(services::EnactorInfo::Request &req, services::EnactorInfo::Response &res);
 

@@ -1,0 +1,117 @@
+\hypertarget{classbsn_1_1generator_1_1Markov}{}\doxysection{bsn\+::generator\+::Markov Class Reference}
+\label{classbsn_1_1generator_1_1Markov}\index{bsn::generator::Markov@{bsn::generator::Markov}}
+
+
+{\ttfamily \#include $<$Markov.\+hpp$>$}
+
+
+
+Collaboration diagram for bsn\+::generator\+::Markov\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classbsn_1_1generator_1_1Markov__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classbsn_1_1generator_1_1Markov_a68ff58dfd7816f1b79416ec73cbc8d88}{Markov}} ()
+\item 
+\mbox{\hyperlink{classbsn_1_1generator_1_1Markov_a5e00c2941e8ea3608271741fb7202e4b}{Markov}} (std\+::array$<$ float, 25 $>$ \mbox{\hyperlink{classbsn_1_1generator_1_1Markov_af8263b601e5b44801f14eaad70b6531b}{transitions}}, std\+::array$<$ \mbox{\hyperlink{classbsn_1_1range_1_1Range}{bsn\+::range\+::\+Range}}, 5 $>$ \mbox{\hyperlink{classbsn_1_1generator_1_1Markov_a45720929268394c759380312fecec714}{states}}, int32\+\_\+t initial\+State)
+\item 
+\mbox{\hyperlink{classbsn_1_1generator_1_1Markov_ac162f1822a1639fe8389d11258e876bf}{Markov}} (const \mbox{\hyperlink{classbsn_1_1generator_1_1Markov}{Markov}} \&)
+\item 
+\mbox{\hyperlink{classbsn_1_1generator_1_1Markov}{Markov}} \& \mbox{\hyperlink{classbsn_1_1generator_1_1Markov_a21b905eeacbe7c6e16c0504647aeafd1}{operator=}} (const \mbox{\hyperlink{classbsn_1_1generator_1_1Markov}{Markov}} \&)
+\item 
+void \mbox{\hyperlink{classbsn_1_1generator_1_1Markov_ad8c0269028bbeb7f854a1692c3fe5b6b}{next\+\_\+state}} ()
+\item 
+double \mbox{\hyperlink{classbsn_1_1generator_1_1Markov_ad94342911e611efca754ea5a4c3b9dca}{calculate\+\_\+state}} ()
+\item 
+const std\+::string \mbox{\hyperlink{classbsn_1_1generator_1_1Markov_a59725deb9f6496b5c8dce15bb7b1005a}{to\+String}} () const
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::array$<$ float, 25 $>$ \mbox{\hyperlink{classbsn_1_1generator_1_1Markov_af8263b601e5b44801f14eaad70b6531b}{transitions}}
+\item 
+int32\+\_\+t \mbox{\hyperlink{classbsn_1_1generator_1_1Markov_a61f3ef7050d429fb8b88f259f2b03cf2}{current\+State}}
+\item 
+std\+::array$<$ \mbox{\hyperlink{classbsn_1_1range_1_1Range}{bsn\+::range\+::\+Range}}, 5 $>$ \mbox{\hyperlink{classbsn_1_1generator_1_1Markov_a45720929268394c759380312fecec714}{states}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classbsn_1_1generator_1_1Markov_a68ff58dfd7816f1b79416ec73cbc8d88}\label{classbsn_1_1generator_1_1Markov_a68ff58dfd7816f1b79416ec73cbc8d88}} 
+\index{bsn::generator::Markov@{bsn::generator::Markov}!Markov@{Markov}}
+\index{Markov@{Markov}!bsn::generator::Markov@{bsn::generator::Markov}}
+\doxysubsubsection{\texorpdfstring{Markov()}{Markov()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily bsn\+::generator\+::\+Markov\+::\+Markov (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classbsn_1_1generator_1_1Markov_a5e00c2941e8ea3608271741fb7202e4b}\label{classbsn_1_1generator_1_1Markov_a5e00c2941e8ea3608271741fb7202e4b}} 
+\index{bsn::generator::Markov@{bsn::generator::Markov}!Markov@{Markov}}
+\index{Markov@{Markov}!bsn::generator::Markov@{bsn::generator::Markov}}
+\doxysubsubsection{\texorpdfstring{Markov()}{Markov()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily bsn\+::generator\+::\+Markov\+::\+Markov (\begin{DoxyParamCaption}\item[{std\+::array$<$ float, 25 $>$}]{transitions,  }\item[{std\+::array$<$ \mbox{\hyperlink{classbsn_1_1range_1_1Range}{bsn\+::range\+::\+Range}}, 5 $>$}]{states,  }\item[{int32\+\_\+t}]{initial\+State }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classbsn_1_1generator_1_1Markov_ac162f1822a1639fe8389d11258e876bf}\label{classbsn_1_1generator_1_1Markov_ac162f1822a1639fe8389d11258e876bf}} 
+\index{bsn::generator::Markov@{bsn::generator::Markov}!Markov@{Markov}}
+\index{Markov@{Markov}!bsn::generator::Markov@{bsn::generator::Markov}}
+\doxysubsubsection{\texorpdfstring{Markov()}{Markov()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily bsn\+::generator\+::\+Markov\+::\+Markov (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classbsn_1_1generator_1_1Markov}{Markov}} \&}]{obj }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classbsn_1_1generator_1_1Markov_ad94342911e611efca754ea5a4c3b9dca}\label{classbsn_1_1generator_1_1Markov_ad94342911e611efca754ea5a4c3b9dca}} 
+\index{bsn::generator::Markov@{bsn::generator::Markov}!calculate\_state@{calculate\_state}}
+\index{calculate\_state@{calculate\_state}!bsn::generator::Markov@{bsn::generator::Markov}}
+\doxysubsubsection{\texorpdfstring{calculate\_state()}{calculate\_state()}}
+{\footnotesize\ttfamily double bsn\+::generator\+::\+Markov\+::calculate\+\_\+state (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classbsn_1_1generator_1_1Markov_ad8c0269028bbeb7f854a1692c3fe5b6b}\label{classbsn_1_1generator_1_1Markov_ad8c0269028bbeb7f854a1692c3fe5b6b}} 
+\index{bsn::generator::Markov@{bsn::generator::Markov}!next\_state@{next\_state}}
+\index{next\_state@{next\_state}!bsn::generator::Markov@{bsn::generator::Markov}}
+\doxysubsubsection{\texorpdfstring{next\_state()}{next\_state()}}
+{\footnotesize\ttfamily void bsn\+::generator\+::\+Markov\+::next\+\_\+state (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classbsn_1_1generator_1_1Markov_a21b905eeacbe7c6e16c0504647aeafd1}\label{classbsn_1_1generator_1_1Markov_a21b905eeacbe7c6e16c0504647aeafd1}} 
+\index{bsn::generator::Markov@{bsn::generator::Markov}!operator=@{operator=}}
+\index{operator=@{operator=}!bsn::generator::Markov@{bsn::generator::Markov}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classbsn_1_1generator_1_1Markov}{Markov}} \& bsn\+::generator\+::\+Markov\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classbsn_1_1generator_1_1Markov}{Markov}} \&}]{obj }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classbsn_1_1generator_1_1Markov_a59725deb9f6496b5c8dce15bb7b1005a}\label{classbsn_1_1generator_1_1Markov_a59725deb9f6496b5c8dce15bb7b1005a}} 
+\index{bsn::generator::Markov@{bsn::generator::Markov}!toString@{toString}}
+\index{toString@{toString}!bsn::generator::Markov@{bsn::generator::Markov}}
+\doxysubsubsection{\texorpdfstring{toString()}{toString()}}
+{\footnotesize\ttfamily const string bsn\+::generator\+::\+Markov\+::to\+String (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+
+
+\doxysubsection{Member Data Documentation}
+\mbox{\Hypertarget{classbsn_1_1generator_1_1Markov_a61f3ef7050d429fb8b88f259f2b03cf2}\label{classbsn_1_1generator_1_1Markov_a61f3ef7050d429fb8b88f259f2b03cf2}} 
+\index{bsn::generator::Markov@{bsn::generator::Markov}!currentState@{currentState}}
+\index{currentState@{currentState}!bsn::generator::Markov@{bsn::generator::Markov}}
+\doxysubsubsection{\texorpdfstring{currentState}{currentState}}
+{\footnotesize\ttfamily int32\+\_\+t bsn\+::generator\+::\+Markov\+::current\+State}
+
+\mbox{\Hypertarget{classbsn_1_1generator_1_1Markov_a45720929268394c759380312fecec714}\label{classbsn_1_1generator_1_1Markov_a45720929268394c759380312fecec714}} 
+\index{bsn::generator::Markov@{bsn::generator::Markov}!states@{states}}
+\index{states@{states}!bsn::generator::Markov@{bsn::generator::Markov}}
+\doxysubsubsection{\texorpdfstring{states}{states}}
+{\footnotesize\ttfamily std\+::array$<$\mbox{\hyperlink{classbsn_1_1range_1_1Range}{bsn\+::range\+::\+Range}}, 5$>$ bsn\+::generator\+::\+Markov\+::states}
+
+\mbox{\Hypertarget{classbsn_1_1generator_1_1Markov_af8263b601e5b44801f14eaad70b6531b}\label{classbsn_1_1generator_1_1Markov_af8263b601e5b44801f14eaad70b6531b}} 
+\index{bsn::generator::Markov@{bsn::generator::Markov}!transitions@{transitions}}
+\index{transitions@{transitions}!bsn::generator::Markov@{bsn::generator::Markov}}
+\doxysubsubsection{\texorpdfstring{transitions}{transitions}}
+{\footnotesize\ttfamily std\+::array$<$float,25$>$ bsn\+::generator\+::\+Markov\+::transitions}
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libbsn/include/generator/\mbox{\hyperlink{Markov_8hpp}{Markov.\+hpp}}\item 
+libbsn/src/generator/\mbox{\hyperlink{Markov_8cpp}{Markov.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,196 @@
+\hypertarget{classLogger}{}\doxysection{Logger Class Reference}
+\label{classLogger}\index{Logger@{Logger}}
+
+
+{\ttfamily \#include $<$Logger.\+hpp$>$}
+
+
+
+Inheritance diagram for Logger\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=235pt]{classLogger__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Logger\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{classLogger__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classLogger_a2a972e87899a345fbd2c237d3933fd26}{Logger}} (int \&argc, char $\ast$$\ast$argv, const std\+::string \&name)
+\item 
+virtual \mbox{\hyperlink{classLogger_acb668a9e186a25fbaad2e4af6d1ed00a}{$\sim$\+Logger}} ()
+\item 
+virtual void \mbox{\hyperlink{classLogger_aab1efed2f9f6ac7929b2d8774ee9b70c}{set\+Up}} ()
+\item 
+virtual void \mbox{\hyperlink{classLogger_aba38120a928c4fa5bf74dc92029dade5}{tear\+Down}} ()
+\item 
+virtual void \mbox{\hyperlink{classLogger_ab3c76b5d301fa8eb1e20f779aa179883}{body}} ()
+\item 
+void \mbox{\hyperlink{classLogger_a91dc05b6320e8749822ea4b5d4bc816e}{receive\+Adaptation\+Command}} (const archlib\+::\+Adaptation\+Command\+::\+Const\+Ptr \&msg)
+\item 
+void \mbox{\hyperlink{classLogger_ae9034d8bf4e3fef539c6eca091cd8c43}{receive\+Status}} (const archlib\+::\+Status\+::\+Const\+Ptr \&msg)
+\item 
+void \mbox{\hyperlink{classLogger_ac5d3c71ae88d6e66f1a0f082a621f045}{receive\+Event}} (const archlib\+::\+Event\+::\+Const\+Ptr \&msg)
+\item 
+void \mbox{\hyperlink{classLogger_a5e58080a4857c3ceba7cac7c14e96585}{receive\+Uncertainty}} (const archlib\+::\+Uncertainty\+::\+Const\+Ptr \&msg)
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+ros\+::\+Node\+Handle \mbox{\hyperlink{classLogger_a4358781880c20ce7e450c06dbd3ceecb}{handle}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Additional Inherited Members}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classLogger_a2a972e87899a345fbd2c237d3933fd26}\label{classLogger_a2a972e87899a345fbd2c237d3933fd26}} 
+\index{Logger@{Logger}!Logger@{Logger}}
+\index{Logger@{Logger}!Logger@{Logger}}
+\doxysubsubsection{\texorpdfstring{Logger()}{Logger()}}
+{\footnotesize\ttfamily Logger\+::\+Logger (\begin{DoxyParamCaption}\item[{int \&}]{argc,  }\item[{char $\ast$$\ast$}]{argv,  }\item[{const std\+::string \&}]{name }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classLogger_acb668a9e186a25fbaad2e4af6d1ed00a}\label{classLogger_acb668a9e186a25fbaad2e4af6d1ed00a}} 
+\index{Logger@{Logger}!````~Logger@{$\sim$Logger}}
+\index{````~Logger@{$\sim$Logger}!Logger@{Logger}}
+\doxysubsubsection{\texorpdfstring{$\sim$Logger()}{~Logger()}}
+{\footnotesize\ttfamily Logger\+::$\sim$\+Logger (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classLogger_ab3c76b5d301fa8eb1e20f779aa179883}\label{classLogger_ab3c76b5d301fa8eb1e20f779aa179883}} 
+\index{Logger@{Logger}!body@{body}}
+\index{body@{body}!Logger@{Logger}}
+\doxysubsubsection{\texorpdfstring{body()}{body()}}
+{\footnotesize\ttfamily void Logger\+::body (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classarch_1_1ROSComponent_ad59a3de60bed73bf6d37f0da4775a2d9}{arch\+::\+ROSComponent}}.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=323pt]{classLogger_ab3c76b5d301fa8eb1e20f779aa179883_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=302pt]{classLogger_ab3c76b5d301fa8eb1e20f779aa179883_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classLogger_a91dc05b6320e8749822ea4b5d4bc816e}\label{classLogger_a91dc05b6320e8749822ea4b5d4bc816e}} 
+\index{Logger@{Logger}!receiveAdaptationCommand@{receiveAdaptationCommand}}
+\index{receiveAdaptationCommand@{receiveAdaptationCommand}!Logger@{Logger}}
+\doxysubsubsection{\texorpdfstring{receiveAdaptationCommand()}{receiveAdaptationCommand()}}
+{\footnotesize\ttfamily void Logger\+::receive\+Adaptation\+Command (\begin{DoxyParamCaption}\item[{const archlib\+::\+Adaptation\+Command\+::\+Const\+Ptr \&}]{msg }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classLogger_a91dc05b6320e8749822ea4b5d4bc816e_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classLogger_ac5d3c71ae88d6e66f1a0f082a621f045}\label{classLogger_ac5d3c71ae88d6e66f1a0f082a621f045}} 
+\index{Logger@{Logger}!receiveEvent@{receiveEvent}}
+\index{receiveEvent@{receiveEvent}!Logger@{Logger}}
+\doxysubsubsection{\texorpdfstring{receiveEvent()}{receiveEvent()}}
+{\footnotesize\ttfamily void Logger\+::receive\+Event (\begin{DoxyParamCaption}\item[{const archlib\+::\+Event\+::\+Const\+Ptr \&}]{msg }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classLogger_ac5d3c71ae88d6e66f1a0f082a621f045_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classLogger_ae9034d8bf4e3fef539c6eca091cd8c43}\label{classLogger_ae9034d8bf4e3fef539c6eca091cd8c43}} 
+\index{Logger@{Logger}!receiveStatus@{receiveStatus}}
+\index{receiveStatus@{receiveStatus}!Logger@{Logger}}
+\doxysubsubsection{\texorpdfstring{receiveStatus()}{receiveStatus()}}
+{\footnotesize\ttfamily void Logger\+::receive\+Status (\begin{DoxyParamCaption}\item[{const archlib\+::\+Status\+::\+Const\+Ptr \&}]{msg }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classLogger_ae9034d8bf4e3fef539c6eca091cd8c43_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classLogger_a5e58080a4857c3ceba7cac7c14e96585}\label{classLogger_a5e58080a4857c3ceba7cac7c14e96585}} 
+\index{Logger@{Logger}!receiveUncertainty@{receiveUncertainty}}
+\index{receiveUncertainty@{receiveUncertainty}!Logger@{Logger}}
+\doxysubsubsection{\texorpdfstring{receiveUncertainty()}{receiveUncertainty()}}
+{\footnotesize\ttfamily void Logger\+::receive\+Uncertainty (\begin{DoxyParamCaption}\item[{const archlib\+::\+Uncertainty\+::\+Const\+Ptr \&}]{msg }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classLogger_a5e58080a4857c3ceba7cac7c14e96585_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classLogger_aab1efed2f9f6ac7929b2d8774ee9b70c}\label{classLogger_aab1efed2f9f6ac7929b2d8774ee9b70c}} 
+\index{Logger@{Logger}!setUp@{setUp}}
+\index{setUp@{setUp}!Logger@{Logger}}
+\doxysubsubsection{\texorpdfstring{setUp()}{setUp()}}
+{\footnotesize\ttfamily void Logger\+::set\+Up (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classarch_1_1ROSComponent_ab134ea71604829a9e520a03bcae4bb8d}{arch\+::\+ROSComponent}}.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classLogger_aab1efed2f9f6ac7929b2d8774ee9b70c_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classLogger_aba38120a928c4fa5bf74dc92029dade5}\label{classLogger_aba38120a928c4fa5bf74dc92029dade5}} 
+\index{Logger@{Logger}!tearDown@{tearDown}}
+\index{tearDown@{tearDown}!Logger@{Logger}}
+\doxysubsubsection{\texorpdfstring{tearDown()}{tearDown()}}
+{\footnotesize\ttfamily void Logger\+::tear\+Down (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classarch_1_1ROSComponent_a0069d6f5e45a9daf0bdbefd773973bba}{arch\+::\+ROSComponent}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\mbox{\Hypertarget{classLogger_a4358781880c20ce7e450c06dbd3ceecb}\label{classLogger_a4358781880c20ce7e450c06dbd3ceecb}} 
+\index{Logger@{Logger}!handle@{handle}}
+\index{handle@{handle}!Logger@{Logger}}
+\doxysubsubsection{\texorpdfstring{handle}{handle}}
+{\footnotesize\ttfamily ros\+::\+Node\+Handle Logger\+::handle\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/logging\+\_\+infrastructure/logger/include/\mbox{\hyperlink{Logger_8hpp}{Logger.\+hpp}}\item 
+src/logging\+\_\+infrastructure/logger/src/\mbox{\hyperlink{Logger_8cpp}{Logger.\+cpp}}\end{DoxyCompactItemize}

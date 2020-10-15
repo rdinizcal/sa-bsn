@@ -1,0 +1,188 @@
+\hypertarget{classDataAccess}{}\doxysection{Data\+Access Class Reference}
+\label{classDataAccess}\index{DataAccess@{DataAccess}}
+
+
+{\ttfamily \#include $<$Data\+Access.\+hpp$>$}
+
+
+
+Inheritance diagram for Data\+Access\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=229pt]{classDataAccess__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Data\+Access\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=316pt]{classDataAccess__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classDataAccess_a1d89301d9e42ee285f0c9d0e8f163eba}{Data\+Access}} (int \&argc, char $\ast$$\ast$argv, const std\+::string \&name)
+\item 
+virtual \mbox{\hyperlink{classDataAccess_a02d65c4dff5b263dddb2d90d695fbe0e}{$\sim$\+Data\+Access}} ()
+\item 
+virtual void \mbox{\hyperlink{classDataAccess_a79a37674517514869067d9afbf0417c1}{set\+Up}} ()
+\item 
+virtual void \mbox{\hyperlink{classDataAccess_afe4f4f677d6a31cd1c6ac967f81b4b42}{tear\+Down}} ()
+\item 
+virtual void \mbox{\hyperlink{classDataAccess_a01b996865224272d1bcafe6307442422}{body}} ()
+\item 
+void \mbox{\hyperlink{classDataAccess_a8a0b01f7a39714b33d5465ef31c3c147}{process\+Target\+System\+Data}} (const messages\+::\+Target\+System\+Data\+::\+Const\+Ptr \&msg)
+\item 
+void \mbox{\hyperlink{classDataAccess_abe7d46e840f7b047a9dfedb76e07518d}{receive\+Persist\+Message}} (const archlib\+::\+Persist\+::\+Const\+Ptr \&msg)
+\item 
+bool \mbox{\hyperlink{classDataAccess_a8bf4ba9143c8a274736aedbdacde9991}{process\+Query}} (archlib\+::\+Data\+Access\+Request\+::\+Request \&req, archlib\+::\+Data\+Access\+Request\+::\+Response \&res)
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+ros\+::\+Node\+Handle \mbox{\hyperlink{classDataAccess_af25e39b3738ee3b218aaf5ba6ca457ed}{handle}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Additional Inherited Members}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classDataAccess_a1d89301d9e42ee285f0c9d0e8f163eba}\label{classDataAccess_a1d89301d9e42ee285f0c9d0e8f163eba}} 
+\index{DataAccess@{DataAccess}!DataAccess@{DataAccess}}
+\index{DataAccess@{DataAccess}!DataAccess@{DataAccess}}
+\doxysubsubsection{\texorpdfstring{DataAccess()}{DataAccess()}}
+{\footnotesize\ttfamily Data\+Access\+::\+Data\+Access (\begin{DoxyParamCaption}\item[{int \&}]{argc,  }\item[{char $\ast$$\ast$}]{argv,  }\item[{const std\+::string \&}]{name }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classDataAccess_a02d65c4dff5b263dddb2d90d695fbe0e}\label{classDataAccess_a02d65c4dff5b263dddb2d90d695fbe0e}} 
+\index{DataAccess@{DataAccess}!````~DataAccess@{$\sim$DataAccess}}
+\index{````~DataAccess@{$\sim$DataAccess}!DataAccess@{DataAccess}}
+\doxysubsubsection{\texorpdfstring{$\sim$DataAccess()}{~DataAccess()}}
+{\footnotesize\ttfamily Data\+Access\+::$\sim$\+Data\+Access (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classDataAccess_a01b996865224272d1bcafe6307442422}\label{classDataAccess_a01b996865224272d1bcafe6307442422}} 
+\index{DataAccess@{DataAccess}!body@{body}}
+\index{body@{body}!DataAccess@{DataAccess}}
+\doxysubsubsection{\texorpdfstring{body()}{body()}}
+{\footnotesize\ttfamily void Data\+Access\+::body (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classarch_1_1ROSComponent_ad59a3de60bed73bf6d37f0da4775a2d9}{arch\+::\+ROSComponent}}.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classDataAccess_a01b996865224272d1bcafe6307442422_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=327pt]{classDataAccess_a01b996865224272d1bcafe6307442422_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classDataAccess_a8bf4ba9143c8a274736aedbdacde9991}\label{classDataAccess_a8bf4ba9143c8a274736aedbdacde9991}} 
+\index{DataAccess@{DataAccess}!processQuery@{processQuery}}
+\index{processQuery@{processQuery}!DataAccess@{DataAccess}}
+\doxysubsubsection{\texorpdfstring{processQuery()}{processQuery()}}
+{\footnotesize\ttfamily bool Data\+Access\+::process\+Query (\begin{DoxyParamCaption}\item[{archlib\+::\+Data\+Access\+Request\+::\+Request \&}]{req,  }\item[{archlib\+::\+Data\+Access\+Request\+::\+Response \&}]{res }\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=333pt]{classDataAccess_a8bf4ba9143c8a274736aedbdacde9991_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classDataAccess_a8bf4ba9143c8a274736aedbdacde9991_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classDataAccess_a8a0b01f7a39714b33d5465ef31c3c147}\label{classDataAccess_a8a0b01f7a39714b33d5465ef31c3c147}} 
+\index{DataAccess@{DataAccess}!processTargetSystemData@{processTargetSystemData}}
+\index{processTargetSystemData@{processTargetSystemData}!DataAccess@{DataAccess}}
+\doxysubsubsection{\texorpdfstring{processTargetSystemData()}{processTargetSystemData()}}
+{\footnotesize\ttfamily void Data\+Access\+::process\+Target\+System\+Data (\begin{DoxyParamCaption}\item[{const messages\+::\+Target\+System\+Data\+::\+Const\+Ptr \&}]{msg }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classDataAccess_a8a0b01f7a39714b33d5465ef31c3c147_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classDataAccess_abe7d46e840f7b047a9dfedb76e07518d}\label{classDataAccess_abe7d46e840f7b047a9dfedb76e07518d}} 
+\index{DataAccess@{DataAccess}!receivePersistMessage@{receivePersistMessage}}
+\index{receivePersistMessage@{receivePersistMessage}!DataAccess@{DataAccess}}
+\doxysubsubsection{\texorpdfstring{receivePersistMessage()}{receivePersistMessage()}}
+{\footnotesize\ttfamily void Data\+Access\+::receive\+Persist\+Message (\begin{DoxyParamCaption}\item[{const archlib\+::\+Persist\+::\+Const\+Ptr \&}]{msg }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classDataAccess_abe7d46e840f7b047a9dfedb76e07518d_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classDataAccess_a79a37674517514869067d9afbf0417c1}\label{classDataAccess_a79a37674517514869067d9afbf0417c1}} 
+\index{DataAccess@{DataAccess}!setUp@{setUp}}
+\index{setUp@{setUp}!DataAccess@{DataAccess}}
+\doxysubsubsection{\texorpdfstring{setUp()}{setUp()}}
+{\footnotesize\ttfamily void Data\+Access\+::set\+Up (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classarch_1_1ROSComponent_ab134ea71604829a9e520a03bcae4bb8d}{arch\+::\+ROSComponent}}.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classDataAccess_a79a37674517514869067d9afbf0417c1_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classDataAccess_afe4f4f677d6a31cd1c6ac967f81b4b42}\label{classDataAccess_afe4f4f677d6a31cd1c6ac967f81b4b42}} 
+\index{DataAccess@{DataAccess}!tearDown@{tearDown}}
+\index{tearDown@{tearDown}!DataAccess@{DataAccess}}
+\doxysubsubsection{\texorpdfstring{tearDown()}{tearDown()}}
+{\footnotesize\ttfamily void Data\+Access\+::tear\+Down (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classarch_1_1ROSComponent_a0069d6f5e45a9daf0bdbefd773973bba}{arch\+::\+ROSComponent}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\mbox{\Hypertarget{classDataAccess_af25e39b3738ee3b218aaf5ba6ca457ed}\label{classDataAccess_af25e39b3738ee3b218aaf5ba6ca457ed}} 
+\index{DataAccess@{DataAccess}!handle@{handle}}
+\index{handle@{handle}!DataAccess@{DataAccess}}
+\doxysubsubsection{\texorpdfstring{handle}{handle}}
+{\footnotesize\ttfamily ros\+::\+Node\+Handle Data\+Access\+::handle\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/knowledge\+\_\+repository/data\+\_\+access/include/data\+\_\+access/\mbox{\hyperlink{DataAccess_8hpp}{Data\+Access.\+hpp}}\item 
+src/knowledge\+\_\+repository/data\+\_\+access/src/\mbox{\hyperlink{DataAccess_8cpp}{Data\+Access.\+cpp}}\end{DoxyCompactItemize}

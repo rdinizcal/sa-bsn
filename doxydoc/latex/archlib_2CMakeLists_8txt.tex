@@ -1,0 +1,24 @@
+\hypertarget{archlib_2CMakeLists_8txt}{}\doxysection{archlib/\+CMake\+Lists.txt File Reference}
+\label{archlib_2CMakeLists_8txt}\index{archlib/CMakeLists.txt@{archlib/CMakeLists.txt}}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{archlib_2CMakeLists_8txt_ad1c8dbf13f220dfe5aa437ac53c8c82e}{add\+\_\+compile\+\_\+options}} (-\/std=c++11 -\/g) ADD\+\_\+\+MESSAGE\+\_\+\+FILES(FILES target\+\_\+system/external/Status.\+msg target\+\_\+system/external/Event.\+msg system\+\_\+manager/external/Adaptation\+Command.\+msg system\+\_\+manager/internal/Strategy.\+msg system\+\_\+manager/internal/Exception.\+msg knowledge\+\_\+repository/external/Persist.\+msg simulation/external/Uncertainty.\+msg) ADD\+\_\+\+SERVICE\+\_\+\+FILES(FILES knowledge\+\_\+repository/external/Data\+Access\+Request.\+srv target\+\_\+system/internal/Effector\+Register.\+srv) CATKIN\+\_\+\+PACKAGE(INCLUDE\+\_\+\+DIRS include LIBRARIES \$
+\item 
+CATKIN\+\_\+\+DEPENDS std\+\_\+msgs message\+\_\+runtime \mbox{\hyperlink{archlib_2CMakeLists_8txt_ae11830d74262f82fdfb969f6cb429a12}{INSTALL}} (TARGETS \$\{PROJECT\+\_\+\+NAME\} ARCHIVE DESTINATION \$\{CATKIN\+\_\+\+PACKAGE\+\_\+\+LIB\+\_\+\+DESTINATION\} LIBRARY DESTINATION \$\{CATKIN\+\_\+\+PACKAGE\+\_\+\+LIB\+\_\+\+DESTINATION\} RUNTIME DESTINATION \$\{CATKIN\+\_\+\+GLOBAL\+\_\+\+BIN\+\_\+\+DESTINATION\}) INSTALL(DIRECTORY include/\$
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{archlib_2CMakeLists_8txt_ad1c8dbf13f220dfe5aa437ac53c8c82e}\label{archlib_2CMakeLists_8txt_ad1c8dbf13f220dfe5aa437ac53c8c82e}} 
+\index{CMakeLists.txt@{CMakeLists.txt}!add\_compile\_options@{add\_compile\_options}}
+\index{add\_compile\_options@{add\_compile\_options}!CMakeLists.txt@{CMakeLists.txt}}
+\doxysubsubsection{\texorpdfstring{add\_compile\_options()}{add\_compile\_options()}}
+{\footnotesize\ttfamily add\+\_\+compile\+\_\+options (\begin{DoxyParamCaption}\item[{-\/}]{std = {\ttfamily c++11~-\/g} }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{archlib_2CMakeLists_8txt_ae11830d74262f82fdfb969f6cb429a12}\label{archlib_2CMakeLists_8txt_ae11830d74262f82fdfb969f6cb429a12}} 
+\index{CMakeLists.txt@{CMakeLists.txt}!INSTALL@{INSTALL}}
+\index{INSTALL@{INSTALL}!CMakeLists.txt@{CMakeLists.txt}}
+\doxysubsubsection{\texorpdfstring{INSTALL()}{INSTALL()}}
+{\footnotesize\ttfamily CATKIN\+\_\+\+DEPENDS std\+\_\+msgs message\+\_\+runtime INSTALL (\begin{DoxyParamCaption}\item[{TARGETS \$\{PROJECT\+\_\+\+NAME\} ARCHIVE DESTINATION \$\{CATKIN\+\_\+\+PACKAGE\+\_\+\+LIB\+\_\+\+DESTINATION\} LIBRARY DESTINATION \$\{CATKIN\+\_\+\+PACKAGE\+\_\+\+LIB\+\_\+\+DESTINATION\} RUNTIME DESTINATION \$\{CATKIN\+\_\+\+GLOBAL\+\_\+\+BIN\+\_\+\+DESTINATION\}}]{ }\end{DoxyParamCaption})}
+

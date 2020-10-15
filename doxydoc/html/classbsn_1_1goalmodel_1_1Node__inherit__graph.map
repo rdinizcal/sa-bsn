@@ -1,0 +1,6 @@
+<map id="bsn::goalmodel::Node" name="bsn::goalmodel::Node">
+<area shape="rect" id="node1" title=" " alt="" coords="89,5,238,317"/>
+<area shape="rect" id="node2" href="$classbsn_1_1goalmodel_1_1Goal.html" title=" " alt="" coords="5,380,151,487"/>
+<area shape="rect" id="node3" href="$classbsn_1_1goalmodel_1_1Task.html" title=" " alt="" coords="175,365,322,501"/>
+<area shape="rect" id="node4" href="$classbsn_1_1goalmodel_1_1LeafTask.html" title=" " alt="" coords="163,549,335,832"/>
+</map>

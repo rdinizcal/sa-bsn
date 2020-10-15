@@ -1,0 +1,304 @@
+\hypertarget{classCentralHub}{}\doxysection{Central\+Hub Class Reference}
+\label{classCentralHub}\index{CentralHub@{CentralHub}}
+
+
+{\ttfamily \#include $<$Central\+Hub.\+hpp$>$}
+
+
+
+Inheritance diagram for Central\+Hub\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{classCentralHub__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Central\+Hub\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCentralHub__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classCentralHub_a6ece0353a79e6d460dd3b7d763f4b621}{Central\+Hub}} (int \&argc, char $\ast$$\ast$argv, const std\+::string \&name, const bool \&\mbox{\hyperlink{classCentralHub_a7f1a47c72faa9c25a551aadba922fb7a}{active}}, const \mbox{\hyperlink{classbsn_1_1resource_1_1Battery}{bsn\+::resource\+::\+Battery}} \&\mbox{\hyperlink{classCentralHub_a2f6ad6070c29977f0faab595429d4af9}{battery}})
+\item 
+\mbox{\hyperlink{classCentralHub_a039f1cf3a24ad8ef5e7ecbb7300ba4dc}{$\sim$\+Central\+Hub}} ()
+\item 
+virtual void \mbox{\hyperlink{classCentralHub_a91be8b44d7c4075c20434723c75fc6f9}{set\+Up}} ()=0
+\item 
+virtual void \mbox{\hyperlink{classCentralHub_a33ab84e2d47f41966b7a2c6c8763c755}{tear\+Down}} ()=0
+\item 
+virtual int32\+\_\+t \mbox{\hyperlink{classCentralHub_a388e947318a28cf7cac762ac8b1cf3d4}{run}} ()
+\item 
+void \mbox{\hyperlink{classCentralHub_a48b13d52b79864e84eae5012108d3211}{body}} ()
+\item 
+void \mbox{\hyperlink{classCentralHub_ad6c1ba1c51d58a420e076fbd27cd2b5c}{apply\+\_\+noise}} ()
+\item 
+void \mbox{\hyperlink{classCentralHub_a72336916ee15e722ee0b9f2c7c3747b6}{reconfigure}} (const archlib\+::\+Adaptation\+Command\+::\+Const\+Ptr \&msg)
+\item 
+virtual void \mbox{\hyperlink{classCentralHub_a4d658629e1d1fc8dc80ee298173e4c22}{collect}} (const messages\+::\+Sensor\+Data\+::\+Const\+Ptr \&sensor\+\_\+data)=0
+\item 
+virtual void \mbox{\hyperlink{classCentralHub_a3527f7455ec82af84e32b182221ede80}{process}} ()=0
+\item 
+virtual void \mbox{\hyperlink{classCentralHub_a31e4df7094f5d176052056464d5886fa}{transfer}} ()=0
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{classCentralHub_a7f1a47c72faa9c25a551aadba922fb7a}{active}}
+\item 
+int \mbox{\hyperlink{classCentralHub_aff51483cf7afd302270339c38d38ef32}{max\+\_\+size}}
+\item 
+int \mbox{\hyperlink{classCentralHub_a708713f43449837e25c4bb7510b8d924}{total\+\_\+buffer\+\_\+size}}
+\item 
+std\+::array$<$ int, 5 $>$ \mbox{\hyperlink{classCentralHub_a8ce9747a39e7da236e900c4bd2bef422}{buffer\+\_\+size}}
+\item 
+\mbox{\hyperlink{classbsn_1_1resource_1_1Battery}{bsn\+::resource\+::\+Battery}} \mbox{\hyperlink{classCentralHub_a2f6ad6070c29977f0faab595429d4af9}{battery}}
+\item 
+std\+::vector$<$ std\+::list$<$ double $>$ $>$ \mbox{\hyperlink{classCentralHub_a40b402dd0a71688415f01901e7a29734}{data\+\_\+buffer}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Additional Inherited Members}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classCentralHub_a6ece0353a79e6d460dd3b7d763f4b621}\label{classCentralHub_a6ece0353a79e6d460dd3b7d763f4b621}} 
+\index{CentralHub@{CentralHub}!CentralHub@{CentralHub}}
+\index{CentralHub@{CentralHub}!CentralHub@{CentralHub}}
+\doxysubsubsection{\texorpdfstring{CentralHub()}{CentralHub()}}
+{\footnotesize\ttfamily Central\+Hub\+::\+Central\+Hub (\begin{DoxyParamCaption}\item[{int \&}]{argc,  }\item[{char $\ast$$\ast$}]{argv,  }\item[{const std\+::string \&}]{name,  }\item[{const bool \&}]{active,  }\item[{const \mbox{\hyperlink{classbsn_1_1resource_1_1Battery}{bsn\+::resource\+::\+Battery}} \&}]{battery }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classCentralHub_a039f1cf3a24ad8ef5e7ecbb7300ba4dc}\label{classCentralHub_a039f1cf3a24ad8ef5e7ecbb7300ba4dc}} 
+\index{CentralHub@{CentralHub}!````~CentralHub@{$\sim$CentralHub}}
+\index{````~CentralHub@{$\sim$CentralHub}!CentralHub@{CentralHub}}
+\doxysubsubsection{\texorpdfstring{$\sim$CentralHub()}{~CentralHub()}}
+{\footnotesize\ttfamily Central\+Hub\+::$\sim$\+Central\+Hub (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classCentralHub_ad6c1ba1c51d58a420e076fbd27cd2b5c}\label{classCentralHub_ad6c1ba1c51d58a420e076fbd27cd2b5c}} 
+\index{CentralHub@{CentralHub}!apply\_noise@{apply\_noise}}
+\index{apply\_noise@{apply\_noise}!CentralHub@{CentralHub}}
+\doxysubsubsection{\texorpdfstring{apply\_noise()}{apply\_noise()}}
+{\footnotesize\ttfamily void Central\+Hub\+::apply\+\_\+noise (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCentralHub_ad6c1ba1c51d58a420e076fbd27cd2b5c_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classCentralHub_a48b13d52b79864e84eae5012108d3211}\label{classCentralHub_a48b13d52b79864e84eae5012108d3211}} 
+\index{CentralHub@{CentralHub}!body@{body}}
+\index{body@{body}!CentralHub@{CentralHub}}
+\doxysubsubsection{\texorpdfstring{body()}{body()}}
+{\footnotesize\ttfamily void Central\+Hub\+::body (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classarch_1_1target__system_1_1Component_ac473539ffdccdef20318a6c4bfea0b22}{arch\+::target\+\_\+system\+::\+Component}}.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCentralHub_a48b13d52b79864e84eae5012108d3211_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCentralHub_a48b13d52b79864e84eae5012108d3211_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classCentralHub_a4d658629e1d1fc8dc80ee298173e4c22}\label{classCentralHub_a4d658629e1d1fc8dc80ee298173e4c22}} 
+\index{CentralHub@{CentralHub}!collect@{collect}}
+\index{collect@{collect}!CentralHub@{CentralHub}}
+\doxysubsubsection{\texorpdfstring{collect()}{collect()}}
+{\footnotesize\ttfamily virtual void Central\+Hub\+::collect (\begin{DoxyParamCaption}\item[{const messages\+::\+Sensor\+Data\+::\+Const\+Ptr \&}]{sensor\+\_\+data }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classG4T1_a1114e1a7142774484a14d34b69c8535d}{G4\+T1}}.
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCentralHub_a4d658629e1d1fc8dc80ee298173e4c22_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classCentralHub_a3527f7455ec82af84e32b182221ede80}\label{classCentralHub_a3527f7455ec82af84e32b182221ede80}} 
+\index{CentralHub@{CentralHub}!process@{process}}
+\index{process@{process}!CentralHub@{CentralHub}}
+\doxysubsubsection{\texorpdfstring{process()}{process()}}
+{\footnotesize\ttfamily virtual void Central\+Hub\+::process (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classG4T1_a7d7a425b2d7fbbc0aa531cbb6ee5ddd9}{G4\+T1}}.
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCentralHub_a3527f7455ec82af84e32b182221ede80_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classCentralHub_a72336916ee15e722ee0b9f2c7c3747b6}\label{classCentralHub_a72336916ee15e722ee0b9f2c7c3747b6}} 
+\index{CentralHub@{CentralHub}!reconfigure@{reconfigure}}
+\index{reconfigure@{reconfigure}!CentralHub@{CentralHub}}
+\doxysubsubsection{\texorpdfstring{reconfigure()}{reconfigure()}}
+{\footnotesize\ttfamily void Central\+Hub\+::reconfigure (\begin{DoxyParamCaption}\item[{const archlib\+::\+Adaptation\+Command\+::\+Const\+Ptr \&}]{msg }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classarch_1_1target__system_1_1Component_ac3b38b32e446d2ae63ea8cd0796810ac}{arch\+::target\+\_\+system\+::\+Component}}.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCentralHub_a72336916ee15e722ee0b9f2c7c3747b6_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classCentralHub_a388e947318a28cf7cac762ac8b1cf3d4}\label{classCentralHub_a388e947318a28cf7cac762ac8b1cf3d4}} 
+\index{CentralHub@{CentralHub}!run@{run}}
+\index{run@{run}!CentralHub@{CentralHub}}
+\doxysubsubsection{\texorpdfstring{run()}{run()}}
+{\footnotesize\ttfamily int32\+\_\+t Central\+Hub\+::run (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classarch_1_1target__system_1_1Component_ac590323763a5ea9e7edf1a5e67f8a94f}{arch\+::target\+\_\+system\+::\+Component}}.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCentralHub_a388e947318a28cf7cac762ac8b1cf3d4_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=240pt]{classCentralHub_a388e947318a28cf7cac762ac8b1cf3d4_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classCentralHub_a91be8b44d7c4075c20434723c75fc6f9}\label{classCentralHub_a91be8b44d7c4075c20434723c75fc6f9}} 
+\index{CentralHub@{CentralHub}!setUp@{setUp}}
+\index{setUp@{setUp}!CentralHub@{CentralHub}}
+\doxysubsubsection{\texorpdfstring{setUp()}{setUp()}}
+{\footnotesize\ttfamily virtual void Central\+Hub\+::set\+Up (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classarch_1_1target__system_1_1Component_a6a7bf2a65bcc78fc61167205509091a5}{arch\+::target\+\_\+system\+::\+Component}}.
+
+
+
+Implemented in \mbox{\hyperlink{classG4T1_ad02634c3bf56a245b99bb30f520628c5}{G4\+T1}}.
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCentralHub_a91be8b44d7c4075c20434723c75fc6f9_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classCentralHub_a33ab84e2d47f41966b7a2c6c8763c755}\label{classCentralHub_a33ab84e2d47f41966b7a2c6c8763c755}} 
+\index{CentralHub@{CentralHub}!tearDown@{tearDown}}
+\index{tearDown@{tearDown}!CentralHub@{CentralHub}}
+\doxysubsubsection{\texorpdfstring{tearDown()}{tearDown()}}
+{\footnotesize\ttfamily virtual void Central\+Hub\+::tear\+Down (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classarch_1_1target__system_1_1Component_af8115ceb5653f47f04537fb0eb7dfff2}{arch\+::target\+\_\+system\+::\+Component}}.
+
+
+
+Implemented in \mbox{\hyperlink{classG4T1_a3027f9c8027d8fe09ae6ca7df2f6ab04}{G4\+T1}}.
+
+\mbox{\Hypertarget{classCentralHub_a31e4df7094f5d176052056464d5886fa}\label{classCentralHub_a31e4df7094f5d176052056464d5886fa}} 
+\index{CentralHub@{CentralHub}!transfer@{transfer}}
+\index{transfer@{transfer}!CentralHub@{CentralHub}}
+\doxysubsubsection{\texorpdfstring{transfer()}{transfer()}}
+{\footnotesize\ttfamily virtual void Central\+Hub\+::transfer (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classG4T1_ace103170a712570f3583900aae954459}{G4\+T1}}.
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCentralHub_a31e4df7094f5d176052056464d5886fa_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\mbox{\Hypertarget{classCentralHub_a7f1a47c72faa9c25a551aadba922fb7a}\label{classCentralHub_a7f1a47c72faa9c25a551aadba922fb7a}} 
+\index{CentralHub@{CentralHub}!active@{active}}
+\index{active@{active}!CentralHub@{CentralHub}}
+\doxysubsubsection{\texorpdfstring{active}{active}}
+{\footnotesize\ttfamily bool Central\+Hub\+::active\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{classCentralHub_a2f6ad6070c29977f0faab595429d4af9}\label{classCentralHub_a2f6ad6070c29977f0faab595429d4af9}} 
+\index{CentralHub@{CentralHub}!battery@{battery}}
+\index{battery@{battery}!CentralHub@{CentralHub}}
+\doxysubsubsection{\texorpdfstring{battery}{battery}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classbsn_1_1resource_1_1Battery}{bsn\+::resource\+::\+Battery}} Central\+Hub\+::battery\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{classCentralHub_a8ce9747a39e7da236e900c4bd2bef422}\label{classCentralHub_a8ce9747a39e7da236e900c4bd2bef422}} 
+\index{CentralHub@{CentralHub}!buffer\_size@{buffer\_size}}
+\index{buffer\_size@{buffer\_size}!CentralHub@{CentralHub}}
+\doxysubsubsection{\texorpdfstring{buffer\_size}{buffer\_size}}
+{\footnotesize\ttfamily std\+::array$<$int, 5$>$ Central\+Hub\+::buffer\+\_\+size\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{classCentralHub_a40b402dd0a71688415f01901e7a29734}\label{classCentralHub_a40b402dd0a71688415f01901e7a29734}} 
+\index{CentralHub@{CentralHub}!data\_buffer@{data\_buffer}}
+\index{data\_buffer@{data\_buffer}!CentralHub@{CentralHub}}
+\doxysubsubsection{\texorpdfstring{data\_buffer}{data\_buffer}}
+{\footnotesize\ttfamily std\+::vector$<$std\+::list$<$double$>$ $>$ Central\+Hub\+::data\+\_\+buffer\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{classCentralHub_aff51483cf7afd302270339c38d38ef32}\label{classCentralHub_aff51483cf7afd302270339c38d38ef32}} 
+\index{CentralHub@{CentralHub}!max\_size@{max\_size}}
+\index{max\_size@{max\_size}!CentralHub@{CentralHub}}
+\doxysubsubsection{\texorpdfstring{max\_size}{max\_size}}
+{\footnotesize\ttfamily int Central\+Hub\+::max\+\_\+size\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{classCentralHub_a708713f43449837e25c4bb7510b8d924}\label{classCentralHub_a708713f43449837e25c4bb7510b8d924}} 
+\index{CentralHub@{CentralHub}!total\_buffer\_size@{total\_buffer\_size}}
+\index{total\_buffer\_size@{total\_buffer\_size}!CentralHub@{CentralHub}}
+\doxysubsubsection{\texorpdfstring{total\_buffer\_size}{total\_buffer\_size}}
+{\footnotesize\ttfamily int Central\+Hub\+::total\+\_\+buffer\+\_\+size\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/target\+\_\+system/components/component/include/component/\mbox{\hyperlink{CentralHub_8hpp}{Central\+Hub.\+hpp}}\item 
+src/target\+\_\+system/components/component/src/\mbox{\hyperlink{CentralHub_8cpp}{Central\+Hub.\+cpp}}\end{DoxyCompactItemize}
