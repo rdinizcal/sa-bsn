@@ -1,9 +1,0 @@
-<map id="bsn::configuration::SensorConfiguration::evaluateNumber" name="bsn::configuration::SensorConfiguration::evaluateNumber">
-<area shape="rect" id="node1" title=" " alt="" coords="5,129,153,185"/>
-<area shape="rect" id="node2" href="$classbsn_1_1configuration_1_1SensorConfiguration.html#aeb452f9154ebbc75bd54564fa0f94430" title=" " alt="" coords="201,49,368,105"/>
-<area shape="rect" id="node6" href="$classbsn_1_1configuration_1_1SensorConfiguration.html#aab092b8b249eda7ee53a38ec45ba9421" title=" " alt="" coords="211,129,359,185"/>
-<area shape="rect" id="node7" href="$classbsn_1_1range_1_1Range.html#a803a947a39a06176384e00e2ad758ec9" title=" " alt="" coords="216,209,353,251"/>
-<area shape="rect" id="node3" href="$classbsn_1_1range_1_1Range.html#ab8b7c15c1b6dc5c0e2c57b968271ac3b" title=" " alt="" coords="416,5,553,47"/>
-<area shape="rect" id="node4" href="$classbsn_1_1range_1_1Range.html#a0785d0aa7d5463bcdd3842089069a2e7" title=" " alt="" coords="416,136,553,177"/>
-<area shape="rect" id="node5" href="$classbsn_1_1range_1_1Range.html#a540c2181ec15a65b189a7fb89659f388" title=" " alt="" coords="416,71,553,112"/>
-</map>
