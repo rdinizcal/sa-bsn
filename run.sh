@@ -2,6 +2,8 @@ bsn=$PWD
 
 gnome-terminal -x roscore & sleep 5s
 
+gnome-terminal --working-directory=${bsn}/src/test -e 'rostest --reuse-master test_suite testnode.launch'
+
 ################# KNOWLEDGE REPOSITORY #################
 gnome-terminal --working-directory=${bsn}/configurations/knowledge_repository -e 'roslaunch data_access.launch' & sleep 1s
 

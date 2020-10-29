@@ -101,7 +101,7 @@ void DataAccess::setUp() {
     server = handle.advertiseService("DataAccessRequest", &DataAccess::processQuery, this);
     adr_server = handle.advertiseService("address", &DataAccess::sendAddress, this);
    
-    targetSystemSub = handle.subscribe("TargeSystemData", 100, &DataAccess::processTargetSystemData, this);
+    targetSystemSub = handle.subscribe("TargetSystemData", 100, &DataAccess::processTargetSystemData, this);
 }
 
 void DataAccess::tearDown(){}

@@ -69,7 +69,7 @@ void G4T1::setUp() {
             (*it) = {0.0};
     }
 
-    pub = config.advertise<messages::TargetSystemData>("TargeSystemData", 10);
+    pub = config.advertise<messages::TargetSystemData>("TargetSystemData", 10);
 }
 
 void G4T1::tearDown() {}

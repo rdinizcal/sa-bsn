@@ -1,0 +1,4 @@
+<launch>
+  <node pkg="test_suite" type="testnode" name="mynode" />
+  <test test-name="test_mynode" pkg="test_suite" type="testnode" />
+</launch>

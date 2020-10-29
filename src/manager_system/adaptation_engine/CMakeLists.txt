@@ -49,15 +49,15 @@ ADD_DEPENDENCIES(engine messages_generate_messages_cpp)
 ###########################################################################
 # Include tests
 
-if(CATKIN_ENABLE_TESTING)
+#if(CATKIN_ENABLE_TESTING)
     # add gtest
-    catkin_add_gtest(${PROJECT_NAME}-test test/adaptation_engine-test.cpp)
+#    catkin_add_gtest(${PROJECT_NAME}-test test/adaptation_engine-test.cpp)
 
  #   if (TARGET ${PROJECT_NAME}-test)
  #       # link required libraries
  #       target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
  #   endif()
-endif()
+#endif()
 
 ###########################################################################
 # Install this project.
