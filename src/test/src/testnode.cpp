@@ -9,14 +9,18 @@
 #include "services/PatientData.h"
 #include "component/g4t1/G4T1.hpp"
 #include "messages/SensorFrequency.h"
+#include "messages/TargetSystemData.h"
 #include "archlib/Status.h"
 #include "classes/SensorTest.cpp"
+#include "classes/CentralhubTest.cpp"
 
 SensorTest g3t11TestClass = SensorTest("g3t1_1", "oximeter", 1.0);
 SensorTest g3t12TestClass = SensorTest("g3t1_2", "ecg", 1.0);
 SensorTest g3t13TestClass = SensorTest("g3t1_3", "thermometer", 1.0);
 SensorTest g3t14TestClass = SensorTest("g3t1_4", "abps", 1.0);
 SensorTest g3t15TestClass = SensorTest("g3t1_5", "abpd", 1.0);
+
+CentralhubTest g4t1Test = CentralhubTest();
 
 std::shared_ptr<ros::NodeHandle> nh;
 
@@ -45,7 +49,6 @@ void ecgCallback(const messages::SensorData::ConstPtr& msg)
     return;
 }
 
-
 bool getPatientData(services::PatientData::Request &request, 
                     services::PatientData::Response &response) {
     
@@ -54,94 +57,182 @@ bool getPatientData(services::PatientData::Request &request,
     return true;
 }
 
+
+
+TEST(G4T1, TestCentralhubWithRegularValues) {
+
+    messages::SensorData thermMsg;
+    messages::SensorData oxiMsg;
+    messages::SensorData ecgMsg;
+    messages::SensorData abpsMsg;
+    messages::SensorData abpdMsg;
+
+
+    thermMsg.type = "thermometer";
+    thermMsg.batt = 96.000000000000227;
+    thermMsg.data = 48.589746857029397;
+    thermMsg.risk = 76.399265812300001;
+    
+    ecgMsg.type = "ecg";
+    ecgMsg.batt = 76.900000000000219;
+    ecgMsg.data = 98.73879563645832;
+    ecgMsg.risk = 25.250389333564783;
+
+    oxiMsg.type = "oximeter";
+    oxiMsg.batt = 83.599999999999767;
+    oxiMsg.data = 74.280214469614151;
+    oxiMsg.risk = 52.444704222465155;
+
+    abpsMsg.type = "abps";
+    abpsMsg.batt = 96.600000000000193;
+    abpsMsg.data = 135.05796508002251;
+    abpsMsg.risk = 69.686328717409538;
+
+    abpdMsg.type = "abpd";
+    abpdMsg.batt = 96.900000000000176;
+    abpdMsg.data = 62.945620035433457;
+    abpdMsg.risk = 69.426413125646604;
+
+
+    g4t1Test.setupCentralhubTest(thermMsg, ecgMsg, oxiMsg, abpsMsg, abpdMsg, nh);
+
+    EXPECT_NEAR(g4t1Test.getTrmBatt(), thermMsg.batt, 0.0001);
+    EXPECT_NEAR(g4t1Test.getTrmData(), thermMsg.data, 0.0001);
+    EXPECT_NEAR(g4t1Test.getTrmRisk(), thermMsg.risk, 0.0001);
+
+    EXPECT_NEAR(g4t1Test.getEcgBatt(), ecgMsg.batt, 0.0001);
+    EXPECT_NEAR(g4t1Test.getEcgData(), ecgMsg.data, 0.0001);
+    EXPECT_NEAR(g4t1Test.getEcgRisk(), ecgMsg.risk, 0.0001);
+
+    EXPECT_NEAR(g4t1Test.getOxiBatt(), oxiMsg.batt, 0.0001);
+    EXPECT_NEAR(g4t1Test.getOxiData(), oxiMsg.data, 0.0001);
+    EXPECT_NEAR(g4t1Test.getOxiRisk(), oxiMsg.risk, 0.0001);
+
+    EXPECT_NEAR(g4t1Test.getAbpsBatt(), abpsMsg.batt, 0.0001);
+    EXPECT_NEAR(g4t1Test.getAbpsData(), abpsMsg.data, 0.0001);
+    EXPECT_NEAR(g4t1Test.getAbpsRisk(), abpsMsg.risk, 0.0001);
+    
+    EXPECT_NEAR(g4t1Test.getAbpdBatt(), abpdMsg.batt, 0.0001);
+    EXPECT_NEAR(g4t1Test.getAbpdData(), abpdMsg.data, 0.0001);
+    EXPECT_NEAR(g4t1Test.getAbpdRisk(), abpdMsg.risk, 0.0001);
+
+    EXPECT_NEAR(g4t1Test.getPatientStatus(), 68.0, 1.0);
+}
+
+TEST(G4T1, TestCentralhubWithZeroPatientRisk) {
+    messages::SensorData thermMsg;
+    messages::SensorData oxiMsg;
+    messages::SensorData ecgMsg;
+    messages::SensorData abpsMsg;
+    messages::SensorData abpdMsg;
+
+    abpdMsg.type = "abpd";
+    abpdMsg.batt = 6.9525147289986856e-310;
+    abpdMsg.data = 2.1220281695573725e-314;
+    abpdMsg.risk = 0;
+
+    abpsMsg.type = "abps";
+    abpsMsg.batt = 2.4703282292062327e-323;
+    abpsMsg.data = 0;
+    abpsMsg.risk = 0;
+
+    ecgMsg.type = "ecg";
+    ecgMsg.batt = 1.4821969375237396e-323;
+    ecgMsg.data = 4.648549688463257e-310;
+    ecgMsg.risk = 0;
+
+    oxiMsg.type = "oximeter";
+    oxiMsg.batt = 98.999999999999986;
+    oxiMsg.data = 6.9532680956194044e-310;
+    oxiMsg.risk = 0;
+
+    thermMsg.type = "thermometer";
+    thermMsg.batt = 4.64854968846217e-310;
+    thermMsg.data = 2.9643938750474793e-323;
+    thermMsg.risk = 0;
+
+    g4t1Test.setupCentralhubTest(thermMsg, ecgMsg, oxiMsg, abpsMsg, abpdMsg, nh);
+
+    EXPECT_NEAR(g4t1Test.getTrmBatt(), thermMsg.batt, 0.0001);
+    EXPECT_NEAR(g4t1Test.getTrmData(), thermMsg.data, 0.0001);
+    EXPECT_NEAR(g4t1Test.getTrmRisk(), thermMsg.risk, 0.0001);
+
+    EXPECT_NEAR(g4t1Test.getEcgBatt(), ecgMsg.batt, 0.0001);
+    EXPECT_NEAR(g4t1Test.getEcgData(), ecgMsg.data, 0.0001);
+    EXPECT_NEAR(g4t1Test.getEcgRisk(), ecgMsg.risk, 0.0001);
+
+    EXPECT_NEAR(g4t1Test.getOxiBatt(), oxiMsg.batt, 0.0001);
+    EXPECT_NEAR(g4t1Test.getOxiData(), oxiMsg.data, 0.0001);
+    EXPECT_NEAR(g4t1Test.getOxiRisk(), oxiMsg.risk, 0.0001);
+
+    EXPECT_NEAR(g4t1Test.getAbpsBatt(), abpsMsg.batt, 0.0001);
+    EXPECT_NEAR(g4t1Test.getAbpsData(), abpsMsg.data, 0.0001);
+    EXPECT_NEAR(g4t1Test.getAbpsRisk(), abpsMsg.risk, 0.0001);
+    
+    EXPECT_NEAR(g4t1Test.getAbpdBatt(), abpdMsg.batt, 0.0001);
+    EXPECT_NEAR(g4t1Test.getAbpdData(), abpdMsg.data, 0.0001);
+    EXPECT_NEAR(g4t1Test.getAbpdRisk(), abpdMsg.risk, 0.0001);
+
+    EXPECT_NEAR(g4t1Test.getPatientStatus(), 0, 0.0001);
+
+}
 /*
-TEST(G4T1TestSuite, G4T1Test) {
+TEST(G4T1, TestCentralhubWithFullPatientRisk) {
+    messages::SensorData thermMsg;
+    messages::SensorData oxiMsg;
+    messages::SensorData ecgMsg;
+    messages::SensorData abpsMsg;
+    messages::SensorData abpdMsg;
 
-    ros::NodeHandle nh;
-    ros::Publisher therm_pub = nh.advertise<messages::SensorData>("thermometer_data", 10);
-    messages::SensorData msg;
+    abpdMsg.type = "abpd";
+    abpdMsg.batt = 6.9525147289986856e-310;
+    abpdMsg.data = 2.1220281695573725e-314;
+    abpdMsg.risk = 100;
 
-    msg.type = "thermometer";
-    msg.data = 54.0;
-    msg.risk = 1.0;
-    msg.batt = 60.0;
+    abpsMsg.type = "abps";
+    abpsMsg.batt = 2.4703282292062327e-323;
+    abpsMsg.data = 0;
+    abpsMsg.risk = 100;
 
-    therm_pub.publish(msg);
+    ecgMsg.type = "ecg";
+    ecgMsg.batt = 1.4821969375237396e-323;
+    ecgMsg.data = 4.648549688463257e-310;
+    ecgMsg.risk = 100;
 
-    while(ros::ok() && receivedMessage == false) {
-        ros::Rate loop_rate(100);
-        ros::spinOnce();
-        loop_rate.sleep();
-    }
-}
+    oxiMsg.type = "oximeter";
+    oxiMsg.batt = 98.999999999999986;
+    oxiMsg.data = 6.9532680956194044e-310;
+    oxiMsg.risk = 100;
 
+    thermMsg.type = "thermometer";
+    thermMsg.batt = 4.64854968846217e-310;
+    thermMsg.data = 2.9643938750474793e-323;
+    thermMsg.risk = 100;
 
-void prepareG3T1_2Test(const SensorTest::ConstPtr& sensor) {
-    ros::ServiceServer service = nh->advertiseService("getPatientData", &getPatientData);
-    ros::Subscriber ecg_sub = nh->subscribe("/ecg_data", 1, &ecgCallback, sensor);
-    ros::Subscriber ecg_freq_sub = nh->subscribe("/sensor_frequency_/g3t1_2", 1, &ecgFreqCallback);
-    ros::Publisher ecg_pub = nh->advertise<archlib::AdaptationCommand>("/reconfigure_/g3t1_2", 1);
-    //ros::Subscriber ecg_freq_sub = nh->subscribe("/collect_status", 1, &statusCallback);
+    g4t1Test.setupCentralhubTest(thermMsg, ecgMsg, oxiMsg, abpsMsg, abpdMsg, nh);
 
-    ros::Rate loop_rate(100);
+    EXPECT_NEAR(g4t1Test.getTrmBatt(), thermMsg.batt, 0.0001);
+    EXPECT_NEAR(g4t1Test.getTrmData(), thermMsg.data, 0.0001);
+    EXPECT_NEAR(g4t1Test.getTrmRisk(), thermMsg.risk, 0.0001);
 
-    archlib::AdaptationCommand msg;
-    msg.source = "/enactor";
-    msg.target = "/g3t1_2";
-    msg.action = "freq=5.0";
+    EXPECT_NEAR(g4t1Test.getEcgBatt(), ecgMsg.batt, 0.0001);
+    EXPECT_NEAR(g4t1Test.getEcgData(), ecgMsg.data, 0.0001);
+    EXPECT_NEAR(g4t1Test.getEcgRisk(), ecgMsg.risk, 0.0001);
 
-    while (ros::ok() && receivedMessage == false) {
-        ecg_pub.publish(msg);
-        ros::spinOnce();
-        loop_rate.sleep();
-    }
-}
+    EXPECT_NEAR(g4t1Test.getOxiBatt(), oxiMsg.batt, 0.0001);
+    EXPECT_NEAR(g4t1Test.getOxiData(), oxiMsg.data, 0.0001);
+    EXPECT_NEAR(g4t1Test.getOxiRisk(), oxiMsg.risk, 0.0001);
 
+    EXPECT_NEAR(g4t1Test.getAbpsBatt(), abpsMsg.batt, 0.0001);
+    EXPECT_NEAR(g4t1Test.getAbpsData(), abpsMsg.data, 0.0001);
+    EXPECT_NEAR(g4t1Test.getAbpsRisk(), abpsMsg.risk, 0.0001);
+    
+    EXPECT_NEAR(g4t1Test.getAbpdBatt(), abpdMsg.batt, 0.0001);
+    EXPECT_NEAR(g4t1Test.getAbpdData(), abpdMsg.data, 0.0001);
+    EXPECT_NEAR(g4t1Test.getAbpdRisk(), abpdMsg.risk, 0.0001);
 
+    EXPECT_NEAR(g4t1Test.getPatientStatus(), 100, 0.0001);
 
-TEST(G3T1_1, EffectorFrequencyChange) {
-
-    ros::ServiceServer service = nh->advertiseService("getPatientData", &getPatientData);
-//    ros::Subscriber ecg_sub = nh->subscribe("/ecg_data", 1, &oxiCallback);
-    ros::Subscriber ecg_freq_sub = nh->subscribe("/sensor_frequency_/g3t1_1", 1, &oxiFreqCallback);
-    ros::Publisher ecg_pub = nh->advertise<archlib::AdaptationCommand>("/reconfigure_/g3t1_1", 1);
-    //ros::Subscriber ecg_freq_sub = nh->subscribe("/collect_status", 1, &statusCallback);
-
-    ros::Rate loop_rate(100);
-
-    archlib::AdaptationCommand msg;
-    msg.source = "/enactor";
-    msg.target = "/g3t1_1";
-    msg.action = "freq=6.0";
-
-    while (ros::ok() && receivedMessage == false) {
-        ecg_pub.publish(msg);
-        ros::spinOnce();
-        loop_rate.sleep();
-    }
-
-    receivedMessage = false;
-}
-
-void sensorFrequencyTestSetup(SensorTest& sensor) {
-    //ros::ServiceServer service = nh->advertiseService("getPatientData", &getPatientData);
-    ros::Subscriber ecg_sub = nh->subscribe("/" + sensor->getName() +"_data", 1, &ecgCallback);
-    ros::Subscriber ecg_freq_sub = nh->subscribe("/sensor_frequency_/" + sensor->getName(), 1, &ecgFreqCallback);
-    ros::Publisher ecg_pub = nh->advertise<archlib::AdaptationCommand>("/reconfigure_/g3t1_2", 1);
-    //ros::Subscriber ecg_freq_sub = nh->subscribe("/collect_status", 1, &statusCallback);
-
-    ros::Rate loop_rate(100);
-
-    archlib::AdaptationCommand msg;
-    msg.source = "/enactor";
-    msg.target = "/g3t1_2";
-    msg.action = "freq=6.0";
-
-    while (ros::ok() && g3t12TestClass.getReceivedMessage() == false) {
-        ecg_pub.publish(msg);
-        ros::spinOnce();
-        loop_rate.sleep();
-    }
 }
 */
 TEST(G3T1_1, LowerboundFrequencyChange) {
@@ -277,7 +368,6 @@ TEST(G3T1_5, ValidFrequencyChange) {
     EXPECT_NEAR(g3t15TestClass.getFreq(), 5.1, 0.001);
 
 }
-
 
 int main(int argc, char **argv)
 {

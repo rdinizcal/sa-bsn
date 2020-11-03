@@ -95,6 +95,7 @@ class DataAccess : public arch::ROSComponent {
 		std::string adaptation_filepath;
 		std::string ctmetrics_filepath;
 		std::string engineinfo_filepath;
+		std::string tsdata_filepath;
 
 		std::string file_id;
 

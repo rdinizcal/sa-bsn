@@ -24,8 +24,9 @@ void DataAccess::setUp() {
     tmp_status_filepath = path + "/../resource/logs/status_" + file_id + "_tmp.log";
     uncertainty_filepath = path + "/../resource/logs/uncertainty_" + file_id + ".log";
     adaptation_filepath = path + "/../resource/logs/adaptation_" + file_id + ".log";
-    ctmetrics_filepath = path + "/../resource/logs/ctmetrics.log";
-    engineinfo_filepath = path + "/../resource/logs/engineinfo.log";
+    ctmetrics_filepath = path + "/../resource/logs/ctmetrics_" + file_id + ".log";
+    engineinfo_filepath = path + "/../resource/logs/engineinfo_" + file_id + ".log";
+    tsdata_filepath = path + "/../resource/logs/targetsystemdata_" + file_id + ".json";
 
     fp.open(event_filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
     fp << "\n";
@@ -42,6 +43,19 @@ void DataAccess::setUp() {
     fp.open(adaptation_filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
     fp << "\n";
     fp.close();
+
+    fp.open(ctmetrics_filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
+    fp << "\n";
+    fp.close();
+
+    fp.open(engineinfo_filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
+    fp << "\n";
+    fp.close();
+
+    fp.open(tsdata_filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
+    fp << "\n";
+    fp.close();
+
 
 	handle.getParam("frequency", frequency);
     rosComponentDescriptor.setFreq(frequency);
@@ -145,9 +159,13 @@ void DataAccess::processTargetSystemData(const messages::TargetSystemData::Const
 
         json_obj["Reliability"] = system_reliability * 100;
         json_obj["Cost"] = system_cost;
-
         client->request(web::http::methods::POST, U("/sendVitalData"), json_obj);
         ROS_INFO("Sent information to server.");
+    /*
+        fp.open(tsdata_filepath, std::fstream::in | std::fstream::out | std::fstream::app);
+        fp << json_obj << std::endl;
+        fp.close();
+    */
     }
 }
 

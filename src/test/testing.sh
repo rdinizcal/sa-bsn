@@ -17,7 +17,7 @@ gnome-terminal --working-directory=${bsn}/src/test -e 'rostest --reuse-master te
 gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch probe.launch' & sleep 1s
 gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch effector.launch' & sleep 1s
 
-gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g4t1.launch' & sleep 3s
+gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g4t1.launch' & sleep 10s
 gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g3t1_1.launch'
 gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g3t1_2.launch'
 gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g3t1_3.launch'
