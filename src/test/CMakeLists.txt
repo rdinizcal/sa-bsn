@@ -22,7 +22,6 @@ INCLUDE_DIRECTORIES (${BSN_INCLUDE_DIRS})
 # Set include directory.
 INCLUDE_DIRECTORIES(include)
 
-
 ###########################################################################
 ## Add gtest based cpp test target and link libraries
 ENABLE_TESTING()
@@ -39,7 +38,7 @@ if(CATKIN_ENABLE_TESTING)
 
     # link required libraries
     target_link_libraries(
-        testnode 
+        testnode
         ${catkin_LIBRARIES} 
         ${LIBRARIES}
         )

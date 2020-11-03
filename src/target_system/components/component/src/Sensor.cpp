@@ -19,6 +19,7 @@ int32_t Sensor::run() {
     ros::NodeHandle nh;
     ros::Subscriber noise_subs = nh.subscribe("uncertainty_"+ros::this_node::getName(), 10, &Sensor::injectUncertainty, this);
     ros::Subscriber reconfig_subs = nh.subscribe("reconfigure_"+ros::this_node::getName(), 10, &Sensor::reconfigure, this);
+    frequency_pub = nh.advertise<messages::SensorFrequency>("sensor_frequency_"+ros::this_node::getName(), 1);
 
     sendStatus("init");
     ros::spinOnce();
@@ -92,13 +93,22 @@ void Sensor::reconfigure(const archlib::AdaptationCommand::ConstPtr& msg) {
         std::vector<std::string> param = bsn::utils::split(action, '=');
 
         if(param[0]=="freq"){
+            std::cout << "new frequency" << std::endl;
             double new_freq =  stod(param[1]);
+ 
             if(new_freq>5 && new_freq<25) rosComponentDescriptor.setFreq(new_freq);
+ 
+            messages::SensorFrequency freq_msg;
+            freq_msg.type = rosComponentDescriptor.getName();
+            freq_msg.value = rosComponentDescriptor.getFreq();
+            frequency_pub.publish(freq_msg);
+                    
         } else if (param[0]=="replicate_collect") {
             int new_replicate_collect = stoi(param[1]);
             if(new_replicate_collect>1 && new_replicate_collect<200) replicate_collect = new_replicate_collect;
         }
     }
+
 }
 
 void Sensor::injectUncertainty(const archlib::Uncertainty::ConstPtr& msg) {

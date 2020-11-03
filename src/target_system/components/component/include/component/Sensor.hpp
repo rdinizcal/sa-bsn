@@ -8,6 +8,7 @@
 #include "archlib/target_system/Component.hpp"
 #include "archlib/AdaptationCommand.h"
 #include "archlib/Uncertainty.h"
+#include "messages/SensorFrequency.h"
 
 #include "bsn/resource/Battery.hpp"
 #include "bsn/utils/utils.hpp"
@@ -49,6 +50,7 @@ class Sensor : public arch::target_system::Component {
 		double noise_factor;
 		bsn::resource::Battery battery;
         double data;
+        ros::Publisher frequency_pub;
     
 };
 

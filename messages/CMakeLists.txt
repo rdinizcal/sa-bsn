@@ -28,6 +28,7 @@ ADD_MESSAGE_FILES( FILES
   target_system/external/TargetSystemData.msg
   system_manager/external/ReconfigurationCommand.msg
   system_manager/internal/CommandControl.msg
+  test_messages/SensorFrequency.msg
 )
 
 GENERATE_MESSAGES(DEPENDENCIES std_msgs)
