@@ -30,7 +30,7 @@ class SensorTest {
         void setReceivedMessage(bool);
 
         void freqCallback(const messages::SensorFrequency::ConstPtr&);
-        void frequencyTestSetup(std::string val);
+        void frequencyTestSetup(std::string val, std::shared_ptr<ros::NodeHandle>);
 };
 
 #endif 

@@ -12,9 +12,11 @@
 #include "archlib/Status.h"
 #include "classes/SensorTest.cpp"
 
-bool receivedMessage = false;
-
+SensorTest g3t11TestClass = SensorTest("g3t1_1", "oximeter", 1.0);
 SensorTest g3t12TestClass = SensorTest("g3t1_2", "ecg", 1.0);
+SensorTest g3t13TestClass = SensorTest("g3t1_3", "thermometer", 1.0);
+SensorTest g3t14TestClass = SensorTest("g3t1_4", "abps", 1.0);
+SensorTest g3t15TestClass = SensorTest("g3t1_5", "abpd", 1.0);
 
 std::shared_ptr<ros::NodeHandle> nh;
 
@@ -43,55 +45,6 @@ void ecgCallback(const messages::SensorData::ConstPtr& msg)
     return;
 }
 
-void ecgFreqCallback(const messages::SensorFrequency::ConstPtr& msg) {
-    std::string path = ros::package::getPath("test_suite");
-    
-    std::ofstream myfile (path + "/test_logs/ecg_freq_callback_output.txt");
-
-    if (myfile.is_open()) {
-        myfile << msg->type << std::endl;
-        myfile << msg->value << std::endl;
-        
-        myfile.close();
-    }
-
-    g3t12TestClass.setFreq(msg->value);
-
-    g3t12TestClass.setReceivedMessage(true);
-}
-
-
-void oxiFreqCallback(const messages::SensorFrequency::ConstPtr& msg) {
-    std::string path = ros::package::getPath("test_suite");
-    
-    std::ofstream myfile (path + "/test_logs/oxi_freq_callback_output.txt");
-
-    if (myfile.is_open()) {
-        myfile << msg->type << std::endl;
-        myfile << msg->value << std::endl;
-        
-        myfile.close();
-    }
-
-    receivedMessage = true;
-}
-
-void statusCallback(const archlib::Status::ConstPtr& msg) {
-    std::string path = ros::package::getPath("test_suite");
-    
-    std::ofstream myfile (path + "/test_logs/status_callback_output.txt");
-
-    if (myfile.is_open()) {
-        myfile << "entered callback" << std::endl;
-        myfile << msg->source<< std::endl;
-        myfile << msg->target << std::endl;
-        myfile << msg->content << std::endl;
-
-        myfile.close();
-    }
-
-    receivedMessage = true;
-}
 
 bool getPatientData(services::PatientData::Request &request, 
                     services::PatientData::Response &response) {
@@ -191,12 +144,137 @@ void sensorFrequencyTestSetup(SensorTest& sensor) {
     }
 }
 */
+TEST(G3T1_1, LowerboundFrequencyChange) {
 
+    g3t11TestClass.frequencyTestSetup("4.9", nh);
+    EXPECT_NEAR(g3t11TestClass.getFreq(), 1.0, 0.001);
 
-TEST(G3T1_2, EffectorFrequencyChange) {
+}
+
+TEST(G3T1_1, UpperboundFrequencyChange) {
+
+    g3t11TestClass.frequencyTestSetup("25.1", nh);
+    EXPECT_NEAR(g3t11TestClass.getFreq(), 1.0, 0.001);
+
+}
+
+TEST(G3T1_1, NegativeFrequencyChange) {
+    g3t11TestClass.frequencyTestSetup("-1.0", nh);
+    EXPECT_NEAR(g3t11TestClass.getFreq(), 1.0, 0.001);
     
-    g3t12TestClass.frequencyTestSetup("6.0");
-    EXPECT_NEAR(g3t12TestClass.getFreq(), 6.0, 0.001);
+}
+
+TEST(G3T1_1, ValidFrequencyChange) {
+    
+    g3t11TestClass.frequencyTestSetup("5.1", nh);
+    EXPECT_NEAR(g3t11TestClass.getFreq(), 5.1, 0.001);
+
+}
+
+TEST(G3T1_2, LowerboundFrequencyChange) {
+
+    g3t12TestClass.frequencyTestSetup("4.9", nh);
+    EXPECT_NEAR(g3t12TestClass.getFreq(), 1.0, 0.001);
+
+}
+
+TEST(G3T1_2, UpperboundFrequencyChange) {
+
+    g3t12TestClass.frequencyTestSetup("25.1", nh);
+    EXPECT_NEAR(g3t12TestClass.getFreq(), 1.0, 0.001);
+
+}
+
+TEST(G3T1_2, NegativeFrequencyChange) {
+    g3t12TestClass.frequencyTestSetup("-1.0", nh);
+    EXPECT_NEAR(g3t12TestClass.getFreq(), 1.0, 0.001);
+    
+}
+
+TEST(G3T1_2, ValidFrequencyChange) {
+    
+    g3t12TestClass.frequencyTestSetup("5.1", nh);
+    EXPECT_NEAR(g3t12TestClass.getFreq(), 5.1, 0.001);
+
+}
+
+TEST(G3T1_3, LowerboundFrequencyChange) {
+
+    g3t13TestClass.frequencyTestSetup("4.9", nh);
+    EXPECT_NEAR(g3t13TestClass.getFreq(), 1.0, 0.001);
+
+}
+
+TEST(G3T1_3, UpperboundFrequencyChange) {
+
+    g3t13TestClass.frequencyTestSetup("25.1", nh);
+    EXPECT_NEAR(g3t13TestClass.getFreq(), 1.0, 0.001);
+
+}
+
+TEST(G3T1_3, NegativeFrequencyChange) {
+    g3t13TestClass.frequencyTestSetup("-1.0", nh);
+    EXPECT_NEAR(g3t13TestClass.getFreq(), 1.0, 0.001);
+    
+}
+
+TEST(G3T1_3, ValidFrequencyChange) {
+    
+    g3t13TestClass.frequencyTestSetup("5.1", nh);
+    EXPECT_NEAR(g3t13TestClass.getFreq(), 5.1, 0.001);
+
+}
+
+TEST(G3T1_4, LowerboundFrequencyChange) {
+
+    g3t14TestClass.frequencyTestSetup("4.9", nh);
+    EXPECT_NEAR(g3t14TestClass.getFreq(), 1.0, 0.001);
+
+}
+
+TEST(G3T1_4, UpperboundFrequencyChange) {
+
+    g3t14TestClass.frequencyTestSetup("25.1", nh);
+    EXPECT_NEAR(g3t14TestClass.getFreq(), 1.0, 0.001);
+
+}
+
+TEST(G3T1_4, NegativeFrequencyChange) {
+    g3t14TestClass.frequencyTestSetup("-1.0", nh);
+    EXPECT_NEAR(g3t14TestClass.getFreq(), 1.0, 0.001);
+    
+}
+
+TEST(G3T1_4, ValidFrequencyChange) {
+    
+    g3t14TestClass.frequencyTestSetup("5.1", nh);
+    EXPECT_NEAR(g3t14TestClass.getFreq(), 5.1, 0.001);
+
+}
+TEST(G3T1_5, LowerboundFrequencyChange) {
+
+    g3t15TestClass.frequencyTestSetup("4.9", nh);
+    EXPECT_NEAR(g3t15TestClass.getFreq(), 1.0, 0.001);
+
+}
+
+TEST(G3T1_5, UpperboundFrequencyChange) {
+
+    g3t15TestClass.frequencyTestSetup("25.1", nh);
+    EXPECT_NEAR(g3t15TestClass.getFreq(), 1.0, 0.001);
+
+}
+
+TEST(G3T1_5, NegativeFrequencyChange) {
+    g3t15TestClass.frequencyTestSetup("-1.0", nh);
+    EXPECT_NEAR(g3t15TestClass.getFreq(), 1.0, 0.001);
+    
+}
+
+TEST(G3T1_5, ValidFrequencyChange) {
+    
+    g3t15TestClass.frequencyTestSetup("5.1", nh);
+    EXPECT_NEAR(g3t15TestClass.getFreq(), 5.1, 0.001);
 
 }
 
