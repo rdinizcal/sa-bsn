@@ -3,12 +3,13 @@
 
 #include "messages/TargetSystemData.h"
 #include "messages/SensorData.h"
+#include "archlib/AdaptationCommand.h"
 
 #include <ros/ros.h>
 #include <ros/package.h>
 
 
-class CentralhubTest {
+class CentralhubTestClass {
 
     double patientRisk;
     double trmBatt;
@@ -29,8 +30,8 @@ class CentralhubTest {
     double patientStatus;
 
     public:
-        CentralhubTest();
-        virtual ~CentralhubTest();
+        CentralhubTestClass();
+        virtual ~CentralhubTestClass();
 
         void setupCentralhubTest(messages::SensorData thermMsg,
             messages::SensorData oxiMsg,

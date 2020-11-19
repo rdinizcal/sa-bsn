@@ -9,18 +9,47 @@ FIND_PACKAGE(catkin REQUIRED COMPONENTS roscpp std_msgs genmsg messages archlib 
 
 ###########################################################################
 # Export catkin package.
-CATKIN_PACKAGE()
+CATKIN_PACKAGE(
+    INCLUDE_DIRS include
+    LIBRARIES ${PROJECT_NAME}
+    CATKIN_DEPENDS messages message_runtime archlib
+)
 
 ###########################################################################
 # Set catkin directory.
 INCLUDE_DIRECTORIES(${catkin_INCLUDE_DIRS})
-
-# Set header files from BSN.
-SET (BSN_INCLUDE_DIRS /usr/local/include/bsn)
-INCLUDE_DIRECTORIES (${BSN_INCLUDE_DIRS})
+message( ${CMAKE_CURRENT_SOURCE_DIR} )
 
 # Set include directory.
 INCLUDE_DIRECTORIES(include)
+
+#LINK_DIRECTORIES(include)
+
+###########################################################################
+#FILE(GLOB_RECURSE ${PROJECT_NAME}-srcs "${PROJECT_SOURCE_DIR}/src/*.cpp")
+#ADD_LIBRARY(${PROJECT_NAME} ${${PROJECT_NAME}-srcs})
+#ADD_EXECUTABLE (sensor_test src/SensorTest.cpp src/CentralhubTest.cpp)
+#TARGET_LINK_LIBRARIES (sensor_test ${catkin_LIBRARIES} include)
+#ADD_DEPENDENCIES(sensor_test)
+
+
+###########################################################################
+# Build this project.
+FILE(GLOB ${PROJECT_NAME}-src "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+
+SET(sensor_test-src "${CMAKE_CURRENT_SOURCE_DIR}/src/SensorTestClass.cpp")
+SET(centralhub_test-src "${CMAKE_CURRENT_SOURCE_DIR}/src/CentralhubTestClass.cpp")
+#ADD_LIBRARY (test_node "${CMAKE_CURRENT_SOURCE_DIR}/apps/testnode.cpp" 
+#            ${${PROJECT_NAME}-src} 
+#            ${sensor_test-src} 
+#            ${centralhub_test-src})
+ADD_LIBRARY (test_node 
+            ${${PROJECT_NAME}-src} 
+            ${sensor_test-src} 
+            ${centralhub_test-src})
+TARGET_LINK_LIBRARIES (test_node ${catkin_LIBRARIES} ${LIBRARIES})
+ADD_DEPENDENCIES(test_node messages_generate_messages_cpp)
+
 
 ###########################################################################
 ## Add gtest based cpp test target and link libraries
@@ -33,7 +62,7 @@ if(CATKIN_ENABLE_TESTING)
     add_rostest_gtest(
         testnode 
         testnode.launch 
-        src/testnode.cpp
+        apps/testnode.cpp
         )
 
     # link required libraries
@@ -41,5 +70,6 @@ if(CATKIN_ENABLE_TESTING)
         testnode
         ${catkin_LIBRARIES} 
         ${LIBRARIES}
+        test_node
         )
 endif()

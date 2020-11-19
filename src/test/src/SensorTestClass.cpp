@@ -1,25 +1,24 @@
-#include "include/SensorTest.hpp"
+#include "../include/SensorTestClass.hpp"
 
-
-SensorTest::SensorTest(std::string name, std::string alias, double freqVal) {
+SensorTestClass::SensorTestClass(std::string name, std::string alias, double freqVal) {
     this->name = name;
     this->alias = alias;
     this->freqVal = freqVal;
     this->receivedMessage = false;
 }
 
-SensorTest::~SensorTest() {}
+SensorTestClass::~SensorTestClass() {}
 
 
-double SensorTest::getFreq() {return this->freqVal;}
-void SensorTest::setFreq(double freqVal) {this->freqVal = freqVal;}
-std::string SensorTest::getName() {return this->name;}
-std::string SensorTest::getAlias() {return this->alias;}
-bool SensorTest::getReceivedMessage() {return this->receivedMessage;}
-void SensorTest::setReceivedMessage(bool receivedMessage) {this->receivedMessage = receivedMessage;}
+double SensorTestClass::getFreq() {return this->freqVal;}
+void SensorTestClass::setFreq(double freqVal) {this->freqVal = freqVal;}
+std::string SensorTestClass::getName() {return this->name;}
+std::string SensorTestClass::getAlias() {return this->alias;}
+bool SensorTestClass::getReceivedMessage() {return this->receivedMessage;}
+void SensorTestClass::setReceivedMessage(bool receivedMessage) {this->receivedMessage = receivedMessage;}
 
-void SensorTest::freqCallback(const messages::SensorFrequency::ConstPtr& msg) {
-    /*
+void SensorTestClass::freqCallback(const messages::SensorFrequency::ConstPtr& msg) {
+    
     std::string path = ros::package::getPath("test_suite");
     std::ofstream myfile (path + "/test_logs/"+this->getName()+"_freq_callback_output.txt");
 
@@ -29,21 +28,21 @@ void SensorTest::freqCallback(const messages::SensorFrequency::ConstPtr& msg) {
         
         myfile.close();
     }
-    */
+    
     this->setFreq(msg->value);
     this->setReceivedMessage(true);
 }
 
-void SensorTest::frequencyTestSetup(std::string val, std::shared_ptr<ros::NodeHandle> nh) {
+void SensorTestClass::frequencyTestSetup(std::string val, std::shared_ptr<ros::NodeHandle> nh) {
     //ros::ServiceServer service = nh->advertiseService("getPatientData", &getPatientData);
-//    ros::Subscriber ecg_sub = nh->subscribe("/" + this->getAlias() +"_data", 1, &SensorTest::dataCallback);
+    //ros::Subscriber ecg_sub = nh->subscribe("/" + this->getAlias() +"_data", 1, &SensorTestClass::dataCallback);
 
-//    ros::NodeHandle nh;
-    ros::Subscriber freq_sub = nh->subscribe("/sensor_frequency_/" + this->getName(), 1, &SensorTest::freqCallback, this);
+    //ros::NodeHandle nh;
+    ros::Subscriber freq_sub = nh->subscribe("/sensor_frequency_/" + this->getName(), 1, &SensorTestClass::freqCallback, this);
     ros::Publisher freq_pub = nh->advertise<archlib::AdaptationCommand>("/reconfigure_/" + this->getName(), 1);
     //ros::Subscriber ecg_freq_sub = nh->subscribe("/collect_status", 1, &statusCallback);
 
-    ros::Rate loop_rate(5);
+    ros::Rate loop_rate(5.0);
 
     archlib::AdaptationCommand msg;
     msg.source = "/enactor";

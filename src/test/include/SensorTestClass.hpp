@@ -3,12 +3,14 @@
 
 #include "messages/SensorFrequency.h"
 #include "archlib/Status.h"
+#include "archlib/AdaptationCommand.h"
 
 #include <ros/ros.h>
 #include <ros/package.h>
+#include <iostream>
+#include <fstream>
 
-
-class SensorTest {
+class SensorTestClass {
 
     std::string name;
     std::string alias;
@@ -17,8 +19,8 @@ class SensorTest {
     bool receivedMessage;
 
     public:
-		SensorTest(std::string name, std::string alias, double freqVal);
-        virtual ~SensorTest();
+		    SensorTestClass(std::string name, std::string alias, double freqVal);
+        virtual ~SensorTestClass();
 
         double getFreq();
         void setFreq(double);
