@@ -19,7 +19,8 @@ class SensorTestClass {
     bool receivedMessage;
 
     public:
-		    SensorTestClass(std::string name, std::string alias, double freqVal);
+        SensorTestClass();
+        SensorTestClass(std::string name, std::string alias, double freqVal);
         virtual ~SensorTestClass();
 
         double getFreq();

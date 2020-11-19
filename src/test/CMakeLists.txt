@@ -35,7 +35,7 @@ INCLUDE_DIRECTORIES(include)
 
 ###########################################################################
 # Build this project.
-FILE(GLOB ${PROJECT_NAME}-src "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+#FILE(GLOB ${PROJECT_NAME}-src "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 SET(sensor_test-src "${CMAKE_CURRENT_SOURCE_DIR}/src/SensorTestClass.cpp")
 SET(centralhub_test-src "${CMAKE_CURRENT_SOURCE_DIR}/src/CentralhubTestClass.cpp")
@@ -63,6 +63,12 @@ if(CATKIN_ENABLE_TESTING)
         testnode 
         testnode.launch 
         apps/testnode.cpp
+        src/G3T11Test.cpp
+        src/G3T12Test.cpp
+        src/G3T13Test.cpp
+        src/G3T14Test.cpp
+        src/G3T15Test.cpp
+        src/G4T1Test.cpp
         )
 
     # link required libraries

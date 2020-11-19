@@ -6,7 +6,7 @@ SensorTestClass::SensorTestClass(std::string name, std::string alias, double fre
     this->freqVal = freqVal;
     this->receivedMessage = false;
 }
-
+SensorTestClass::SensorTestClass() {}
 SensorTestClass::~SensorTestClass() {}
 
 
