@@ -51,21 +51,22 @@ void Sensor::body() {
         sendStatus("running");
         
         data = collect();
-
-        /*for data replication, as if replicate_collect values were collected*/
-        {
-            double sum;
-            for(int i = 0; i < replicate_collect; ++i) {
-                double aux_data = data;
-                apply_noise(aux_data);
-                sum += aux_data;
-            }
-            data = sum/replicate_collect;
-        }
+        double original_data = data;
 
         data = process(data);
         transfer(data);
 		sendStatus("success");
+
+        /*for data replication, as if replicate_collect values were collected*/
+        {
+            for(int i = 0; i < replicate_collect; ++i) {
+                double aux_data = original_data;
+                apply_noise(aux_data);
+                aux_data = process(aux_data);
+                transfer(aux_data);
+                sendStatus("success");
+            }
+        }
     } else {
         recharge();
         throw std::domain_error("out of charge");
