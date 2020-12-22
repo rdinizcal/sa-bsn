@@ -13,7 +13,7 @@ void Controller::setUp() {
 
     double freq;
 	nh.getParam("frequency", freq);
-    nh.getParam("kp", kp);
+    nh.getParam("kp", KP);
 	rosComponentDescriptor.setFreq(freq);
 }
 

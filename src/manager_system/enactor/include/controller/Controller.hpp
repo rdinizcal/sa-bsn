@@ -8,10 +8,14 @@ class Controller : public Enactor {
         Controller(int &argc, char **argv, std::string name);
         virtual ~Controller();
 
+    private:
+      	Controller(const Controller &);
+    	Controller &operator=(const Controller &);
+
     public: 
         virtual void setUp();
 
-        virtual void apply_strategy(const std::string &component);
+        virtual void apply_strategy(const std::string &component);      
 };
 
 #endif

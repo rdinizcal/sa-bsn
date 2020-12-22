@@ -55,6 +55,7 @@ class Enactor : public arch::ROSComponent {
 
 		int64_t cycles;
 		double stability_margin;
+		double KP;
 };
 
 #endif 

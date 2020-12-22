@@ -36,6 +36,6 @@ SET (LIBRARIES ${BSN_LIBRARY})
 FILE(GLOB ${PROJECT_NAME}-src "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 SET(enactor-src "${CMAKE_CURRENT_SOURCE_DIR}/src/Controller.cpp")
-ADD_EXECUTABLE (enactor "${CMAKE_CURRENT_SOURCE_DIR}/apps/controller.cpp" ${${PROJECT_NAME}-src} ${enactor-src})
+ADD_EXECUTABLE (enactor "${CMAKE_CURRENT_SOURCE_DIR}/apps/controller.cpp" ${${PROJECT_NAME}-src} ${enactor-src} ${CMAKE_CURRENT_SOURCE_DIR}/src/Enactor.cpp)
 TARGET_LINK_LIBRARIES (enactor ${catkin_LIBRARIES} ${LIBRARIES})
 ADD_DEPENDENCIES(enactor messages_generate_messages_cpp)

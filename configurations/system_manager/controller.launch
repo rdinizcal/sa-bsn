@@ -2,6 +2,6 @@
     <node name="enactor" pkg="enactor" type="enactor" output="screen" />
 
     <param name="frequency" value="100" /> <!--100 Hz-->
-    <param name="kp" value="200" />
+    <param name="kp" value="150" />
 
 </launch>

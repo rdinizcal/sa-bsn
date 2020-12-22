@@ -12,7 +12,8 @@ void Enactor::receiveEvent(const archlib::Event::ConstPtr& msg) {
         invocations[msg->source] = {};
         r_curr[msg->source] = 1;
         r_ref[msg->source] = 0.80;
-        kp[msg->source] = 200;
+        //kp[msg->source] = 200;
+        kp[msg->source] = KP;
         replicate_task[msg->source] = 1;
         freq[msg->source] = 20;
         exception_buffer[msg->source] = 0;
