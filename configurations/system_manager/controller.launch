@@ -3,5 +3,6 @@
 
     <param name="frequency" value="100" /> <!--100 Hz-->
     <param name="kp" value="150" />
+    <param name="adaptation_parameter" value="replicate_collect" />
 
 </launch>

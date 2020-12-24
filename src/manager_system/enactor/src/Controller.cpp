@@ -14,6 +14,7 @@ void Controller::setUp() {
     double freq;
 	nh.getParam("frequency", freq);
     nh.getParam("kp", KP);
+    nh.getParam("adaptation_parameter", adaptation_parameter);
 	rosComponentDescriptor.setFreq(freq);
 }
 
@@ -30,6 +31,11 @@ void Controller::apply_strategy(const std::string &component) {
 
         if(component == "/g4t1"){
             // g4t1 reliability is inversely proportional to the sensors frequency
+            /*
+                Nota:
+
+                -> Quando o componente é a Centralhub, adaptamos as frequências dos sensores. Porquê?
+            */
             for (std::map<std::string, double>::iterator it = freq.begin(); it != freq.end(); ++it){
                 if(it->first != "/g4t1"){
                     freq[it->first] += (error>0) ? ((-kp[it->first]/100) * error) : ((kp[it->first]/100) * error); 
@@ -42,13 +48,19 @@ void Controller::apply_strategy(const std::string &component) {
                 }
             }
         } else {
-            replicate_task[component] += (error > 0) ? ceil(kp[component] * error) : floor(kp[component] * error);
-            if (replicate_task[component] < 1) replicate_task[component] = 1;
-            archlib::AdaptationCommand msg;
-            msg.source = ros::this_node::getName();
-            msg.target = component;
-            msg.action = "replicate_collect=" + std::to_string(replicate_task[(component)]);
-            adapt.publish(msg);
+            if(adaptation_parameter == "replicate_collect") {
+                replicate_task[component] += (error > 0) ? ceil(kp[component] * error) : floor(kp[component] * error);
+                if (replicate_task[component] < 1) replicate_task[component] = 1;
+                archlib::AdaptationCommand msg;
+                msg.source = ros::this_node::getName();
+                msg.target = component;
+                msg.action = "replicate_collect=" + std::to_string(replicate_task[(component)]);
+                adapt.publish(msg);
+            } else {
+                /*
+                    TODO: Adapt sensor frequencies
+                */
+            }
         }
     } else {
         exception_buffer[component] = (exception_buffer[component] > 0) ? 0 : exception_buffer[component] - 1;
