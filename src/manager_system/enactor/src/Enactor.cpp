@@ -15,7 +15,8 @@ void Enactor::receiveEvent(const archlib::Event::ConstPtr& msg) {
         //kp[msg->source] = 200;
         kp[msg->source] = KP;
         replicate_task[msg->source] = 1;
-        freq[msg->source] = 20;
+        //freq[msg->source] = 20;
+        freq[msg->source] = msg->freq;
         exception_buffer[msg->source] = 0;
 
     } else if (msg->content=="deactivate") {

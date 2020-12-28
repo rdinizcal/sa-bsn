@@ -6,7 +6,7 @@
 #include <numeric>
 
 #include "archlib/target_system/Component.hpp"
-#include "archlib/AdaptationCommand.h"
+#include "archlib/AdaptationCommand.h"  
 #include "messages/SensorData.h"
 
 #include "bsn/resource/Battery.hpp"

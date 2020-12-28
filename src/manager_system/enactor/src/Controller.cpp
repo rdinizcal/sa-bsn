@@ -1,5 +1,7 @@
 #include "controller/Controller.hpp"
 
+#include <iostream>
+
 Controller::Controller(int &argc, char **argv, std::string name) : Enactor(argc, argv, name) {}
 
 Controller::~Controller() {}
@@ -36,7 +38,7 @@ void Controller::apply_strategy(const std::string &component) {
 
                 -> Quando o componente é a Centralhub, adaptamos as frequências dos sensores. Porquê?
             */
-            for (std::map<std::string, double>::iterator it = freq.begin(); it != freq.end(); ++it){
+            /*for (std::map<std::string, double>::iterator it = freq.begin(); it != freq.end(); ++it){
                 if(it->first != "/g4t1"){
                     freq[it->first] += (error>0) ? ((-kp[it->first]/100) * error) : ((kp[it->first]/100) * error); 
                     if(freq[(it->first)] <= 0) break;
@@ -46,7 +48,26 @@ void Controller::apply_strategy(const std::string &component) {
                     msg.action = "freq=" + std::to_string(freq[(it->first)]);
                     adapt.publish(msg);
                 }
-            }
+            }*/
+            //double new_freq = freq[component] + ((error>0) ? ((-kp[component]/100) * error) : ((kp[component]/100) * error)); 
+            double new_freq = freq[component] + ((kp[component]/100) * error);
+            if(new_freq > 0) {
+                freq[component] = new_freq;
+                archlib::AdaptationCommand msg;
+                msg.source = ros::this_node::getName();
+                msg.target = component;
+                msg.action = "freq=" + std::to_string(freq[component]);
+                adapt.publish(msg);
+                /*std::cout << "################################################" << std::endl;
+                std::cout << "Adapting Centralhub" << std::endl;
+                std::cout << "Action: " << msg.action << std::endl;
+                std::cout << "################################################" << std::endl;*/
+            } /*else {
+                std::cout << "################################################" << std::endl;
+                std::cout << "COULD NOT ADAPT CENTRALHUB"<< std::endl;
+                std::cout << "Calculated frequency: " << new_freq << std::endl;
+                std::cout << "################################################" << std::endl;
+            }*/
         } else {
             if(adaptation_parameter == "replicate_collect") {
                 replicate_task[component] += (error > 0) ? ceil(kp[component] * error) : floor(kp[component] * error);
@@ -57,9 +78,17 @@ void Controller::apply_strategy(const std::string &component) {
                 msg.action = "replicate_collect=" + std::to_string(replicate_task[(component)]);
                 adapt.publish(msg);
             } else {
-                /*
-                    TODO: Adapt sensor frequencies
-                */
+                //freq[component] += (error>0) ? ((-kp[component]/100) * error) : ((kp[component]/100) * error); 
+                //double new_freq = freq[component] + ((error>0) ? ((-kp[component]/100) * error) : ((kp[component]/100) * error));
+                double new_freq = freq[component] + ((kp[component]/100) * error);
+                if(new_freq > 0) {
+                    freq[component] = new_freq;
+                    archlib::AdaptationCommand msg;
+                    msg.source = ros::this_node::getName();
+                    msg.target = component;
+                    msg.action = "freq=" + std::to_string(freq[component]);
+                    adapt.publish(msg);
+                }
             }
         }
     } else {

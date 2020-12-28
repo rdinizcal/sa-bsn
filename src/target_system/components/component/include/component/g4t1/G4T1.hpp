@@ -12,7 +12,7 @@
 #include "bsn/processor/Processor.hpp"
 #include "bsn/utils/utils.hpp"
 
-#include "component/CentralHub.hpp"
+#include "component/CentralHub.hpp" 
 
 #include "archlib/target_system/Component.hpp"
 #include "archlib/AdaptationCommand.h"

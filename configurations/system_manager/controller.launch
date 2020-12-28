@@ -1,8 +1,8 @@
 <launch> 
     <node name="enactor" pkg="enactor" type="enactor" output="screen" />
 
-    <param name="frequency" value="100" /> <!--100 Hz-->
+    <param name="frequency" value="1" /> <!--100 Hz-->
     <param name="kp" value="150" />
-    <param name="adaptation_parameter" value="replicate_collect" />
+    <param name="adaptation_parameter" value="freq" />
 
 </launch>
