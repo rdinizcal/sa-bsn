@@ -1,0 +1,24 @@
+((CTX_G3_T1_1*W_G3_T1_1+CTX_G3_T1_2*W_G3_T1_2+CTX_G3_T1_3*W_G3_T1_3+CTX_G3_T1_4*W_G3_T1_4+CTX_G3_T1_5*W_G3_T1_5+CTX_G3_T1_6*W_G3_T1_6)+CTX_G4_T1*W_G4_T1)
+
+//CTX_G3_T1_2 = (ECG_sensor = true)
+//CTX_G3_T1_1 = (SaO2_sensor = true)
+//CTX_G3_T1_6 = (Glucose_sensor = true)
+//CTX_G3_T1_5 = (Unknown_sensor = true)
+//CTX_G3_T1_4 = (ABP_sensor = true)
+//CTX_G3_T1_3 = (TEMP_sensor = true)
+//CTX_G4_T1 = (SaO2_data>0 & SaO2_data<100 & ECG_data>0 & ECG_data<300 & TEMP_data>0 & TEMP_data<50 & Systolic_data>0 & Systolic_data<300 & Diastolic_data>0 & Diastolic_data<300)
+//R_G3_T1_2 = reliability of node G3_T1_2
+//R_G3_T1_1 = reliability of node G3_T1_1
+//R_G3_T1_6 = reliability of node G3_T1_6
+//R_G3_T1_5 = reliability of node G3_T1_5
+//R_G3_T1_4 = reliability of node G3_T1_4
+//R_G3_T1_3 = reliability of node G3_T1_3
+//R_G4_T1 = reliability of node G4_T1
+//W_G3_T1_2 = cost of node G3_T1_2
+//W_G3_T1_1 = cost of node G3_T1_1
+//W_G3_T1_6 = cost of node G3_T1_6
+//W_G3_T1_5 = cost of node G3_T1_5
+//W_G3_T1_4 = cost of node G3_T1_4
+//W_G3_T1_3 = cost of node G3_T1_3
+//W_G4_T1 = cost of node G4_T1
+

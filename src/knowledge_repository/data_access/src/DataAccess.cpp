@@ -52,11 +52,11 @@ void DataAccess::setUp() {
     std::string reliability_formula, cost_formula;
 
     try {
-        reliability_file.open(path + "/../resource/models/reliability.formula");
+        reliability_file.open(path + "/../resource/models/reliabilityAND.formula");
         std::getline(reliability_file, reliability_formula);
         reliability_file.close();
     } catch (std::ifstream::failure e) {
-        std::cerr << "Exception opening/reading/closing file (reliability.formula)\n";
+        std::cerr << "Exception opening/reading/closing file (reliabilityAND.formula)\n";
     }
 
     try {
