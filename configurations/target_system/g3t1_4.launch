@@ -17,7 +17,10 @@
     <param name="abpsHighRisk1" value="140,300" />
 
     <!-- accuracy in percentage for abps -->
-    <param name="abpsdata_accuracy" value="90" type="double" />
+    <param name="abpsdata_accuracy" value="99" type="double" />
     <param name="abpscomm_accuracy" value="100" type="double" />
+
+    <!-- instant recharge parameter-->
+    <param name="instant_recharge" value="true" type="bool" />
 
 </launch>

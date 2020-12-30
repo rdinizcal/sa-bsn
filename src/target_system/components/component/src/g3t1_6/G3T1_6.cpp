@@ -10,7 +10,7 @@ using namespace bsn::configuration;
 
 
 G3T1_6::G3T1_6(int &argc, char **argv, const std::string &name) :
-    Sensor(argc, argv, name, "glucosemeter", true, 1, bsn::resource::Battery("glc_batt", 100, 100, 1)),
+    Sensor(argc, argv, name, "glucosemeter", true, 1, bsn::resource::Battery("glc_batt", 100, 100, 1), false),
     markov(),
     dataGenerator(),
     filter(1),
@@ -72,6 +72,10 @@ void G3T1_6::setUp() {
         percentages[2] = Range(std::stod(high_p[0]), std::stod(high_p[1]));
 
         sensorConfig = SensorConfiguration(0, low_range, midRanges, highRanges, percentages);
+    }
+
+    { //Check for instant recharge parameter
+        handle.getParam("instant_recharge", instant_recharge);
     }
 }
 

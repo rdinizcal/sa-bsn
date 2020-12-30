@@ -9,7 +9,7 @@ using namespace bsn::configuration;
 
 
 G3T1_3::G3T1_3(int &argc, char **argv, const std::string &name) :
-    Sensor(argc, argv, name, "thermometer", true, 1, bsn::resource::Battery("therm_batt", 100, 100, 1)),
+    Sensor(argc, argv, name, "thermometer", true, 1, bsn::resource::Battery("therm_batt", 100, 100, 1), false),
     markov(),
     dataGenerator(),
     filter(1),
@@ -71,6 +71,10 @@ void G3T1_3::setUp() {
         percentages[2] = Range(std::stod(high_p[0]), std::stod(high_p[1]));
 
         sensorConfig = SensorConfiguration(0, low_range, midRanges, highRanges, percentages);
+    }
+
+    { //Check for instant recharge parameter
+        handle.getParam("instant_recharge", instant_recharge);
     }
 }
 

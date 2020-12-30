@@ -17,7 +17,10 @@
     <param name="abpdHighRisk1" value="90,300" />
 
     <!-- accuracy in percentage for abpd -->
-    <param name="abpddata_accuracy" value="90" type="double" />
+    <param name="abpddata_accuracy" value="99" type="double" />
     <param name="abpdcomm_accuracy" value="100" type="double" />
+
+    <!-- instant recharge parameter-->
+    <param name="instant_recharge" value="true" type="bool" />
 
 </launch>
