@@ -153,8 +153,8 @@ void Engine::monitor() {
 
     std::vector<std::string> pairs = bsn::utils::split(ans, ';');
     
-    for (std::vector<std::string>::iterator it = pairs.begin(); it != pairs.end(); it++) {
-        std::vector<std::string> pair = bsn::utils::split(*it, ':');
+    for (std::string it : pairs) {
+        std::vector<std::string> pair = bsn::utils::split(it, ':');
         std::string first = pair[0];
         std::string second = pair[1];
 
@@ -165,7 +165,7 @@ void Engine::monitor() {
 
         std::vector<std::string> values = bsn::utils::split(second, ',');
 
-        strategy["R_"+first] = stod(values[values.size()-1]);
+        strategy["R_" + first] = stod(values[values.size()-1]);
         std::cout << "R_" + first + " = " << strategy["R_" + first] << std::endl;
     } 
 
@@ -174,7 +174,7 @@ void Engine::monitor() {
     c_srv.request.name = ros::this_node::getName();
     c_srv.request.query = "all:event:1";
 
-    if(!client_module.call(c_srv)) {
+    if (!client_module.call(c_srv)) {
         ROS_ERROR("Failed to connect to data access node.");
         return;
     } 
@@ -183,14 +183,14 @@ void Engine::monitor() {
     ans = c_srv.response.content;
     //std::cout << "received=> [" << ans << "]" << std::endl;
 
-    if(ans == ""){
+    if (ans == "") {
         ROS_ERROR("Received empty answer when asked for event.");
     }
 
     std::vector<std::string> ctx_pairs = bsn::utils::split(ans, ';');
     
-    for(std::vector<std::string>::iterator it = ctx_pairs.begin(); it != ctx_pairs.end(); it++){
-        std::vector<std::string> pair = bsn::utils::split(*it, ':');
+    for (std::string ctx : ctx_pairs) {
+        std::vector<std::string> pair = bsn::utils::split(ctx, ':');
         std::string first = pair[0];
         std::string second = pair[1];
 
@@ -200,14 +200,23 @@ void Engine::monitor() {
         first.insert(int(first.find('T')),"_"); // G3_T1_1
 
         std::vector<std::string> values = bsn::utils::split(second, ',');
-        for (std::vector<std::string>::iterator value = values.begin(); value != values.end(); value++) {
-            if(*value=="activate"){
-                strategy["CTX_"+first] = 1;
-            } else if (*value=="deactivate") {
-                strategy["CTX_"+first] = 0;
+        for (std::string value : values) {
+            if (first != "G4_T1") {
+                strategy["CTX_" + first] = 1;
+                
+                if (value == "deactivate") {
+                    strategy["R_" + first] = 1;
+                    std::cout << first + " was deactivate and its reliability was set to 1" << std::endl;
+                }
+            } else {
+                if (value == "activate") {
+                    strategy["CTX_" + first] = 1;
+                } else {
+                    strategy["CTX_" + first] = 0; 
+                }
             }
         }
-    } 
+    }
     
     analyze();
 }
@@ -426,7 +435,7 @@ void Engine::body(){
     ros::Subscriber t_sub = n.subscribe("exception", 1000, &Engine::receiveException, this);
 
     ros::Rate loop_rate(rosComponentDescriptor.getFreq());
-    while(ros::ok){
+    while (ros::ok){
         monitor();
         ros::spinOnce();
         loop_rate.sleep();        
