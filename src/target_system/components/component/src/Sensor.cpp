@@ -82,6 +82,7 @@ void Sensor::apply_noise(double &data) {
  
     offset = (noise_factor + ((double)rand() / RAND_MAX) * noise_factor) * data;
     data += (rand()%2==0)?offset:(-1)*offset;
+    noise_factor = 0;
 }
 
 void Sensor::reconfigure(const archlib::AdaptationCommand::ConstPtr& msg) {
