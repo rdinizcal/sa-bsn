@@ -115,6 +115,7 @@ namespace arch {
 
 			msg.source = rosComponentDescriptor.getName();
 			msg.content = content;
+			msg.freq = rosComponentDescriptor.getFreq();
 
 			collect_event.publish(msg);
 		}

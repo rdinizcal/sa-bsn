@@ -7,7 +7,7 @@ using namespace bsn::generator;
 using namespace bsn::configuration;
 
 G3T1_2::G3T1_2(int &argc, char **argv, const std::string &name) :
-    Sensor(argc, argv, name, "ecg", true, 1, bsn::resource::Battery("ecg_batt", 100, 100, 1)),
+    Sensor(argc, argv, name, "ecg", true, 1, bsn::resource::Battery("ecg_batt", 100, 100, 1), false),
     markov(),
     dataGenerator(),
     filter(1),
@@ -71,6 +71,9 @@ void G3T1_2::setUp() {
         sensorConfig = SensorConfiguration(0, low_range, midRanges, highRanges, percentages);
     }
 
+    { //Check for instant recharge parameter
+        handle.getParam("instant_recharge", instant_recharge);
+    }
 }
 
 void G3T1_2::tearDown() {

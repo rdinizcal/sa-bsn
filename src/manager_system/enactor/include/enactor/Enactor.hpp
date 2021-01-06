@@ -20,17 +20,16 @@
 #include "archlib/ROSComponent.hpp"
 
 class Enactor : public arch::ROSComponent {
-
     public:
     	Enactor(int &argc, char **argv, std::string name);
-    	virtual ~Enactor();
+    	virtual ~Enactor();	
 
     private:
-      	Enactor(const Enactor &);
+      	Enactor(const Enactor &);	
     	Enactor &operator=(const Enactor &);
 
   	public:
-        virtual void setUp();
+        virtual void setUp() = 0;
     	virtual void tearDown();
 		virtual void body();
 
@@ -38,24 +37,25 @@ class Enactor : public arch::ROSComponent {
 	  	void receiveEvent(const archlib::Event::ConstPtr& msg);
 	  	void receiveStrategy(const archlib::Strategy::ConstPtr& msg);
 
-		void apply_strategy(const std::string &component);
+		virtual void apply_strategy(const std::string &component) = 0;
 
 		void print();
-
-  	private:
+	
+	protected:
 		ros::Publisher adapt;
 		ros::Publisher except;
 
+		std::map<std::string, std::deque<int>> invocations; //a map of deques where 1s represent successes and 0s represents failures
+		std::map<std::string, int> exception_buffer;
+		std::map<std::string, double> freq;
 		std::map<std::string, double> r_curr;
 		std::map<std::string, double> r_ref;
 		std::map<std::string, double> kp;
-		std::map<std::string, std::deque<int>> invocations; //a map of deques where 1s represent successes and 0s represents failures
 		std::map<std::string, int> replicate_task;
-		std::map<std::string, double> freq;
-		std::map<std::string, int> exception_buffer;
 
 		int64_t cycles;
 		double stability_margin;
+		double KP;
 };
 
 #endif 

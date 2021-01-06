@@ -10,7 +10,7 @@ using namespace bsn::generator;
 using namespace bsn::configuration;
 
 G3T1_1::G3T1_1(int &argc, char **argv, const std::string &name) :
-    Sensor(argc, argv, name, "oximeter", true, 1, bsn::resource::Battery("oxi_batt", 100, 100, 1)),
+    Sensor(argc, argv, name, "oximeter", true, 1, bsn::resource::Battery("oxi_batt", 100, 100, 1), false),
     markov(),
     dataGenerator(),
     filter(1),
@@ -75,6 +75,9 @@ void G3T1_1::setUp() {
         sensorConfig = SensorConfiguration(0, low_range, midRanges, highRanges, percentages);
     }
     
+    { //Check for instant recharge parameter
+        handle.getParam("instant_recharge", instant_recharge);
+    }
 }
 
 void G3T1_1::tearDown() {

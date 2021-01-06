@@ -17,6 +17,9 @@
     <param name="HighRisk1" value="0,55" />
 
     <!-- accuracy in percentage -->
-    <param name="accuracy" value="90" type="double" />
+    <param name="accuracy" value="99" type="double" />
+
+    <!-- instant recharge parameter-->
+    <param name="instant_recharge" value="true" type="bool" />
 
 </launch>

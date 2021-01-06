@@ -161,7 +161,7 @@ void G4T1::process(){
     std::cout << "| ABPD_RISK: " << abpd_risk << std::endl;
     std::cout << "| GLC_RISK: " << glc_risk << std::endl;
     std::cout << "| PATIENT_STATE:" << patient_risk << std::endl;
-    std::cout << "*****************************************" << std::endl; 
+    std::cout << "*****************************************" << std::endl;
 }
 
 int32_t G4T1::getSensorId(std::string type) {
