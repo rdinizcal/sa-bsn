@@ -1,4 +1,4 @@
 Header  Header
-int32  id  
+string id  
 string sensor
 string state

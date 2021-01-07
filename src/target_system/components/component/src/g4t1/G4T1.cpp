@@ -57,11 +57,11 @@ std::vector<std::string> G4T1::getPatientStatus() {
 
 void G4T1::setUp() {
     Component::setUp();
-
-    ros::NodeHandle config;
+    
+    diagSub = nh.subscribe("diagnostics", 10, &G4T1::processDiagnostics, this);
 
     double freq;
-    config.getParam("frequency", freq);
+    nh.getParam("frequency", freq);
     rosComponentDescriptor.setFreq(freq);
 
     for (std::vector<std::list<double>>::iterator it = data_buffer.begin();
@@ -69,7 +69,7 @@ void G4T1::setUp() {
             (*it) = {0.0};
     }
 
-    pub = config.advertise<messages::TargetSystemData>("TargetSystemData", 10);
+    pub = nh.advertise<messages::TargetSystemData>("TargetSystemData", 10);
 }
 
 void G4T1::tearDown() {}
@@ -154,6 +154,14 @@ void G4T1::process(){
     std::cout << "| ABPD_RISK: " << abpd_risk << std::endl;
     std::cout << "| PATIENT_STATE:" << patient_risk << std::endl;
     std::cout << "*****************************************" << std::endl; 
+}
+
+void G4T1::processDiagnostics(const messages::DiagnosticsData::ConstPtr& msg) {
+    //std::cout << "===========================" << std::endl;
+    //std::cout << "id: " + msg->id;
+    //std::cout << ",from: " + msg->sensor;
+    //std::cout << ", in state: " + msg->state << std::endl;
+    return;
 }
 
 int32_t G4T1::getSensorId(std::string type) {

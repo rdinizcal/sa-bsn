@@ -8,6 +8,7 @@
 #include "archlib/target_system/Component.hpp"
 #include "archlib/AdaptationCommand.h"
 #include "messages/SensorData.h"
+#include "messages/DiagnosticsData.h"
 
 #include "bsn/resource/Battery.hpp"
 #include "bsn/utils/utils.hpp"

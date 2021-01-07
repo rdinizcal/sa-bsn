@@ -101,7 +101,7 @@ double G3T1_1::collect() {
 
     collected_risk = sensorConfig.evaluateNumber(m_data);
 
-    diagMsg.id = this->msg_id;
+    diagMsg.id = std::to_string(this->msg_id);
     diagMsg.sensor = "oximeter";
     diagMsg.state = "collect";
 
@@ -143,7 +143,7 @@ void G3T1_1::transfer(const double &m_data) {
     data_pub.publish(msg);
     battery.consume(BATT_UNIT);
 
-    diagMsg.id = this->msg_id;
+    diagMsg.id = std::to_string(this->msg_id);
     diagMsg.sensor = "oximeter";
     diagMsg.state = "sent";
 

@@ -42,6 +42,8 @@ class G4T1 : public CentralHub {
         virtual void process();
         virtual void transfer();
 
+        void processDiagnostics(const messages::DiagnosticsData::ConstPtr& msg);
+
     private:
         double patient_status;
 
@@ -64,6 +66,9 @@ class G4T1 : public CentralHub {
         double trm_raw;
 
         ros::Publisher pub;
+        ros::NodeHandle nh;
+        ros::Subscriber diagSub;
+    
         bool lost_packt;
 };
 
