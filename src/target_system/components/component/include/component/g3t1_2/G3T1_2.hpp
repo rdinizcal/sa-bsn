@@ -50,6 +50,7 @@ class G3T1_2 : public Sensor {
 		ros::ServiceClient client;
 
 		double collected_risk;
+		int32_t msg_id;
 
 };
 
