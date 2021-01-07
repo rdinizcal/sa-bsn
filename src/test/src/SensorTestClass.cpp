@@ -8,8 +8,15 @@ SensorTestClass::SensorTestClass(std::string name, std::string alias, double fre
 }
 SensorTestClass::SensorTestClass() {}
 SensorTestClass::~SensorTestClass() {}
-
-
+/*
+bool SensorTestClass::getPatientData(services::PatientData::Request &request, 
+                    services::PatientData::Response &response) {
+    
+    response.data = 95.0201;
+    
+    return true;
+}
+*/
 double SensorTestClass::getFreq() {return this->freqVal;}
 void SensorTestClass::setFreq(double freqVal) {this->freqVal = freqVal;}
 std::string SensorTestClass::getName() {return this->name;}
@@ -34,7 +41,7 @@ void SensorTestClass::freqCallback(const messages::SensorFrequency::ConstPtr& ms
 }
 
 void SensorTestClass::frequencyTestSetup(std::string val, std::shared_ptr<ros::NodeHandle> nh) {
-    //ros::ServiceServer service = nh->advertiseService("getPatientData", &getPatientData);
+    //ros::ServiceServer service = nh->advertiseService("getPatientData", &SensorTestClass::getPatientData);
     //ros::Subscriber ecg_sub = nh->subscribe("/" + this->getAlias() +"_data", 1, &SensorTestClass::dataCallback);
 
     //ros::NodeHandle nh;

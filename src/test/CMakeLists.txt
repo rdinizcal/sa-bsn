@@ -62,13 +62,13 @@ if(CATKIN_ENABLE_TESTING)
     add_rostest_gtest(
         testnode 
         testnode.launch 
-        apps/testnode.cpp
+        apps/main.cpp
+        src/G4T1Test.cpp
         src/G3T11Test.cpp
         src/G3T12Test.cpp
         src/G3T13Test.cpp
         src/G3T14Test.cpp
         src/G3T15Test.cpp
-        src/G4T1Test.cpp
         )
 
     # link required libraries

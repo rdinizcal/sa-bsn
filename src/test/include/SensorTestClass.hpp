@@ -32,6 +32,7 @@ class SensorTestClass {
         bool getReceivedMessage();
         void setReceivedMessage(bool);
 
+        //bool getPatientData(services::PatientData::Request &request, services::PatientData::Response &response);
         void freqCallback(const messages::SensorFrequency::ConstPtr&);
         void frequencyTestSetup(std::string val, std::shared_ptr<ros::NodeHandle>);
 };

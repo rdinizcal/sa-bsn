@@ -4,35 +4,6 @@
 CentralhubTestClass::CentralhubTestClass() {}
 CentralhubTestClass::~CentralhubTestClass() {}
 
-/*
-void CentralhubTestClass::setTherm(messages::SensorData msg){
-    this->therm_batt = msg.therm_batt;
-    this->therm_risk = msg.therm_risk;
-    this->therm_data = msg.therm_data;
-}
-void CentralhubTestClass::setEcg(messages::SensorData msg){
-    this->ecg_batt = msg.ecg_batt;
-    this->ecg_risk = msg.ecg_risk;
-    this->ecg_data = msg.ecg_data;
-}
-void CentralhubTestClass::setOxi(messages::SensorData msg){
-    this->oxi_batt = msg.oxi_batt;
-    this->oxi_risk = msg.oxi_risk;
-    this->oxi_data = msg.oxi_data;
-}
-void CentralhubTestClass::setAbps(messages::SensorData msg){
-    this->abps_batt = msg.abps_batt;
-    this->abps_risk = msg.abps_risk;
-    this->abps_data = msg.abps_data;
-}
-void CentralhubTestClass::setAbpd(messages::SensorData msg) {
-    this->abpd_batt = msg.abpd_batt;
-    this->abpd_risk = msg.abpd_risk;
-    this->abpd_data = msg.abpd_data;
-}
-*/
-
-
 void CentralhubTestClass::processTargetSystemData(const messages::TargetSystemData::ConstPtr &msg) {
 /*
     std::string path = ros::package::getPath("test_suite");
