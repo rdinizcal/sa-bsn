@@ -15,7 +15,8 @@ G3T1_1::G3T1_1(int &argc, char **argv, const std::string &name) :
     dataGenerator(),
     filter(1),
     sensorConfig(),
-    collected_risk() {}
+    collected_risk(),
+    msg_id(0) {}
 
 G3T1_1::~G3T1_1() {}
 
@@ -85,6 +86,7 @@ double G3T1_1::collect() {
     double m_data = 0;
     ros::ServiceClient client = handle.serviceClient<services::PatientData>("getPatientData");
     services::PatientData srv;
+    messages::DiagnosticsData diagMsg;
 
     srv.request.vitalSign = "oxigenation";
 
@@ -98,6 +100,12 @@ double G3T1_1::collect() {
     battery.consume(BATT_UNIT);
 
     collected_risk = sensorConfig.evaluateNumber(m_data);
+
+    diagMsg.id = this->msg_id;
+    diagMsg.sensor = "oximeter";
+    diagMsg.state = "collect";
+
+    diagnostics_pub.publish(diagMsg);
 
     return m_data;
 }
@@ -123,7 +131,10 @@ void G3T1_1::transfer(const double &m_data) {
 
     ros::NodeHandle handle;
     data_pub = handle.advertise<messages::SensorData>("oximeter_data", 10);
+
     messages::SensorData msg;
+    messages::DiagnosticsData diagMsg;
+
     msg.type = type;
     msg.data = m_data;
     msg.risk = risk;
@@ -131,6 +142,14 @@ void G3T1_1::transfer(const double &m_data) {
 
     data_pub.publish(msg);
     battery.consume(BATT_UNIT);
+
+    diagMsg.id = this->msg_id;
+    diagMsg.sensor = "oximeter";
+    diagMsg.state = "sent";
+
+    diagnostics_pub.publish(diagMsg);
+
+    this->msg_id++;
 
     ROS_INFO("risk calculated and transferred: [%.2f%%]", risk);
 }

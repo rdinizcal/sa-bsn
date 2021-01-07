@@ -9,6 +9,7 @@
 #include "archlib/AdaptationCommand.h"
 #include "archlib/Uncertainty.h"
 #include "messages/SensorFrequency.h"
+#include "messages/DiagnosticsData.h"
 
 #include "bsn/resource/Battery.hpp"
 #include "bsn/utils/utils.hpp"
@@ -42,6 +43,8 @@ class Sensor : public arch::target_system::Component {
         void turnOff();
         void recharge();
 
+        ros::Publisher diagnostics_pub;
+        
     protected:
 		std::string type;
 		bool active;
@@ -50,8 +53,8 @@ class Sensor : public arch::target_system::Component {
 		double noise_factor;
 		bsn::resource::Battery battery;
         double data;
+
         ros::Publisher frequency_pub;
-    
 };
 
 #endif 
