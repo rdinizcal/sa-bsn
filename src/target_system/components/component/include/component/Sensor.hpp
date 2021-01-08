@@ -50,7 +50,7 @@ class Sensor : public arch::target_system::Component {
 		bsn::resource::Battery battery;
         double data;
         bool instant_recharge;
-    
+        bool shouldStart;
 };
 
 #endif 

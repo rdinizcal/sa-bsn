@@ -25,6 +25,8 @@ void G3T1_1::setUp() {
     std::string s;
 
     std::array<bsn::range::Range,5> ranges;
+
+    handle.getParam("start", shouldStart);
     
     { // Configure markov chain
         std::vector<std::string> lrs,mrs0,hrs0,mrs1,hrs1;

@@ -40,6 +40,7 @@ namespace arch {
             protected:
                 void activate();
                 void deactivate();
+                static void shutdownComponent();
 
                 ros::NodeHandle handle;
                 static void sigIntHandler(int signal);

@@ -49,7 +49,11 @@ namespace arch {
 			*/
 		}
 
-		void Component::sigIntHandler(int signal){
+		void Component::sigIntHandler(int signal) {
+			shutdownComponent();
+		}
+
+		void Component::shutdownComponent() {
 			archlib::Event eventMsg;
 			archlib::Status statusMsg;
 
