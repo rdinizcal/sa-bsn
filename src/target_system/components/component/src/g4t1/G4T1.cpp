@@ -110,6 +110,8 @@ void G4T1::collect(const messages::SensorData::ConstPtr& msg) {
         data_buffer[type].erase(data_buffer[type].begin());//erase the first element to avoid overflow
         lost_packt = true;
     }
+    std::cout << "message id is: " + msg->id;
+    std::cout << ", data is: " << msg->data << std::endl;
 }
 
 void G4T1::process(){
@@ -144,7 +146,7 @@ void G4T1::process(){
     } else if(patient_status > 80 && patient_status <= 100) {
         patient_risk = "VERY CRITICAL RISK";
     }
-
+/*
     std::cout << std::endl << "*****************************************" << std::endl;
     std::cout << "PatientStatusInfo#" << std::endl;
     std::cout << "| THERM_RISK: " << trm_risk << std::endl;
@@ -154,13 +156,14 @@ void G4T1::process(){
     std::cout << "| ABPD_RISK: " << abpd_risk << std::endl;
     std::cout << "| PATIENT_STATE:" << patient_risk << std::endl;
     std::cout << "*****************************************" << std::endl; 
+*/
 }
 
 void G4T1::processDiagnostics(const messages::DiagnosticsData::ConstPtr& msg) {
-    //std::cout << "===========================" << std::endl;
-    //std::cout << "id: " + msg->id;
-    //std::cout << ",from: " + msg->sensor;
-    //std::cout << ", in state: " + msg->state << std::endl;
+    std::cout << "id: " + msg->id;
+    std::cout << ",from: " + msg->sensor;
+    std::cout << ", in state: " + msg->state;
+    std::cout << ", data: " << msg->data << std::endl;
     return;
 }
 

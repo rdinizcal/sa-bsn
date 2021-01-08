@@ -42,8 +42,6 @@ class Sensor : public arch::target_system::Component {
         void turnOn();
         void turnOff();
         void recharge();
-
-        ros::Publisher diagnostics_pub;
         
     protected:
 		std::string type;
@@ -55,6 +53,7 @@ class Sensor : public arch::target_system::Component {
         double data;
 
         ros::Publisher frequency_pub;
+        ros::Publisher diagnostics_pub;
 };
 
 #endif 

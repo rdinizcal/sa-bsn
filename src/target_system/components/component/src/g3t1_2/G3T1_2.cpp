@@ -99,6 +99,7 @@ double G3T1_2::collect() {
     diagMsg.id = std::to_string(this->msg_id);
     diagMsg.sensor = "ecg";
     diagMsg.state = "collect";
+    diagMsg.data = m_data;
 
     diagnostics_pub.publish(diagMsg);
 
@@ -129,6 +130,7 @@ void G3T1_2::transfer(const double &m_data) {
     messages::SensorData msg;
     messages::DiagnosticsData diagMsg;
 
+    msg.id = std::to_string(this->msg_id);
     msg.type = type;
     msg.data = m_data;
     msg.risk = risk;
@@ -141,6 +143,7 @@ void G3T1_2::transfer(const double &m_data) {
     diagMsg.id = std::to_string(this->msg_id);
     diagMsg.sensor = "ecg";
     diagMsg.state = "sent";
+    diagMsg.data = m_data;
 
     diagnostics_pub.publish(diagMsg);
 
