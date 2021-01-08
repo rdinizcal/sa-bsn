@@ -1,0 +1,3 @@
+<launch>     
+    <node name="diagnostics_analyzer" pkg="diagnostics_analyzer" type="diagnostics_analyzer" output="screen" />
+</launch>

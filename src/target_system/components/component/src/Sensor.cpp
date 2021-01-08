@@ -11,7 +11,7 @@ Sensor& Sensor::operator=(const Sensor &obj) {
     this->battery = obj.battery;
     this->data = obj.data;
 }
-
+ 
 int32_t Sensor::run() {
 
 	setUp();
@@ -20,7 +20,7 @@ int32_t Sensor::run() {
     ros::Subscriber noise_subs = nh.subscribe("uncertainty_"+ros::this_node::getName(), 10, &Sensor::injectUncertainty, this);
     ros::Subscriber reconfig_subs = nh.subscribe("reconfigure_"+ros::this_node::getName(), 10, &Sensor::reconfigure, this);
     frequency_pub = nh.advertise<messages::SensorFrequency>("sensor_frequency_"+ros::this_node::getName(), 1);
-    diagnostics_pub = nh.advertise<messages::DiagnosticsData>("diagnostics", 1);
+    diagnostics_pub = nh.advertise<messages::DiagnosticsData>("sensor_diagnostics", 1);
 
     sendStatus("init");
     ros::spinOnce();
