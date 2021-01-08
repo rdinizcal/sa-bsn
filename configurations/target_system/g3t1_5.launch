@@ -2,6 +2,8 @@
     <!-- Blood Pressure Measurement sensor-->    
     <node name="g3t1_5" pkg="component" type="g3t1_5" output="screen" />
 
+    <param name="start" value="true" />
+
     <param name="frequency" value="5" /> <!-- 1 Hz  -->
 
     <!-- Defines the percentages to consider low, moderate or high risk -->

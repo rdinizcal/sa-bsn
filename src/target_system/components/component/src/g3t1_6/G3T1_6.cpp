@@ -25,6 +25,8 @@ void G3T1_6::setUp() {
     std::array<bsn::range::Range,5> ranges;
     std::string s;
 
+    handle.getParam("start", shouldStart);
+
     { // Get ranges
         std::vector<std::string> lrs,mrs0,hrs0,mrs1,hrs1;
 
