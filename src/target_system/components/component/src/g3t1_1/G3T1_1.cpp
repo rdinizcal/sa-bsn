@@ -113,7 +113,7 @@ double G3T1_1::process(const double &m_data) {
 
     ROS_INFO("filtered data: [%s]", std::to_string(filtered_data).c_str());
 
-    diagMsg.id = std::to_string(this->msg_id);
+    diagMsg.id = this->msg_id;
     diagMsg.sensor = "oximeter";
     diagMsg.state = "collect";
     diagMsg.data = filtered_data;
@@ -131,7 +131,7 @@ void G3T1_1::transfer(const double &m_data) {
         this->msg_id++;
         throw std::domain_error("risk data out of boundaries");
     }
-    
+
     if (label(risk) != label(collected_risk)) {
         this->msg_id++;
         throw std::domain_error("sensor accuracy fail");
@@ -143,7 +143,7 @@ void G3T1_1::transfer(const double &m_data) {
     messages::SensorData msg;
     messages::DiagnosticsData diagMsg;
 
-    msg.id = std::to_string(this->msg_id);
+    msg.id = this->msg_id;
     msg.type = type;
     msg.data = m_data;
     msg.risk = risk;
@@ -152,7 +152,7 @@ void G3T1_1::transfer(const double &m_data) {
     data_pub.publish(msg);
     battery.consume(BATT_UNIT);
 
-    diagMsg.id = std::to_string(this->msg_id);
+    diagMsg.id = this->msg_id;
     diagMsg.sensor = "oximeter";
     diagMsg.state = "sent";
     diagMsg.data = m_data;

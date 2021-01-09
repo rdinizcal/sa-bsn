@@ -110,7 +110,7 @@ double G3T1_2::process(const double &m_data) {
 
     ROS_INFO("filtered data: [%s]", std::to_string(filtered_data).c_str());
     
-    diagMsg.id = std::to_string(this->msg_id);
+    diagMsg.id = this->msg_id;
     diagMsg.sensor = "ecg";
     diagMsg.state = "collect";
     diagMsg.data = filtered_data;
@@ -131,13 +131,13 @@ void G3T1_2::transfer(const double &m_data) {
         this->msg_id++;
         throw std::domain_error("sensor accuracy fail");
     }
-    
+
     ros::NodeHandle handle;
     data_pub = handle.advertise<messages::SensorData>("ecg_data", 10);
     messages::SensorData msg;
     messages::DiagnosticsData diagMsg;
 
-    msg.id = std::to_string(this->msg_id);
+    msg.id = this->msg_id;
     msg.type = type;
     msg.data = m_data;
     msg.risk = risk;
@@ -147,7 +147,7 @@ void G3T1_2::transfer(const double &m_data) {
     
     battery.consume(BATT_UNIT);
 
-    diagMsg.id = std::to_string(this->msg_id);
+    diagMsg.id = this->msg_id;
     diagMsg.sensor = "ecg";
     diagMsg.state = "sent";
     diagMsg.data = m_data;

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <map>
 
 #include "messages/DiagnosticsData.h"
 
@@ -23,7 +24,16 @@ class DiagnosticsAnalyzer {
         void processCentralhubData(const messages::DiagnosticsData::ConstPtr&);
         void processSensorData(const messages::DiagnosticsData::ConstPtr&);
 
-//        ros::NodeHandle nh;
+        //ros::NodeHandle nh;
         ros::Subscriber sensorSub;
         ros::Subscriber centralhubSub;
+        
+        //int32_t collectedId;
+        //int32_t processedId;
+        std::map<std::string, int> currentCollectedId;
+        std::map<std::string, int> currentSentId;
+
+        std::map<std::string, int> expectedCollectedId;
+        std::map<std::string, int> expectedSentId;
+
 };
