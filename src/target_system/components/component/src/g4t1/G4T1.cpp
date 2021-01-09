@@ -58,7 +58,7 @@ std::vector<std::string> G4T1::getPatientStatus() {
 void G4T1::setUp() {
     Component::setUp();
     
-    diagSub = nh.subscribe("diagnostics", 10, &G4T1::processDiagnostics, this);
+    //diagSub = nh.subscribe("sensor_diagnostics", 10, &G4T1::processDiagnostics, this);
 
     double freq;
     nh.getParam("frequency", freq);
@@ -70,6 +70,7 @@ void G4T1::setUp() {
     }
 
     pub = nh.advertise<messages::TargetSystemData>("TargetSystemData", 10);
+    diagPub = nh.advertise<messages::DiagnosticsData>("centralhub_diagnostics", 10);
 }
 
 void G4T1::tearDown() {}
@@ -78,7 +79,7 @@ void G4T1::collect(const messages::SensorData::ConstPtr& msg) {
     int type = getSensorId(msg->type);
     double risk = msg->risk;
     double batt = msg->batt;
-    
+
     battery.consume(BATT_UNIT);
     if (msg->type == "null" || int32_t(risk) == -1)  throw std::domain_error("risk data out of boundaries");
 
@@ -110,11 +111,20 @@ void G4T1::collect(const messages::SensorData::ConstPtr& msg) {
         data_buffer[type].erase(data_buffer[type].begin());//erase the first element to avoid overflow
         lost_packt = true;
     }
-    std::cout << "message id is: " + msg->id;
-    std::cout << ", data is: " << msg->data << std::endl;
+
+    messages::DiagnosticsData diagMsg;
+    diagMsg.id = msg->id;
+    diagMsg.sensor = msg->type;
+    diagMsg.state = "centralhub collected";
+    diagMsg.data = msg->data;
+
+    diagPub.publish(diagMsg);
+
+    //std::cout << "message id is: " + msg->id;
+    //std::cout << ", data is: " << msg->data << std::endl;
 }
 
-void G4T1::process(){
+void G4T1::process() {
     battery.consume(BATT_UNIT * data_buffer.size());
     std::vector<double> current_data;
 
@@ -146,7 +156,7 @@ void G4T1::process(){
     } else if(patient_status > 80 && patient_status <= 100) {
         patient_risk = "VERY CRITICAL RISK";
     }
-/*
+
     std::cout << std::endl << "*****************************************" << std::endl;
     std::cout << "PatientStatusInfo#" << std::endl;
     std::cout << "| THERM_RISK: " << trm_risk << std::endl;
@@ -156,16 +166,15 @@ void G4T1::process(){
     std::cout << "| ABPD_RISK: " << abpd_risk << std::endl;
     std::cout << "| PATIENT_STATE:" << patient_risk << std::endl;
     std::cout << "*****************************************" << std::endl; 
-*/
 }
 
-void G4T1::processDiagnostics(const messages::DiagnosticsData::ConstPtr& msg) {
-    std::cout << "id: " + msg->id;
-    std::cout << ",from: " + msg->sensor;
-    std::cout << ", in state: " + msg->state;
-    std::cout << ", data: " << msg->data << std::endl;
-    return;
-}
+//void G4T1::processDiagnostics(const messages::DiagnosticsData::ConstPtr& msg) {
+//    std::cout << "id: " + msg->id;
+//    std::cout << ",from: " + msg->sensor;
+//    std::cout << ", in state: " + msg->state;
+//    std::cout << ", data: " << msg->data << std::endl;
+//    return;
+//}
 
 int32_t G4T1::getSensorId(std::string type) {
     if (type == "thermometer")

@@ -82,7 +82,6 @@ double G3T1_2::collect() {
     double m_data = 0;
     ros::ServiceClient client = handle.serviceClient<services::PatientData>("getPatientData");
     services::PatientData srv;
-    messages::DiagnosticsData diagMsg;
 
     srv.request.vitalSign = "heart_rate";
 
@@ -96,18 +95,13 @@ double G3T1_2::collect() {
     battery.consume(BATT_UNIT);
     collected_risk = sensorConfig.evaluateNumber(m_data);
 
-    diagMsg.id = std::to_string(this->msg_id);
-    diagMsg.sensor = "ecg";
-    diagMsg.state = "collect";
-    diagMsg.data = m_data;
-
-    diagnostics_pub.publish(diagMsg);
 
     return m_data;
 }
 
 double G3T1_2::process(const double &m_data) {
     double filtered_data;
+    messages::DiagnosticsData diagMsg;
     
     
     filter.insert(m_data);
@@ -115,6 +109,13 @@ double G3T1_2::process(const double &m_data) {
     battery.consume(BATT_UNIT*filter.getRange());
 
     ROS_INFO("filtered data: [%s]", std::to_string(filtered_data).c_str());
+    
+    diagMsg.id = std::to_string(this->msg_id);
+    diagMsg.sensor = "ecg";
+    diagMsg.state = "collect";
+    diagMsg.data = filtered_data;
+
+    diagnostics_pub.publish(diagMsg);
     return filtered_data;
 }
 
@@ -122,9 +123,15 @@ void G3T1_2::transfer(const double &m_data) {
     double risk;
     risk = sensorConfig.evaluateNumber(m_data);
 
-    if (risk < 0 || risk > 100) throw std::domain_error("risk data out of boundaries");
-    if (label(risk) != label(collected_risk)) throw std::domain_error("sensor accuracy fail");
-
+    if (risk < 0 || risk > 100) {
+        this->msg_id++;
+        throw std::domain_error("risk data out of boundaries");
+    }    
+    if (label(risk) != label(collected_risk)) {
+        this->msg_id++;
+        throw std::domain_error("sensor accuracy fail");
+    }
+    
     ros::NodeHandle handle;
     data_pub = handle.advertise<messages::SensorData>("ecg_data", 10);
     messages::SensorData msg;

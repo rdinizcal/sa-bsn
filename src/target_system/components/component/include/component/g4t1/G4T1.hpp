@@ -66,9 +66,15 @@ class G4T1 : public CentralHub {
         double trm_raw;
 
         ros::Publisher pub;
+        ros::Publisher diagPub;
         ros::NodeHandle nh;
         ros::Subscriber diagSub;
     
+        std::string processed_id;
+        std::string processed_sensor;
+        std::string processed_state;
+        double processed_data;
+
         bool lost_packt;
 };
 

@@ -13,7 +13,12 @@ void DiagnosticsAnalyzer::setUp() {
     centralhubSub = nh.subscribe("centralhub_diagnostics", 10, &DiagnosticsAnalyzer::processCentralhubData, this);
 }
 
-void DiagnosticsAnalyzer::processCentralhubData(const messages::DiagnosticsData::ConstPtr& msg) {}
+void DiagnosticsAnalyzer::processCentralhubData(const messages::DiagnosticsData::ConstPtr& msg) {
+    std::cout << "id: " + msg->id;
+    std::cout << ",from: " + msg->sensor;
+    std::cout << ", in state: " + msg->state;
+    std::cout << ", data: " << msg->data << std::endl;
+}
 
 void DiagnosticsAnalyzer::processSensorData(const messages::DiagnosticsData::ConstPtr& msg) {
     std::cout << "id: " + msg->id;
@@ -23,9 +28,7 @@ void DiagnosticsAnalyzer::processSensorData(const messages::DiagnosticsData::Con
 }
 
 void DiagnosticsAnalyzer::tearDown() {}
-void DiagnosticsAnalyzer::body() {
-    std::cout << "reached body" << std::endl;
-}
+void DiagnosticsAnalyzer::body() {}
 
 
 int32_t DiagnosticsAnalyzer::run() {
