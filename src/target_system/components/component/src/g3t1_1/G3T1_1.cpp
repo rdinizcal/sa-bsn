@@ -1,6 +1,6 @@
 #include "component/g3t1_1/G3T1_1.hpp"
 
-#define BATT_UNIT 0.2
+#define BATT_UNIT 2
 
 #include <algorithm>
 #include <cmath>
@@ -22,7 +22,7 @@ G3T1_1::~G3T1_1() {}
 
 void G3T1_1::setUp() {
     Component::setUp();
-
+    
     std::string s;
 
     std::array<bsn::range::Range,5> ranges;
@@ -86,6 +86,12 @@ double G3T1_1::collect() {
     double m_data = 0;
     ros::ServiceClient client = handle.serviceClient<services::PatientData>("getPatientData");
     services::PatientData srv;
+    messages::DiagnosticsStatus msg;
+
+    msg.sensor = this->type;
+    msg.status = "collect";
+
+    status_pub.publish(msg);
 
     srv.request.vitalSign = "oxigenation";
 
@@ -99,6 +105,7 @@ double G3T1_1::collect() {
     battery.consume(BATT_UNIT);
 
     collected_risk = sensorConfig.evaluateNumber(m_data);
+
 
     return m_data;
 }

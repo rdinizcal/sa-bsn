@@ -10,6 +10,7 @@
 #include "archlib/Uncertainty.h"
 #include "messages/SensorFrequency.h"
 #include "messages/DiagnosticsData.h"
+#include "messages/DiagnosticsStatus.h"
 
 #include "bsn/resource/Battery.hpp"
 #include "bsn/utils/utils.hpp"
@@ -54,6 +55,7 @@ class Sensor : public arch::target_system::Component {
 
         ros::Publisher frequency_pub;
         ros::Publisher diagnostics_pub;
+        ros::Publisher status_pub;
 };
 
 #endif 

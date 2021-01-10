@@ -21,12 +21,19 @@ int32_t Sensor::run() {
     ros::Subscriber reconfig_subs = nh.subscribe("reconfigure_"+ros::this_node::getName(), 10, &Sensor::reconfigure, this);
     frequency_pub = nh.advertise<messages::SensorFrequency>("sensor_frequency_"+ros::this_node::getName(), 1);
     diagnostics_pub = nh.advertise<messages::DiagnosticsData>("sensor_diagnostics", 1);
+    status_pub = nh.advertise<messages::DiagnosticsStatus>("sensor_status", 10);
+
+    messages::DiagnosticsStatus msg;
+
+    ros::Rate loop_rate(rosComponentDescriptor.getFreq());
 
     sendStatus("init");
-    ros::spinOnce();
+
+    msg.sensor = this->type;
+    msg.status = "on";
+    status_pub.publish(msg);
 
     while (ros::ok()) {
-        ros::Rate loop_rate(rosComponentDescriptor.getFreq());
         ros::spinOnce();
 
         try {
@@ -42,10 +49,19 @@ int32_t Sensor::run() {
 }
 
 void Sensor::body() {
+
+    messages::DiagnosticsStatus msg;
     
+    msg.sensor = this->type;
+
     if (!isActive() && battery.getCurrentLevel() > 90){
         turnOn();
+        msg.status = "on";
+        status_pub.publish(msg);
     } else if (isActive() && battery.getCurrentLevel() < 2){
+        //Sends info to diagnostics here
+        msg.status = "off";
+        status_pub.publish(msg);
         turnOff();        
     }
 
@@ -149,7 +165,7 @@ void Sensor::turnOff() {
 */
 void Sensor::recharge() {
     if(battery.getCurrentLevel() <= 100) {
-        battery.generate(1);
+        battery.generate(5);
         // battery.generate((100/2000)/rosComponentDescriptor.getFreq());
     }
 }

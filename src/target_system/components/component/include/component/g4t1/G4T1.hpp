@@ -19,6 +19,7 @@
 
 #include "messages/SensorData.h"
 #include "messages/TargetSystemData.h"
+#include "messages/DiagnosticsStatus.h"
 
 class G4T1 : public CentralHub {
     
@@ -67,6 +68,7 @@ class G4T1 : public CentralHub {
 
         ros::Publisher pub;
         ros::Publisher diagPub;
+        ros::Publisher statusPub;
         ros::NodeHandle nh;
         ros::Subscriber diagSub;
     

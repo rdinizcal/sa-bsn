@@ -82,6 +82,12 @@ double G3T1_2::collect() {
     double m_data = 0;
     ros::ServiceClient client = handle.serviceClient<services::PatientData>("getPatientData");
     services::PatientData srv;
+    messages::DiagnosticsStatus msg;
+
+    msg.sensor = this->type;
+    msg.status = "collect";
+
+    status_pub.publish(msg);
 
     srv.request.vitalSign = "heart_rate";
 

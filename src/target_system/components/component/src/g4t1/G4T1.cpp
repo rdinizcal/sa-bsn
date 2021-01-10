@@ -58,8 +58,6 @@ std::vector<std::string> G4T1::getPatientStatus() {
 void G4T1::setUp() {
     Component::setUp();
     
-    //diagSub = nh.subscribe("sensor_diagnostics", 10, &G4T1::processDiagnostics, this);
-
     double freq;
     nh.getParam("frequency", freq);
     rosComponentDescriptor.setFreq(freq);
@@ -71,6 +69,13 @@ void G4T1::setUp() {
 
     pub = nh.advertise<messages::TargetSystemData>("TargetSystemData", 10);
     diagPub = nh.advertise<messages::DiagnosticsData>("centralhub_diagnostics", 10);
+    statusPub = nh.advertise<messages::DiagnosticsStatus>("sensor_status", 1);
+
+    messages::DiagnosticsStatus msg;
+    msg.sensor = "centralhub";
+    msg.status = "on";
+    statusPub.publish(msg);
+
 }
 
 void G4T1::tearDown() {}
@@ -156,6 +161,12 @@ void G4T1::process() {
     } else if(patient_status > 80 && patient_status <= 100) {
         patient_risk = "VERY CRITICAL RISK";
     }
+
+    messages::DiagnosticsStatus msg;
+    msg.sensor = "centralhub";
+    msg.status = "processed";
+
+    statusPub.publish(msg);
 
     std::cout << std::endl << "*****************************************" << std::endl;
     std::cout << "PatientStatusInfo#" << std::endl;
