@@ -1,0 +1,4 @@
+<launch>     
+    <node name="abps_p7" pkg="diagnostics_analyzer" type="diagnostics_analyzer" output="screen" />
+    <param name="SensorName" value="/g3t1_4"/>
+</launch>

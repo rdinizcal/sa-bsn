@@ -4,6 +4,12 @@ gnome-terminal -x roscore & sleep 5s
 
 
 gnome-terminal --working-directory=${bsn}/configurations/property_analyzer/P7 -e 'roslaunch oximeter_analyzer.launch'
+gnome-terminal --working-directory=${bsn}/configurations/property_analyzer/P7 -e 'roslaunch ecg_analyzer.launch'
+gnome-terminal --working-directory=${bsn}/configurations/property_analyzer/P7 -e 'roslaunch thermometer_analyzer.launch'
+gnome-terminal --working-directory=${bsn}/configurations/property_analyzer/P7 -e 'roslaunch abps_analyzer.launch'
+gnome-terminal --working-directory=${bsn}/configurations/property_analyzer/P7 -e 'roslaunch abpd_analyzer.launch'
+
+
 ################# KNOWLEDGE REPOSITORY #################
 gnome-terminal --working-directory=${bsn}/configurations/knowledge_repository -e 'roslaunch data_access.launch' & sleep 1s
 
@@ -20,10 +26,10 @@ gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'rosla
 gnome-terminal --working-directory=${bsn}/configurations/environment   -e 'roslaunch patient.launch'
 gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g4t1.launch' & sleep 5s
 gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g3t1_1.launch'
-#gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g3t1_2.launch'
-#gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g3t1_3.launch'
-#gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g3t1_4.launch'
-#gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g3t1_5.launch'
+gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g3t1_2.launch'
+gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g3t1_3.launch'
+gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g3t1_4.launch'
+gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g3t1_5.launch'
 
 #gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g3t1_4.launch'
 

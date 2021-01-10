@@ -86,14 +86,13 @@ double G3T1_1::collect() {
     double m_data = 0;
     ros::ServiceClient client = handle.serviceClient<services::PatientData>("getPatientData");
     services::PatientData srv;
-    messages::DiagnosticsStatus msg;
-
-    msg.sensor = this->type;
-    msg.status = "collect";
-
-    status_pub.publish(msg);
-
-    srv.request.vitalSign = "oxigenation";
+    //messages::DiagnosticsStatus msg;
+//
+    //srv.request.vitalSign = "oxigenation";
+//
+    //msg.sensor = this->type;
+    //msg.status = "collect";
+    //status_pub.publish(msg);
 
     if (client.call(srv)) {
         m_data = srv.response.data;

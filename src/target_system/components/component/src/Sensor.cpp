@@ -69,6 +69,8 @@ void Sensor::body() {
         sendStatus("running");
         
         data = collect();
+        msg.status = "collect";
+        status_pub.publish(msg);
 
         /*for data replication, as if replicate_collect values were collected*/
         {
@@ -83,6 +85,8 @@ void Sensor::body() {
 
         data = process(data);
         transfer(data);
+        msg.status = "sent";
+        status_pub.publish(msg);
 		sendStatus("success");
     } else {
         recharge();

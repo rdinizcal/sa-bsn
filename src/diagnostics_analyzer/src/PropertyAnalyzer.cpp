@@ -70,12 +70,12 @@ void PropertyAnalyzer::processSensorData(const messages::DiagnosticsData::ConstP
 void PropertyAnalyzer::processSensorStatus(const messages::DiagnosticsStatus::ConstPtr& msg) {
     //std::cout << msg->sensor << " is " << msg->status << std::endl;
 
-    gotMessage = true;
     if (msg->sensor == "centralhub") {
         if (msg->status == "processed") {
             PROCESSED_reached = true;
+            gotMessage = true;
         }
-    } else {
+    } else if (msg->sensor == sensorAlias[currentSensor]) {
         if (msg->status == "on") {
             ON_reached = true;
         } else if (msg->status == "collect") {
@@ -83,6 +83,7 @@ void PropertyAnalyzer::processSensorStatus(const messages::DiagnosticsStatus::Co
         } else if (msg->status == "off") {
             OFF_reached = true;
         }
+        gotMessage = true;
     }
 }
 
@@ -91,6 +92,7 @@ void PropertyAnalyzer::processSensorOn(const archlib::Status::ConstPtr& msg) {
     if (msg->source == currentSensor) {
         if (msg->content == "init" && ON_reached == false) {
             ON_reached = true;
+            printStack();
         }
     }
 }
@@ -99,7 +101,9 @@ void PropertyAnalyzer::tearDown() {}
 
 void PropertyAnalyzer::busyWait() {
     ros::Rate loop_rate(2);
+    printStack();
     while (!gotMessage) {ros::spinOnce();loop_rate.sleep();}
+    printStack();
     gotMessage = false;
 }
 
@@ -122,7 +126,6 @@ void PropertyAnalyzer::body() {
 
     while (init == true) {
         currentState = "Observer was initialized";
-        printStack();
         busyWait();
 
         if(ON_reached == true) {
@@ -132,7 +135,6 @@ void PropertyAnalyzer::body() {
     
             while(wait_collect == true) {
                 currentState = "Waiting for data to be collected";
-                printStack();
                 busyWait();
 
                 if(COLLECTED_reached == true) {
@@ -142,7 +144,6 @@ void PropertyAnalyzer::body() {
 
                     while(wait_process == true) {
                         currentState = "Waiting for data to be processed";
-                        printStack();
                         busyWait();
                         if(PROCESSED_reached == true) {
                             PROCESSED_reached = false;
@@ -171,7 +172,7 @@ void PropertyAnalyzer::body() {
 int32_t PropertyAnalyzer::run() {
         setUp();
         
-        ros::Rate loop_rate(5);
+        ros::Rate loop_rate(2);
         
         while(ros::ok()) {
             body();
