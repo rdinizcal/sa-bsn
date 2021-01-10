@@ -4,7 +4,7 @@
 
     <param name="start" value="true" />
 
-    <param name="frequency" value="1" /> <!-- 1 Hz  -->
+    <param name="frequency" value="0.1" /> <!-- 1 Hz  -->
 
     <!-- Defines the percentages to consider low, moderate or high risk -->
     <param name="lowrisk" value="0,20" />
