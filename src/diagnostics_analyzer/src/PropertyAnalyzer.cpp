@@ -23,6 +23,16 @@ void PropertyAnalyzer::setUp() {
     wait_process = false;
     gotMessage = false;
     property_satisfied = true;
+
+    nh.getParam("SensorName", currentSensor);
+
+    sensorAlias["/g3t1_1"] = "oximeter";
+    sensorAlias["/g3t1_2"] = "ecg";
+    sensorAlias["/g3t1_3"] = "thermometer";
+    sensorAlias["/g3t1_4"] = "abps";
+    sensorAlias["/g3t1_5"] = "abpd";
+
+    std::cout << "Monitoring sensor: " << sensorAlias[currentSensor] << std::endl;
 }
 
 void PropertyAnalyzer::processCentralhubData(const messages::DiagnosticsData::ConstPtr& msg) {
@@ -78,7 +88,7 @@ void PropertyAnalyzer::processSensorStatus(const messages::DiagnosticsStatus::Co
 
 void PropertyAnalyzer::processSensorOn(const archlib::Status::ConstPtr& msg) {
     
-    if (msg->source == "/g3t1_1") {
+    if (msg->source == currentSensor) {
         if (msg->content == "init" && ON_reached == false) {
             ON_reached = true;
         }

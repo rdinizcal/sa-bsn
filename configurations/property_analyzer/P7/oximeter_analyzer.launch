@@ -1,0 +1,4 @@
+<launch>     
+    <node name="oximeter_p7" pkg="diagnostics_analyzer" type="diagnostics_analyzer" output="screen" />
+    <param name="SensorName" value="/g3t1_1"/>
+</launch>

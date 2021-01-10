@@ -3,7 +3,7 @@ bsn=$PWD
 gnome-terminal -x roscore & sleep 5s
 
 
-gnome-terminal --working-directory=${bsn}/configurations/diagnostics_analyzer -e 'roslaunch diagnostics_analyzer.launch'
+gnome-terminal --working-directory=${bsn}/configurations/property_analyzer/P7 -e 'roslaunch oximeter_analyzer.launch'
 ################# KNOWLEDGE REPOSITORY #################
 gnome-terminal --working-directory=${bsn}/configurations/knowledge_repository -e 'roslaunch data_access.launch' & sleep 1s
 

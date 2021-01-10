@@ -36,16 +36,11 @@ class PropertyAnalyzer {
         ros::Subscriber centralhubSub;
         ros::Subscriber sensorStatusSub;
         ros::Subscriber sensorOnSub;
-        
-        //int32_t collectedId;
-        //int32_t processedId;
-        std::map<std::string, int> currentCollectedId;
-        std::map<std::string, int> currentSentId;
 
-        std::map<std::string, int> expectedCollectedId;
-        std::map<std::string, int> expectedSentId;
+        std::map<std::string, std::string> sensorAlias;
 
         std::string currentState;
+        std::string currentSensor;
 
         bool init;
         bool ON_reached;
