@@ -35,7 +35,7 @@ SET (LIBRARIES ${BSN_LIBRARY})
 # Build this project.
 FILE(GLOB ${PROJECT_NAME}-src "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
-SET(diangostics_analyzer-src "${CMAKE_CURRENT_SOURCE_DIR}/src/DiagnosticsAnalyzer.cpp")
+SET(diangostics_analyzer-src "${CMAKE_CURRENT_SOURCE_DIR}/src/PropertyAnalyzer.cpp")
 ADD_EXECUTABLE (diagnostics_analyzer  "${CMAKE_CURRENT_SOURCE_DIR}/apps/diagnostics.cpp" ${${PROJECT_NAME}-src} ${diagnostics_analyzer-src})
 TARGET_LINK_LIBRARIES (diagnostics_analyzer ${catkin_LIBRARIES} ${LIBRARIES})
 ADD_DEPENDENCIES(diagnostics_analyzer services_generate_messages_cpp)

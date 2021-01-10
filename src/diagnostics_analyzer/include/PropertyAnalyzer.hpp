@@ -10,10 +10,10 @@
 #include "messages/DiagnosticsStatus.h"
 #include "archlib/Status.h"
 
-class DiagnosticsAnalyzer {
+class PropertyAnalyzer {
     public:
-        DiagnosticsAnalyzer(int &argc, char **argv, std::string name);
-        ~DiagnosticsAnalyzer();
+        PropertyAnalyzer(int &argc, char **argv, std::string name);
+        ~PropertyAnalyzer();
 
         void setUp();
         void tearDown();
