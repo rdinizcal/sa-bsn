@@ -22,6 +22,7 @@ void DiagnosticsAnalyzer::setUp() {
     wait_collect = false;
     wait_process = false;
     gotMessage = false;
+    property_satisfied = true;
 }
 
 void DiagnosticsAnalyzer::processCentralhubData(const messages::DiagnosticsData::ConstPtr& msg) {
@@ -67,7 +68,7 @@ void DiagnosticsAnalyzer::processSensorStatus(const messages::DiagnosticsStatus:
     } else {
         if (msg->status == "on") {
             ON_reached = true;
-        } else if (msg->status == "collected") {
+        } else if (msg->status == "collect") {
             COLLECTED_reached = true;
         } else if (msg->status == "off") {
             OFF_reached = true;
@@ -77,25 +78,41 @@ void DiagnosticsAnalyzer::processSensorStatus(const messages::DiagnosticsStatus:
 
 void DiagnosticsAnalyzer::processSensorOn(const archlib::Status::ConstPtr& msg) {
     
-    //if (msg->source == "/g3t1_1") {
-    //    if (msg->content == "init" && ON_reached == false) {
-    //        ON_reached = true;
-    //    }
-    //}
+    if (msg->source == "/g3t1_1") {
+        if (msg->content == "init" && ON_reached == false) {
+            ON_reached = true;
+        }
+    }
 }
 
 void DiagnosticsAnalyzer::tearDown() {}
 
 void DiagnosticsAnalyzer::busyWait() {
-    ros::Rate loop_rate(5);
+    ros::Rate loop_rate(2);
     while (!gotMessage) {ros::spinOnce();loop_rate.sleep();}
     gotMessage = false;
+}
+
+std::string DiagnosticsAnalyzer::yesOrNo(bool state) {
+    return state == true? "yes":"no";
+}
+
+void DiagnosticsAnalyzer::printStack() {
+    std::cout << "==========================================" << std::endl;
+    std::cout << "Current state: " << currentState << std::endl;
+    std::cout << "ON_reached: " << yesOrNo(ON_reached) << std::endl;
+    std::cout << "COLLECTED_reached: " << yesOrNo(COLLECTED_reached) << std::endl;
+    std::cout << "PROCESSED_reached: " << yesOrNo(PROCESSED_reached) << std::endl;
+    std::cout << "OFF_reached: " << yesOrNo(OFF_reached) << std::endl;
+    std::cout << "Property satisfied? " << yesOrNo(property_satisfied) <<std::endl;
+    std::cout << "==========================================" << std::endl;
 }
 
 void DiagnosticsAnalyzer::body() {
 
     while (init == true) {
-        std::cout << "on state: init" << std::endl;
+        currentState = "Observer was initialized";
+        printStack();
         busyWait();
 
         if(ON_reached == true) {
@@ -104,7 +121,8 @@ void DiagnosticsAnalyzer::body() {
             wait_collect = true;
     
             while(wait_collect == true) {
-                std::cout << "on state: wait_collect" << std::endl;
+                currentState = "Waiting for data to be collected";
+                printStack();
                 busyWait();
 
                 if(COLLECTED_reached == true) {
@@ -113,8 +131,8 @@ void DiagnosticsAnalyzer::body() {
                     wait_process = true;
 
                     while(wait_process == true) {
-                        std::cout << "on state: wait_process" << std::endl;
-
+                        currentState = "Waiting for data to be processed";
+                        printStack();
                         busyWait();
                         if(PROCESSED_reached == true) {
                             PROCESSED_reached = false;
@@ -123,8 +141,10 @@ void DiagnosticsAnalyzer::body() {
                         }
 
                         if(OFF_reached == true) {
-                            std::cout << "on state: ERROR!" << std::endl;
+                            currentState = "ERROR! Data collected, but not processed";
+                            property_satisfied = false;
                             wait_process = false;
+                            printStack();
                         }
                     }
                 } 

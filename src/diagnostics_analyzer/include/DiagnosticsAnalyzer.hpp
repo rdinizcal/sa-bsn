@@ -27,6 +27,8 @@ class DiagnosticsAnalyzer {
         void processSensorData(const messages::DiagnosticsData::ConstPtr&);
         void processSensorStatus(const messages::DiagnosticsStatus::ConstPtr&);
         void processSensorOn(const archlib::Status::ConstPtr&);
+        void printStack();
+        std::string yesOrNo(bool);
         void busyWait();
 
         //ros::NodeHandle nh;
@@ -43,12 +45,15 @@ class DiagnosticsAnalyzer {
         std::map<std::string, int> expectedCollectedId;
         std::map<std::string, int> expectedSentId;
 
+        std::string currentState;
+
         bool init;
         bool ON_reached;
         bool OFF_reached;
         bool COLLECTED_reached;
         bool wait_collect, wait_process;
         bool PROCESSED_reached;
+        bool property_satisfied;
 
         bool gotMessage;
 };
