@@ -4,7 +4,7 @@
     <!--<param name="frequency" value="1" /> --> <!--1 Hz the module frequency is the same as the monitors--> 
     <param name="monitor_freq" value="1" />        <!-- Hz -->
 
-    <param name="setpoint" value="0.9" />          <!-- -->
+    <param name="setpoint" value="0.85" />          <!-- -->
     <param name="actuation_freq" value="0.02" />    <!-- Hz -->
     <param name="info_quant" value="5" />         <!-- [1,1000] -->
 

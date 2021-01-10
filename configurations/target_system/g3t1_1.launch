@@ -2,7 +2,7 @@
     <!-- Blood Oxigenation Measurement Sensor -->    
     <node name="g3t1_1" pkg="component" type="g3t1_1" output="screen" />
 
-    <param name="start" value="false" />
+    <param name="start" value="true" />
 
     <param name="frequency" value="1.3" /> <!-- 0.2 Hz  -->
 

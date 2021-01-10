@@ -106,7 +106,7 @@ class Analyzer:
     def run(self): 
         # load formula
         formula = Formula("../../knowledge_repository/resource/models/"+self.formula_id+".formula", "float")
-        b_formula = Formula("../../knowledge_repository/resource/models/b_"+self.formula_id+".formula", "bool")
+        #b_formula = Formula("../../knowledge_repository/resource/models/b_"+self.formula_id+".formula", "bool")
 
         # build list of participating tasks
         tasks = dict()
@@ -159,9 +159,11 @@ class Analyzer:
 
         t0 = int(log[0][2])
 
-
+        reg_count = 0
         # read log 
         for reg in log:
+            print("Analyzing reg " + str(reg_count) + "...")
+            reg_count += 1
             # compute time series
             instant = int(reg[2]) - t0
 
@@ -205,7 +207,7 @@ class Analyzer:
                         formula.compute('C_'+tag, tasks[tag].cost())
                         formula.compute('F_'+tag, tasks[tag].frequency())
 
-                        b_formula.compute('B_'+tag, status.content == 'success')
+                        #b_formula.compute('B_'+tag, status.content == 'success')
 
             elif(reg[0]=="Event"):
                 event = Event(str(reg[1]),str(reg[2]),str(reg[3]),str(reg[4]),str(reg[5]))
@@ -224,7 +226,7 @@ class Analyzer:
 
 
             if(reg[0]=="Event" or reg[0]=="Status"):
-                global_status_timeseries[instant] = b_formula.eval()
+                #global_status_timeseries[instant] = b_formula.eval()
                 global_reli_timeseries[instant] = formula.eval()
 
         input_timeseries = dict()
@@ -262,7 +264,7 @@ class Analyzer:
         ## discretizing the curve
         #[x,y] = self.discretize(x,y,1) #precision in ms
 
-        setpoint = 0.95
+        setpoint = 0.85
 
         xa = []
         ya = []
@@ -307,10 +309,10 @@ class Analyzer:
 
         ## Then, plot the local reliabilities against time (same figure)
         i = 0
-        for tag in local_reli_timeseries:
+        '''for tag in local_reli_timeseries:
             x = [el[0] for el in local_reli_timeseries[tag]]
             y = [el[1] for el in local_reli_timeseries[tag]]
-            ax.plot(x, y, label=tag, color=colors[tag])
+            ax.plot(x, y, label=tag, color=colors[tag])'''
 
         ## Plot horizontal lines for setpoint
         ax.axhline(y=setpoint, linestyle='--', linewidth=0.7, color="black")
