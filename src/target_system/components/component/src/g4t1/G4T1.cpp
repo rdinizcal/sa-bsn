@@ -206,6 +206,7 @@ int32_t G4T1::getSensorId(std::string type) {
 
 void G4T1::transfer() {
     messages::TargetSystemData msg;
+    messages::DiagnosticsStatus statusMsg;
 
     msg.trm_batt = trm_batt;
     msg.ecg_batt = ecg_batt;
@@ -228,6 +229,10 @@ void G4T1::transfer() {
     msg.patient_status = patient_status;
 
     pub.publish(msg);
+
+    statusMsg.sensor = "centralhub";
+    statusMsg.status = "persisted";
+    statusPub.publish(statusMsg);
 
     if (lost_packt) {
         lost_packt = false;

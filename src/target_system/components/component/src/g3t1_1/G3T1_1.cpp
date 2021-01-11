@@ -111,20 +111,12 @@ double G3T1_1::collect() {
 
 double G3T1_1::process(const double &m_data) {
     double filtered_data;
-    messages::DiagnosticsData diagMsg;
     
     filter.insert(m_data);
     filtered_data = filter.getValue();
     battery.consume(BATT_UNIT*filter.getRange());
 
     ROS_INFO("filtered data: [%s]", std::to_string(filtered_data).c_str());
-
-    diagMsg.id = this->msg_id;
-    diagMsg.sensor = "oximeter";
-    diagMsg.state = "collect";
-    diagMsg.data = filtered_data;
-
-    diagnostics_pub.publish(diagMsg);
 
     return filtered_data;
 }
@@ -147,7 +139,6 @@ void G3T1_1::transfer(const double &m_data) {
     data_pub = handle.advertise<messages::SensorData>("oximeter_data", 10);
 
     messages::SensorData msg;
-    messages::DiagnosticsData diagMsg;
 
     msg.id = this->msg_id;
     msg.type = type;
@@ -157,15 +148,6 @@ void G3T1_1::transfer(const double &m_data) {
 
     data_pub.publish(msg);
     battery.consume(BATT_UNIT);
-
-    diagMsg.id = this->msg_id;
-    diagMsg.sensor = "oximeter";
-    diagMsg.state = "sent";
-    diagMsg.data = m_data;
-
-    diagnostics_pub.publish(diagMsg);
-
-    this->msg_id++;
 
     ROS_INFO("risk calculated and transferred: [%.2f%%]", risk);
 }

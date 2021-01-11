@@ -101,8 +101,6 @@ double G3T1_2::collect() {
 
 double G3T1_2::process(const double &m_data) {
     double filtered_data;
-    messages::DiagnosticsData diagMsg;
-    
     
     filter.insert(m_data);
     filtered_data = filter.getValue();
@@ -110,12 +108,6 @@ double G3T1_2::process(const double &m_data) {
 
     ROS_INFO("filtered data: [%s]", std::to_string(filtered_data).c_str());
     
-    diagMsg.id = this->msg_id;
-    diagMsg.sensor = "ecg";
-    diagMsg.state = "collect";
-    diagMsg.data = filtered_data;
-
-    diagnostics_pub.publish(diagMsg);
     return filtered_data;
 }
 
@@ -135,7 +127,6 @@ void G3T1_2::transfer(const double &m_data) {
     ros::NodeHandle handle;
     data_pub = handle.advertise<messages::SensorData>("ecg_data", 10);
     messages::SensorData msg;
-    messages::DiagnosticsData diagMsg;
 
     msg.id = this->msg_id;
     msg.type = type;
@@ -147,17 +138,7 @@ void G3T1_2::transfer(const double &m_data) {
     
     battery.consume(BATT_UNIT);
 
-    diagMsg.id = this->msg_id;
-    diagMsg.sensor = "ecg";
-    diagMsg.state = "sent";
-    diagMsg.data = m_data;
-
-    diagnostics_pub.publish(diagMsg);
-
-    this->msg_id++;
-
-    ROS_INFO("risk calculated and transferred: [%.2f%%]", risk);
-    
+    ROS_INFO("risk calculated and transferred: [%.2f%%]", risk);   
 }
 
 std::string G3T1_2::label(double &risk) {

@@ -69,7 +69,7 @@ void Sensor::body() {
         sendStatus("running");
         
         data = collect();
-        msg.status = "collect";
+        msg.status = "collected";
         status_pub.publish(msg);
 
         /*for data replication, as if replicate_collect values were collected*/

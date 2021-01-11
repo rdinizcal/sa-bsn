@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <array>
 
 #include "messages/DiagnosticsData.h"
 #include "messages/DiagnosticsStatus.h"
@@ -27,9 +28,11 @@ class PropertyAnalyzer {
         void processSensorData(const messages::DiagnosticsData::ConstPtr&);
         void processSensorStatus(const messages::DiagnosticsStatus::ConstPtr&);
         void processSensorOn(const archlib::Status::ConstPtr&);
-        void printStack();
-        std::string yesOrNo(bool);
         void busyWait();
+        void printStack();
+        void defineStateNames();
+        std::string yesOrNo(bool);
+
 
         //ros::NodeHandle nh;
         ros::Subscriber sensorSub;
@@ -41,6 +44,12 @@ class PropertyAnalyzer {
 
         std::string currentState;
         std::string currentSensor;
+        std::string currentProperty;
+
+        std::string sensorSignal;
+        std::string centralhubSignal;
+
+        std::array<std::string, 4> stateNames;
 
         bool init;
         bool ON_reached;

@@ -25,14 +25,46 @@ void PropertyAnalyzer::setUp() {
     property_satisfied = true;
 
     nh.getParam("SensorName", currentSensor);
+    nh.getParam("property", currentProperty);
+
+    defineStateNames();
 
     sensorAlias["/g3t1_1"] = "oximeter";
     sensorAlias["/g3t1_2"] = "ecg";
     sensorAlias["/g3t1_3"] = "thermometer";
     sensorAlias["/g3t1_4"] = "abps";
     sensorAlias["/g3t1_5"] = "abpd";
+ 
+    std::cout << "Monitoring property: " << currentProperty;
+    std::cout << " on sensor: " << sensorAlias[currentSensor] << std::endl;
+}
 
-    std::cout << "Monitoring sensor: " << sensorAlias[currentSensor] << std::endl;
+void PropertyAnalyzer::defineStateNames() {
+    
+    stateNames[0] = "init";
+    stateNames[3] = "ERROR";
+
+    if (currentProperty == "p7") {
+        stateNames[1] = "wait_collect";
+        stateNames[2] = "wait_process";
+        sensorSignal = "collected";
+        centralhubSignal = "processed";
+    } else if (currentProperty == "p8") {
+        stateNames[1] = "wait_collected";
+        stateNames[2] = "wait_persisted";
+        sensorSignal = "collected";
+        centralhubSignal = "persisted";
+    } else if (currentProperty == "p9") {
+        stateNames[1] = "wait_sent";
+        stateNames[2] = "wait_process";
+        sensorSignal = "sent";
+        centralhubSignal = "processed";
+    } else if (currentProperty == "p10") {
+        stateNames[1] = "wait_process";
+        stateNames[2] = "wait_detected";
+        sensorSignal = "processed";
+        centralhubSignal = "detected";
+    }
 }
 
 void PropertyAnalyzer::processCentralhubData(const messages::DiagnosticsData::ConstPtr& msg) {
@@ -71,14 +103,14 @@ void PropertyAnalyzer::processSensorStatus(const messages::DiagnosticsStatus::Co
     //std::cout << msg->sensor << " is " << msg->status << std::endl;
 
     if (msg->sensor == "centralhub") {
-        if (msg->status == "processed") {
+        if (msg->status == centralhubSignal) {
             PROCESSED_reached = true;
             gotMessage = true;
         }
     } else if (msg->sensor == sensorAlias[currentSensor]) {
         if (msg->status == "on") {
             ON_reached = true;
-        } else if (msg->status == "collect") {
+        } else if (msg->status == sensorSignal) {
             COLLECTED_reached = true;
         } else if (msg->status == "off") {
             OFF_reached = true;
