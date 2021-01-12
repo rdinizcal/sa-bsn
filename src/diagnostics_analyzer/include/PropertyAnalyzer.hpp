@@ -31,8 +31,10 @@ class PropertyAnalyzer {
         void busyWait(const std::string&);
         void printStack();
         void defineStateNames();
+        void defineStateTypes();
         std::string yesOrNo(bool);
 
+        bool isPropertySatisfied();
 
         //ros::NodeHandle nh;
         ros::Subscriber sensorSub;
@@ -50,13 +52,15 @@ class PropertyAnalyzer {
         std::string centralhubSignal;
 
         std::array<std::string, 4> stateNames;
+        std::array<std::string, 2> stateTypes;
 
-        bool init;
         bool ON_reached;
         bool OFF_reached;
-        bool COLLECTED_reached;
-        bool wait_collect, wait_process;
-        bool PROCESSED_reached;
+        bool SECOND_reached;
+        bool THIRD_reached;
+
+        bool init;
+        bool wait_second, wait_third;
         bool property_satisfied;
 
         std::map<std::string, bool> gotMessage;

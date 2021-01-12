@@ -17,17 +17,18 @@ void PropertyAnalyzer::setUp() {
     init = true;
     ON_reached = false;
     OFF_reached = false;
-    COLLECTED_reached = false;
-    PROCESSED_reached = false;
-    wait_collect = false;
-    wait_process = false;
-    gotMessage["sensor"] =  gotMessage["centralhub"] = false;
+    SECOND_reached = false;
+    THIRD_reached = false;
+    wait_second = false;
+    wait_third = false;
+    gotMessage["sensor"] = gotMessage["centralhub"] = false;
     property_satisfied = true;
 
     nh.getParam("SensorName", currentSensor);
     nh.getParam("property", currentProperty);
 
     defineStateNames();
+    defineStateTypes();
 
     sensorAlias["/g3t1_1"] = "oximeter";
     sensorAlias["/g3t1_2"] = "ecg";
@@ -67,6 +68,12 @@ void PropertyAnalyzer::defineStateNames() {
     }
 }
 
+void PropertyAnalyzer::defineStateTypes() {
+    
+    stateTypes[0] = currentProperty == "p10" ? "centralhub" : "sensor";
+    stateTypes[1] = "centralhub";
+}
+
 void PropertyAnalyzer::processCentralhubData(const messages::DiagnosticsData::ConstPtr& msg) {     
     if (msg->source == "centralhub") {
         gotMessage["centralhub"] = true;
@@ -74,7 +81,7 @@ void PropertyAnalyzer::processCentralhubData(const messages::DiagnosticsData::Co
             //ON_reached = true;
         } else if (msg->status == centralhubSignal) {
             outgoingId = msg->id;
-            PROCESSED_reached = true;
+            THIRD_reached = true;
             property_satisfied = outgoingId == incomingId;
         } else if (msg->status == "off") {
             //OFF_reached = true;
@@ -84,15 +91,17 @@ void PropertyAnalyzer::processCentralhubData(const messages::DiagnosticsData::Co
 }
 
 void PropertyAnalyzer::processSensorData(const messages::DiagnosticsData::ConstPtr& msg) {
-    if (msg->source == sensorAlias[currentSensor]) {
-        gotMessage["sensor"] = true;
-        if (msg->status == "on") {
-            ON_reached = true;
-        } else if (msg->status == sensorSignal) {
-            COLLECTED_reached = true;
-            incomingId = msg->id;
-        } else if (msg->status == "off") {
-            OFF_reached = true;
+    if (currentProperty != "p10") {
+        if (msg->source == sensorAlias[currentSensor]) {
+            gotMessage["sensor"] = true;
+            if (msg->status == "on") {
+                ON_reached = true;
+            } else if (msg->status == sensorSignal) {
+                SECOND_reached = true;
+                incomingId = msg->id;
+            } else if (msg->status == "off") {
+                OFF_reached = true;
+            }
         }
     }
 }
@@ -126,10 +135,10 @@ void PropertyAnalyzer::printStack() {
     std::cout << "Current state: " << currentState << std::endl;
     std::cout << "Incoming: " << incomingId << " Outgoing: " << outgoingId << std::endl;
     //std::cout << "ON_reached: " << yesOrNo(ON_reached) << std::endl;
-    //std::cout << "COLLECTED_reached: " << yesOrNo(COLLECTED_reached) << std::endl;
-    //std::cout << "PROCESSED_reached: " << yesOrNo(PROCESSED_reached) << std::endl;
+    //std::cout << "SECOND_reached: " << yesOrNo(SECOND_reached) << std::endl;
+    //std::cout << "THIRD_reached: " << yesOrNo(THIRD_reached) << std::endl;
     //std::cout << "OFF_reached: " << yesOrNo(OFF_reached) << std::endl;
-    std::cout << "Property satisfied? " << yesOrNo(property_satisfied) <<std::endl;
+    std::cout << "Property satisfied? " << yesOrNo(property_satisfied) << std::endl;
     std::cout << "==========================================" << std::endl;
 }
 
@@ -137,43 +146,43 @@ void PropertyAnalyzer::body() {
 
     while (init == true) {
         currentState = "Observer was initialized";
-        busyWait("sensor");
+        busyWait(stateTypes[0]);
 
         if(ON_reached == true) {
             init = false;
             ON_reached = false;
-            COLLECTED_reached = false;
-            wait_collect = true;
+            SECOND_reached = false;
+            wait_second = true;
     
-            while(wait_collect == true) {
-                currentState = "Waiting for data to be collected";
-                busyWait("sensor");
+            while(wait_second == true) {
+                currentState = "Waiting for data to be " + sensorSignal;
+                busyWait(stateTypes[0]);
 
-                if(COLLECTED_reached == true) {
-                    COLLECTED_reached = false;
-                    wait_collect = false;
-                    wait_process = true;
+                if(SECOND_reached == true) {
+                    SECOND_reached = false;
+                    wait_second = false;
+                    wait_third = true;
 
-                    while(wait_process == true) {
-                        currentState = "Waiting for data to be processed";
-                        busyWait("centralhub");
+                    while(wait_third == true) {
+                        currentState = "Waiting for data to be " + centralhubSignal;
+                        busyWait(stateTypes[1]);
                         if(OFF_reached == true || !property_satisfied) {
                             currentState = "ERROR! Data collected, but not processed";
-                            wait_process = false;
+                            wait_third = false;
                             exit(0);
                         }
 
-                        if(PROCESSED_reached == true) {
-                            PROCESSED_reached = false;
-                            wait_process = false;
-                            wait_collect = true;
+                        if(THIRD_reached == true) {
+                            THIRD_reached = false;
+                            wait_third = false;
+                            wait_second = true;
                         }
 
                     }
                 } 
                 if(OFF_reached == true) {
                     OFF_reached = false;
-                    wait_collect = false;
+                    wait_second = false;
                     init = true;
                 } 
             }
