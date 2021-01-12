@@ -11,7 +11,6 @@ void PropertyAnalyzer::setUp() {
     ros::NodeHandle nh;
     sensorSub = nh.subscribe("sensor_diagnostics", 10, &PropertyAnalyzer::processSensorData, this);
     centralhubSub = nh.subscribe("centralhub_diagnostics", 10, &PropertyAnalyzer::processCentralhubData, this);
-    //sensorStatusSub = nh.subscribe("sensor_status", 10, &PropertyAnalyzer::processSensorStatus, this);
     sensorOnSub = nh.subscribe("collect_status", 10, &PropertyAnalyzer::processSensorOn, this);
 
     init = true;
@@ -74,8 +73,12 @@ void PropertyAnalyzer::defineStateTypes() {
     stateTypes[1] = "centralhub";
 }
 
-void PropertyAnalyzer::processCentralhubData(const messages::DiagnosticsData::ConstPtr& msg) {     
-    if (msg->source == "centralhub") {
+void PropertyAnalyzer::processCentralhubData(const messages::CentralhubDiagnostics::ConstPtr& msg) {     
+    //std::cout << msg->id << std::endl;
+    //std::cout << msg->type << std::endl;
+    //std::cout << msg->source << std::endl;
+    //std::cout << msg->status << std::endl;
+    if (msg->type == "sensor" && msg->source == sensorAlias[currentSensor]) {
         gotMessage["centralhub"] = true;
         if (msg->status == "on") {
             //ON_reached = true;
@@ -87,6 +90,9 @@ void PropertyAnalyzer::processCentralhubData(const messages::DiagnosticsData::Co
             //OFF_reached = true;
         }
         //std::cout << "centralhub is " << msg->status << std::endl;
+    } else if (msg->type == "centralhub") {
+        gotMessage["centralhub"] = true;
+        std::cout << "received meta message from centralhub" << std::endl;
     }
 }
 
@@ -134,10 +140,6 @@ void PropertyAnalyzer::printStack() {
     std::cout << "==========================================" << std::endl;
     std::cout << "Current state: " << currentState << std::endl;
     std::cout << "Incoming: " << incomingId << " Outgoing: " << outgoingId << std::endl;
-    //std::cout << "ON_reached: " << yesOrNo(ON_reached) << std::endl;
-    //std::cout << "SECOND_reached: " << yesOrNo(SECOND_reached) << std::endl;
-    //std::cout << "THIRD_reached: " << yesOrNo(THIRD_reached) << std::endl;
-    //std::cout << "OFF_reached: " << yesOrNo(OFF_reached) << std::endl;
     std::cout << "Property satisfied? " << yesOrNo(property_satisfied) << std::endl;
     std::cout << "==========================================" << std::endl;
 }

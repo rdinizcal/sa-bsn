@@ -39,7 +39,7 @@ class G4T1 : public CentralHub {
         virtual void tearDown();   
 
         virtual void collect(const messages::SensorData::ConstPtr& sensor_data);
-        virtual int32_t process();
+        virtual void process();
         virtual void transfer();
 
         void processDiagnostics(const messages::DiagnosticsData::ConstPtr& msg);
@@ -71,6 +71,7 @@ class G4T1 : public CentralHub {
         bool lost_packt;
 
         int32_t currentDataId;
+        std::string currentType;
 };
 
 #endif 

@@ -30,6 +30,7 @@ ADD_MESSAGE_FILES( FILES
   system_manager/internal/CommandControl.msg
   test_messages/SensorFrequency.msg
   diagnostics/DiagnosticsData.msg
+  diagnostics/CentralhubDiagnostics.msg
 )
 
 GENERATE_MESSAGES(DEPENDENCIES std_msgs)

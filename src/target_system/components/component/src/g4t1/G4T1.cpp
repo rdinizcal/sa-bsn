@@ -100,6 +100,7 @@ void G4T1::collect(const messages::SensorData::ConstPtr& msg) {
     }
 
     this->currentDataId = msg->id;
+    this->currentType = msg->type;
 
     if (buffer_size[type] < max_size) {
         data_buffer[type].push_back(risk);
@@ -112,7 +113,7 @@ void G4T1::collect(const messages::SensorData::ConstPtr& msg) {
     }
 }
 
-int32_t G4T1::process() {
+void G4T1::process() {
     battery.consume(BATT_UNIT * data_buffer.size());
     std::vector<double> current_data;
 
@@ -129,6 +130,15 @@ int32_t G4T1::process() {
     total_buffer_size = std::accumulate(std::begin(buffer_size), std::end(buffer_size), 0, std::plus<int>()); //update total buffer size 
 
     // std::vector<std::string> risks;
+
+    messages::CentralhubDiagnostics diagMsg;
+    diagMsg.id = currentDataId;
+    diagMsg.type = "sensor";
+    diagMsg.source = currentType;
+    diagMsg.status = "processed";
+    statusPub.publish(diagMsg);
+
+
     getPatientStatus();
 
     std::string patient_risk;
@@ -154,8 +164,6 @@ int32_t G4T1::process() {
     std::cout << "| ABPD_RISK: " << abpd_risk << std::endl;
     std::cout << "| PATIENT_STATE:" << patient_risk << std::endl;
     std::cout << "*****************************************" << std::endl; 
-
-    return this->currentDataId;
 }
 
 //void G4T1::processDiagnostics(const messages::DiagnosticsData::ConstPtr& msg) {
@@ -207,6 +215,14 @@ void G4T1::transfer() {
     msg.patient_status = patient_status;
 
     pub.publish(msg);
+
+    messages::CentralhubDiagnostics diagMsg;
+    
+    diagMsg.id = currentDataId;
+    diagMsg.type = "sensor";
+    diagMsg.source = currentType;
+    diagMsg.status = "persisted";
+    statusPub.publish(diagMsg);
 
     if (lost_packt) {
         lost_packt = false;

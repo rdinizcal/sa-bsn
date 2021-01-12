@@ -8,7 +8,7 @@
 #include <array>
 
 #include "messages/DiagnosticsData.h"
-#include "messages/DiagnosticsStatus.h"
+#include "messages/CentralhubDiagnostics.h"
 #include "archlib/Status.h"
 
 class PropertyAnalyzer {
@@ -24,9 +24,8 @@ class PropertyAnalyzer {
 
     private:
 
-        void processCentralhubData(const messages::DiagnosticsData::ConstPtr&);
+        void processCentralhubData(const messages::CentralhubDiagnostics::ConstPtr&);
         void processSensorData(const messages::DiagnosticsData::ConstPtr&);
-        void processSensorStatus(const messages::DiagnosticsStatus::ConstPtr&);
         void processSensorOn(const archlib::Status::ConstPtr&);
         void busyWait(const std::string&);
         void printStack();

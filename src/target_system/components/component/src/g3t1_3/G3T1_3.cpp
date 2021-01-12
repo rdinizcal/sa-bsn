@@ -82,6 +82,7 @@ double G3T1_3::collect() {
     double m_data = 0;
     ros::ServiceClient client = handle.serviceClient<services::PatientData>("getPatientData");
     services::PatientData srv;
+    messages::DiagnosticsData msg;
 
     srv.request.vitalSign = "temperature";
 
@@ -95,6 +96,11 @@ double G3T1_3::collect() {
     battery.consume(BATT_UNIT);
 
     collected_risk = sensorConfig.evaluateNumber(m_data);
+    msg.id = this->dataId;
+    msg.source = this->type;
+    msg.status = "collected";
+    statusPub.publish(msg);
+
 
     return m_data;
 }
@@ -114,12 +120,21 @@ double G3T1_3::process(const double &m_data) {
 void G3T1_3::transfer(const double &m_data) {
     double risk;
     risk = sensorConfig.evaluateNumber(m_data);
-    if (risk < 0 || risk > 100) throw std::domain_error("risk data out of boundaries");
-    if (label(risk) != label(collected_risk)) throw std::domain_error("sensor accuracy fail");
 
+    if (risk < 0 || risk > 100) {
+        this->dataId++;
+        throw std::domain_error("risk data out of boundaries");
+    }    
+    if (label(risk) != label(collected_risk)) {
+        this->dataId++;
+        throw std::domain_error("sensor accuracy fail");
+    }
     ros::NodeHandle handle;
     data_pub = handle.advertise<messages::SensorData>("thermometer_data", 10);
     messages::SensorData msg;
+    messages::DiagnosticsData statusMsg;
+
+    msg.id = this->dataId;
     msg.type = type;
     msg.data = m_data;
     msg.risk = risk;
@@ -128,6 +143,12 @@ void G3T1_3::transfer(const double &m_data) {
     data_pub.publish(msg);
     
     battery.consume(BATT_UNIT);
+    statusMsg.id = this->dataId;
+    statusMsg.source = this->type;
+    statusMsg.status = "sent";
+    statusPub.publish(statusMsg);
+
+    this->dataId++;
 
     ROS_INFO("risk calculated and transferred: [%.2f%%]", risk);
 }

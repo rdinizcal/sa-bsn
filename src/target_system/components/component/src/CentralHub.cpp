@@ -14,11 +14,12 @@ int32_t CentralHub::run() {
     ros::Subscriber abpsSub = nh.subscribe("abps_data", 10, &CentralHub::collect, this);
     ros::Subscriber abpdSub = nh.subscribe("abpd_data", 10, &CentralHub::collect, this);
 
-    statusPub = nh.advertise<messages::DiagnosticsData>("centralhub_diagnostics", 10);
+    statusPub = nh.advertise<messages::CentralhubDiagnostics>("centralhub_diagnostics", 10);
 
-    messages::DiagnosticsData msg;
+    messages::CentralhubDiagnostics msg;
     msg.id = 0;
-    msg.source = "centralhub";
+    msg.type = "centralhub";
+    msg.source = "none";
     msg.status = "on";
 
     statusPub.publish(msg);
@@ -36,20 +37,22 @@ int32_t CentralHub::run() {
     return 0;
 }
 
+
 void CentralHub::body() {
     ros::spinOnce(); //calls collect() if there's data in the topics
 
-    messages::DiagnosticsData msg;
+    messages::CentralhubDiagnostics msg;
     int32_t dataId;
 
-    msg.source = "centralhub";
     if (!isActive() && battery.getCurrentLevel() > 90){
         turnOn();
         msg.id = 0;
+        msg.type = "centralhub";
         msg.status = "on";
         statusPub.publish(msg);
     } else if (isActive() && battery.getCurrentLevel() < 2){
         msg.id = 0;
+        msg.type = "centralhub";
         msg.status = "off";
         statusPub.publish(msg);
         turnOff();        
@@ -58,15 +61,8 @@ void CentralHub::body() {
     if(isActive()) {
         if(total_buffer_size > 0){
             apply_noise();
-
-            dataId = process();
-            msg.id = dataId;
-            msg.status = "processed";
-            statusPub.publish(msg);
-            
+            process();            
             transfer();
-            msg.status = "persisted";
-            statusPub.publish(msg);
             
             sendStatus("success");
         }
