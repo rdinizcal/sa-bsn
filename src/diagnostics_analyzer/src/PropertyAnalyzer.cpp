@@ -75,6 +75,7 @@ void PropertyAnalyzer::processCentralhubData(const messages::DiagnosticsData::Co
         } else if (msg->status == centralhubSignal) {
             outgoingId = msg->id;
             PROCESSED_reached = true;
+            property_satisfied = outgoingId == incomingId;
         } else if (msg->status == "off") {
             //OFF_reached = true;
         }
@@ -156,17 +157,18 @@ void PropertyAnalyzer::body() {
                     while(wait_process == true) {
                         currentState = "Waiting for data to be processed";
                         busyWait("centralhub");
+                        if(OFF_reached == true || !property_satisfied) {
+                            currentState = "ERROR! Data collected, but not processed";
+                            wait_process = false;
+                            exit(0);
+                        }
+
                         if(PROCESSED_reached == true) {
                             PROCESSED_reached = false;
                             wait_process = false;
                             wait_collect = true;
                         }
 
-                        if(OFF_reached == true) {
-                            currentState = "ERROR! Data collected, but not processed";
-                            property_satisfied = false;
-                            wait_process = false;
-                        }
                     }
                 } 
                 if(OFF_reached == true) {
