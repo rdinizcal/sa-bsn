@@ -70,10 +70,6 @@ void Sensor::body() {
         
         data = collect();
 
-        msg.id = this->dataId;
-        msg.status = "collected";
-        statusPub.publish(msg);
-
         /*for data replication, as if replicate_collect values were collected*/
         {
             double sum;
@@ -87,12 +83,8 @@ void Sensor::body() {
 
         data = process(data);
         transfer(data);
-
-        msg.status = "sent";
-        statusPub.publish(msg);
 		
         sendStatus("success");
-        this->dataId++;
     } else {
         recharge();
         throw std::domain_error("out of charge");

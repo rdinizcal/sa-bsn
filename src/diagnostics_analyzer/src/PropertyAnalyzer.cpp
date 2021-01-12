@@ -21,7 +21,7 @@ void PropertyAnalyzer::setUp() {
     PROCESSED_reached = false;
     wait_collect = false;
     wait_process = false;
-    gotMessage = false;
+    gotMessage["sensor"] =  gotMessage["centralhub"] = false;
     property_satisfied = true;
 
     nh.getParam("SensorName", currentSensor);
@@ -69,20 +69,22 @@ void PropertyAnalyzer::defineStateNames() {
 
 void PropertyAnalyzer::processCentralhubData(const messages::DiagnosticsData::ConstPtr& msg) {     
     if (msg->source == "centralhub") {
+        gotMessage["centralhub"] = true;
         if (msg->status == "on") {
-            ON_reached = true;
+            //ON_reached = true;
         } else if (msg->status == centralhubSignal) {
             outgoingId = msg->id;
             PROCESSED_reached = true;
-            gotMessage = true;
         } else if (msg->status == "off") {
-            OFF_reached = true;
+            //OFF_reached = true;
         }
+        //std::cout << "centralhub is " << msg->status << std::endl;
     }
 }
 
 void PropertyAnalyzer::processSensorData(const messages::DiagnosticsData::ConstPtr& msg) {
     if (msg->source == sensorAlias[currentSensor]) {
+        gotMessage["sensor"] = true;
         if (msg->status == "on") {
             ON_reached = true;
         } else if (msg->status == sensorSignal) {
@@ -91,7 +93,6 @@ void PropertyAnalyzer::processSensorData(const messages::DiagnosticsData::ConstP
         } else if (msg->status == "off") {
             OFF_reached = true;
         }
-        gotMessage = true;
     }
 }
 
@@ -107,12 +108,12 @@ void PropertyAnalyzer::processSensorOn(const archlib::Status::ConstPtr& msg) {
 
 void PropertyAnalyzer::tearDown() {}
 
-void PropertyAnalyzer::busyWait() {
+void PropertyAnalyzer::busyWait(const std::string& type) {
     ros::Rate loop_rate(2);
+    //printStack();
+    while (!gotMessage[type]) {ros::spinOnce();loop_rate.sleep();}
     printStack();
-    while (!gotMessage) {ros::spinOnce();loop_rate.sleep();}
-    printStack();
-    gotMessage = false;
+    gotMessage[type] = false;
 }
 
 std::string PropertyAnalyzer::yesOrNo(bool state) {
@@ -123,10 +124,10 @@ void PropertyAnalyzer::printStack() {
     std::cout << "==========================================" << std::endl;
     std::cout << "Current state: " << currentState << std::endl;
     std::cout << "Incoming: " << incomingId << " Outgoing: " << outgoingId << std::endl;
-    std::cout << "ON_reached: " << yesOrNo(ON_reached) << std::endl;
-    std::cout << "COLLECTED_reached: " << yesOrNo(COLLECTED_reached) << std::endl;
-    std::cout << "PROCESSED_reached: " << yesOrNo(PROCESSED_reached) << std::endl;
-    std::cout << "OFF_reached: " << yesOrNo(OFF_reached) << std::endl;
+    //std::cout << "ON_reached: " << yesOrNo(ON_reached) << std::endl;
+    //std::cout << "COLLECTED_reached: " << yesOrNo(COLLECTED_reached) << std::endl;
+    //std::cout << "PROCESSED_reached: " << yesOrNo(PROCESSED_reached) << std::endl;
+    //std::cout << "OFF_reached: " << yesOrNo(OFF_reached) << std::endl;
     std::cout << "Property satisfied? " << yesOrNo(property_satisfied) <<std::endl;
     std::cout << "==========================================" << std::endl;
 }
@@ -135,16 +136,17 @@ void PropertyAnalyzer::body() {
 
     while (init == true) {
         currentState = "Observer was initialized";
-        busyWait();
+        busyWait("sensor");
 
         if(ON_reached == true) {
             init = false;
             ON_reached = false;
+            COLLECTED_reached = false;
             wait_collect = true;
     
             while(wait_collect == true) {
                 currentState = "Waiting for data to be collected";
-                busyWait();
+                busyWait("sensor");
 
                 if(COLLECTED_reached == true) {
                     COLLECTED_reached = false;
@@ -153,7 +155,7 @@ void PropertyAnalyzer::body() {
 
                     while(wait_process == true) {
                         currentState = "Waiting for data to be processed";
-                        busyWait();
+                        busyWait("centralhub");
                         if(PROCESSED_reached == true) {
                             PROCESSED_reached = false;
                             wait_process = false;
@@ -164,14 +166,13 @@ void PropertyAnalyzer::body() {
                             currentState = "ERROR! Data collected, but not processed";
                             property_satisfied = false;
                             wait_process = false;
-                            printStack();
                         }
                     }
                 } 
                 if(OFF_reached == true) {
-                    init = true;
                     OFF_reached = false;
                     wait_collect = false;
+                    init = true;
                 } 
             }
         }

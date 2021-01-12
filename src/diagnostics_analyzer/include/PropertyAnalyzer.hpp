@@ -28,7 +28,7 @@ class PropertyAnalyzer {
         void processSensorData(const messages::DiagnosticsData::ConstPtr&);
         void processSensorStatus(const messages::DiagnosticsStatus::ConstPtr&);
         void processSensorOn(const archlib::Status::ConstPtr&);
-        void busyWait();
+        void busyWait(const std::string&);
         void printStack();
         void defineStateNames();
         std::string yesOrNo(bool);
@@ -59,7 +59,7 @@ class PropertyAnalyzer {
         bool PROCESSED_reached;
         bool property_satisfied;
 
-        bool gotMessage;
+        std::map<std::string, bool> gotMessage;
         uint32_t incomingId;
         uint32_t outgoingId;
 };
