@@ -68,14 +68,6 @@ void G4T1::setUp() {
     }
 
     pub = nh.advertise<messages::TargetSystemData>("TargetSystemData", 10);
-    diagPub = nh.advertise<messages::DiagnosticsData>("centralhub_diagnostics", 10);
-    statusPub = nh.advertise<messages::DiagnosticsStatus>("sensor_status", 1);
-
-    messages::DiagnosticsStatus msg;
-    msg.sensor = "centralhub";
-    msg.status = "on";
-    statusPub.publish(msg);
-
 }
 
 void G4T1::tearDown() {}
@@ -107,6 +99,8 @@ void G4T1::collect(const messages::SensorData::ConstPtr& msg) {
         abpd_raw = msg->data;
     }
 
+    this->currentDataId = msg->id;
+
     if (buffer_size[type] < max_size) {
         data_buffer[type].push_back(risk);
         buffer_size[type] = data_buffer[type].size();
@@ -116,20 +110,9 @@ void G4T1::collect(const messages::SensorData::ConstPtr& msg) {
         data_buffer[type].erase(data_buffer[type].begin());//erase the first element to avoid overflow
         lost_packt = true;
     }
-
-    messages::DiagnosticsData diagMsg;
-    diagMsg.id = msg->id;
-    diagMsg.sensor = msg->type;
-    diagMsg.state = "centralhub collected";
-    diagMsg.data = msg->data;
-
-    diagPub.publish(diagMsg);
-
-    //std::cout << "message id is: " + msg->id;
-    //std::cout << ", data is: " << msg->data << std::endl;
 }
 
-void G4T1::process() {
+int32_t G4T1::process() {
     battery.consume(BATT_UNIT * data_buffer.size());
     std::vector<double> current_data;
 
@@ -162,12 +145,6 @@ void G4T1::process() {
         patient_risk = "VERY CRITICAL RISK";
     }
 
-    messages::DiagnosticsStatus msg;
-    msg.sensor = "centralhub";
-    msg.status = "processed";
-
-    statusPub.publish(msg);
-
     std::cout << std::endl << "*****************************************" << std::endl;
     std::cout << "PatientStatusInfo#" << std::endl;
     std::cout << "| THERM_RISK: " << trm_risk << std::endl;
@@ -177,6 +154,8 @@ void G4T1::process() {
     std::cout << "| ABPD_RISK: " << abpd_risk << std::endl;
     std::cout << "| PATIENT_STATE:" << patient_risk << std::endl;
     std::cout << "*****************************************" << std::endl; 
+
+    return this->currentDataId;
 }
 
 //void G4T1::processDiagnostics(const messages::DiagnosticsData::ConstPtr& msg) {
@@ -206,7 +185,6 @@ int32_t G4T1::getSensorId(std::string type) {
 
 void G4T1::transfer() {
     messages::TargetSystemData msg;
-    messages::DiagnosticsStatus statusMsg;
 
     msg.trm_batt = trm_batt;
     msg.ecg_batt = ecg_batt;
@@ -229,10 +207,6 @@ void G4T1::transfer() {
     msg.patient_status = patient_status;
 
     pub.publish(msg);
-
-    statusMsg.sensor = "centralhub";
-    statusMsg.status = "persisted";
-    statusPub.publish(statusMsg);
 
     if (lost_packt) {
         lost_packt = false;

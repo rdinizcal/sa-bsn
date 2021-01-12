@@ -60,4 +60,6 @@ class PropertyAnalyzer {
         bool property_satisfied;
 
         bool gotMessage;
+        uint32_t incomingId;
+        uint32_t outgoingId;
 };

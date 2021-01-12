@@ -33,7 +33,7 @@ class CentralHub : public arch::target_system::Component {
         void reconfigure(const archlib::AdaptationCommand::ConstPtr& msg);
 
         virtual void collect(const messages::SensorData::ConstPtr& sensor_data) = 0;
-        virtual void process() = 0;
+        virtual int32_t process() = 0;
         virtual void transfer() = 0;
 
     private:
@@ -49,6 +49,8 @@ class CentralHub : public arch::target_system::Component {
         std::array<int, 5> buffer_size;
 		bsn::resource::Battery battery;
         std::vector<std::list<double>> data_buffer;
+
+        ros::Publisher statusPub;
 };
 
 #endif 

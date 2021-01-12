@@ -1,5 +1,4 @@
-Header  Header
-uint32 id  
-string sensor
-string state
-float64 data
+Header Header
+uint32 id
+string source
+string status

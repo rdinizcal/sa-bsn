@@ -1,6 +1,6 @@
 #include "component/Sensor.hpp"
 
-Sensor::Sensor(int &argc, char **argv, const std::string &name, const std::string &type, const bool &active, const double &noise_factor, const bsn::resource::Battery &battery) : Component(argc, argv, name), type(type), active(active), buffer_size(1), replicate_collect(1), noise_factor(0), battery(battery), data(0.0) {}
+Sensor::Sensor(int &argc, char **argv, const std::string &name, const std::string &type, const bool &active, const double &noise_factor, const bsn::resource::Battery &battery) : Component(argc, argv, name), type(type), active(active), buffer_size(1), replicate_collect(1), noise_factor(0), battery(battery), data(0.0), dataId(1) {}
 
 Sensor::~Sensor() {}
 
@@ -20,18 +20,18 @@ int32_t Sensor::run() {
     ros::Subscriber noise_subs = nh.subscribe("uncertainty_"+ros::this_node::getName(), 10, &Sensor::injectUncertainty, this);
     ros::Subscriber reconfig_subs = nh.subscribe("reconfigure_"+ros::this_node::getName(), 10, &Sensor::reconfigure, this);
     frequency_pub = nh.advertise<messages::SensorFrequency>("sensor_frequency_"+ros::this_node::getName(), 1);
-    diagnostics_pub = nh.advertise<messages::DiagnosticsData>("sensor_diagnostics", 1);
-    status_pub = nh.advertise<messages::DiagnosticsStatus>("sensor_status", 10);
-
-    messages::DiagnosticsStatus msg;
+    statusPub = nh.advertise<messages::DiagnosticsData>("sensor_diagnostics", 10);
 
     ros::Rate loop_rate(rosComponentDescriptor.getFreq());
+    messages::DiagnosticsData msg;
 
     sendStatus("init");
 
-    msg.sensor = this->type;
+    msg.id = 0;
+    msg.source = this->type;
     msg.status = "on";
-    status_pub.publish(msg);
+
+    statusPub.publish(msg);
 
     while (ros::ok()) {
         ros::spinOnce();
@@ -50,18 +50,18 @@ int32_t Sensor::run() {
 
 void Sensor::body() {
 
-    messages::DiagnosticsStatus msg;
+    messages::DiagnosticsData msg;
     
-    msg.sensor = this->type;
+    msg.source = this->type;
 
     if (!isActive() && battery.getCurrentLevel() > 90){
         turnOn();
         msg.status = "on";
-        status_pub.publish(msg);
+        statusPub.publish(msg);
     } else if (isActive() && battery.getCurrentLevel() < 2){
         //Sends info to diagnostics here
         msg.status = "off";
-        status_pub.publish(msg);
+        statusPub.publish(msg);
         turnOff();        
     }
 
@@ -69,8 +69,10 @@ void Sensor::body() {
         sendStatus("running");
         
         data = collect();
+
+        msg.id = this->dataId;
         msg.status = "collected";
-        status_pub.publish(msg);
+        statusPub.publish(msg);
 
         /*for data replication, as if replicate_collect values were collected*/
         {
@@ -85,9 +87,12 @@ void Sensor::body() {
 
         data = process(data);
         transfer(data);
+
         msg.status = "sent";
-        status_pub.publish(msg);
-		sendStatus("success");
+        statusPub.publish(msg);
+		
+        sendStatus("success");
+        this->dataId++;
     } else {
         recharge();
         throw std::domain_error("out of charge");

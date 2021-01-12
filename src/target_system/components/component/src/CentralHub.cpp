@@ -14,6 +14,14 @@ int32_t CentralHub::run() {
     ros::Subscriber abpsSub = nh.subscribe("abps_data", 10, &CentralHub::collect, this);
     ros::Subscriber abpdSub = nh.subscribe("abpd_data", 10, &CentralHub::collect, this);
 
+    statusPub = nh.advertise<messages::DiagnosticsData>("centralhub_diagnostics", 10);
+
+    messages::DiagnosticsData msg;
+    msg.id = 0;
+    msg.source = "centralhub";
+    msg.status = "on";
+
+    statusPub.publish(msg);
     while(ros::ok()) {
         ros::Rate loop_rate(rosComponentDescriptor.getFreq());
 
@@ -31,17 +39,35 @@ int32_t CentralHub::run() {
 void CentralHub::body() {
     ros::spinOnce(); //calls collect() if there's data in the topics
 
+    messages::DiagnosticsData msg;
+    int32_t dataId;
+
+    msg.source = "centralhub";
     if (!isActive() && battery.getCurrentLevel() > 90){
         turnOn();
+        msg.id = 0;
+        msg.status = "on";
+        statusPub.publish(msg);
     } else if (isActive() && battery.getCurrentLevel() < 2){
+        msg.id = 0;
+        msg.status = "off";
+        statusPub.publish(msg);
         turnOff();        
     }
-    
+     
     if(isActive()) {
         if(total_buffer_size > 0){
             apply_noise();
-            process();
+
+            dataId = process();
+            msg.id = dataId;
+            msg.status = "processed";
+            statusPub.publish(msg);
+            
             transfer();
+            msg.status = "persisted";
+            statusPub.publish(msg);
+            
             sendStatus("success");
         }
     } else {

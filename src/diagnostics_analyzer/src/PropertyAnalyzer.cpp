@@ -11,7 +11,7 @@ void PropertyAnalyzer::setUp() {
     ros::NodeHandle nh;
     sensorSub = nh.subscribe("sensor_diagnostics", 10, &PropertyAnalyzer::processSensorData, this);
     centralhubSub = nh.subscribe("centralhub_diagnostics", 10, &PropertyAnalyzer::processCentralhubData, this);
-    sensorStatusSub = nh.subscribe("sensor_status", 10, &PropertyAnalyzer::processSensorStatus, this);
+    //sensorStatusSub = nh.subscribe("sensor_status", 10, &PropertyAnalyzer::processSensorStatus, this);
     sensorOnSub = nh.subscribe("collect_status", 10, &PropertyAnalyzer::processSensorOn, this);
 
     init = true;
@@ -67,51 +67,27 @@ void PropertyAnalyzer::defineStateNames() {
     }
 }
 
-void PropertyAnalyzer::processCentralhubData(const messages::DiagnosticsData::ConstPtr& msg) {
-    //std::cout << "id: " + std::to_string(msg->id);
-    //std::cout << ",from: " + msg->sensor;
-    //std::cout << ", in state: " + msg->state;
-    //std::cout << ", data: " << msg->data << std::endl;
-
-    //if (msg->id != currentCollectedId[msg->sensor]) {
-    //    std::cout << "p7: "<<msg->sensor <<": " << currentCollectedId[msg->sensor] << ", got: " << msg->id;
-    //    std::cout << "data: " << msg->data << std::endl;
-    //    //std::cout << "Property P7 not OK! id: " << std::to_string(msg->id) << std::endl;
-    //} if (msg->id != currentSentId[msg->sensor]) {
-    //    std::cout << "p9: "<< msg->sensor <<": " << currentSentId[msg->sensor] << ", got: " << msg->id;
-    //    std::cout << " data: " << msg->data << std::endl;
-    //    //std::cout << "Property P9 not OK! id: " << std::to_string(msg->id) << std::endl;
-    //}
+void PropertyAnalyzer::processCentralhubData(const messages::DiagnosticsData::ConstPtr& msg) {     
+    if (msg->source == "centralhub") {
+        if (msg->status == "on") {
+            ON_reached = true;
+        } else if (msg->status == centralhubSignal) {
+            outgoingId = msg->id;
+            PROCESSED_reached = true;
+            gotMessage = true;
+        } else if (msg->status == "off") {
+            OFF_reached = true;
+        }
+    }
 }
 
 void PropertyAnalyzer::processSensorData(const messages::DiagnosticsData::ConstPtr& msg) {
-    //std::cout << "id: " + std::to_string(msg->id);
-    //std::cout << ",from: " + msg->sensor;
-    //std::cout << ", in state: " + msg->state;
-    //std::cout << ", data: " << msg->data << std::endl;
-
-    //if (msg->state == "collect") {
-    //    currentCollectedId[msg->sensor] = msg->id;
-    //    //expectedCollectedId[msg->sensor]++;
-    //} else if (msg->state == "sent") {
-    //    currentSentId[msg->sensor] = msg->id;
-    //    //expectedSentId[msg->sensor]++;
-    //}
-}
-
-void PropertyAnalyzer::processSensorStatus(const messages::DiagnosticsStatus::ConstPtr& msg) {
-    //std::cout << msg->sensor << " is " << msg->status << std::endl;
-
-    if (msg->sensor == "centralhub") {
-        if (msg->status == centralhubSignal) {
-            PROCESSED_reached = true;
-            gotMessage = true;
-        }
-    } else if (msg->sensor == sensorAlias[currentSensor]) {
+    if (msg->source == sensorAlias[currentSensor]) {
         if (msg->status == "on") {
             ON_reached = true;
         } else if (msg->status == sensorSignal) {
             COLLECTED_reached = true;
+            incomingId = msg->id;
         } else if (msg->status == "off") {
             OFF_reached = true;
         }
@@ -146,6 +122,7 @@ std::string PropertyAnalyzer::yesOrNo(bool state) {
 void PropertyAnalyzer::printStack() {
     std::cout << "==========================================" << std::endl;
     std::cout << "Current state: " << currentState << std::endl;
+    std::cout << "Incoming: " << incomingId << " Outgoing: " << outgoingId << std::endl;
     std::cout << "ON_reached: " << yesOrNo(ON_reached) << std::endl;
     std::cout << "COLLECTED_reached: " << yesOrNo(COLLECTED_reached) << std::endl;
     std::cout << "PROCESSED_reached: " << yesOrNo(PROCESSED_reached) << std::endl;

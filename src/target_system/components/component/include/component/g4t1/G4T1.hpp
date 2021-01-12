@@ -19,7 +19,6 @@
 
 #include "messages/SensorData.h"
 #include "messages/TargetSystemData.h"
-#include "messages/DiagnosticsStatus.h"
 
 class G4T1 : public CentralHub {
     
@@ -40,7 +39,7 @@ class G4T1 : public CentralHub {
         virtual void tearDown();   
 
         virtual void collect(const messages::SensorData::ConstPtr& sensor_data);
-        virtual void process();
+        virtual int32_t process();
         virtual void transfer();
 
         void processDiagnostics(const messages::DiagnosticsData::ConstPtr& msg);
@@ -66,18 +65,12 @@ class G4T1 : public CentralHub {
         double ecg_raw;
         double trm_raw;
 
-        ros::Publisher pub;
-        ros::Publisher diagPub;
-        ros::Publisher statusPub;
         ros::NodeHandle nh;
-        ros::Subscriber diagSub;
-    
-        std::string processed_id;
-        std::string processed_sensor;
-        std::string processed_state;
-        double processed_data;
+        ros::Publisher pub;
 
         bool lost_packt;
+
+        int32_t currentDataId;
 };
 
 #endif 
