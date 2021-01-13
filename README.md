@@ -53,7 +53,7 @@ bash run.sh 600
 
 For this example we chose to use the run.sh script with 600 seconds of execution time, but it can be any user-defined value. If no value is provided , the default value used is 300 seconds (5 minutes).
 
-## Analysis of Logs
+### Analysis of Logs
 After running the system, four log files of the execution will appear inside the 'bsn_ros/src/knowledge_repository/resource/logs' folder. Remember that each execution generates different log files in the form logName_logID, where the logID is the timestamp of the beginning of the execution.
 
 In order to analyze these log files, one can run the Analyzer python code inside the 'bsn_ros/src/simulation/analyzer' folder using the following command
@@ -76,7 +76,7 @@ One example of the command usage would be:
 python3 analyzer.py 1610549979516318295 reliability False 0.9
 ```
 
-#### In case or error due to the ROS path
+### In case or error due to the ROS path
 
 You might want to source the setup.bash inside the catkin workspace:
 ```
