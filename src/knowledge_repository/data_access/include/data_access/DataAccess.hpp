@@ -7,8 +7,6 @@
 
 #include "ros/ros.h"
 #include <ros/package.h>
-#include <cpprest/http_client.h>
-#include <cpprest/json.h>
 
 #include "bsn/goalmodel/Node.hpp"
 #include "bsn/goalmodel/Goal.hpp"
@@ -50,7 +48,6 @@ class DataAccess : public arch::ROSComponent {
 		void persistUncertainty(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content);
 		void persistAdaptation(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content);
 
-
 		void flush();
 
 		double calculateCost();
@@ -66,7 +63,6 @@ class DataAccess : public arch::ROSComponent {
 		virtual void tearDown();
 		virtual void body();
 
-		void processTargetSystemData(const messages::TargetSystemData::ConstPtr &msg);
 		void receivePersistMessage(const archlib::Persist::ConstPtr& msg);
 		bool processQuery(archlib::DataAccessRequest::Request &req, archlib::DataAccessRequest::Response &res);
 
@@ -76,7 +72,6 @@ class DataAccess : public arch::ROSComponent {
 	private:
 		ros::Subscriber handle_persist;
 		ros::ServiceServer server;
-		ros::Subscriber targetSystemSub;
 
 		std::fstream fp;
 		std::string event_filepath;
@@ -103,9 +98,6 @@ class DataAccess : public arch::ROSComponent {
 		bsn::model::Formula reliability_expression;
 		bsn::model::Formula cost_expression;
 
-		std::shared_ptr<web::http::client::http_client> client;
-
-		bool connected;
 		double frequency;
 		double system_reliability;
 		double system_cost;

@@ -42,11 +42,7 @@ void DataAccess::setUp() {
 	handle.getParam("frequency", frequency);
     rosComponentDescriptor.setFreq(frequency);
 
-    handle.getParam("server_url", url);
-
     buffer_size = 1000;
-
-    handle.getParam("connect", connected);
 
     std::ifstream reliability_file, cost_file;
     std::string reliability_formula, cost_formula;
@@ -70,9 +66,6 @@ void DataAccess::setUp() {
     cost_expression = bsn::model::Formula(cost_formula);
     reliability_expression = bsn::model::Formula(reliability_formula);
 
-    this->client = std::shared_ptr<web::http::client::http_client>
-        (new web::http::client::http_client(U(url)));
-
     count_to_calc_and_reset = 0;
     arrived_status = 0;
 
@@ -94,66 +87,12 @@ void DataAccess::setUp() {
     components_reliabilities["g3t1_4"] = 1;
     components_reliabilities["g3t1_5"] = 1;
     components_reliabilities["g3t1_6"] = 1;
-
     
     handle_persist = handle.subscribe("persist", 1000, &DataAccess::receivePersistMessage, this);
     server = handle.advertiseService("DataAccessRequest", &DataAccess::processQuery, this);
-
-    targetSystemSub = handle.subscribe("TargeSystemData", 100, &DataAccess::processTargetSystemData, this);
 }
 
-void DataAccess::tearDown(){}
-
-void DataAccess::processTargetSystemData(const messages::TargetSystemData::ConstPtr &msg) {
-    if (connected) {
-        components_batteries["g3t1_3"] = msg->trm_batt;
-        components_batteries["g3t1_2"] = msg->ecg_batt;
-        components_batteries["g3t1_1"] = msg->oxi_batt;
-        components_batteries["g3t1_4"] = msg->abps_batt;
-        components_batteries["g3t1_5"] = msg->abpd_batt;
-        components_batteries["g3t1_6"] = msg->glc_batt;
-
-        web::json::value json_obj, sensorPacket, patientPacket, reli_costPacket;
-
-        sensorPacket["battery"] = msg->trm_batt;
-        sensorPacket["risk"] = msg->trm_risk;
-        sensorPacket["raw"] = msg->trm_data;
-        json_obj["ThermometerPacket"] = sensorPacket;
-
-        sensorPacket["battery"] = msg->ecg_batt;
-        sensorPacket["risk"] = msg->ecg_risk;
-        sensorPacket["raw"] = msg->ecg_data;
-        json_obj["EcgPacket"] = sensorPacket;
-
-        sensorPacket["battery"] = msg->oxi_batt;
-        sensorPacket["risk"] = msg->oxi_risk;
-        sensorPacket["raw"] = msg->oxi_data;
-        json_obj["OximeterPacket"] = sensorPacket;
-
-        sensorPacket["battery"] = msg->abps_batt;
-        sensorPacket["risk"] = msg->abps_risk;
-        sensorPacket["raw"] = msg->abps_data;
-        json_obj["ABPSPacket"] = sensorPacket;
-
-        sensorPacket["battery"] = msg->abpd_batt;
-        sensorPacket["risk"] = msg->abpd_risk;
-        sensorPacket["raw"] = msg->abpd_data;
-        json_obj["ABPDPacket"] = sensorPacket;
-
-        sensorPacket["battery"] = msg->glc_batt;
-        sensorPacket["risk"] = msg->glc_risk;
-        sensorPacket["raw"] = msg->glc_data;
-        json_obj["GlucosmeterPacket"] = sensorPacket;
-
-        json_obj["PatientRisk"] = msg->patient_status;
-
-        json_obj["Reliability"] = system_reliability * 100;
-        json_obj["Cost"] = system_cost;
-
-        client->request(web::http::methods::POST, U("/sendVitalData"), json_obj);
-        ROS_INFO("Sent information to server.");
-    }
-}
+void DataAccess::tearDown(){}   
 
 double DataAccess::calculateCost() {
     std::vector<std::string> keys;
