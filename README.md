@@ -10,8 +10,7 @@ Virtual machine with bsn: https://drive.google.com/file/d/1G1A5_VIuqTvzTUchiGsM7
 * [Bsn Library](https://github.com/rdinizcal/libbsn)  provides the implementation of sensors, data fusers and emergency detection
 * [Bsn arch](https://github.com/rdinizcal/arch)
 
-## Install dependencies: 
-#### ROS:
+## ROS:
 First it is required to install ROS Melodic. Our development team is strictly using Ubuntu 18.04 (Bionic). To install it please follow this [link](http://wiki.ros.org/melodic/Installation/Ubuntu).  
 Also, it is strongly advised to use catkin for managing the ROS packages, refer to this [link](http://wiki.ros.org/ROS/Tutorials/InstallingandConfiguringROSEnvironment) after installing ROS Melodic. As such you will need to create a catkin workspace. You can do so by following the steps:
 
@@ -21,8 +20,8 @@ cd ~/catkin_ws/
 catkin_make
 ```
 
-### Lepton and Libbsn
-For these two dependencies, one must first clone this repository into the 'src' folder inside the catkin workspace previously created:
+## Lepton, Libbsn and Archlib Build
+For these 3 dependencies, one must first clone this repository into the 'src' folder inside the catkin workspace previously created:
 
 ```
 cd ~/catkin_ws/src
@@ -35,52 +34,11 @@ When cloned, go to the 'bsn_ros' folder and then proceed to install the dependen
 cd bsn_ros
 ```
 
-#### Lepton:
-1. First, create and enter build folder.
+Inside the 'bsn_ros' folder, simply run the following command to effectively install and build the 3 dependencies:
+
 ```
-cd lepton
-``` 
-``` 
-mkdir build && cd build
-``` 
-
-3. Execute cmake from the build folder.
-``` 
-cmake ..
-``` 
-
-4. Finally, compile and install lepton library.
-``` 
-sudo make install
-``` 
-
-#### Libbsn:
-1. Create and enter build folder.
+bash install.sh
 ```
-cd libbsn
-``` 
-``` 
-mkdir build && cd build
-``` 
-
-3. Execute cmake from the build folder.
-``` 
-cmake ..
-``` 
-
-4. Finally, compile and install libbsn library.
-``` 
-sudo make install
-``` 
-Once ALL the dependencies have been successfully installed, you can proceed to the next steps.
-
-## Compiling BSN and arch lib
-
-1. Compile under 'catkin_ws' directory.
-```
-cd ~/catkin_ws/ && 
-catkin_make
-``` 
 
 ## Configuration and Execution
 
