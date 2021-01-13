@@ -6,7 +6,6 @@ Virtual machine with bsn: https://drive.google.com/file/d/1G1A5_VIuqTvzTUchiGsM7
 
 ## Dependencies:
 * [Ros Melodic](http://wiki.ros.org/melodic) which provides software libraries for BSN engines.
-* [Cpp rest Sdk](https://github.com/Microsoft/cpprestsdk) which implements HTTP protocols on C++ (get, post...)
 * [Lepton](https://github.com/rdinizcal/lepton) ("lightweight expression parser") is a small C++ library for parsing, evaluating, differentiating, and analyzing mathematical expressions.
 * [Bsn Library](https://github.com/rdinizcal/libbsn)  provides the implementation of sensors, data fusers and emergency detection
 * [Bsn arch](https://github.com/rdinizcal/arch)
@@ -22,37 +21,15 @@ cd ~/catkin_ws/
 catkin_make
 ```
 
-#### CPP rest sdk:
-In order to use Cpp rest sdk, it is required to build its dependency source code.  
-First install the dependencies.)
-
-```
-sudo apt-get install g++ git libboost-atomic-dev libboost-thread-dev libboost-system-dev libboost-date-time-dev libboost-regex-dev libboost-filesystem-dev libboost-random-dev libboost-chrono-dev libboost-serialization-dev libwebsocketpp-dev openssl libssl-dev ninja-build
-```
-Then, clone the repository.
-
-```
-git clone https://github.com/Microsoft/cpprestsdk.git casablanca
-```
-
-And finally, build it.
-```
-cd casablanca
-mkdir build.debug
-cd build.debug
-cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Debug
-sudo ninja install
-```
-
 ### Lepton and Libbsn
-For these two dependencies, one must first clone this repository into the src folder inside the catkin workspace previously created:
+For these two dependencies, one must first clone this repository into the 'src' folder inside the catkin workspace previously created:
 
 ```
 cd ~/catkin_ws/src
 git clone https://github.com/rdinizcal/bsn_ros.git
 ```
 
-When cloned, go to the bsn_ros folder and then proceed to install the dependencies
+When cloned, go to the 'bsn_ros' folder and then proceed to install the dependencies
 
 ```
 cd bsn_ros
@@ -125,15 +102,21 @@ In order to analyze these log files, one can run the Analyzer python code inside
 
 ```
 cd ~/catkin_ws/src/bsn_ros/src/simulation/analyzer/
-python analyzer.py [logID] [metric] [plot_component_metrics] [setpoint]
+python3 analyzer.py [logID] [metric] [plot_component_metrics] [setpoint]
 ```
 
 where:
 
 * [logID] is the ID for the execution log files previously mentioned
-* [metric] is the metric to be analyzed. This can be reliability or cost
+* [metric] is the metric to be analyzed. This can be reliability or cost depending on what was the metric used for the execution
 * [plot_component_metrics] is a parameter that defines if the graphic which will be shown at the end of analysis will contain components local reliabilities or not. The components local reliabilities will be present if this is equal to True or true and only the system's global reliability will be present otherwise
 * [setpoint] will be the value of the setpoint used in the execution. This needs to be the same as the one defined in the System Manager launch file
+
+One example of the command usage would be:
+
+```
+python3 analyzer.py 1610549979516318295 reliability False 0.9
+```
 
 #### In case or error due to the ROS path
 
