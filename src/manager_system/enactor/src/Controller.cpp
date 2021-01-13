@@ -16,7 +16,6 @@ void Controller::setUp() {
     double freq;
 	nh.getParam("frequency", freq);
     nh.getParam("kp", KP);
-    nh.getParam("adaptation_parameter", adaptation_parameter);
 	rosComponentDescriptor.setFreq(freq);
 }
 
@@ -69,26 +68,16 @@ void Controller::apply_strategy(const std::string &component) {
                 std::cout << "################################################" << std::endl;
             }*/
         } else {
-            if(adaptation_parameter == "replicate_collect") {
-                replicate_task[component] += (error > 0) ? ceil(kp[component] * error) : floor(kp[component] * error);
-                if (replicate_task[component] < 1) replicate_task[component] = 1;
+            //freq[component] += (error>0) ? ((-kp[component]/100) * error) : ((kp[component]/100) * error); 
+            //double new_freq = freq[component] + ((error>0) ? ((-kp[component]/100) * error) : ((kp[component]/100) * error));
+            double new_freq = freq[component] + ((kp[component]/100) * error);
+            if(new_freq > 0) {
+                freq[component] = new_freq;
                 archlib::AdaptationCommand msg;
                 msg.source = ros::this_node::getName();
                 msg.target = component;
-                msg.action = "replicate_collect=" + std::to_string(replicate_task[(component)]);
+                msg.action = "freq=" + std::to_string(freq[component]);
                 adapt.publish(msg);
-            } else {
-                //freq[component] += (error>0) ? ((-kp[component]/100) * error) : ((kp[component]/100) * error); 
-                //double new_freq = freq[component] + ((error>0) ? ((-kp[component]/100) * error) : ((kp[component]/100) * error));
-                double new_freq = freq[component] + ((kp[component]/100) * error);
-                if(new_freq > 0) {
-                    freq[component] = new_freq;
-                    archlib::AdaptationCommand msg;
-                    msg.source = ros::this_node::getName();
-                    msg.target = component;
-                    msg.action = "freq=" + std::to_string(freq[component]);
-                    adapt.publish(msg);
-                }
             }
         }
     } else {

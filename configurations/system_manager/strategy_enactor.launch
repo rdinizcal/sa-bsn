@@ -3,6 +3,5 @@
 
     <param name="frequency" value="1" /> <!--100 Hz-->
     <param name="kp" value="150" />
-    <param name="adaptation_parameter" value="freq" />
 
 </launch>

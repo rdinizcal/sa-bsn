@@ -65,10 +65,6 @@ void CentralHub::reconfigure(const archlib::AdaptationCommand::ConstPtr& msg) {
     for (std::vector<std::string>::iterator it = pairs.begin(); it != pairs.end(); ++it){
         std::vector<std::string> param = bsn::utils::split(action, '=');
 
-        // Why does replicate_collect updates frequency?
-        /*if(param[0]=="replicate_collect"){
-            rosComponentDescriptor.setFreq(rosComponentDescriptor.getFreq()+stoi(param[1]));
-        }*/
         if(param[0]=="freq"){
             //double new_freq = rosComponentDescriptor.getFreq()+stoi(param[1]);
             double new_freq = stod(param[1]);

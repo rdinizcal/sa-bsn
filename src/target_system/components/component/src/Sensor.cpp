@@ -1,6 +1,6 @@
 #include "component/Sensor.hpp"
 
-Sensor::Sensor(int &argc, char **argv, const std::string &name, const std::string &type, const bool &active, const double &noise_factor, const bsn::resource::Battery &battery, const bool &instant_recharge) : Component(argc, argv, name), type(type), active(active), buffer_size(1), replicate_collect(1), noise_factor(0), battery(battery), data(0.0), instant_recharge(instant_recharge) {}
+Sensor::Sensor(int &argc, char **argv, const std::string &name, const std::string &type, const bool &active, const double &noise_factor, const bsn::resource::Battery &battery, const bool &instant_recharge) : Component(argc, argv, name), type(type), active(active), buffer_size(1), noise_factor(0), battery(battery), data(0.0), instant_recharge(instant_recharge) {}
 
 Sensor::~Sensor() {}
 
@@ -57,16 +57,7 @@ void Sensor::body() {
         
         data = collect();
 
-        /*for data replication, as if replicate_collect values were collected*/
-        {
-            double sum;
-            for(int i = 0; i < replicate_collect; ++i) {
-                double aux_data = data;
-                apply_noise(aux_data);
-                sum += aux_data;
-            }
-            data = sum/replicate_collect;
-        }
+        apply_noise(data);
 
         data = process(data);
         transfer(data);
@@ -100,9 +91,6 @@ void Sensor::reconfigure(const archlib::AdaptationCommand::ConstPtr& msg) {
         if(param[0]=="freq"){
             double new_freq =  stod(param[1]);
             if(new_freq>5 && new_freq<25) rosComponentDescriptor.setFreq(new_freq);
-        } else if (param[0]=="replicate_collect") {
-            int new_replicate_collect = stoi(param[1]);
-            if(new_replicate_collect>1 && new_replicate_collect<200) replicate_collect = new_replicate_collect;
         }
     }
 }
