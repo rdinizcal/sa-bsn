@@ -24,12 +24,11 @@ catkin_make
 
 #### CPP rest sdk:
 In order to use Cpp rest sdk, it is required to build its dependency source code.  
-First install the dependencies.
+First install the dependencies.)
 
 ```
 sudo apt-get install g++ git libboost-atomic-dev libboost-thread-dev libboost-system-dev libboost-date-time-dev libboost-regex-dev libboost-filesystem-dev libboost-random-dev libboost-chrono-dev libboost-serialization-dev libwebsocketpp-dev openssl libssl-dev ninja-build
 ```
-
 Then, clone the repository.
 
 ```
@@ -43,6 +42,20 @@ mkdir build.debug
 cd build.debug
 cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Debug
 sudo ninja install
+```
+
+### Lepton and Libbsn
+For these two dependencies, one must first clone this repository into the src folder inside the catkin workspace previously created:
+
+```
+cd ~/catkin_ws/src
+git clone https://github.com/rdinizcal/bsn_ros.git
+```
+
+When cloned, go to the bsn_ros folder and then proceed to install the dependencies
+
+```
+cd bsn_ros
 ```
 
 #### Lepton:
@@ -91,6 +104,7 @@ Once ALL the dependencies have been successfully installed, you can proceed to t
 cd ~/catkin_ws/ && 
 catkin_make
 ``` 
+
 ## Configuration and Execution
 
 3. Configure roslaunch files for personalized execution under '/catkin_ws/src/bsn/configurations';
@@ -99,8 +113,27 @@ catkin_make
 or use roslaunch x.launch to execute a single node:
 ```
 cd ~/catkin_ws/src/bsn/ && 
-bash run.sh
+bash run.sh 600
 ``` 
+
+For this example we chose to use the run.sh script with 600 seconds of execution time, but it can be any user-defined value. If no value is provided , the default value used is 300 seconds (5 minutes).
+
+## Analysis of Logs
+After running the system, four log files of the execution will appear inside the 'bsn_ros/src/knowledge_repository/resource/logs' folder. Remember that each execution generates different log files in the form logName_logID, where the logID is the timestamp of the beginning of the execution.
+
+In order to analyze these log files, one can run the Analyzer python code inside the 'bsn_ros/src/simulation/analyzer' folder using the following command
+
+```
+cd ~/catkin_ws/src/bsn_ros/src/simulation/analyzer/
+python analyzer.py [logID] [metric] [plot_component_metrics] [setpoint]
+```
+
+where:
+
+* [logID] is the ID for the execution log files previously mentioned
+* [metric] is the metric to be analyzed. This can be reliability or cost
+* [plot_component_metrics] is a parameter that defines if the graphic which will be shown at the end of analysis will contain components local reliabilities or not. The components local reliabilities will be present if this is equal to True or true and only the system's global reliability will be present otherwise
+* [setpoint] will be the value of the setpoint used in the execution. This needs to be the same as the one defined in the System Manager launch file
 
 #### In case or error due to the ROS path
 
