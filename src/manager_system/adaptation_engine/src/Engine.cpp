@@ -36,10 +36,10 @@ void Engine::setUp() {
     std::string reliability_formula;
 
     try{
-        reliability_file.open(path + "/formulae/reliabilityAND.formula");
+        reliability_file.open(path + "/formulae/reliability.formula");
         std::getline(reliability_file,reliability_formula);
         reliability_file.close();
-    } catch (std::ifstream::failure e) { std::cerr << "Exception opening/reading/closing file (reliabilityAND.formula)\n"; }
+    } catch (std::ifstream::failure e) { std::cerr << "Exception opening/reading/closing file (reliability.formula)\n"; }
 
     //this->cost_expression = bsn::model::Formula(cost_formula);
     reliability_expression = bsn::model::Formula(reliability_formula);
