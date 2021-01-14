@@ -65,6 +65,7 @@ class DataAccess : public arch::ROSComponent {
 
 		void receivePersistMessage(const archlib::Persist::ConstPtr& msg);
 		bool processQuery(archlib::DataAccessRequest::Request &req, archlib::DataAccessRequest::Response &res);
+		void processTargetSystemData(const messages::TargetSystemData::ConstPtr& msg);
 
 	protected:
 		ros::NodeHandle handle;
@@ -72,6 +73,7 @@ class DataAccess : public arch::ROSComponent {
 	private:
 		ros::Subscriber handle_persist;
 		ros::ServiceServer server;
+		ros::Subscriber targetSystemSub;
 
 		std::fstream fp;
 		std::string event_filepath;

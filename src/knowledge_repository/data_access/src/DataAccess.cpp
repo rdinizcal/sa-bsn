@@ -90,9 +90,19 @@ void DataAccess::setUp() {
     
     handle_persist = handle.subscribe("persist", 1000, &DataAccess::receivePersistMessage, this);
     server = handle.advertiseService("DataAccessRequest", &DataAccess::processQuery, this);
+    targetSystemSub = handle.subscribe("TargetSystemData", 100, &DataAccess::processTargetSystemData, this);
 }
 
-void DataAccess::tearDown(){}   
+void DataAccess::tearDown(){}
+
+void DataAccess::processTargetSystemData(const messages::TargetSystemData::ConstPtr& msg) {
+    components_batteries["g3t1_1"] = msg->trm_batt;
+    components_batteries["g3t1_2"] = msg->ecg_batt;
+    components_batteries["g3t1_3"] = msg->oxi_batt;
+    components_batteries["g3t1_4"] = msg->abps_batt;
+    components_batteries["g3t1_5"] = msg->abpd_batt;
+    components_batteries["g3t1_6"] = msg->glc_batt;
+}
 
 double DataAccess::calculateCost() {
     std::vector<std::string> keys;

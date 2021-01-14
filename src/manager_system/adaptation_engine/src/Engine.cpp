@@ -35,13 +35,14 @@ void Engine::setUp() {
 
     std::ifstream file;
     std::string formula;
-    std::cout << "ADAPTATION " << adaptation << '\n';
-    try{
+
+    try {
         if (adaptation == "reliability")
             file.open(path + "/formulae/reliabilityAND.formula");
         else {
-            file.open(path + "/formulae/cost.formula");
+            file.open(path + "/formulae/costAND.formula");
         }
+
         std::getline(file, formula);
         file.close();
 
