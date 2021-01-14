@@ -38,7 +38,7 @@ void Engine::setUp() {
     std::cout << "ADAPTATION " << adaptation << '\n';
     try{
         if (adaptation == "reliability")
-            file.open(path + "/formulae/reliability.formula");
+            file.open(path + "/formulae/reliabilityAND.formula");
         else {
             file.open(path + "/formulae/cost.formula");
         }
