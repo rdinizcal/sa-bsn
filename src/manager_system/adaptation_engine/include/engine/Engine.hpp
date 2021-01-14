@@ -64,8 +64,9 @@ class Engine : public arch::ROSComponent {
 		double monitor_freq;
 		double actuation_freq;
 		double stability_margin;
+		std::string adaptation;
 
-		bsn::model::Formula reliability_expression;
+		bsn::model::Formula expression;
 		std::map<std::string, double> strategy;
 		std::map<std::string, int> priority;
 

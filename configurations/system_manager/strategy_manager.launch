@@ -11,4 +11,6 @@
     <param name="offset" value="0.50" />            <!-- % of the current state -->
     <param name="gain" value="0.01" />              <!-- search granularity -->
 
+    <param name="adaptation" value="reliability" />       <!-- reliability or cost -->
+
 </launch>

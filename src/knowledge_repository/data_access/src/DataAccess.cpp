@@ -174,6 +174,7 @@ void DataAccess::body() {
         system_reliability = calculateReliability();
         updateCosts();
         system_cost = calculateCost();
+        std::cout << "system cost: " << system_cost << '\n';
         updateBatteries();
         count_to_calc_and_reset = 0;
     }
@@ -246,6 +247,11 @@ bool DataAccess::processQuery(archlib::DataAccessRequest::Request &req, archlib:
                         res.content += aux;
                     }
                 }
+            } else if (query[1] == "cost") {
+                // applyTimeWindow();
+                // for (auto it : status) {
+                //     res.content += calculateCost()
+                // }
             }
         } 
     } catch(...) {}

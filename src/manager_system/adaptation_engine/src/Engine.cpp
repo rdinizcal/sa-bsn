@@ -13,7 +13,7 @@ struct comp{
     }
 };
 
-Engine::Engine(int  &argc, char **argv, std::string name): ROSComponent(argc, argv, name), r_ref(0.9), stability_margin(0.02), offset(0), info_quant(0), monitor_freq(1), actuation_freq(1), reliability_expression(), strategy(),  priority(),  Kp(0.01), cycles(0) {}
+Engine::Engine(int  &argc, char **argv, std::string name): ROSComponent(argc, argv, name), r_ref(0.9), stability_margin(0.02), offset(0), info_quant(0), monitor_freq(1), actuation_freq(1), expression(), strategy(),  priority(),  Kp(0.01), cycles(0) {}
 
 Engine::~Engine() {}
 
@@ -27,32 +27,36 @@ void Engine::setUp() {
 	nh.getParam("monitor_freq", monitor_freq);
     rosComponentDescriptor.setFreq(monitor_freq);
 	nh.getParam("actuation_freq", actuation_freq);
+    nh.getParam("adaptation", adaptation);
 
     enact = handle.advertise<archlib::Strategy>("strategy", 10);
 
     std::string path = ros::package::getPath("adaptation_engine");
 
-    std::ifstream reliability_file;
-    std::string reliability_formula;
-
+    std::ifstream file;
+    std::string formula;
+    std::cout << "ADAPTATION " << adaptation << '\n';
     try{
-        reliability_file.open(path + "/formulae/reliability.formula");
-        std::getline(reliability_file,reliability_formula);
-        reliability_file.close();
-    } catch (std::ifstream::failure e) { std::cerr << "Exception opening/reading/closing file (reliability.formula)\n"; }
+        if (adaptation == "reliability")
+            file.open(path + "/formulae/reliability.formula");
+        else {
+            file.open(path + "/formulae/cost.formula");
+        }
+        std::getline(file, formula);
+        file.close();
 
-    //this->cost_expression = bsn::model::Formula(cost_formula);
-    reliability_expression = bsn::model::Formula(reliability_formula);
+    } catch (std::ifstream::failure e) { std::cerr << "Exception opening/reading/closing file (reliability.formula) or (cost.formula)\n"; }
 
+    expression = bsn::model::Formula(formula);
 
     //parse formula:
-    std::replace(reliability_formula.begin(), reliability_formula.end(), '+',' ');
-    std::replace(reliability_formula.begin(), reliability_formula.end(), '-',' ');
-    std::replace(reliability_formula.begin(), reliability_formula.end(), '*',' ');
-    std::replace(reliability_formula.begin(), reliability_formula.end(), '/',' ');
-    std::replace(reliability_formula.begin(), reliability_formula.end(), '(',' ');
-    std::replace(reliability_formula.begin(), reliability_formula.end(), ')',' ');
-    std::vector<std::string> terms = bsn::utils::split(reliability_formula, ' ');
+    std::replace(formula.begin(), formula.end(), '+',' ');
+    std::replace(formula.begin(), formula.end(), '-',' ');
+    std::replace(formula.begin(), formula.end(), '*',' ');
+    std::replace(formula.begin(), formula.end(), '/',' ');
+    std::replace(formula.begin(), formula.end(), '(',' ');
+    std::replace(formula.begin(), formula.end(), ')',' ');
+    std::vector<std::string> terms = bsn::utils::split(formula, ' ');
 
     for (std::vector<std::string>::iterator it = terms.begin(); it != terms.end(); ++it) {
         strategy[*it] = 1;
@@ -81,13 +85,13 @@ void Engine::receiveException(const archlib::Exception::ConstPtr& msg){
     std::string first = param[0];
     std::transform(first.begin(), first.end(),first.begin(), ::toupper); // /G3T1_1
     first.erase(0,1); // G3T1_1
-    first.insert(int(first.find('T')),"_"); // G3_T1_1
+    first.insert(int(first.find('T')), "_"); // G3_T1_1
     first = "R_" + first; 
 
-    if(priority.find(first) != priority.end()){  
+    if (priority.find(first) != priority.end()) {
         priority[first] += stoi(param[1]);
-        if(priority[first]>99) priority[first] = 100;
-        if(priority[first]<1) priority[first] = 0;
+        if (priority[first] > 99) priority[first] = 100;
+        if (priority[first] < 1) priority[first] = 0;
     } else {
         ROS_ERROR("COULD NOT FIND COMPONENT IN LIST OF PRIORITIES.");
     }
@@ -100,7 +104,7 @@ double Engine::calculate_reli() {
         keys.push_back(it->first);
         values.push_back(it->second);
     }
-    return reliability_expression.apply(keys, values);
+    return expression.apply(keys, values);
 }
 
 /*bool Engine::blacklisted(std::map<std::string,double> &strat) {
@@ -133,7 +137,6 @@ void Engine::monitor() {
         if(it->first.find("F_") != std::string::npos)  it->second = 1;
     }
 
-
     archlib::DataAccessRequest r_srv;
     r_srv.request.name = ros::this_node::getName();
     r_srv.request.query = "all:reliability:" + std::to_string(info_quant);
@@ -142,7 +145,6 @@ void Engine::monitor() {
         ROS_ERROR("Failed to connect to data access node.");
         return;
     } /*request reliability for all tasks*/
-    
     
     //expecting smth like: "/g3t1_1:success,fail,success;/g4t1:success; ..."
     std::string ans = r_srv.response.content;
@@ -201,7 +203,7 @@ void Engine::monitor() {
 
         std::vector<std::string> values = bsn::utils::split(second, ',');
         for (std::string value : values) {
-            if (first != "G4_T1") {
+            if (first != "G4_T1" && adaptation == "reliability") {
                 strategy["CTX_" + first] = 1;
                 
                 if (value == "deactivate") {
@@ -235,11 +237,15 @@ void Engine::analyze() {
     //}
 
     double r_curr = calculate_reli();
-    std::cout << "current system reliability: " <<  r_curr << std::endl;
+    if (adaptation == "reliability") {
+        std::cout << "current system reliability: " <<  r_curr << std::endl;
+    } else {
+        std::cout << "current system cost: " <<  r_curr << std::endl;
+    }
     double error = r_ref - r_curr;
     // if the error is out of the stability margin, plan!
-    if((error > r_ref*stability_margin) || (error < -stability_margin*r_ref)){
-        if(cycles >= monitor_freq/actuation_freq){
+    if ((error > r_ref * stability_margin) || (error < -stability_margin * r_ref)) {
+        if (cycles >= monitor_freq / actuation_freq) {
             cycles = 0;
             plan();
         }
