@@ -14,15 +14,16 @@ int32_t CentralHub::run() {
     ros::Subscriber abpsSub = nh.subscribe("abps_data", 10, &CentralHub::collect, this);
     ros::Subscriber abpdSub = nh.subscribe("abpd_data", 10, &CentralHub::collect, this);
 
-    statusPub = nh.advertise<messages::CentralhubDiagnostics>("centralhub_diagnostics", 10);
+    statusPub = nh.advertise<messages::CentralhubDiagnostics>("centralhub_diagnostics", 1000);
 
     messages::CentralhubDiagnostics msg;
     msg.id = 0;
     msg.type = "centralhub";
-    msg.source = "none";
+    msg.source = "centralhub";
     msg.status = "on";
 
     statusPub.publish(msg);
+
     while(ros::ok()) {
         ros::Rate loop_rate(rosComponentDescriptor.getFreq());
 

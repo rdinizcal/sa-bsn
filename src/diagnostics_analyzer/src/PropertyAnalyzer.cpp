@@ -9,8 +9,8 @@ PropertyAnalyzer::~PropertyAnalyzer() {}
 void PropertyAnalyzer::setUp() {
 
     ros::NodeHandle nh;
-    sensorSub = nh.subscribe("sensor_diagnostics", 10, &PropertyAnalyzer::processSensorData, this);
-    centralhubSub = nh.subscribe("centralhub_diagnostics", 10, &PropertyAnalyzer::processCentralhubData, this);
+    sensorSub = nh.subscribe("sensor_diagnostics", 100, &PropertyAnalyzer::processSensorData, this);
+    centralhubSub = nh.subscribe("centralhub_diagnostics", 100, &PropertyAnalyzer::processCentralhubData, this);
     sensorOnSub = nh.subscribe("collect_status", 10, &PropertyAnalyzer::processSensorOn, this);
 
     init = true;
@@ -37,6 +37,8 @@ void PropertyAnalyzer::setUp() {
  
     std::cout << "Monitoring property: " << currentProperty;
     std::cout << " on sensor: " << sensorAlias[currentSensor] << std::endl;
+    
+    if (currentProperty == "p10") chDetectedSub = nh.subscribe("ch_detected", 10, &PropertyAnalyzer::processCentralhubDetection, this);
 }
 
 void PropertyAnalyzer::defineStateNames() {
@@ -69,36 +71,52 @@ void PropertyAnalyzer::defineStateNames() {
 
 void PropertyAnalyzer::defineStateTypes() {
     
-    stateTypes[0] = currentProperty == "p10" ? "centralhub" : "sensor";
+    stateTypes[0] = currentProperty == "p10" ? "centralhub_processed" : "sensor";
     stateTypes[1] = "centralhub";
 }
 
-void PropertyAnalyzer::processCentralhubData(const messages::CentralhubDiagnostics::ConstPtr& msg) {     
-    //std::cout << msg->id << std::endl;
-    //std::cout << msg->type << std::endl;
-    //std::cout << msg->source << std::endl;
-    //std::cout << msg->status << std::endl;
-    if (msg->type == "sensor" && msg->source == sensorAlias[currentSensor]) {
-        gotMessage["centralhub"] = true;
-        if (msg->status == "on") {
-            //ON_reached = true;
-        } else if (msg->status == centralhubSignal) {
-            outgoingId = msg->id;
-            THIRD_reached = true;
-            property_satisfied = outgoingId == incomingId;
-        } else if (msg->status == "off") {
-            //OFF_reached = true;
+void PropertyAnalyzer::processCentralhubDetection(const messages::CentralhubDiagnostics::ConstPtr& msg) {
+    if (currentProperty == "p10") {
+        if (msg->type == "centralhub") {
+            std::cout << msg->source + " " << msg->status << std::endl;
+            if (msg->status == "processed") {
+                incomingId = msg->id;
+                SECOND_reached = true;
+                gotMessage["centralhub_processed"] = true;
+            } else if (msg->status == "detected") {
+                outgoingId = msg->id;
+                THIRD_reached = true;
+                property_satisfied = outgoingId == incomingId;
+                gotMessage["centralhub"] = true;
+            } else if (msg->status == "on") {
+                ON_reached = true;
+            } else if (msg->status == "off") {
+                OFF_reached = true;
+            }
         }
-        //std::cout << "centralhub is " << msg->status << std::endl;
-    } else if (msg->type == "centralhub") {
-        gotMessage["centralhub"] = true;
-        std::cout << "received meta message from centralhub" << std::endl;
+    }
+}
+
+void PropertyAnalyzer::processCentralhubData(const messages::CentralhubDiagnostics::ConstPtr& msg) {     
+    if (currentProperty != "p10") {
+        if (msg->type == "sensor" && msg->source == sensorAlias[currentSensor]) {
+            gotMessage["centralhub"] = true;
+            if (msg->status == centralhubSignal) {
+                outgoingId = msg->id;
+                THIRD_reached = true;
+                if (property_satisfied) property_satisfied = outgoingId == incomingId;
+            }
+        } else if (msg->type == "centralhub") {
+            gotMessage["centralhub"] = true;
+            std::cout << "received meta message from centralhub" << std::endl;
+        }
     }
 }
 
 void PropertyAnalyzer::processSensorData(const messages::DiagnosticsData::ConstPtr& msg) {
     if (currentProperty != "p10") {
         if (msg->source == sensorAlias[currentSensor]) {
+            //std::cout << "current sensor: " << sensorAlias[currentSensor] <<std::endl; 
             gotMessage["sensor"] = true;
             if (msg->status == "on") {
                 ON_reached = true;
@@ -113,13 +131,27 @@ void PropertyAnalyzer::processSensorData(const messages::DiagnosticsData::ConstP
 }
 
 void PropertyAnalyzer::processSensorOn(const archlib::Status::ConstPtr& msg) {
-    
-    if (msg->source == currentSensor) {
-        if (msg->content == "init" && ON_reached == false) {
-            ON_reached = true;
-            printStack();
+
+
+    if (currentProperty == "p10") {    
+        if (msg->source == "/g4t1") {
+            if (msg->content == "init" && ON_reached == false) {
+                ON_reached = true;
+                printStack();
+            }
+        }
+    } else if (currentProperty != "p10") {    
+        if (msg->source == currentSensor) {
+            if (msg->content == "init" && ON_reached == false) {
+                ON_reached = true;
+                printStack();
+            }
         }
     }
+}
+
+void PropertyAnalyzer::processCentralhubOn(const archlib::Status::ConstPtr& msg) {
+
 }
 
 void PropertyAnalyzer::tearDown() {}
@@ -155,7 +187,7 @@ void PropertyAnalyzer::body() {
             ON_reached = false;
             SECOND_reached = false;
             wait_second = true;
-    
+
             while(wait_second == true) {
                 currentState = "Waiting for data to be " + sensorSignal;
                 busyWait(stateTypes[0]);
@@ -168,10 +200,10 @@ void PropertyAnalyzer::body() {
                     while(wait_third == true) {
                         currentState = "Waiting for data to be " + centralhubSignal;
                         busyWait(stateTypes[1]);
+
                         if(OFF_reached == true || !property_satisfied) {
-                            currentState = "ERROR! Data collected, but not processed";
+                            currentState = "ERROR! Data "+sensorSignal+", but not "+centralhubSignal;
                             wait_third = false;
-                            exit(0);
                         }
 
                         if(THIRD_reached == true) {

@@ -67,6 +67,7 @@ class G4T1 : public CentralHub {
 
         ros::NodeHandle nh;
         ros::Publisher pub;
+        ros::Publisher chDetectPub;
 
         bool lost_packt;
 

@@ -1,5 +1,5 @@
 <launch>     
-    <node name="thermometer_p7" pkg="diagnostics_analyzer" type="diagnostics_analyzer" output="screen" />
+    <node name="thermometer_p9" pkg="diagnostics_analyzer" type="diagnostics_analyzer" output="screen" />
     <param name="SensorName" value="/g3t1_3"/>
     <param name="property" value="p9"/>
 </launch>

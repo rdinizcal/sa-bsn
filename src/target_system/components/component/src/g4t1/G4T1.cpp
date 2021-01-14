@@ -10,7 +10,7 @@ G4T1::G4T1(int &argc, char **argv, const std::string &name) : lost_packt(false),
     patient_status(0.0) {}
 	
 G4T1::~G4T1() {}
-
+ 
 std::vector<std::string> G4T1::getPatientStatus() {
     std::string sensor_risk_str;
     std::string abps;
@@ -68,6 +68,7 @@ void G4T1::setUp() {
     }
 
     pub = nh.advertise<messages::TargetSystemData>("TargetSystemData", 10);
+    chDetectPub = nh.advertise<messages::CentralhubDiagnostics>("ch_detected", 10);
 }
 
 void G4T1::tearDown() {}
@@ -138,8 +139,13 @@ void G4T1::process() {
     diagMsg.status = "processed";
     statusPub.publish(diagMsg);
 
+    diagMsg.type = "centralhub";
+    chDetectPub.publish(diagMsg);
 
     getPatientStatus();
+
+    diagMsg.status = "detected";
+    chDetectPub.publish(diagMsg);
 
     std::string patient_risk;
 

@@ -1,5 +1,5 @@
 <launch>     
-    <node name="ecg_p7" pkg="diagnostics_analyzer" type="diagnostics_analyzer" output="screen" />
+    <node name="ecg_p8" pkg="diagnostics_analyzer" type="diagnostics_analyzer" output="screen" />
     <param name="SensorName" value="/g3t1_2"/>
     <param name="property" value="p8"/>
 </launch>
