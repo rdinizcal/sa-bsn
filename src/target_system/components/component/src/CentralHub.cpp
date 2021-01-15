@@ -24,6 +24,15 @@ int32_t CentralHub::run() {
 
     statusPub.publish(msg);
 
+    std::string path = ros::package::getPath("diagnostics_analyzer");
+    nh.getParam("property", foldername);
+
+    filepath = path + "/../logs/"+foldername+"/centralhub/centralhub.log";
+
+    fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
+    fp << "\n";
+    fp.close();
+
     while(ros::ok()) {
         ros::Rate loop_rate(rosComponentDescriptor.getFreq());
 
@@ -38,24 +47,44 @@ int32_t CentralHub::run() {
     return 0;
 }
 
+void CentralHub::flushData(messages::CentralhubDiagnostics msg) {
+    fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::app);
+    fp << msg.timestamp << ",";
+    fp << msg.id << ",";
+    fp << msg.source << ",";
+    fp << msg.status << std::endl;
+    fp.close();
+}
+
 
 void CentralHub::body() {
     ros::spinOnce(); //calls collect() if there's data in the topics
 
     messages::CentralhubDiagnostics msg;
     int32_t dataId;
+    boost::posix_time::ptime my_posix_time;
 
     if (!isActive() && battery.getCurrentLevel() > 90){
         turnOn();
+        
         msg.id = 0;
-        msg.type = "centralhub";
+        msg.source = "centralhub";
         msg.status = "on";
+        my_posix_time = ros::Time::now().toBoost();
+        timestamp = boost::posix_time::to_iso_extended_string(my_posix_time);
         statusPub.publish(msg);
+        
+        flushData(msg);
     } else if (isActive() && battery.getCurrentLevel() < 2){
         msg.id = 0;
         msg.type = "centralhub";
         msg.status = "off";
+        my_posix_time = ros::Time::now().toBoost();
+        timestamp = boost::posix_time::to_iso_extended_string(my_posix_time);
         statusPub.publish(msg);
+        
+        flushData(msg);
+        
         turnOff();        
     }
      

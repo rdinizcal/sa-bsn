@@ -4,6 +4,7 @@
 #include <stdio.h> 
 #include <string>
 #include <numeric>
+#include <fstream>
 
 #include "archlib/target_system/Component.hpp"
 #include "archlib/AdaptationCommand.h"
@@ -14,6 +15,8 @@
 #include "bsn/resource/Battery.hpp"
 #include "bsn/utils/utils.hpp"
 
+#include <ros/package.h>
+#include "boost/date_time/posix_time/posix_time.hpp"
 
 class CentralHub : public arch::target_system::Component {
 
@@ -36,6 +39,7 @@ class CentralHub : public arch::target_system::Component {
         virtual void collect(const messages::SensorData::ConstPtr& sensor_data) = 0;
         virtual void process() = 0;
         virtual void transfer() = 0;
+        void flushData(messages::CentralhubDiagnostics);
 
     private:
         bool isActive();
@@ -52,6 +56,12 @@ class CentralHub : public arch::target_system::Component {
         std::vector<std::list<double>> data_buffer;
 
         ros::Publisher statusPub;
+        std::string timestamp;
+
+        std::fstream fp;
+        std::string filepath;
+        std::string foldername;
+
 };
 
 #endif 

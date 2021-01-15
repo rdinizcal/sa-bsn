@@ -27,6 +27,15 @@ int32_t Sensor::run() {
 
     sendStatus("init");
 
+    std::string path = ros::package::getPath("diagnostics_analyzer");
+    handle.getParam("property", foldername);
+
+    filepath = path + "/../logs/"+foldername+"/sensors/" +this->type+ ".log";
+
+    fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
+    fp << "\n";
+    fp.close();
+
     while (ros::ok()) {
         ros::spinOnce();
 
@@ -42,22 +51,42 @@ int32_t Sensor::run() {
     return 0;
 }
 
+void Sensor::flushData(messages::DiagnosticsData msg) {
+    fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::app);
+    fp << msg.timestamp << ",";
+    fp << msg.id << ",";
+    fp << msg.source << ",";
+    fp << msg.status << std::endl;
+    fp.close();
+
+    return;
+}
+
 void Sensor::body() {
 
     messages::DiagnosticsData msg;
     
     msg.source = this->type;
+    boost::posix_time::ptime my_posix_time;
+        
 
     if (!isActive() && battery.getCurrentLevel() > 90){
         turnOn();
-        
+        my_posix_time = ros::Time::now().toBoost();
+        timestamp = boost::posix_time::to_iso_extended_string(my_posix_time);
         msg.status = "on";
-        msg.timestamp = ros::Time::now();
+        msg.timestamp = timestamp;
+
+        flushData(msg);
+
         statusPub.publish(msg);
     } else if (isActive() && battery.getCurrentLevel() < 2){
         //Sends info to diagnostics here
+        my_posix_time = ros::Time::now().toBoost();
+        timestamp = boost::posix_time::to_iso_extended_string(my_posix_time);
         msg.status = "off";
-        msg.timestamp = ros::Time::now();
+        msg.timestamp = timestamp;
+        flushData(msg);
         statusPub.publish(msg);
 
         turnOff();        

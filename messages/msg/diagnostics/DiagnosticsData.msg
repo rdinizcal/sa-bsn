@@ -2,4 +2,4 @@ Header Header
 uint32 id
 string source
 string status
-time timestamp
+string timestamp

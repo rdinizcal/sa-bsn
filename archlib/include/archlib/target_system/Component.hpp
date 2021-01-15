@@ -12,6 +12,7 @@
 #include "archlib/EffectorRegister.h"
 
 #include "archlib/ROSComponent.hpp"
+#include "boost/date_time/posix_time/posix_time.hpp"
 
 namespace arch {
     namespace target_system {

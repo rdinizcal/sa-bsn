@@ -18,6 +18,8 @@
 #include "bsn/resource/Battery.hpp"
 #include "bsn/utils/utils.hpp"
 
+#include "boost/date_time/posix_time/posix_time.hpp"
+
 class Sensor : public arch::target_system::Component {
 
     public:
@@ -37,6 +39,7 @@ class Sensor : public arch::target_system::Component {
         void reconfigure(const archlib::AdaptationCommand::ConstPtr& msg);
         void injectUncertainty(const archlib::Uncertainty::ConstPtr& msg);
         int64_t now() const;
+        void flushData(messages::DiagnosticsData msg);
 		
         virtual double collect() = 0;
         virtual double process(const double &data) = 0;
@@ -63,8 +66,9 @@ class Sensor : public arch::target_system::Component {
         uint32_t dataId;
 
         std::string filepath;
-        ros::Time timestamp;
+        std::string timestamp; 
         std::fstream fp;
+        std::string foldername;
 };
 
 #endif 

@@ -3,5 +3,5 @@ uint32 id
 string source
 string status
 string property
-time timestamp
+string timestamp
 bool validity

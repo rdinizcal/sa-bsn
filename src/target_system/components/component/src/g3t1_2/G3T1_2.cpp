@@ -70,7 +70,6 @@ void G3T1_2::setUp() {
 
         sensorConfig = SensorConfiguration(0, low_range, midRanges, highRanges, percentages);
     }
-
 }
 
 void G3T1_2::tearDown() {
@@ -91,14 +90,19 @@ double G3T1_2::collect() {
     } else {
         ROS_INFO("error collecting data");
     }
-
     battery.consume(BATT_UNIT);
     collected_risk = sensorConfig.evaluateNumber(m_data);
+
+    boost::posix_time::ptime my_posix_time = ros::Time::now().toBoost();
+    timestamp = boost::posix_time::to_iso_extended_string(my_posix_time);
+
     msg.id = this->dataId;
     msg.source = this->type;
     msg.status = "collected";
-    msg.timestamp = ros::Time::now();
+    msg.timestamp = timestamp;
     statusPub.publish(msg);
+
+    flushData(msg);
 
     return m_data;
 }
@@ -140,15 +144,21 @@ void G3T1_2::transfer(const double &m_data) {
     msg.batt = battery.getCurrentLevel();
 
     data_pub.publish(msg);
-    
     battery.consume(BATT_UNIT);
+
+    boost::posix_time::ptime my_posix_time = ros::Time::now().toBoost();
+    timestamp = boost::posix_time::to_iso_extended_string(my_posix_time);
+    
     statusMsg.id = this->dataId;
     statusMsg.source = this->type;
     statusMsg.status = "sent";
-    statusMsg.timestamp = ros::Time::now();
+    statusMsg.timestamp = timestamp;
     statusPub.publish(statusMsg);
 
+    flushData(statusMsg);
+
     this->dataId++;
+
     ROS_INFO("risk calculated and transferred: [%.2f%%]", risk);   
 }
 

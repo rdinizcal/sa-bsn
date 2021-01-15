@@ -1,6 +1,6 @@
 #include "component/g3t1_1/G3T1_1.hpp"
 
-#define BATT_UNIT 3
+#define BATT_UNIT 0.2
 
 #include <algorithm>
 #include <cmath>
@@ -15,8 +15,7 @@ G3T1_1::G3T1_1(int &argc, char **argv, const std::string &name) :
     dataGenerator(),
     filter(1),
     sensorConfig(),
-    collected_risk(),
-    msg_id(0) {}
+    collected_risk() {}
 
 G3T1_1::~G3T1_1() {}
 
@@ -75,14 +74,6 @@ void G3T1_1::setUp() {
 
         sensorConfig = SensorConfiguration(0, low_range, midRanges, highRanges, percentages);
     }
-    
-    std::string path = ros::package::getPath("diagnostics_logger");
-    filepath = path + "/../logs/sensors/" +this->type+ "_" + std::to_string(now()) + ".log";
-
-    fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
-    fp << "\n";
-    fp.close();
-
 }
 
 void G3T1_1::tearDown() {
@@ -94,7 +85,7 @@ double G3T1_1::collect() {
     ros::ServiceClient client = handle.serviceClient<services::PatientData>("getPatientData");
     services::PatientData srv;
     messages::DiagnosticsData msg;
-    
+
     srv.request.vitalSign = "oxigenation";
 
     if (client.call(srv)) {
@@ -105,23 +96,18 @@ double G3T1_1::collect() {
     }
 
     battery.consume(BATT_UNIT);
-
     collected_risk = sensorConfig.evaluateNumber(m_data);
 
-    timestamp = ros::Time::now();
+    boost::posix_time::ptime my_posix_time = ros::Time::now().toBoost();
+    timestamp = boost::posix_time::to_iso_extended_string(my_posix_time);
 
     msg.id = this->dataId;
     msg.source = this->type;
     msg.status = "collected";
     msg.timestamp = timestamp;
+    flushData(msg);
     statusPub.publish(msg);
 
-    fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::app);
-    fp << timestamp << ",";
-    fp << msg.id << ",";
-    fp << msg.source << ",";
-    fp << msg.status << std::endl;
-    fp.close();
 
     return m_data;
 }
@@ -167,7 +153,8 @@ void G3T1_1::transfer(const double &m_data) {
     data_pub.publish(msg);
     battery.consume(BATT_UNIT);
 
-    timestamp = ros::Time::now();
+    boost::posix_time::ptime my_posix_time = ros::Time::now().toBoost();
+    timestamp = boost::posix_time::to_iso_extended_string(my_posix_time);
 
     statusMsg.id = this->dataId;
     statusMsg.source = this->type;
@@ -175,13 +162,7 @@ void G3T1_1::transfer(const double &m_data) {
     statusMsg.timestamp = timestamp;
     statusPub.publish(statusMsg);
 
-
-    fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::app);
-    fp << timestamp << ",";
-    fp << statusMsg.id << ",";
-    fp << statusMsg.source << ",";
-    fp << statusMsg.status << std::endl;
-    fp.close();
+    flushData(statusMsg);
 
     this->dataId++;
 
