@@ -30,6 +30,26 @@ void Enactor::receiveEvent(const archlib::Event::ConstPtr& msg) {
     }
 }
 
+void Enactor::receiveAdaptationParameter() {
+    ros::NodeHandle client_handler;
+    ros::ServiceClient client_module;
+
+    client_module = client_handler.serviceClient<archlib::EngineRequest>("EngineRequest");
+    archlib::EngineRequest adapt_srv;
+    
+    if(!client_module.call(adapt_srv)) {
+        ROS_ERROR("Failed to connect to Strategy Manager node.");
+        return;
+    }
+
+    adaptation_parameter = adapt_srv.response.content;
+
+    if(adaptation_parameter != "reliability" && adaptation_parameter != "cost") {
+        ROS_ERROR("Invalid adaptation parameter received.");
+        return;
+    }
+}
+
 void Enactor::receiveStatus() {
     ros::NodeHandle client_handler;
     ros::ServiceClient client_module;

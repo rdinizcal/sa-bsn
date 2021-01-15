@@ -21,6 +21,7 @@ ADD_MESSAGE_FILES( FILES
 ADD_SERVICE_FILES( FILES
   knowledge_repository/external/DataAccessRequest.srv
   target_system/internal/EffectorRegister.srv
+  system_manager/internal/EngineRequest.srv
 )
 
 GENERATE_MESSAGES(DEPENDENCIES std_msgs)

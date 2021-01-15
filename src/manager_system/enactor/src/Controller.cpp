@@ -18,6 +18,8 @@ void Controller::setUp() {
     nh.getParam("kp", KP);
     nh.getParam("adaptation_parameter", adaptation_parameter);
 	rosComponentDescriptor.setFreq(freq);
+
+    receiveAdaptationParameter();
 }
 
 void Controller::apply_strategy(const std::string &component) {

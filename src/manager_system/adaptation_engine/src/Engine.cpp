@@ -83,11 +83,18 @@ void Engine::setUp() {
         if(it->first.find("R_") != std::string::npos) {
             priority[it->first] = 50;
         }
-    }  
-    
+    } 
+
+    enactor_server = handle.advertiseService("EngineRequest", &Engine::sendAdaptationParameter, this);
 }
 
 void Engine::tearDown() {}
+
+bool Engine::sendAdaptationParameter(archlib::EngineRequest::Request &req, archlib::EngineRequest::Response &res) {
+    try {
+        res.content = adaptation;
+    } catch(...) {}
+}
 
 void Engine::receiveException(const archlib::Exception::ConstPtr& msg){
     std::string content = msg->content.c_str();

@@ -27,6 +27,7 @@
 #include "archlib/Strategy.h"
 #include "archlib/Exception.h"
 #include "archlib/ROSComponent.hpp"
+#include "archlib/EngineRequest.h"
 
 
 class Engine : public arch::ROSComponent {
@@ -53,6 +54,7 @@ class Engine : public arch::ROSComponent {
 		void plan_cost();
     	void execute();
 
+		bool sendAdaptationParameter(archlib::EngineRequest::Request &req, archlib::EngineRequest::Response &res);
 
   	private:
 	  double calculate_reli();
@@ -75,6 +77,7 @@ class Engine : public arch::ROSComponent {
 
 		ros::NodeHandle handle;
 		ros::Publisher enact;
+		ros::ServiceServer enactor_server;
 
 		int cycles;
 		int counter;

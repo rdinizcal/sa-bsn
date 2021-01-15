@@ -18,6 +18,7 @@
 
 #include "archlib/DataAccessRequest.h"
 #include "archlib/ROSComponent.hpp"
+#include "archlib/EngineRequest.h"
 
 class Enactor : public arch::ROSComponent {
     public:
@@ -36,6 +37,7 @@ class Enactor : public arch::ROSComponent {
 	  	void receiveStatus();
 	  	void receiveEvent(const archlib::Event::ConstPtr& msg);
 	  	void receiveStrategy(const archlib::Strategy::ConstPtr& msg);
+		void receiveAdaptationParameter();
 
 		virtual void apply_strategy(const std::string &component) = 0;
 
@@ -56,6 +58,8 @@ class Enactor : public arch::ROSComponent {
 		int64_t cycles;
 		double stability_margin;
 		double KP;
+
+		std::string adaptation_parameter;
 };
 
 #endif 
