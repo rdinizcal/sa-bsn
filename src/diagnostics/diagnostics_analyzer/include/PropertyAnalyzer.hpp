@@ -76,5 +76,5 @@ class PropertyAnalyzer {
 
         std::string msgSource;
         std::string msgStatus;
-        ros::Time msgTimestamp;
+        std::string msgTimestamp;
 };

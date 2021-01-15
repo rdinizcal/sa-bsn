@@ -14,6 +14,7 @@
 #include "bsn/resource/Battery.hpp"
 #include "bsn/utils/utils.hpp"
 
+#include "boost/date_time/posix_time/posix_time.hpp"
 
 class CentralHub : public arch::target_system::Component {
 
@@ -52,6 +53,7 @@ class CentralHub : public arch::target_system::Component {
         std::vector<std::list<double>> data_buffer;
 
         ros::Publisher statusPub;
+        std::string timestamp;
 };
 
 #endif 

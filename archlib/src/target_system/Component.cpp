@@ -122,9 +122,10 @@ namespace arch {
 		void Component::sendStatus(const std::string &content) {
 			archlib::Status msg;
 
+    		boost::posix_time::ptime my_posix_time = ros::Time::now().toBoost();
 			msg.source = rosComponentDescriptor.getName();
 			msg.content = content;
-			msg.timestamp = ros::Time::now();
+			msg.timestamp = boost::posix_time::to_iso_extended_string(my_posix_time);
 
 			collect_status.publish(msg);
 		}

@@ -18,6 +18,8 @@
 #include "bsn/resource/Battery.hpp"
 #include "bsn/utils/utils.hpp"
 
+#include "boost/date_time/posix_time/posix_time.hpp"
+
 class Sensor : public arch::target_system::Component {
 
     public:
@@ -63,7 +65,7 @@ class Sensor : public arch::target_system::Component {
         uint32_t dataId;
 
         std::string filepath;
-        ros::Time timestamp;
+        std::string timestamp; 
         std::fstream fp;
 };
 

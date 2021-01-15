@@ -132,12 +132,15 @@ void G4T1::process() {
 
     // std::vector<std::string> risks;
 
+    boost::posix_time::ptime my_posix_time = ros::Time::now().toBoost();
+    timestamp = boost::posix_time::to_iso_extended_string(my_posix_time);
+
     messages::CentralhubDiagnostics diagMsg;
     diagMsg.id = currentDataId;
     diagMsg.type = "sensor";
     diagMsg.source = currentType;
     diagMsg.status = "processed";
-    diagMsg.timestamp = ros::Time::now();
+    diagMsg.timestamp = timestamp;
     statusPub.publish(diagMsg);
 
     //diagMsg.type = "centralhub";
@@ -146,8 +149,11 @@ void G4T1::process() {
 
     getPatientStatus();
 
+    my_posix_time = ros::Time::now().toBoost();
+    timestamp = boost::posix_time::to_iso_extended_string(my_posix_time);
+
     diagMsg.status = "detected";
-    diagMsg.timestamp = ros::Time::now();        
+    diagMsg.timestamp = timestamp;        
     chDetectPub.publish(diagMsg);
 
     std::string patient_risk;
@@ -226,12 +232,14 @@ void G4T1::transfer() {
     pub.publish(msg);
 
     messages::CentralhubDiagnostics diagMsg;
+    boost::posix_time::ptime my_posix_time = ros::Time::now().toBoost();
+    timestamp = boost::posix_time::to_iso_extended_string(my_posix_time);
     
     diagMsg.id = currentDataId;
     diagMsg.type = "sensor";
     diagMsg.source = currentType;
     diagMsg.status = "persisted";
-    diagMsg.timestamp = ros::Time::now();
+    diagMsg.timestamp = timestamp;
     statusPub.publish(diagMsg);
 
     if (lost_packt) {

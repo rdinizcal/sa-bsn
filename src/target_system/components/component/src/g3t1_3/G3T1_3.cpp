@@ -96,10 +96,14 @@ double G3T1_3::collect() {
     battery.consume(BATT_UNIT);
 
     collected_risk = sensorConfig.evaluateNumber(m_data);
+
+    boost::posix_time::ptime my_posix_time = ros::Time::now().toBoost();
+    timestamp = boost::posix_time::to_iso_extended_string(my_posix_time);
+
     msg.id = this->dataId;
     msg.source = this->type;
     msg.status = "collected";
-    msg.timestamp = ros::Time::now();
+    msg.timestamp = timestamp;
     statusPub.publish(msg);
 
 
@@ -142,12 +146,16 @@ void G3T1_3::transfer(const double &m_data) {
     msg.batt = battery.getCurrentLevel();
 
     data_pub.publish(msg);
+
+    boost::posix_time::ptime my_posix_time = ros::Time::now().toBoost();
+    timestamp = boost::posix_time::to_iso_extended_string(my_posix_time);
+
     
     battery.consume(BATT_UNIT);
     statusMsg.id = this->dataId;
     statusMsg.source = this->type;
     statusMsg.status = "sent";
-    statusMsg.timestamp = ros::Time::now();
+    statusMsg.timestamp = timestamp;
     statusPub.publish(statusMsg);
 
     this->dataId++;
