@@ -1,11 +1,13 @@
 #include <ros/ros.h>
 #include <ros/console.h>
+#include <ros/package.h>
 
 #include <iostream>
 #include <string>
 #include <vector>
 #include <map>
 #include <array>
+#include <fstream>
 
 #include "messages/DiagnosticsData.h"
 #include "messages/CentralhubDiagnostics.h"
@@ -73,8 +75,12 @@ class PropertyAnalyzer {
         std::map<std::string, bool> gotMessage;
         uint32_t incomingId;
         uint32_t outgoingId;
+        uint32_t prevId, currentId;
 
         std::string msgSource;
         std::string msgStatus;
         std::string msgTimestamp;
+
+        std::fstream fp;
+        std::string filepath;
 };

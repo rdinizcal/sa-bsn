@@ -40,6 +40,15 @@ void PropertyAnalyzer::setUp() {
     std::cout << " on sensor: " << sensorAlias[currentSensor] << std::endl;
     
     if (currentProperty == "p10") chDetectedSub = nh.subscribe("ch_detected", 10, &PropertyAnalyzer::processCentralhubDetection, this);
+
+    std::string path = ros::package::getPath("diagnostics_logger");
+
+    filepath = path + "/../logs/"+currentProperty+"/observer/observer_"+sensorAlias[currentSensor]+".log";
+    std::cout << filepath << std::endl;
+
+    fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
+    fp << "\n";
+    fp.close();
 }
 
 void PropertyAnalyzer::defineStateNames() {
@@ -82,23 +91,28 @@ void PropertyAnalyzer::processCentralhubDetection(const messages::CentralhubDiag
             if (msg->status == "on" || msg->status == "processed"
              || msg->status == "detected" || msg->status == "off") {
                 gotMessage["centralhub"] = true;
-                msgTimestamp = msg->timestamp;
-                msgStatus = msg->status;
-                msgSource = msg->source;
-            }
-            if (msg->status == "processed") {
-                incomingId = msg->id;
-                SECOND_reached = true;
-                gotMessage["centralhub_processed"] = true;
-            } else if (msg->status == "detected") {
-                outgoingId = msg->id;
-                THIRD_reached = true;
-                property_satisfied = outgoingId == incomingId;
-                gotMessage["centralhub"] = true;
-            } else if (msg->status == "on") {
-                ON_reached = true;
-            } else if (msg->status == "off") {
-                OFF_reached = true;
+
+                if (msg->status == "processed") {
+                    incomingId = msg->id;
+                    SECOND_reached = true;
+                    gotMessage["centralhub_processed"] = true;
+                } else if (msg->status == "detected") {
+                    outgoingId = msg->id;
+                    THIRD_reached = true;
+                    property_satisfied = outgoingId == incomingId;
+                    gotMessage["centralhub"] = true;
+                } else if (msg->status == "on") {
+                    ON_reached = true;
+                } else if (msg->status == "off") {
+                    OFF_reached = true;
+                }
+                fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::app);
+                fp << msg->timestamp << ",";
+                fp << msg->id << ",";
+                fp << msg->source << ",";
+                fp << msg->status << std::endl;
+                fp.close();
+                
             }
         }
     }
@@ -115,13 +129,16 @@ void PropertyAnalyzer::processCentralhubData(const messages::CentralhubDiagnosti
                     THIRD_reached = true;
                     if (property_satisfied) property_satisfied = outgoingId == incomingId;
                 }
-                messages::LogMessage logMsg;
-                logMsg.timestamp = msg->timestamp;
-                logMsg.status = msg->status;
-                logMsg.source = msg->source;
-                logMsg.property = currentProperty;
-                logMsg.validity = property_satisfied;
-                logPub.publish(logMsg);
+                if (currentId != prevId) {
+                    fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::app);
+                    fp << msg->timestamp << ",";
+                    fp << msg->id << ",";
+                    fp << "centralhub" << ",";
+                    fp << msg->status << ",";
+                    fp << property_satisfied << std::endl; 
+                    fp.close();
+                }
+                    prevId = currentId;
             }
         } else if (msg->type == "centralhub") {
             gotMessage["centralhub"] = true;
@@ -143,13 +160,14 @@ void PropertyAnalyzer::processSensorData(const messages::DiagnosticsData::ConstP
                 } else if (msg->status == "off") {
                     OFF_reached = true;
                 }
-                messages::LogMessage logMsg;
-                logMsg.timestamp = msg->timestamp;
-                logMsg.status = msg->status;
-                logMsg.source = msg->source;
-                logMsg.property = currentProperty;
-                logMsg.validity = property_satisfied;
-                logPub.publish(logMsg);
+                currentId = msg->id;
+                fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::app);
+                fp << msg->timestamp << ",";
+                fp << msg->id << ",";
+                fp << msg->source << ",";
+                fp << msg->status << ",";
+                fp << property_satisfied << std::endl;
+                fp.close();
             }
         }
     }
@@ -159,34 +177,36 @@ void PropertyAnalyzer::processSensorOn(const archlib::Status::ConstPtr& msg) {
     if (currentProperty == "p10") {    
         if (msg->source == "/g4t1") {
             if (msg->content == "init" && ON_reached == false) {
-                messages::LogMessage logMsg;
-                logMsg.timestamp = msg->timestamp;
-                logMsg.status = "on";
-                logMsg.source = "centralhub";
-                logMsg.property = currentProperty;
-                logPub.publish(logMsg);
-
                 ON_reached = true;
                 printStack();
+
+                fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::app);
+                fp << msg->timestamp << ",";
+                fp << 0 << ",";
+                fp << "centralhub" << ",";
+                fp << "on" << ",";
+                fp << property_satisfied << std::endl;
+                fp.close();    
             }
         }
     } else if (currentProperty != "p10") {    
         if (msg->source == currentSensor) {
             if (msg->content == "init" && ON_reached == false) {            
-                messages::LogMessage logMsg;
-                logMsg.timestamp = msg->timestamp;
-                logMsg.status = "on";
-                logMsg.source = sensorAlias[currentSensor];
-                logMsg.property = currentProperty;
-                logPub.publish(logMsg);
-                          
                 ON_reached = true;
                 printStack();
+
+                fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::app);
+                fp << msg->timestamp << ",";
+                fp << 0 << ",";
+                fp << sensorAlias[currentSensor] << ",";
+                fp << "on" << ",";
+                fp << property_satisfied << std::endl;
+                fp.close();
             }
         }
     }
 }
-
+ 
 void PropertyAnalyzer::tearDown() {}
 
 void PropertyAnalyzer::busyWait(const std::string& type) {
@@ -202,11 +222,11 @@ std::string PropertyAnalyzer::yesOrNo(bool state) {
 }
 
 void PropertyAnalyzer::printStack() {
-    //std::cout << "==========================================" << std::endl;
-    //std::cout << "Current state: " << currentState << std::endl;
-    //std::cout << "Incoming: " << incomingId << " Outgoing: " << outgoingId << std::endl;
-    //std::cout << "Property satisfied? " << yesOrNo(property_satisfied) << std::endl;
-    //std::cout << "==========================================" << std::endl;            
+    std::cout << "==========================================" << std::endl;
+    std::cout << "Current state: " << currentState << std::endl;
+    std::cout << "Incoming: " << incomingId << " Outgoing: " << outgoingId << std::endl;
+    std::cout << "Property satisfied? " << yesOrNo(property_satisfied) << std::endl;
+    std::cout << "==========================================" << std::endl;            
 
 }
 

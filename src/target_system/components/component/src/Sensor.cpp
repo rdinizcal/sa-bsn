@@ -27,6 +27,15 @@ int32_t Sensor::run() {
 
     sendStatus("init");
 
+    std::string path = ros::package::getPath("diagnostics_logger");
+    handle.getParam("property", foldername);
+
+    filepath = path + "/../logs/"+foldername+"/sensors/" +this->type+ ".log";
+
+    fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
+    fp << "\n";
+    fp.close();
+
     while (ros::ok()) {
         ros::spinOnce();
 

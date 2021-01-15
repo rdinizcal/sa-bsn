@@ -143,6 +143,9 @@ void G4T1::process() {
     diagMsg.timestamp = timestamp;
     statusPub.publish(diagMsg);
 
+    if (prevId[currentType] != currentDataId) flushData(diagMsg);
+
+
     //diagMsg.type = "centralhub";
     //diagMsg.timestamp = ros::Time::now();
     //chDetectPub.publish(diagMsg);
@@ -155,6 +158,8 @@ void G4T1::process() {
     diagMsg.status = "detected";
     diagMsg.timestamp = timestamp;        
     chDetectPub.publish(diagMsg);
+
+    if (prevId[currentType] != currentDataId) flushData(diagMsg);
 
     std::string patient_risk;
 
@@ -241,6 +246,9 @@ void G4T1::transfer() {
     diagMsg.status = "persisted";
     diagMsg.timestamp = timestamp;
     statusPub.publish(diagMsg);
+
+    if (prevId[currentType] != currentDataId) flushData(diagMsg);
+    prevId[currentType] = currentDataId;
 
     if (lost_packt) {
         lost_packt = false;

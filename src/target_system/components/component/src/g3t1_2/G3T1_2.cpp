@@ -70,16 +70,6 @@ void G3T1_2::setUp() {
 
         sensorConfig = SensorConfiguration(0, low_range, midRanges, highRanges, percentages);
     }
-
-    std::string path = ros::package::getPath("diagnostics_logger");
-    handle.getParam("property", foldername);
-
-    filepath = path + "/../logs/"+foldername+"/sensors/" +this->type+ ".log";
-
-    fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
-    fp << "\n";
-    fp.close();
-
 }
 
 void G3T1_2::tearDown() {
@@ -165,7 +155,7 @@ void G3T1_2::transfer(const double &m_data) {
     statusMsg.timestamp = timestamp;
     statusPub.publish(statusMsg);
 
-    flushData(msg);
+    flushData(statusMsg);
 
     this->dataId++;
 

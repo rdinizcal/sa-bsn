@@ -1,6 +1,6 @@
 #include "component/g3t1_1/G3T1_1.hpp"
 
-#define BATT_UNIT 3
+#define BATT_UNIT 0.2
 
 #include <algorithm>
 #include <cmath>
@@ -74,16 +74,6 @@ void G3T1_1::setUp() {
 
         sensorConfig = SensorConfiguration(0, low_range, midRanges, highRanges, percentages);
     }
-
-    std::string path = ros::package::getPath("diagnostics_logger");
-    handle.getParam("property", foldername);
-
-    filepath = path + "/../logs/"+foldername+"/sensors/" +this->type+ ".log";
-
-    fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
-    fp << "\n";
-    fp.close();
-
 }
 
 void G3T1_1::tearDown() {
@@ -115,9 +105,9 @@ double G3T1_1::collect() {
     msg.source = this->type;
     msg.status = "collected";
     msg.timestamp = timestamp;
+    flushData(msg);
     statusPub.publish(msg);
 
-    flushData(msg);
 
     return m_data;
 }

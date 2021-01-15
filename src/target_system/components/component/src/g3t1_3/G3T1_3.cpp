@@ -72,15 +72,6 @@ void G3T1_3::setUp() {
 
         sensorConfig = SensorConfiguration(0, low_range, midRanges, highRanges, percentages);
     }
-    std::string path = ros::package::getPath("diagnostics_logger");
-    handle.getParam("property", foldername);
-
-    filepath = path + "/../logs/"+foldername+"/sensors/" +this->type+ ".log";
-
-    fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
-    fp << "\n";
-    fp.close();
-
 }
 
 void G3T1_3::tearDown() {
@@ -114,12 +105,7 @@ double G3T1_3::collect() {
     msg.timestamp = timestamp;
     statusPub.publish(msg);
 
-    fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::app);
-    fp << timestamp << ",";
-    fp << msg.id << ",";
-    fp << msg.source << ",";
-    fp << msg.status << std::endl;
-    fp.close();
+    flushData(msg);
 
     return m_data;
 }
@@ -172,13 +158,7 @@ void G3T1_3::transfer(const double &m_data) {
     statusMsg.timestamp = timestamp;
     statusPub.publish(statusMsg);
 
-
-    fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::app);
-    fp << timestamp << ",";
-    fp << statusMsg.id << ",";
-    fp << statusMsg.source << ",";
-    fp << statusMsg.status << std::endl;
-    fp.close();
+    flushData(statusMsg);
 
     this->dataId++;
 

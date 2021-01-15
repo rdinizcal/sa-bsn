@@ -15,6 +15,7 @@
 #include "bsn/resource/Battery.hpp"
 #include "bsn/utils/utils.hpp"
 
+#include <ros/package.h>
 #include "boost/date_time/posix_time/posix_time.hpp"
 
 class CentralHub : public arch::target_system::Component {
@@ -38,6 +39,7 @@ class CentralHub : public arch::target_system::Component {
         virtual void collect(const messages::SensorData::ConstPtr& sensor_data) = 0;
         virtual void process() = 0;
         virtual void transfer() = 0;
+        void flushData(messages::CentralhubDiagnostics);
 
     private:
         bool isActive();
@@ -57,8 +59,9 @@ class CentralHub : public arch::target_system::Component {
         std::string timestamp;
 
         std::fstream fp;
-        std::string filename;
+        std::string filepath;
         std::string foldername;
+
 };
 
 #endif 

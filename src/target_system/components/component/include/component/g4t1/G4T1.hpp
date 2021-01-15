@@ -72,6 +72,8 @@ class G4T1 : public CentralHub {
 
         int32_t currentDataId;
         std::string currentType;
+        std::map<std::string, uint32_t> prevId;
+
 };
 
 #endif 
