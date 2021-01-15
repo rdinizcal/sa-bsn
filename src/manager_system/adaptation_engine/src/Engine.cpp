@@ -19,8 +19,11 @@ Engine::~Engine() {}
 
 void Engine::setUp() {
     ros::NodeHandle nh;
-
-	nh.getParam("setpoint", r_ref);
+    if(adaptation == "reliability") {
+	    nh.getParam("setpoint", r_ref);
+    } else {
+        nh.getParam("setpoint", c_ref);
+    }
 	nh.getParam("offset", offset);
 	nh.getParam("gain", Kp);
 	nh.getParam("info_quant", info_quant);
@@ -66,7 +69,7 @@ void Engine::setUp() {
 
         //initialize:
         calculate_reli();
-    } else if(adaptation == "cost") {
+    } else {
         for (std::vector<std::string>::iterator it = terms.begin(); it != terms.end(); ++it) {
             strategy[*it] = 0; //Do we initialize it with 1 as in reliability or 0 because this is the maximum cost?
         }
@@ -368,28 +371,41 @@ void Engine::analyze() {
     //   std::cout<< itt->first << ":" << itt->second << ", ";
     //}
 
-    double r_curr = calculate_reli();
+    double r_curr, c_curr;
+    double error;
     if (adaptation == "reliability") {
+        r_curr = calculate_reli();
         std::cout << "current system reliability: " <<  r_curr << std::endl;
+
+        error = r_ref - r_curr;
+        // if the error is out of the stability margin, plan!
+        if ((error > r_ref * stability_margin) || (error < -stability_margin * r_ref)) {
+            if (cycles >= monitor_freq / actuation_freq) {
+                cycles = 0;
+                plan_reli();
+            }
+        }
     } else {
-        std::cout << "current system cost: " <<  r_curr << std::endl;
-    }
-    double error = r_ref - r_curr;
-    // if the error is out of the stability margin, plan!
-    if ((error > r_ref * stability_margin) || (error < -stability_margin * r_ref)) {
-        if (cycles >= monitor_freq / actuation_freq) {
-            cycles = 0;
-            plan();
+        c_curr = calculate_cost();
+        std::cout << "current system cost: " <<  c_curr << std::endl;
+
+        error = c_ref - c_curr;
+        // if the error is out of the stability margin, plan!
+        if ((error > c_ref * stability_margin) || (error < -stability_margin * c_ref)) {
+            if (cycles >= monitor_freq / actuation_freq) {
+                cycles = 0;
+                plan_cost();
+            }
         }
     }
 }
 
 /** **************************************************************
- *                          PLAN
+ *                          PLAN_RELI
 /* ***************************************************************
  * ***************************************************************
 */
-void Engine::plan() {
+void Engine::plan_reli() {
     std::cout << "[plan]" << std::endl;
 
     std::cout << "r_ref= " << r_ref << std::endl;
@@ -514,6 +530,135 @@ void Engine::plan() {
 }
 
 /** **************************************************************
+ *                          PLAN_COST
+/* ***************************************************************
+ * ***************************************************************
+*/
+void Engine::plan_cost() {
+    std::cout << "[plan]" << std::endl;
+
+    std::cout << "c_ref= " << c_ref << std::endl;
+    double c_curr = calculate_cost();
+    std::cout << "c_curr= " << c_curr << std::endl;
+    double error = c_ref - c_curr;
+    std::cout << "error= " << error << std::endl;
+
+    //reset the formula
+    std::vector<std::string> c_vec;
+    for (std::map<std::string,double>::iterator it = strategy.begin(); it != strategy.end(); ++it) {
+        if(it->first.find("W_") != std::string::npos) {
+            std::string task = it->first;
+            task.erase(0,2);
+            if((strategy["CTX_"+task] != 0) && (strategy["F_"+task] != 0)){ // avoid ctx = 0 components thus infinite loops
+                c_vec.push_back(it->first);
+                strategy[it->first] = c_curr;
+            }
+        }
+    }  
+
+    //reorder r_vec based on priority
+    std::vector<std::string> aux = c_vec;
+    c_vec.clear();
+    std::set<std::pair<std::string,int>, comp> set(priority.begin(), priority.end());
+    for(auto const &pair: set){
+        if(std::find(aux.begin(), aux.end(), pair.first) != aux.end()){ // key from priority exists in r_vec
+            c_vec.push_back(pair.first);
+        }
+    }
+
+    //print ordered r_vec
+    std::cout << "ordered c_vec: [";
+    for(std::vector<std::string>::iterator i = c_vec.begin(); i != c_vec.end(); ++i) { 
+        std::cout << *i << ", ";
+    }
+    std::cout << "]" << std::endl;
+
+    // ladies and gentleman, the search...
+
+    std::vector<std::map<std::string, double>> solutions;
+    for(std::vector<std::string>::iterator i = c_vec.begin(); i != c_vec.end(); ++i) { 
+        //std::cout <<"i: "<< *i << std::endl;
+
+        //reset offset
+        for (std::vector<std::string>::iterator it = c_vec.begin(); it != c_vec.end(); ++it) {
+            if(error>0){
+                strategy[*it] = c_curr*(1-offset);
+            } else if(error<0) {
+                strategy[*it] = (c_curr*(1+offset)>1)?1:c_curr*(1+offset);
+            }
+        }
+        double c_new = calculate_cost(); // set offset
+        std::cout << "offset=" << c_new << std::endl;
+
+        std::map<std::string,double> prev;
+        double c_prev=0;
+        if(error > 0){
+            do {
+                prev = strategy;
+                c_prev = c_new;
+                strategy[*i] += Kp*error;
+                c_new = calculate_cost();
+            } while(c_new < c_ref && c_prev < c_new && strategy[*i] > 0 && strategy[*i] < 1);
+        } else if (error < 0){
+            do {
+                prev = strategy;
+                c_prev = c_new;
+                strategy[*i] += Kp*error;
+                c_new = calculate_cost();
+            } while(c_new > c_ref && c_prev > c_new && strategy[*i] > 0 && strategy[*i] < 1);
+        }
+
+        strategy = prev;
+        c_new = calculate_cost();
+
+        for(std::vector<std::string>::iterator j = c_vec.begin(); j != c_vec.end(); ++j) { // all the others
+            if(*i == *j) continue;
+            //std::cout <<"j: "<< *j << std::endl;
+
+            if(error > 0){
+                do {
+                    prev = strategy;
+                    c_prev = c_new;
+                    strategy[*j] += Kp*error;
+                    c_new = calculate_cost();
+                } while(c_new < c_ref && c_prev < c_new && strategy[*j] > 0 && strategy[*j] < 1);
+            } else if (error < 0) {
+                do {
+                    prev = strategy;
+                    c_prev = c_new;
+                    strategy[*j] += Kp*error;
+                    c_new = calculate_cost();
+                } while(c_new > c_ref && c_prev > c_new && strategy[*j] > 0 && strategy[*j] < 1);
+            }
+            
+            strategy = prev;
+            c_new = calculate_cost();
+        }
+        solutions.push_back(strategy);
+    }
+
+    for (std::vector<std::map<std::string,double>>::iterator it = solutions.begin(); it != solutions.end(); it++){
+        strategy = *it;
+        double c_new = calculate_cost();
+
+        std::cout << "strategy: [";
+        for (std::map<std::string,double>::iterator itt = (*it).begin(); itt != (*it).end(); ++itt) {
+            if(itt->first.find("W_") != std::string::npos) {
+                std::cout<< itt->first << ":" << itt->second << ", ";
+            }
+        }
+        std::cout << "] = " << c_new << std::endl;
+
+        if(/*!blacklisted(*it) && */(c_new > c_ref*(1-stability_margin) && c_new < c_ref*(1+stability_margin))){ // if not listed and converges, yay!
+            execute();
+            return;
+        }
+    }
+
+    ROS_INFO("Did not converge :(");
+}
+
+/** **************************************************************
  *                         EXECUTE
 /* ***************************************************************
  * if so, send messages containing the actions to the modules
@@ -526,31 +671,60 @@ void Engine::execute() {
     size_t index = 0;
     bool flag = false;  //nasty
     bool flagO = false; //uber nasty
-    //get the reliabilities in the formula and send!
-    // send in form "/g3t1_1:0.89;/g4t1=0.2;..."
-    for (std::map<std::string,double>::iterator it = strategy.begin(); it != strategy.end(); ++it) {
-        std::string aux = "";
-        if(it->first.find("R_") != std::string::npos) { //if it is a R_ term of the formula 
-            aux += it->first;
-            std::transform(aux.begin(), aux.end(), aux.begin(), ::tolower);
+    if(adaptation == "reliability") {
+        //get the reliabilities in the formula and send!
+        // send in form "/g3t1_1:0.89;/g4t1=0.2;..."
+        for (std::map<std::string,double>::iterator it = strategy.begin(); it != strategy.end(); ++it) {
+            std::string aux = "";
+            if(it->first.find("R_") != std::string::npos) { //if it is a R_ term of the formula 
+                aux += it->first;
+                std::transform(aux.begin(), aux.end(), aux.begin(), ::tolower);
 
-            std::vector<std::string> str = bsn::utils::split(aux, '_');
-            content += "/";
-            content += str[1]; //g3
-            content += str[2] ; //t1
-            if(str.size()>3) content += "_" + str[3]; //_1:
-            content += ":"; 
-            content += std::to_string(it->second) + ","; // 0.82 
-            flag = true;
+                std::vector<std::string> str = bsn::utils::split(aux, '_');
+                content += "/";
+                content += str[1]; //g3
+                content += str[2] ; //t1
+                if(str.size()>3) content += "_" + str[3]; //_1:
+                content += ":"; 
+                content += std::to_string(it->second) + ","; // 0.82 
+                flag = true;
+            }
+            if(flag){
+                //remove last ','
+                content.pop_back();
+                content += ";";
+                flag = false;
+                flagO = true;
+            }
+            aux.clear();
         }
-        if(flag){
-            //remove last ','
-            content.pop_back();
-            content += ";";
-            flag = false;
-            flagO = true;
+    } else {
+         //get the costs in the formula and send!
+        // send in form "/g3t1_1:0.89;/g4t1=0.2;..."
+        for (std::map<std::string,double>::iterator it = strategy.begin(); it != strategy.end(); ++it) {
+            std::string aux = "";
+            if(it->first.find("W_") != std::string::npos) { //if it is a W_ term of the formula 
+                aux += it->first;
+                std::transform(aux.begin(), aux.end(), aux.begin(), ::tolower);
+
+                std::vector<std::string> str = bsn::utils::split(aux, '_');
+                content += "/";
+                content += str[1]; //g3
+                content += str[2] ; //t1
+                if(str.size()>3) content += "_" + str[3]; //_1:
+                content += ":"; 
+                content += std::to_string(it->second) + ","; // 0.82 
+                flag = true;
+            }
+            if(flag){
+                //remove last ','
+                content.pop_back();
+                content += ";";
+                flag = false;
+                flagO = true;
+            }
+            aux.clear();
         }
-        aux.clear();
     }
 
     //remove last ';'

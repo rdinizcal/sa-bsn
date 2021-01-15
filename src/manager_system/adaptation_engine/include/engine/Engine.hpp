@@ -49,7 +49,8 @@ class Engine : public arch::ROSComponent {
 		void monitor_reli();
 		void monitor_cost();
     	void analyze();
-    	void plan();
+    	void plan_reli();
+		void plan_cost();
     	void execute();
 
 
@@ -59,7 +60,7 @@ class Engine : public arch::ROSComponent {
 	  bool blacklisted(std::map<std::string,double> &);
 
 	private:
-		double r_ref;
+		double r_ref, c_ref;
 		double offset;
 		double Kp;
 		double info_quant;
