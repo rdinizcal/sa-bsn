@@ -99,6 +99,7 @@ double G3T1_3::collect() {
     msg.id = this->dataId;
     msg.source = this->type;
     msg.status = "collected";
+    msg.timestamp = ros::Time::now();
     statusPub.publish(msg);
 
 
@@ -146,6 +147,7 @@ void G3T1_3::transfer(const double &m_data) {
     statusMsg.id = this->dataId;
     statusMsg.source = this->type;
     statusMsg.status = "sent";
+    statusMsg.timestamp = ros::Time::now();
     statusPub.publish(statusMsg);
 
     this->dataId++;

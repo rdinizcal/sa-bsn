@@ -12,6 +12,7 @@ void PropertyAnalyzer::setUp() {
     sensorSub = nh.subscribe("sensor_diagnostics", 100, &PropertyAnalyzer::processSensorData, this);
     centralhubSub = nh.subscribe("centralhub_diagnostics", 100, &PropertyAnalyzer::processCentralhubData, this);
     sensorOnSub = nh.subscribe("collect_status", 10, &PropertyAnalyzer::processSensorOn, this);
+    logPub = nh.advertise<messages::LogMessage>("diagnostics_logger", 1000);
 
     init = true;
     ON_reached = false;
@@ -78,7 +79,13 @@ void PropertyAnalyzer::defineStateTypes() {
 void PropertyAnalyzer::processCentralhubDetection(const messages::CentralhubDiagnostics::ConstPtr& msg) {
     if (currentProperty == "p10") {
         if (msg->type == "centralhub") {
-            std::cout << msg->source + " " << msg->status << std::endl;
+            if (msg->status == "on" || msg->status == "processed"
+             || msg->status == "detected" || msg->status == "off") {
+                gotMessage["centralhub"] = true;
+                msgTimestamp = msg->timestamp;
+                msgStatus = msg->status;
+                msgSource = msg->source;
+            }
             if (msg->status == "processed") {
                 incomingId = msg->id;
                 SECOND_reached = true;
@@ -100,11 +107,21 @@ void PropertyAnalyzer::processCentralhubDetection(const messages::CentralhubDiag
 void PropertyAnalyzer::processCentralhubData(const messages::CentralhubDiagnostics::ConstPtr& msg) {     
     if (currentProperty != "p10") {
         if (msg->type == "sensor" && msg->source == sensorAlias[currentSensor]) {
-            gotMessage["centralhub"] = true;
-            if (msg->status == centralhubSignal) {
-                outgoingId = msg->id;
-                THIRD_reached = true;
-                if (property_satisfied) property_satisfied = outgoingId == incomingId;
+            if (msg->status == "on" || msg->status == centralhubSignal || msg->status == "off") {
+                gotMessage["centralhub"] = true;
+                
+                if (msg->status == centralhubSignal) {
+                    outgoingId = msg->id;
+                    THIRD_reached = true;
+                    if (property_satisfied) property_satisfied = outgoingId == incomingId;
+                }
+                messages::LogMessage logMsg;
+                logMsg.timestamp = msg->timestamp;
+                logMsg.status = msg->status;
+                logMsg.source = msg->source;
+                logMsg.property = currentProperty;
+                logMsg.validity = property_satisfied;
+                logPub.publish(logMsg);
             }
         } else if (msg->type == "centralhub") {
             gotMessage["centralhub"] = true;
@@ -116,42 +133,58 @@ void PropertyAnalyzer::processCentralhubData(const messages::CentralhubDiagnosti
 void PropertyAnalyzer::processSensorData(const messages::DiagnosticsData::ConstPtr& msg) {
     if (currentProperty != "p10") {
         if (msg->source == sensorAlias[currentSensor]) {
-            //std::cout << "current sensor: " << sensorAlias[currentSensor] <<std::endl; 
-            gotMessage["sensor"] = true;
-            if (msg->status == "on") {
-                ON_reached = true;
-            } else if (msg->status == sensorSignal) {
-                SECOND_reached = true;
-                incomingId = msg->id;
-            } else if (msg->status == "off") {
-                OFF_reached = true;
+            if (msg->status == "on" || msg->status == sensorSignal || msg->status == "off") {
+                gotMessage["sensor"] = true;
+                if (msg->status == "on") {
+                    ON_reached = true;
+                } else if (msg->status == sensorSignal) {
+                    SECOND_reached = true;
+                    incomingId = msg->id;
+                } else if (msg->status == "off") {
+                    OFF_reached = true;
+                }
+                messages::LogMessage logMsg;
+                logMsg.timestamp = msg->timestamp;
+                logMsg.status = msg->status;
+                logMsg.source = msg->source;
+                logMsg.property = currentProperty;
+                logMsg.validity = property_satisfied;
+                logPub.publish(logMsg);
             }
         }
     }
 }
 
 void PropertyAnalyzer::processSensorOn(const archlib::Status::ConstPtr& msg) {
-
-
     if (currentProperty == "p10") {    
         if (msg->source == "/g4t1") {
             if (msg->content == "init" && ON_reached == false) {
+                messages::LogMessage logMsg;
+                logMsg.timestamp = msg->timestamp;
+                logMsg.status = "on";
+                logMsg.source = "centralhub";
+                logMsg.property = currentProperty;
+                logPub.publish(logMsg);
+
                 ON_reached = true;
                 printStack();
             }
         }
     } else if (currentProperty != "p10") {    
         if (msg->source == currentSensor) {
-            if (msg->content == "init" && ON_reached == false) {
+            if (msg->content == "init" && ON_reached == false) {            
+                messages::LogMessage logMsg;
+                logMsg.timestamp = msg->timestamp;
+                logMsg.status = "on";
+                logMsg.source = sensorAlias[currentSensor];
+                logMsg.property = currentProperty;
+                logPub.publish(logMsg);
+                          
                 ON_reached = true;
                 printStack();
             }
         }
     }
-}
-
-void PropertyAnalyzer::processCentralhubOn(const archlib::Status::ConstPtr& msg) {
-
 }
 
 void PropertyAnalyzer::tearDown() {}
@@ -169,11 +202,12 @@ std::string PropertyAnalyzer::yesOrNo(bool state) {
 }
 
 void PropertyAnalyzer::printStack() {
-    std::cout << "==========================================" << std::endl;
-    std::cout << "Current state: " << currentState << std::endl;
-    std::cout << "Incoming: " << incomingId << " Outgoing: " << outgoingId << std::endl;
-    std::cout << "Property satisfied? " << yesOrNo(property_satisfied) << std::endl;
-    std::cout << "==========================================" << std::endl;
+    //std::cout << "==========================================" << std::endl;
+    //std::cout << "Current state: " << currentState << std::endl;
+    //std::cout << "Incoming: " << incomingId << " Outgoing: " << outgoingId << std::endl;
+    //std::cout << "Property satisfied? " << yesOrNo(property_satisfied) << std::endl;
+    //std::cout << "==========================================" << std::endl;            
+
 }
 
 void PropertyAnalyzer::body() {

@@ -4,6 +4,10 @@
 #include <stdio.h> 
 #include <string>
 #include <vector>
+#include <chrono>
+#include <fstream>
+
+#include <ros/package.h>
 
 #include "archlib/target_system/Component.hpp"
 #include "archlib/AdaptationCommand.h"
@@ -32,6 +36,7 @@ class Sensor : public arch::target_system::Component {
 
         void reconfigure(const archlib::AdaptationCommand::ConstPtr& msg);
         void injectUncertainty(const archlib::Uncertainty::ConstPtr& msg);
+        int64_t now() const;
 		
         virtual double collect() = 0;
         virtual double process(const double &data) = 0;
@@ -56,6 +61,10 @@ class Sensor : public arch::target_system::Component {
         ros::Publisher statusPub;
 
         uint32_t dataId;
+
+        std::string filepath;
+        ros::Time timestamp;
+        std::fstream fp;
 };
 
 #endif 

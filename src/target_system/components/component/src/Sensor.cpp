@@ -27,12 +27,6 @@ int32_t Sensor::run() {
 
     sendStatus("init");
 
-    msg.id = 0;
-    msg.source = this->type;
-    msg.status = "on";
-
-    statusPub.publish(msg);
-
     while (ros::ok()) {
         ros::spinOnce();
 
@@ -56,12 +50,16 @@ void Sensor::body() {
 
     if (!isActive() && battery.getCurrentLevel() > 90){
         turnOn();
+        
         msg.status = "on";
+        msg.timestamp = ros::Time::now();
         statusPub.publish(msg);
     } else if (isActive() && battery.getCurrentLevel() < 2){
         //Sends info to diagnostics here
         msg.status = "off";
+        msg.timestamp = ros::Time::now();
         statusPub.publish(msg);
+
         turnOff();        
     }
 
@@ -150,6 +148,11 @@ bool Sensor::isActive() {
 void Sensor::turnOn() {
     active = true;
 }
+
+int64_t Sensor::now() const {
+    return std::chrono::high_resolution_clock::now().time_since_epoch().count();
+}
+
 
 void Sensor::turnOff() {
     active = false;

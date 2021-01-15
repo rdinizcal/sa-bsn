@@ -137,14 +137,17 @@ void G4T1::process() {
     diagMsg.type = "sensor";
     diagMsg.source = currentType;
     diagMsg.status = "processed";
+    diagMsg.timestamp = ros::Time::now();
     statusPub.publish(diagMsg);
 
-    diagMsg.type = "centralhub";
-    chDetectPub.publish(diagMsg);
+    //diagMsg.type = "centralhub";
+    //diagMsg.timestamp = ros::Time::now();
+    //chDetectPub.publish(diagMsg);
 
     getPatientStatus();
 
     diagMsg.status = "detected";
+    diagMsg.timestamp = ros::Time::now();        
     chDetectPub.publish(diagMsg);
 
     std::string patient_risk;
@@ -228,6 +231,7 @@ void G4T1::transfer() {
     diagMsg.type = "sensor";
     diagMsg.source = currentType;
     diagMsg.status = "persisted";
+    diagMsg.timestamp = ros::Time::now();
     statusPub.publish(diagMsg);
 
     if (lost_packt) {

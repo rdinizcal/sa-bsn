@@ -76,6 +76,13 @@ void G3T1_1::setUp() {
         sensorConfig = SensorConfiguration(0, low_range, midRanges, highRanges, percentages);
     }
     
+    std::string path = ros::package::getPath("diagnostics_logger");
+    filepath = path + "/../logs/sensors/" +this->type+ "_" + std::to_string(now()) + ".log";
+
+    fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
+    fp << "\n";
+    fp.close();
+
 }
 
 void G3T1_1::tearDown() {
@@ -101,10 +108,20 @@ double G3T1_1::collect() {
 
     collected_risk = sensorConfig.evaluateNumber(m_data);
 
+    timestamp = ros::Time::now();
+
     msg.id = this->dataId;
     msg.source = this->type;
     msg.status = "collected";
+    msg.timestamp = timestamp;
     statusPub.publish(msg);
+
+    fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::app);
+    fp << timestamp << ",";
+    fp << msg.id << ",";
+    fp << msg.source << ",";
+    fp << msg.status << std::endl;
+    fp.close();
 
     return m_data;
 }
@@ -150,10 +167,21 @@ void G3T1_1::transfer(const double &m_data) {
     data_pub.publish(msg);
     battery.consume(BATT_UNIT);
 
+    timestamp = ros::Time::now();
+
     statusMsg.id = this->dataId;
     statusMsg.source = this->type;
     statusMsg.status = "sent";
+    statusMsg.timestamp = timestamp;
     statusPub.publish(statusMsg);
+
+
+    fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::app);
+    fp << timestamp << ",";
+    fp << statusMsg.id << ",";
+    fp << statusMsg.source << ",";
+    fp << statusMsg.status << std::endl;
+    fp.close();
 
     this->dataId++;
 

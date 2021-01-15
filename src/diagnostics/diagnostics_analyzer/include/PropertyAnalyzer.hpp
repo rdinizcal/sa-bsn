@@ -9,6 +9,7 @@
 
 #include "messages/DiagnosticsData.h"
 #include "messages/CentralhubDiagnostics.h"
+#include "messages/LogMessage.h"
 #include "archlib/Status.h"
 
 class PropertyAnalyzer {
@@ -44,6 +45,8 @@ class PropertyAnalyzer {
         ros::Subscriber sensorOnSub;
         ros::Subscriber chDetectedSub;
 
+        ros::Publisher logPub;
+
         std::map<std::string, std::string> sensorAlias;
 
         std::string currentState;
@@ -70,4 +73,8 @@ class PropertyAnalyzer {
         std::map<std::string, bool> gotMessage;
         uint32_t incomingId;
         uint32_t outgoingId;
+
+        std::string msgSource;
+        std::string msgStatus;
+        ros::Time msgTimestamp;
 };

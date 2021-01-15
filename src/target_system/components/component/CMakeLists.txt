@@ -4,7 +4,7 @@ PROJECT(component)
 add_compile_options(-std=c++11)
 
 ## Find catkin and any catkin packages
-FIND_PACKAGE(catkin REQUIRED COMPONENTS roscpp std_msgs genmsg messages archlib)
+FIND_PACKAGE(catkin REQUIRED COMPONENTS roslib roscpp std_msgs genmsg messages archlib)
 
 # Export catkin package.
 CATKIN_PACKAGE(
@@ -62,7 +62,7 @@ ADD_DEPENDENCIES(g3t1_5 messages_generate_messages_cpp)
 SET(g4t1-src "${CMAKE_CURRENT_SOURCE_DIR}/src/g4t1/G4T1.cpp")
 ADD_EXECUTABLE (g4t1 "${CMAKE_CURRENT_SOURCE_DIR}/apps/g4t1.cpp" ${${PROJECT_NAME}-src} ${g4t1-src})
 TARGET_LINK_LIBRARIES (g4t1 ${catkin_LIBRARIES} ${LIBRARIES})
-ADD_DEPENDENCIES(g4t1 messages_generate_messages_cpp)
+ADD_DEPENDENCIES(g4t1 roslib messages_generate_messages_cpp)
 
 ###########################################################################
 # Install this project.

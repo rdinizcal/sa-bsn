@@ -124,6 +124,7 @@ namespace arch {
 
 			msg.source = rosComponentDescriptor.getName();
 			msg.content = content;
+			msg.timestamp = ros::Time::now();
 
 			collect_status.publish(msg);
 		}

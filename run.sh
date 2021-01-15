@@ -3,18 +3,18 @@ bsn=$PWD
 gnome-terminal -e roscore & sleep 3s
 
 gnome-terminal --working-directory=${bsn}/configurations/property_analyzer/P7 -e 'roslaunch P7_oximeter_analyzer.launch'
-gnome-terminal --working-directory=${bsn}/configurations/property_analyzer/P7 -e 'roslaunch P7_ecg_analyzer.launch'
-gnome-terminal --working-directory=${bsn}/configurations/property_analyzer/P7 -e 'roslaunch P7_thermometer_analyzer.launch'
+#gnome-terminal --working-directory=${bsn}/configurations/property_analyzer/P7 -e 'roslaunch P7_ecg_analyzer.launch'
+#gnome-terminal --working-directory=${bsn}/configurations/property_analyzer/P7 -e 'roslaunch P7_thermometer_analyzer.launch'
 
-gnome-terminal --working-directory=${bsn}/configurations/property_analyzer/P8 -e 'roslaunch P8_oximeter_analyzer.launch'
-gnome-terminal --working-directory=${bsn}/configurations/property_analyzer/P8 -e 'roslaunch P8_ecg_analyzer.launch'
-gnome-terminal --working-directory=${bsn}/configurations/property_analyzer/P8 -e 'roslaunch P8_thermometer_analyzer.launch'
+#gnome-terminal --working-directory=${bsn}/configurations/property_analyzer/P8 -e 'roslaunch P8_oximeter_analyzer.launch'
+#gnome-terminal --working-directory=${bsn}/configurations/property_analyzer/P8 -e 'roslaunch P8_ecg_analyzer.launch'
+#gnome-terminal --working-directory=${bsn}/configurations/property_analyzer/P8 -e 'roslaunch P8_thermometer_analyzer.launch'
 
-gnome-terminal --working-directory=${bsn}/configurations/property_analyzer/P9 -e 'roslaunch P9_oximeter_analyzer.launch'
-gnome-terminal --working-directory=${bsn}/configurations/property_analyzer/P9 -e 'roslaunch P9_ecg_analyzer.launch'
-gnome-terminal --working-directory=${bsn}/configurations/property_analyzer/P9 -e 'roslaunch P9_thermometer_analyzer.launch'
+#gnome-terminal --working-directory=${bsn}/configurations/property_analyzer/P9 -e 'roslaunch P9_oximeter_analyzer.launch'
+#gnome-terminal --working-directory=${bsn}/configurations/property_analyzer/P9 -e 'roslaunch P9_ecg_analyzer.launch'
+#gnome-terminal --working-directory=${bsn}/configurations/property_analyzer/P9 -e 'roslaunch P9_thermometer_analyzer.launch'
 
-gnome-terminal --working-directory=${bsn}/configurations/property_analyzer/P10 -e 'roslaunch P10_analyzer.launch'
+#gnome-terminal --working-directory=${bsn}/configurations/property_analyzer/P10 -e 'roslaunch P10_analyzer.launch'
 
 
 ################# KNOWLEDGE REPOSITORY #################
@@ -32,8 +32,8 @@ gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'rosla
 
 gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g4t1.launch' & sleep 5s
 gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g3t1_1.launch'
-gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g3t1_2.launch'
-gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g3t1_3.launch'
+#gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g3t1_2.launch'
+#gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g3t1_3.launch'
 #gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g3t1_4.launch'
 #gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch g3t1_5.launch'
 gnome-terminal --working-directory=${bsn}/configurations/environment   -e 'roslaunch patient.launch'
