@@ -179,7 +179,7 @@ void Engine::monitor_cost() {
     for (std::map<std::string,double>::iterator it = strategy.begin(); it != strategy.end(); ++it){
         if(it->first.find("CTX_") != std::string::npos)  it->second = 0;
         if(it->first.find("W_") != std::string::npos)  it->second = 1;
-        if(it->first.find("F_") != std::string::npos)  it->second = 1;
+        //if(it->first.find("F_") != std::string::npos)  it->second = 1;
     }
 
     archlib::DataAccessRequest r_srv;
@@ -567,12 +567,29 @@ void Engine::plan_cost() {
         if(it->first.find("W_") != std::string::npos) {
             std::string task = it->first;
             task.erase(0,2);
-            if((strategy["CTX_"+task] != 0) && (strategy["F_"+task] != 0)){ // avoid ctx = 0 components thus infinite loops
+            if((strategy["CTX_"+task] != 0) /*&& (strategy["F_"+task] != 0)*/){ // avoid ctx = 0 components thus infinite loops
                 c_vec.push_back(it->first);
                 strategy[it->first] = c_curr;
             }
         }
     }  
+
+    int sensor_num;
+    if(c_vec.size()-1 < 1) {
+        sensor_num = 1;
+    } else {
+        sensor_num = c_vec.size()-1;
+    }
+
+    for(std::map<std::string,double>::iterator it = strategy.begin(); it != strategy.end(); ++it) {
+        if(it->first.find("W_") != std::string::npos) {
+            it->second = it->second/sensor_num;
+        }
+    }
+
+    //Divide error and ref by the number of sensors
+    error /= sensor_num; 
+    c_ref /= sensor_num;
 
     //reorder r_vec based on priority
     std::vector<std::string> aux = c_vec;
@@ -599,13 +616,18 @@ void Engine::plan_cost() {
 
         //reset offset
         for (std::vector<std::string>::iterator it = c_vec.begin(); it != c_vec.end(); ++it) {
-            if(error>0){
-                strategy[*it] = c_curr*(1-offset);
-            } else if(error<0) {
-                strategy[*it] = c_curr*(1+offset);
+            if(*it != "W_G4_T1") {
+                if(error>0){
+                    strategy[*it] = strategy[*it]*(1-offset);
+                } else if(error<0) {
+                    strategy[*it] = strategy[*it]*(1+offset);
+                }
+            } else {
+                strategy[*it] = 0;
             }
         }
         double c_new = calculate_cost(); // set offset
+        c_new /= sensor_num;
         std::cout << "offset=" << c_new << std::endl;
 
         std::map<std::string,double> prev;
@@ -614,20 +636,31 @@ void Engine::plan_cost() {
             do {
                 prev = strategy;
                 c_prev = c_new;
-                strategy[*i] += Kp*error;
+                if(*i != "W_G4_T1") {
+                    strategy[*i] += Kp*error;
+                } else {
+                    strategy[*i] = 0;
+                }
                 c_new = calculate_cost();
-            } while(c_new < c_ref && c_prev < c_new && strategy[*i] > 0 && strategy[*i] < 1);
+                c_new /= sensor_num;
+            } while(c_new < c_ref && c_prev < c_new && strategy[*i] > 0);
         } else if (error < 0){
             do {
                 prev = strategy;
                 c_prev = c_new;
-                strategy[*i] += Kp*error;
+                if(*i != "W_G4_T1") {
+                    strategy[*i] += Kp*error;
+                } else {
+                    strategy[*i] = 0;
+                }
                 c_new = calculate_cost();
-            } while(c_new > c_ref && c_prev > c_new && strategy[*i] > 0 && strategy[*i] < 1);
+                c_new /= sensor_num;
+            } while(c_new > c_ref && c_prev > c_new && strategy[*i] > 0);
         }
 
         strategy = prev;
         c_new = calculate_cost();
+        c_new /= sensor_num;
 
         for(std::vector<std::string>::iterator j = c_vec.begin(); j != c_vec.end(); ++j) { // all the others
             if(*i == *j) continue;
@@ -637,23 +670,49 @@ void Engine::plan_cost() {
                 do {
                     prev = strategy;
                     c_prev = c_new;
-                    strategy[*j] += Kp*error;
+                    if(*j != "W_G4_T1") {
+                        strategy[*j] += Kp*error;
+                    } else {
+                        strategy[*i] = 0;
+                    }
                     c_new = calculate_cost();
-                } while(c_new < c_ref && c_prev < c_new && strategy[*j] > 0 && strategy[*j] < 1);
+                    c_new /= sensor_num;
+                } while(c_new < c_ref && c_prev < c_new && strategy[*j] > 0);
             } else if (error < 0) {
                 do {
                     prev = strategy;
                     c_prev = c_new;
-                    strategy[*j] += Kp*error;
+                    if(*i != "W_G4_T1") {
+                        strategy[*i] += Kp*error;
+                    } else {
+                        strategy[*i] = 0;
+                    }
                     c_new = calculate_cost();
-                } while(c_new > c_ref && c_prev > c_new && strategy[*j] > 0 && strategy[*j] < 1);
+                    c_new /= sensor_num;
+                } while(c_new > c_ref && c_prev > c_new && strategy[*j] > 0);
             }
             
             strategy = prev;
             c_new = calculate_cost();
+            c_new /= sensor_num;
         }
-        solutions.push_back(strategy);
+
+        bool negative_cost = false;
+        for(std::map<std::string,double>::iterator strategy_it = strategy.begin();strategy_it != strategy.end();++strategy_it) {
+            if(strategy_it->first.find("W_") != std::string::npos) {
+                if(strategy_it->second < 0) {
+                    negative_cost = true;
+                    break;
+                }
+            }
+        }
+
+        if(!negative_cost) {
+            solutions.push_back(strategy);
+        }
     }
+
+    c_ref *= sensor_num;
 
     for (std::vector<std::map<std::string,double>>::iterator it = solutions.begin(); it != solutions.end(); it++){
         strategy = *it;

@@ -132,9 +132,9 @@ double DataAccess::calculateCost() {
         keys.push_back(r_key);
         values.push_back(1);*/
 
-        f_key = "F_" + formated_key;
+        /*f_key = "F_" + formated_key;
         keys.push_back(f_key);
-        values.push_back(1);
+        values.push_back(1);*/
     }
 
     return cost_expression.apply(keys, values);
