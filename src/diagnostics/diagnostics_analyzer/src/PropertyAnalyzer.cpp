@@ -40,7 +40,7 @@ void PropertyAnalyzer::setUp() {
     
     if (currentProperty == "p10") chDetectedSub = nh.subscribe("ch_detected", 10, &PropertyAnalyzer::processCentralhubDetection, this);
 
-    std::string path = ros::package::getPath("diagnostics_logger");
+    std::string path = ros::package::getPath("diagnostics_analyzer");
 
     filepath = path + "/../logs/"+currentProperty+"/observer/observer_"+sensorAlias[currentSensor]+".log";
     std::cout << filepath << std::endl;
