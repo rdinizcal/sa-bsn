@@ -12,7 +12,6 @@ void PropertyAnalyzer::setUp() {
     sensorSub = nh.subscribe("sensor_diagnostics", 100, &PropertyAnalyzer::processSensorData, this);
     centralhubSub = nh.subscribe("centralhub_diagnostics", 100, &PropertyAnalyzer::processCentralhubData, this);
     sensorOnSub = nh.subscribe("collect_status", 10, &PropertyAnalyzer::processSensorOn, this);
-    logPub = nh.advertise<messages::LogMessage>("diagnostics_logger", 1000);
 
     init = true;
     ON_reached = false;

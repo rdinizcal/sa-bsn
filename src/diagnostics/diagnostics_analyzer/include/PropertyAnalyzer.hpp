@@ -11,7 +11,7 @@
 
 #include "messages/DiagnosticsData.h"
 #include "messages/CentralhubDiagnostics.h"
-#include "messages/LogMessage.h"
+
 #include "archlib/Status.h"
 
 class PropertyAnalyzer {

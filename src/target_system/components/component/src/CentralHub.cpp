@@ -24,7 +24,7 @@ int32_t CentralHub::run() {
 
     statusPub.publish(msg);
 
-    std::string path = ros::package::getPath("diagnostics_logger");
+    std::string path = ros::package::getPath("diagnostics_analyzer");
     nh.getParam("property", foldername);
 
     filepath = path + "/../logs/"+foldername+"/centralhub/centralhub.log";
