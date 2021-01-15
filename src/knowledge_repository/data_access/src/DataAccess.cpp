@@ -258,10 +258,10 @@ bool DataAccess::processQuery(archlib::DataAccessRequest::Request &req, archlib:
                     }
                 }
             } else if (query[1] == "cost") {
-                // applyTimeWindow();
-                // for (auto it : status) {
-                //     res.content += calculateCost()
-                // }
+                applyTimeWindow();
+                for (auto it : status) {
+                    res.content += calculateCost();
+                }
             }
         } 
     } catch(...) {}

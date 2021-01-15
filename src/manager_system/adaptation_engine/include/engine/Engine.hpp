@@ -46,7 +46,8 @@ class Engine : public arch::ROSComponent {
 
 		void receiveException(const archlib::Exception::ConstPtr& msg);
 
-		void monitor();
+		void monitor_reli();
+		void monitor_cost();
     	void analyze();
     	void plan();
     	void execute();
@@ -54,6 +55,7 @@ class Engine : public arch::ROSComponent {
 
   	private:
 	  double calculate_reli();
+	  double calculate_cost();
 	  bool blacklisted(std::map<std::string,double> &);
 
 	private:

@@ -59,12 +59,21 @@ void Engine::setUp() {
     std::replace(formula.begin(), formula.end(), ')',' ');
     std::vector<std::string> terms = bsn::utils::split(formula, ' ');
 
-    for (std::vector<std::string>::iterator it = terms.begin(); it != terms.end(); ++it) {
-        strategy[*it] = 1;
-    }
+    if(adaptation == "reliability") {
+        for (std::vector<std::string>::iterator it = terms.begin(); it != terms.end(); ++it) {
+            strategy[*it] = 1;
+        }
 
-    //initialize:
-    calculate_reli();
+        //initialize:
+        calculate_reli();
+    } else if(adaptation == "cost") {
+        for (std::vector<std::string>::iterator it = terms.begin(); it != terms.end(); ++it) {
+            strategy[*it] = 0; //Do we initialize it with 1 as in reliability or 0 because this is the maximum cost?
+        }
+
+        //initialize:
+        calculate_cost();
+    }
 
     //initialize priorities
     for (std::map<std::string,double>::iterator it = strategy.begin(); it != strategy.end(); ++it) {
@@ -98,7 +107,21 @@ void Engine::receiveException(const archlib::Exception::ConstPtr& msg){
     }
 }
 
+
+/*
+    If we keep these two functions equal we need to create an unique function called calculate_metric
+*/
 double Engine::calculate_reli() {
+    std::vector<std::string> keys;
+    std::vector<double> values;
+    for (std::map<std::string,double>::iterator it = strategy.begin(); it != strategy.end(); ++it) {
+        keys.push_back(it->first);
+        values.push_back(it->second);
+    }
+    return expression.apply(keys, values);
+}
+
+double Engine::calculate_cost() {
     std::vector<std::string> keys;
     std::vector<double> values;
     for (std::map<std::string,double>::iterator it = strategy.begin(); it != strategy.end(); ++it) {
@@ -117,11 +140,119 @@ double Engine::calculate_reli() {
 }*/
 
 /** **************************************************************
- *                          MONITOR 
+ *                          MONITOR_COST
 /* ***************************************************************
  * ***************************************************************
 */ 
-void Engine::monitor() {
+void Engine::monitor_cost() {
+    std::cout << "[monitoring]" << std::endl;
+    cycles++;
+
+    // request system status data for the knowledge repository
+    ros::NodeHandle client_handler;
+    ros::ServiceClient client_module;
+
+    client_module = client_handler.serviceClient<archlib::DataAccessRequest>("DataAccessRequest");
+    
+    //reset the formula
+    for (std::map<std::string,double>::iterator it = strategy.begin(); it != strategy.end(); ++it){
+        if(it->first.find("CTX_") != std::string::npos)  it->second = 0;
+        if(it->first.find("W_") != std::string::npos)  it->second = 1;
+        if(it->first.find("F_") != std::string::npos)  it->second = 1;
+    }
+
+    archlib::DataAccessRequest r_srv;
+    r_srv.request.name = ros::this_node::getName();
+    r_srv.request.query = "all:cost:" + std::to_string(info_quant);
+
+    if(!client_module.call(r_srv)) {
+        ROS_ERROR("Failed to connect to data access node.");
+        return;
+    } /*request reliability for all tasks*/
+    
+    //expecting smth like: "/g3t1_1:success,fail,success;/g4t1:success; ..."
+    std::string ans = r_srv.response.content;
+    // std::cout << "received=> [" << ans << "]" << std::endl;
+    if(ans == ""){
+        ROS_ERROR("Received empty answer when asked for reliability.");
+    }
+
+    std::vector<std::string> pairs = bsn::utils::split(ans, ';');
+    
+    for (std::string it : pairs) {
+        std::vector<std::string> pair = bsn::utils::split(it, ':');
+        std::string first = pair[0];
+        std::string second = pair[1];
+
+        //a "/g3t1_1 arrives here"
+        std::transform(first.begin(), first.end(),first.begin(), ::toupper); // /G3T1_1
+        first.erase(0,1); // G3T1_1
+        first.insert(int(first.find('T')),"_"); // G3_T1_1
+
+        std::vector<std::string> values = bsn::utils::split(second, ',');
+
+        strategy["W_" + first] = stod(values[values.size()-1]);
+        std::cout << "W_" + first + " = " << strategy["W_" + first] << std::endl;
+    } 
+
+    //request context status for all tasks
+    archlib::DataAccessRequest c_srv;
+    c_srv.request.name = ros::this_node::getName();
+    c_srv.request.query = "all:event:1";
+
+    if (!client_module.call(c_srv)) {
+        ROS_ERROR("Failed to connect to data access node.");
+        return;
+    } 
+    
+    //expecting smth like: "/g3t1_1:activate;/g4t1:deactivate; ..."
+    ans = c_srv.response.content;
+    //std::cout << "received=> [" << ans << "]" << std::endl;
+
+    if (ans == "") {
+        ROS_ERROR("Received empty answer when asked for event.");
+    }
+
+    std::vector<std::string> ctx_pairs = bsn::utils::split(ans, ';');
+    
+    for (std::string ctx : ctx_pairs) {
+        std::vector<std::string> pair = bsn::utils::split(ctx, ':');
+        std::string first = pair[0];
+        std::string second = pair[1];
+
+        //a "/g3t1_1 arrives here"
+        std::transform(first.begin(), first.end(),first.begin(), ::toupper); // /G3T1_1
+        first.erase(0,1); // G3T1_1
+        first.insert(int(first.find('T')),"_"); // G3_T1_1
+
+        std::vector<std::string> values = bsn::utils::split(second, ',');
+        for (std::string value : values) {
+            if (first != "G4_T1") {
+                strategy["CTX_" + first] = 1;
+                
+                if (value == "deactivate") {
+                    strategy["W_" + first] = 0;
+                    std::cout << first + " was deactivate and its cost was set to 0" << std::endl;
+                }
+            } else {
+                if (value == "activate") {
+                    strategy["CTX_" + first] = 1;
+                } else {
+                    strategy["CTX_" + first] = 0; 
+                }
+            }
+        }
+    }
+    
+    analyze();
+}
+
+/** **************************************************************
+ *                          MONITOR_RELI
+/* ***************************************************************
+ * ***************************************************************
+*/ 
+void Engine::monitor_reli() {
     std::cout << "[monitoring]" << std::endl;
     cycles++;
 
@@ -204,7 +335,7 @@ void Engine::monitor() {
 
         std::vector<std::string> values = bsn::utils::split(second, ',');
         for (std::string value : values) {
-            if (first != "G4_T1" && adaptation == "reliability") {
+            if (first != "G4_T1") {
                 strategy["CTX_" + first] = 1;
                 
                 if (value == "deactivate") {
@@ -443,7 +574,11 @@ void Engine::body(){
 
     ros::Rate loop_rate(rosComponentDescriptor.getFreq());
     while (ros::ok){
-        monitor();
+        if(adaptation == "reliability") {
+            monitor_reli();
+        } else if(adaptation == "cost") {
+            monitor_cost();
+        }
         ros::spinOnce();
         loop_rate.sleep();        
     }   
