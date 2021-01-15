@@ -396,7 +396,7 @@ std::string DataAccess::calculateComponentCost(const std::string& component) {
     std::string key = component;
     key = key.substr(1, key.size());
 
-    aux += std::to_string(components_batteries[key]) + ';';
+    aux += std::to_string(components_costs[key]) + ';';
 
     return aux;
 }
@@ -411,6 +411,10 @@ void DataAccess::updateCosts() {
     for (auto component : components_batteries) {
         components_costs[component.first] = 
             components_last_batteries[component.first] - component.second;
+        
+        while(components_costs[component.first] < 0) {
+            components_costs[component.first] += 100;
+        }
     }
 }
 
