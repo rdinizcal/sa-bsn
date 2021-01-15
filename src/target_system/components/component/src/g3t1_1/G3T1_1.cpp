@@ -15,8 +15,7 @@ G3T1_1::G3T1_1(int &argc, char **argv, const std::string &name) :
     dataGenerator(),
     filter(1),
     sensorConfig(),
-    collected_risk(),
-    msg_id(0) {}
+    collected_risk() {}
 
 G3T1_1::~G3T1_1() {}
 
@@ -75,9 +74,11 @@ void G3T1_1::setUp() {
 
         sensorConfig = SensorConfiguration(0, low_range, midRanges, highRanges, percentages);
     }
-    
+
     std::string path = ros::package::getPath("diagnostics_logger");
-    filepath = path + "/../logs/sensors/" +this->type+ "_" + std::to_string(now()) + ".log";
+    handle.getParam("property", foldername);
+
+    filepath = path + "/../logs/"+foldername+"/sensors/" +this->type+ ".log";
 
     fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
     fp << "\n";
@@ -94,7 +95,7 @@ double G3T1_1::collect() {
     ros::ServiceClient client = handle.serviceClient<services::PatientData>("getPatientData");
     services::PatientData srv;
     messages::DiagnosticsData msg;
-    
+
     srv.request.vitalSign = "oxigenation";
 
     if (client.call(srv)) {
@@ -105,7 +106,6 @@ double G3T1_1::collect() {
     }
 
     battery.consume(BATT_UNIT);
-
     collected_risk = sensorConfig.evaluateNumber(m_data);
 
     boost::posix_time::ptime my_posix_time = ros::Time::now().toBoost();
@@ -117,12 +117,7 @@ double G3T1_1::collect() {
     msg.timestamp = timestamp;
     statusPub.publish(msg);
 
-    fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::app);
-    fp << timestamp << ",";
-    fp << msg.id << ",";
-    fp << msg.source << ",";
-    fp << msg.status << std::endl;
-    fp.close();
+    flushData(msg);
 
     return m_data;
 }
@@ -177,13 +172,7 @@ void G3T1_1::transfer(const double &m_data) {
     statusMsg.timestamp = timestamp;
     statusPub.publish(statusMsg);
 
-
-    fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::app);
-    fp << timestamp << ",";
-    fp << statusMsg.id << ",";
-    fp << statusMsg.source << ",";
-    fp << statusMsg.status << std::endl;
-    fp.close();
+    flushData(statusMsg);
 
     this->dataId++;
 

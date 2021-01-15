@@ -1,7 +1,6 @@
 #ifndef G4T1_HPP
 #define G4T1_HPP
 
-#include <fstream>
 #include <chrono>
 #include <memory>
 #include <map>

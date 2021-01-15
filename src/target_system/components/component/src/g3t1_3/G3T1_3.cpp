@@ -72,6 +72,15 @@ void G3T1_3::setUp() {
 
         sensorConfig = SensorConfiguration(0, low_range, midRanges, highRanges, percentages);
     }
+    std::string path = ros::package::getPath("diagnostics_logger");
+    handle.getParam("property", foldername);
+
+    filepath = path + "/../logs/"+foldername+"/sensors/" +this->type+ ".log";
+
+    fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
+    fp << "\n";
+    fp.close();
+
 }
 
 void G3T1_3::tearDown() {
@@ -94,7 +103,6 @@ double G3T1_3::collect() {
     }
 
     battery.consume(BATT_UNIT);
-
     collected_risk = sensorConfig.evaluateNumber(m_data);
 
     boost::posix_time::ptime my_posix_time = ros::Time::now().toBoost();
@@ -106,6 +114,12 @@ double G3T1_3::collect() {
     msg.timestamp = timestamp;
     statusPub.publish(msg);
 
+    fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::app);
+    fp << timestamp << ",";
+    fp << msg.id << ",";
+    fp << msg.source << ",";
+    fp << msg.status << std::endl;
+    fp.close();
 
     return m_data;
 }
@@ -146,17 +160,25 @@ void G3T1_3::transfer(const double &m_data) {
     msg.batt = battery.getCurrentLevel();
 
     data_pub.publish(msg);
+    battery.consume(BATT_UNIT);
 
     boost::posix_time::ptime my_posix_time = ros::Time::now().toBoost();
     timestamp = boost::posix_time::to_iso_extended_string(my_posix_time);
 
     
-    battery.consume(BATT_UNIT);
     statusMsg.id = this->dataId;
     statusMsg.source = this->type;
     statusMsg.status = "sent";
     statusMsg.timestamp = timestamp;
     statusPub.publish(statusMsg);
+
+
+    fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::app);
+    fp << timestamp << ",";
+    fp << statusMsg.id << ",";
+    fp << statusMsg.source << ",";
+    fp << statusMsg.status << std::endl;
+    fp.close();
 
     this->dataId++;
 

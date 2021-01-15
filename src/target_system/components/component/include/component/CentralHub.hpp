@@ -4,6 +4,7 @@
 #include <stdio.h> 
 #include <string>
 #include <numeric>
+#include <fstream>
 
 #include "archlib/target_system/Component.hpp"
 #include "archlib/AdaptationCommand.h"
@@ -54,6 +55,10 @@ class CentralHub : public arch::target_system::Component {
 
         ros::Publisher statusPub;
         std::string timestamp;
+
+        std::fstream fp;
+        std::string filename;
+        std::string foldername;
 };
 
 #endif 
