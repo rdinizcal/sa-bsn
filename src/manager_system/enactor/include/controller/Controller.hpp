@@ -15,7 +15,8 @@ class Controller : public Enactor {
     public: 
         virtual void setUp();
 
-        virtual void apply_strategy(const std::string &component); 
+        virtual void apply_reli_strategy(const std::string &component);
+        virtual void apply_cost_strategy(const std::string &component); 
 
     private:
         std::string adaptation_parameter;   

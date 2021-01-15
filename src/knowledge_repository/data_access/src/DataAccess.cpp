@@ -56,11 +56,11 @@ void DataAccess::setUp() {
     }
 
     try {
-        cost_file.open(path + "/../resource/models/cost.formula");
+        cost_file.open(path + "/../resource/models/costAND.formula");
         std::getline(cost_file, cost_formula);
         cost_file.close();
     } catch (std::ifstream::failure e) {
-        std::cerr << "Exception opening/reading/closing file (cost.formula)\n";
+        std::cerr << "Exception opening/reading/closing file (costAND.formula)\n";
     }
 
     cost_expression = bsn::model::Formula(cost_formula);
@@ -128,9 +128,9 @@ double DataAccess::calculateCost() {
         keys.push_back(context_key);
         values.push_back(x.second);
 
-        r_key = "R_" + formated_key;
+        /*r_key = "R_" + formated_key;
         keys.push_back(r_key);
-        values.push_back(1);
+        values.push_back(1);*/
 
         f_key = "F_" + formated_key;
         keys.push_back(f_key);
@@ -184,7 +184,7 @@ void DataAccess::body() {
         system_reliability = calculateReliability();
         updateCosts();
         system_cost = calculateCost();
-        std::cout << "system cost: " << system_cost << '\n';
+        //std::cout << "system cost: " << system_cost << '\n';
         updateBatteries();
         count_to_calc_and_reset = 0;
     }
@@ -260,7 +260,7 @@ bool DataAccess::processQuery(archlib::DataAccessRequest::Request &req, archlib:
             } else if (query[1] == "cost") {
                 applyTimeWindow();
                 for (auto it : status) {
-                    res.content += calculateCost();
+                    res.content += calculateComponentCost(it.first);
                 }
             }
         } 
@@ -383,6 +383,22 @@ std::string DataAccess::calculateComponentReliability(const std::string& compone
     components_reliabilities[key] = (len > 0) ? sum / len : 0;
 
     return content;
+}
+
+/**
+ * Builds the response string and calculate the cost
+ * of the component specified as parameter
+*/
+std::string DataAccess::calculateComponentCost(const std::string& component) {
+    std::string aux = component;
+    aux += ":";
+
+    std::string key = component;
+    key = key.substr(1, key.size());
+
+    aux += std::to_string(components_batteries[key]) + ';';
+
+    return aux;
 }
 
 void DataAccess::updateBatteries() {

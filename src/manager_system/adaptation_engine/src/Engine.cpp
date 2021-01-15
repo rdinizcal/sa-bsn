@@ -19,6 +19,7 @@ Engine::~Engine() {}
 
 void Engine::setUp() {
     ros::NodeHandle nh;
+    nh.getParam("adaptation", adaptation);
     if(adaptation == "reliability") {
 	    nh.getParam("setpoint", r_ref);
     } else {
@@ -30,7 +31,6 @@ void Engine::setUp() {
 	nh.getParam("monitor_freq", monitor_freq);
     rosComponentDescriptor.setFreq(monitor_freq);
 	nh.getParam("actuation_freq", actuation_freq);
-    nh.getParam("adaptation", adaptation);
 
     enact = handle.advertise<archlib::Strategy>("strategy", 10);
 
@@ -69,6 +69,13 @@ void Engine::setUp() {
 
         //initialize:
         calculate_reli();
+
+        //initialize priorities
+        for (std::map<std::string,double>::iterator it = strategy.begin(); it != strategy.end(); ++it) {
+            if(it->first.find("R_") != std::string::npos) {
+                priority[it->first] = 50;
+            }
+        } 
     } else {
         for (std::vector<std::string>::iterator it = terms.begin(); it != terms.end(); ++it) {
             strategy[*it] = 0; //Do we initialize it with 1 as in reliability or 0 because this is the maximum cost?
@@ -76,14 +83,14 @@ void Engine::setUp() {
 
         //initialize:
         calculate_cost();
-    }
 
-    //initialize priorities
-    for (std::map<std::string,double>::iterator it = strategy.begin(); it != strategy.end(); ++it) {
-        if(it->first.find("R_") != std::string::npos) {
-            priority[it->first] = 50;
-        }
-    } 
+        //initialize priorities
+        for (std::map<std::string,double>::iterator it = strategy.begin(); it != strategy.end(); ++it) {
+            if(it->first.find("W_") != std::string::npos) {
+                priority[it->first] = 50;
+            }
+        } 
+    }
 
     enactor_server = handle.advertiseService("EngineRequest", &Engine::sendAdaptationParameter, this);
 }
@@ -106,7 +113,11 @@ void Engine::receiveException(const archlib::Exception::ConstPtr& msg){
     std::transform(first.begin(), first.end(),first.begin(), ::toupper); // /G3T1_1
     first.erase(0,1); // G3T1_1
     first.insert(int(first.find('T')), "_"); // G3_T1_1
-    first = "R_" + first; 
+    if(adaptation == "reliability") {
+        first = "R_" + first; 
+    } else {
+        first = "W_" + first;
+    }
 
     if (priority.find(first) != priority.end()) {
         priority[first] += stoi(param[1]);
@@ -178,13 +189,13 @@ void Engine::monitor_cost() {
     if(!client_module.call(r_srv)) {
         ROS_ERROR("Failed to connect to data access node.");
         return;
-    } /*request reliability for all tasks*/
+    } /*request cost for all tasks*/
     
     //expecting smth like: "/g3t1_1:success,fail,success;/g4t1:success; ..."
     std::string ans = r_srv.response.content;
-    // std::cout << "received=> [" << ans << "]" << std::endl;
+
     if(ans == ""){
-        ROS_ERROR("Received empty answer when asked for reliability.");
+        ROS_ERROR("Received empty answer when asked for cost.");
     }
 
     std::vector<std::string> pairs = bsn::utils::split(ans, ';');
@@ -242,7 +253,7 @@ void Engine::monitor_cost() {
                 
                 if (value == "deactivate") {
                     strategy["W_" + first] = 0;
-                    std::cout << first + " was deactivate and its cost was set to 0" << std::endl;
+                    std::cout << first + " was deactivated and its cost was set to 0" << std::endl;
                 }
             } else {
                 if (value == "activate") {
@@ -591,7 +602,7 @@ void Engine::plan_cost() {
             if(error>0){
                 strategy[*it] = c_curr*(1-offset);
             } else if(error<0) {
-                strategy[*it] = (c_curr*(1+offset)>1)?1:c_curr*(1+offset);
+                strategy[*it] = c_curr*(1+offset);
             }
         }
         double c_new = calculate_cost(); // set offset
