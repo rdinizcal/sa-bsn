@@ -96,14 +96,6 @@ void PropertyAnalyzer::processCentralhubDetection(const messages::CentralhubDiag
         if (msg->status == "on" || msg->status == "processed"
              || msg->status == "detected" || msg->status == "off") {
                 gotMessage["centralhub"] = true;
-
-//            if (msg->status == "processed") {
-//                incomingId = msg->id;
-//                SECOND_reached = true;
-//                gotMessage["centralhub_processed"] = true;
-//                currentIdList[msg->source] = msg->id;
-//                currentStatusList[msg->source] = msg->status;
-//            } else 
             if (msg->status == "detected") {
                 outgoingId = msg->id;
                 THIRD_reached = true;
