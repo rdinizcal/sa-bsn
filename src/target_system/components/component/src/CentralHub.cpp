@@ -14,7 +14,7 @@ int32_t CentralHub::run() {
     ros::Subscriber abpsSub = nh.subscribe("abps_data", 10, &CentralHub::collect, this);
     ros::Subscriber abpdSub = nh.subscribe("abpd_data", 10, &CentralHub::collect, this);
 
-    statusPub = nh.advertise<messages::CentralhubDiagnostics>("centralhub_diagnostics", 1000);
+    statusPub = nh.advertise<messages::CentralhubDiagnostics>("centralhub_diagnostics", 100);
 
     messages::CentralhubDiagnostics msg;
     msg.id = 0;

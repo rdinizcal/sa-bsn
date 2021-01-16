@@ -142,24 +142,21 @@ void G4T1::process() {
     diagMsg.status = "processed";
     diagMsg.timestamp = timestamp;
     statusPub.publish(diagMsg);
-    //chDetectPub.publish(diagMsg);
 
+    diagMsg.id = currentDataId;
     diagMsg.type = "centralhub";
     statusPub.publish(diagMsg);
     
     if (prevId[currentType] != currentDataId) flushData(diagMsg);
-
-
-    //diagMsg.type = "centralhub";
-    //diagMsg.timestamp = ros::Time::now();
-    //chDetectPub.publish(diagMsg);
 
     getPatientStatus();
 
     my_posix_time = ros::Time::now().toBoost();
     timestamp = boost::posix_time::to_iso_extended_string(my_posix_time);
 
+    diagMsg.id = currentDataId;
     diagMsg.status = "detected";
+    diagMsg.type = "centralhub";
     diagMsg.timestamp = timestamp;        
     chDetectPub.publish(diagMsg);
 

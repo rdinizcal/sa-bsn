@@ -54,6 +54,7 @@ class PropertyAnalyzer {
         std::string currentState;
         std::string currentSensor;
         std::string currentProperty;
+        std::string currentProcessed;
 
         std::string sensorSignal;
         std::string centralhubSignal;

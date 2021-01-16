@@ -38,11 +38,18 @@ void PropertyAnalyzer::setUp() {
     std::cout << "Monitoring property: " << currentProperty;
     std::cout << " on sensor: " << sensorAlias[currentSensor] << std::endl;
     
-    if (currentProperty == "p10") chDetectedSub = nh.subscribe("ch_detected", 10, &PropertyAnalyzer::processCentralhubDetection, this);
 
     std::string path = ros::package::getPath("diagnostics_analyzer");
 
-    filepath = path + "/../logs/"+currentProperty+"/observer/observer_"+sensorAlias[currentSensor]+".log";
+    filepath = path + "/../logs/"+currentProperty+"/observer/observer_";
+    
+    if (currentProperty == "p10") {
+        chDetectedSub = nh.subscribe("ch_detected", 100, &PropertyAnalyzer::processCentralhubDetection, this);
+        filepath = filepath + "centralhub.log";
+    } else {
+        filepath = filepath +sensorAlias[currentSensor]+".log";
+    }
+    
     std::cout << filepath << std::endl;
 
     fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
@@ -100,7 +107,9 @@ void PropertyAnalyzer::processCentralhubDetection(const messages::CentralhubDiag
             if (msg->status == "detected") {
                 outgoingId = msg->id;
                 THIRD_reached = true;
-                property_satisfied = outgoingId == incomingId;
+                if (property_satisfied && msg->source == currentProcessed) {
+                    property_satisfied = currentIdList[msg->source] == msg->id;
+                }
                 gotMessage["centralhub"] = true;
             } else if (msg->status == "on") {
                 ON_reached = true;
@@ -156,6 +165,7 @@ void PropertyAnalyzer::processCentralhubData(const messages::CentralhubDiagnosti
                 SECOND_reached = true;
                 gotMessage["centralhub_processed"] = true;
                 currentIdList[msg->source] = msg->id;
+                currentProcessed = msg->source;
             }
             if (currentIdList[msg->source] != prevIdList[msg->source]) {
                 std::cout << msg->source << std::endl;
