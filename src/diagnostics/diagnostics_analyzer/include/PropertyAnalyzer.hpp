@@ -73,13 +73,11 @@ class PropertyAnalyzer {
         std::map<std::string, uint32_t> expectedMessage;
 
         std::map<std::string, bool> gotMessage;
+        std::map<std::string, uint32_t> prevIdList, currentIdList;
+        std::map<std::string, std::string> prevStatusList, currentStatusList;
         uint32_t incomingId;
         uint32_t outgoingId;
         uint32_t prevId, currentId;
-
-        std::string msgSource;
-        std::string msgStatus;
-        std::string msgTimestamp;
 
         std::fstream fp;
         std::string filepath;

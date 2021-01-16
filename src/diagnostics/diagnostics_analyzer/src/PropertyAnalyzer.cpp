@@ -1,7 +1,7 @@
 #include <PropertyAnalyzer.hpp>
 
 PropertyAnalyzer::PropertyAnalyzer(int  &argc, char **argv, std::string name) {
-    ros::init(argc, argv, name, ros::init_options::NoSigintHandler);
+    ros::init(argc, argv, name);
 }
 
 PropertyAnalyzer::~PropertyAnalyzer() {}
@@ -86,36 +86,42 @@ void PropertyAnalyzer::defineStateTypes() {
 
 void PropertyAnalyzer::processCentralhubDetection(const messages::CentralhubDiagnostics::ConstPtr& msg) {
     if (currentProperty == "p10") {
-        if (msg->type == "centralhub") {
-            if (msg->status == "on" || msg->status == "processed"
+        if (msg->status == "on" || msg->status == "processed"
              || msg->status == "detected" || msg->status == "off") {
                 gotMessage["centralhub"] = true;
 
-                if (msg->status == "processed") {
-                    incomingId = msg->id;
-                    SECOND_reached = true;
-                    gotMessage["centralhub_processed"] = true;
-                } else if (msg->status == "detected") {
-                    outgoingId = msg->id;
-                    THIRD_reached = true;
-                    property_satisfied = outgoingId == incomingId;
-                    gotMessage["centralhub"] = true;
-                } else if (msg->status == "on") {
-                    ON_reached = true;
-                } else if (msg->status == "off") {
-                    OFF_reached = true;
-                }
+//            if (msg->status == "processed") {
+//                incomingId = msg->id;
+//                SECOND_reached = true;
+//                gotMessage["centralhub_processed"] = true;
+//                currentIdList[msg->source] = msg->id;
+//                currentStatusList[msg->source] = msg->status;
+//            } else 
+            if (msg->status == "detected") {
+                outgoingId = msg->id;
+                THIRD_reached = true;
+                property_satisfied = outgoingId == incomingId;
+                gotMessage["centralhub"] = true;
+            } else if (msg->status == "on") {
+                ON_reached = true;
+            } else if (msg->status == "off") {
+                OFF_reached = true;
+            }
+
+            if (prevIdList[msg->source] != currentIdList[msg->source]) {
                 fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::app);
                 fp << msg->timestamp << ",";
                 fp << msg->id << ",";
                 fp << msg->source << ",";
-                fp << msg->status << std::endl;
+                fp << msg->status << ",";
+                fp << property_satisfied << std::endl;
                 fp.close();
-                
             }
+            prevIdList[msg->source] = currentIdList[msg->source];
         }
     }
 }
+
 
 void PropertyAnalyzer::processCentralhubData(const messages::CentralhubDiagnostics::ConstPtr& msg) {     
     if (currentProperty != "p10") {
@@ -142,6 +148,25 @@ void PropertyAnalyzer::processCentralhubData(const messages::CentralhubDiagnosti
         } else if (msg->type == "centralhub") {
             gotMessage["centralhub"] = true;
             std::cout << "received meta message from centralhub" << std::endl;
+        }
+    } else if (currentProperty == "p10") {
+        if (msg->type == "centralhub") {
+            if (msg->status == "processed") {
+                incomingId = msg->id;
+                SECOND_reached = true;
+                gotMessage["centralhub_processed"] = true;
+                currentIdList[msg->source] = msg->id;
+            }
+            if (currentIdList[msg->source] != prevIdList[msg->source]) {
+                std::cout << msg->source << std::endl;
+                fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::app);
+                fp << msg->timestamp << ",";
+                fp << msg->id << ",";
+                fp << msg->source << ",";
+                fp << msg->status << ",";
+                fp << property_satisfied << std::endl;
+                fp.close();
+            }
         }
     }
 }

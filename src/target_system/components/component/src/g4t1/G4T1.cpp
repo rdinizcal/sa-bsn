@@ -142,7 +142,11 @@ void G4T1::process() {
     diagMsg.status = "processed";
     diagMsg.timestamp = timestamp;
     statusPub.publish(diagMsg);
+    //chDetectPub.publish(diagMsg);
 
+    diagMsg.type = "centralhub";
+    statusPub.publish(diagMsg);
+    
     if (prevId[currentType] != currentDataId) flushData(diagMsg);
 
 
