@@ -17,8 +17,8 @@
     <param name="HighRisk1" value="0,55" />
 
     <!-- accuracy in percentage -->
+    <param name="noise" value="true" />
     <param name="accuracy" value="90" type="double" />
     <param name="property" value="p1"/>
-    <param name="noise" value="true"/>
 
 </launch>

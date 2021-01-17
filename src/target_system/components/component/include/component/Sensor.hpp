@@ -69,6 +69,7 @@ class Sensor : public arch::target_system::Component {
         std::string timestamp; 
         std::fstream fp;
         std::string foldername;
+        std::string pathSuffix;
 };
 
 #endif 
