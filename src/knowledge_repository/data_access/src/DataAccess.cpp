@@ -185,7 +185,7 @@ void DataAccess::body() {
         updateCosts();
         system_cost = calculateCost();
         //std::cout << "system cost: " << system_cost << '\n';
-        updateBatteries();
+        //updateBatteries();
         count_to_calc_and_reset = 0;
     }
 
@@ -416,6 +416,8 @@ void DataAccess::updateCosts() {
             components_costs[component.first] += 100;
         }
     }
+
+    updateBatteries();
 }
 
 void DataAccess::applyTimeWindow() {

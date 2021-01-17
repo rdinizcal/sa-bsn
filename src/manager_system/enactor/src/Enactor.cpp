@@ -14,8 +14,8 @@ void Enactor::receiveEvent(const archlib::Event::ConstPtr& msg) {
             r_curr[msg->source] = 1;
             r_ref[msg->source] = 0.80;
         } else {
-            r_curr[msg->source] = 0;
-            r_ref[msg->source] = 0.50;
+            c_curr[msg->source] = 0;
+            c_ref[msg->source] = 5;
         }
         //kp[msg->source] = 200;
         kp[msg->source] = KP;
@@ -29,6 +29,9 @@ void Enactor::receiveEvent(const archlib::Event::ConstPtr& msg) {
         if(adaptation_parameter == "reliability") {
             r_curr.erase(msg->source);
             r_ref.erase(msg->source);
+        } else {
+            c_curr.erase(msg->source);
+            c_ref.erase(msg->source);
         }
         kp.erase(msg->source);
         replicate_task.erase(msg->source);

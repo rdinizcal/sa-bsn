@@ -1,6 +1,6 @@
 #include "component/g3t1_1/G3T1_1.hpp"
 
-#define BATT_UNIT 0.2
+#define BATT_UNIT 0.05
 
 #include <algorithm>
 #include <cmath>

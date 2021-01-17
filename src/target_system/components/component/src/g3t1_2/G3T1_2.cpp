@@ -1,6 +1,6 @@
 #include "component/g3t1_2/G3T1_2.hpp"
 
-#define BATT_UNIT 0.3
+#define BATT_UNIT 0.05
 
 using namespace bsn::range;
 using namespace bsn::generator;

@@ -83,7 +83,7 @@ void Controller::apply_reli_strategy(const std::string &component) {
                 //freq[component] += (error>0) ? ((-kp[component]/100) * error) : ((kp[component]/100) * error); 
                 //double new_freq = freq[component] + ((error>0) ? ((-kp[component]/100) * error) : ((kp[component]/100) * error));
                 double new_freq = freq[component] + ((kp[component]/100) * error);
-                if(new_freq > 0) {
+                if(new_freq >= 0.5 && new_freq <= 25) {
                     freq[component] = new_freq;
                     archlib::AdaptationCommand msg;
                     msg.source = ros::this_node::getName();
@@ -177,7 +177,7 @@ void Controller::apply_cost_strategy(const std::string &component) {
                 //freq[component] += (error>0) ? ((-kp[component]/100) * error) : ((kp[component]/100) * error); 
                 //double new_freq = freq[component] + ((error>0) ? ((-kp[component]/100) * error) : ((kp[component]/100) * error));
                 double new_freq = freq[component] + ((kp[component]/100) * error);
-                if(new_freq > 0) {
+                if(new_freq >= 0.5 && new_freq <= 25) {
                     freq[component] = new_freq;
                     archlib::AdaptationCommand msg;
                     msg.source = ros::this_node::getName();
