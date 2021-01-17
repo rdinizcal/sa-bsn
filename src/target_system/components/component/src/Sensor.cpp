@@ -30,17 +30,13 @@ int32_t Sensor::run() {
     std::string path = ros::package::getPath("diagnostics_analyzer");
 
     handle.getParam("property", foldername);
-    handle.getParam("noise", pathSuffix);
 
-    if (pathSuffix == "true") pathSuffix = "_" + pathSuffix;
-
-    filepath = path + "/../logs/"+foldername+"/sensors/" +this->type+ pathSuffix+".log";
+    filepath = path + "/../logs/"+foldername+"/sensors/" +this->type+".log";
 
     fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
     fp << "\n";
     fp.close();
 
-        std::cout << "pathsuffix: " << pathSuffix << std::endl;
     while (ros::ok()) {
         ros::spinOnce();
 

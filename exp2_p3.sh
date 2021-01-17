@@ -13,7 +13,7 @@ gnome-terminal --working-directory=${bsn}/configurations/experiments/p3/environm
 
 rosnode kill -a & sleep 5s
 
-mv -f ${bsn}/src/diagnostics/logs/p3/sensors/*.log ${bsn}/src/diagnostics/logs/p3/sensors/noiseless/
+mv -f ${bsn}/src/diagnostics/logs/p3/centralhub/*.log ${bsn}/src/diagnostics/logs/p3/centralhub/noiseless/
 
 gnome-terminal --working-directory=${bsn}/configurations/property_analyzer/P3 -e 'roslaunch P3_oximeter_analyzer.launch'
 gnome-terminal --working-directory=${bsn}/configurations/property_analyzer/P3 -e 'roslaunch P3_ecg_analyzer.launch'

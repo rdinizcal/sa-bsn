@@ -21,7 +21,7 @@ void PropertyAnalyzer::setUp() {
     wait_second = false;
     wait_third = false;
     gotMessage["sensor"] = gotMessage["centralhub"] = false;
-    violation_flag = true;
+    violation_flag = false;
     property_satisfied = true;
 
     nh.getParam("SensorName", currentSensor);
@@ -139,14 +139,14 @@ void PropertyAnalyzer::processCentralhubData(const messages::CentralhubDiagnosti
     if (currentProperty != "p4") {
         if (msg->type == "sensor" && msg->source == sensorAlias[currentSensor]) {
             if (msg->status == "on" || msg->status == centralhubSignal || msg->status == "off") {                
-                gotMessage["centralhub"] = true;
                 if (msg->status == centralhubSignal) {
                     outgoingId = msg->id;
                     THIRD_reached = true;
-                    if (violation_flag) violation_flag = outgoingId == incomingId;
+                    if (!violation_flag) violation_flag = outgoingId != incomingId;
                 }
                 if (currentId != prevId) flushData(msg);
                 prevId = currentId;
+                gotMessage["centralhub"] = true;
             }
         }   //else if (msg->type == "centralhub") {
             //gotMessage["centralhub"] = true;
@@ -169,7 +169,6 @@ void PropertyAnalyzer::processSensorData(const messages::DiagnosticsData::ConstP
     if (currentProperty != "p4") {
         if (msg->source == sensorAlias[currentSensor]) {
             if (msg->status == "on" || msg->status == sensorSignal || msg->status == "off") {
-                gotMessage["sensor"] = true;
                 if (msg->status == "on") {
                     ON_reached = true;
                 } else if (msg->status == sensorSignal) {
@@ -180,6 +179,7 @@ void PropertyAnalyzer::processSensorData(const messages::DiagnosticsData::ConstP
                 }
                 currentId = msg->id;
                 flushData(msg);
+                gotMessage["sensor"] = true;
             }
         }
     }
@@ -222,7 +222,7 @@ void PropertyAnalyzer::processSensorOn(const archlib::Status::ConstPtr& msg) {
 void PropertyAnalyzer::tearDown() {}
 
 void PropertyAnalyzer::busyWait(const std::string& type) {
-    ros::Rate loop_rate(5);
+    ros::Rate loop_rate(10);
     //printStack();
     while (!gotMessage[type]) {ros::spinOnce();loop_rate.sleep();}
     printStack();
@@ -267,16 +267,18 @@ void PropertyAnalyzer::body() {
                         currentState = "Waiting for data to be " + centralhubSignal;
                         busyWait(stateTypes[1]);
 
-                        if(OFF_reached || !violation_flag) {
+                        if (OFF_reached) {
                             currentState = "ERROR! Data "+sensorSignal+", but not "+centralhubSignal;
                             wait_third = false;
-                            property_satisfied = false;
+                            if(violation_flag) property_satisfied = false;
+                            printStack();
                         }
 
                         if(THIRD_reached == true) {
                             THIRD_reached = false;
                             wait_third = false;
                             wait_second = true;
+                            if (violation_flag) property_satisfied = false;
                         }
 
                     }
@@ -294,7 +296,7 @@ void PropertyAnalyzer::body() {
 int32_t PropertyAnalyzer::run() {
         setUp();
         
-        ros::Rate loop_rate(5);
+        ros::Rate loop_rate(10);
         
         while(ros::ok()) {
             body();

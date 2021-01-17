@@ -13,7 +13,7 @@ gnome-terminal --working-directory=${bsn}/configurations/experiments/p4/environm
 
 rosnode kill -a & sleep 5s
 
-mv -f ${bsn}/src/diagnostics/logs/p4/sensors/*.log ${bsn}/src/diagnostics/logs/p4/sensors/noiseless/
+mv -f ${bsn}/src/diagnostics/logs/p4/centralhub/*.log ${bsn}/src/diagnostics/logs/p4/centralhub/noiseless/
 
 gnome-terminal --working-directory=${bsn}/configurations/property_analyzer/P4 -e 'roslaunch P4_analyzer.launch'
 
