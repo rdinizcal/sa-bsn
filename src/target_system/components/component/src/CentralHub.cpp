@@ -27,7 +27,12 @@ int32_t CentralHub::run() {
     std::string path = ros::package::getPath("diagnostics_analyzer");
     nh.getParam("property", foldername);
 
-    filepath = path + "/../logs/"+foldername+"/centralhub/centralhub.log";
+    std::string pathSuffix = "";
+    handle.getParam("noise", pathSuffix);
+
+    if (pathSuffix != "") pathSuffix = "_" + pathSuffix;
+
+    filepath = path + "/../logs/"+foldername+"/centralhub/centralhub"+pathSuffix+".log";
 
     fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
     fp << "\n";

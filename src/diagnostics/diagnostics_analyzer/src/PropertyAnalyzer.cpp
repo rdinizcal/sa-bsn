@@ -42,7 +42,7 @@ void PropertyAnalyzer::setUp() {
 
     filepath = path + "/../logs/"+currentProperty+"/observer/observer_";
     
-    if (currentProperty == "p10") {
+    if (currentProperty == "p4") {
         chDetectedSub = nh.subscribe("ch_detected", 100, &PropertyAnalyzer::processCentralhubDetection, this);
         filepath = filepath + "centralhub.log";
     } else {
@@ -60,22 +60,22 @@ void PropertyAnalyzer::defineStateNames() {
     stateNames[0] = "init";
     stateNames[3] = "ERROR";
 
-    if (currentProperty == "p7") {
+    if (currentProperty == "p1") {
         stateNames[1] = "wait_collect";
         stateNames[2] = "wait_process";
         sensorSignal = "collected";
         centralhubSignal = "processed";
-    } else if (currentProperty == "p8") {
+    } else if (currentProperty == "p2") {
         stateNames[1] = "wait_collected";
         stateNames[2] = "wait_persisted";
         sensorSignal = "collected";
         centralhubSignal = "persisted";
-    } else if (currentProperty == "p9") {
+    } else if (currentProperty == "p3") {
         stateNames[1] = "wait_sent";
         stateNames[2] = "wait_process";
         sensorSignal = "sent";
         centralhubSignal = "processed";
-    } else if (currentProperty == "p10") {
+    } else if (currentProperty == "p4") {
         stateNames[1] = "wait_process";
         stateNames[2] = "wait_detected";
         sensorSignal = "processed";
@@ -106,12 +106,12 @@ void PropertyAnalyzer::flushData(const messages::DiagnosticsData::ConstPtr& msg)
 
 void PropertyAnalyzer::defineStateTypes() {
     
-    stateTypes[0] = currentProperty == "p10" ? "centralhub_processed" : "sensor";
+    stateTypes[0] = currentProperty == "p4" ? "centralhub_processed" : "sensor";
     stateTypes[1] = "centralhub";
 }
 
 void PropertyAnalyzer::processCentralhubDetection(const messages::CentralhubDiagnostics::ConstPtr& msg) {
-    if (currentProperty == "p10") {
+    if (currentProperty == "p4") {
         if (msg->status == "on" || msg->status == "processed"
              || msg->status == "detected" || msg->status == "off") {
                 gotMessage["centralhub"] = true;
@@ -136,7 +136,7 @@ void PropertyAnalyzer::processCentralhubDetection(const messages::CentralhubDiag
 
 
 void PropertyAnalyzer::processCentralhubData(const messages::CentralhubDiagnostics::ConstPtr& msg) {     
-    if (currentProperty != "p10") {
+    if (currentProperty != "p4") {
         if (msg->type == "sensor" && msg->source == sensorAlias[currentSensor]) {
             if (msg->status == "on" || msg->status == centralhubSignal || msg->status == "off") {                
                 gotMessage["centralhub"] = true;
@@ -151,7 +151,7 @@ void PropertyAnalyzer::processCentralhubData(const messages::CentralhubDiagnosti
         }   //else if (msg->type == "centralhub") {
             //gotMessage["centralhub"] = true;
             //}
-    } else if (currentProperty == "p10") {
+    } else if (currentProperty == "p4") {
         if (msg->type == "centralhub") {
             if (msg->status == "processed") {
                 incomingId = msg->id;
@@ -166,7 +166,7 @@ void PropertyAnalyzer::processCentralhubData(const messages::CentralhubDiagnosti
 }
 
 void PropertyAnalyzer::processSensorData(const messages::DiagnosticsData::ConstPtr& msg) {
-    if (currentProperty != "p10") {
+    if (currentProperty != "p4") {
         if (msg->source == sensorAlias[currentSensor]) {
             if (msg->status == "on" || msg->status == sensorSignal || msg->status == "off") {
                 gotMessage["sensor"] = true;
@@ -186,7 +186,7 @@ void PropertyAnalyzer::processSensorData(const messages::DiagnosticsData::ConstP
 }
 
 void PropertyAnalyzer::processSensorOn(const archlib::Status::ConstPtr& msg) {
-    if (currentProperty == "p10") {    
+    if (currentProperty == "p4") {    
         if (msg->source == "/g4t1") {
             if (msg->content == "init" && ON_reached == false) {
                 ON_reached = true;
@@ -201,7 +201,7 @@ void PropertyAnalyzer::processSensorOn(const archlib::Status::ConstPtr& msg) {
                 fp.close();    
             }
         }
-    } else if (currentProperty != "p10") {    
+    } else if (currentProperty != "p4") {    
         if (msg->source == currentSensor) {
             if (msg->content == "init" && ON_reached == false) {            
                 ON_reached = true;

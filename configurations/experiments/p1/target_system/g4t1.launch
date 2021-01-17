@@ -1,0 +1,7 @@
+<launch> 
+    <node name="g4t1" pkg="component" type="g4t1" output="screen" />
+
+    <param name="frequency" value="5" /> <!-- 1 Hz  -->
+    <param name="property" value="p1"/>
+
+</launch>
