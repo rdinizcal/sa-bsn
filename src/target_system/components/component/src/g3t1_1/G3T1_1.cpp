@@ -101,6 +101,7 @@ double G3T1_1::collect() {
     }
 
     battery.consume(BATT_UNIT);
+    cost += BATT_UNIT;
 
     collected_risk = sensorConfig.evaluateNumber(m_data);
 
@@ -110,10 +111,10 @@ double G3T1_1::collect() {
 double G3T1_1::process(const double &m_data) {
     double filtered_data;
     
-    
     filter.insert(m_data);
     filtered_data = filter.getValue();
     battery.consume(BATT_UNIT*filter.getRange());
+    cost += BATT_UNIT*filter.getRange();
 
     ROS_INFO("filtered data: [%s]", std::to_string(filtered_data).c_str());
     return filtered_data;
@@ -136,6 +137,7 @@ void G3T1_1::transfer(const double &m_data) {
 
     data_pub.publish(msg);
     battery.consume(BATT_UNIT);
+    cost += BATT_UNIT;
 
     ROS_INFO("risk calculated and transferred: [%.2f%%]", risk);
 }

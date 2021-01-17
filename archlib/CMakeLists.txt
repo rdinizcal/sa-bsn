@@ -10,6 +10,7 @@ FIND_PACKAGE(catkin REQUIRED COMPONENTS roscpp std_msgs genmsg message_generatio
 # Set message generation.
 ADD_MESSAGE_FILES( FILES
   target_system/external/Status.msg
+  target_system/external/EnergyStatus.msg
   target_system/external/Event.msg
   system_manager/external/AdaptationCommand.msg
   system_manager/internal/Strategy.msg

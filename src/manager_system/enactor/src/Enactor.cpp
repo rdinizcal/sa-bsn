@@ -12,10 +12,10 @@ void Enactor::receiveEvent(const archlib::Event::ConstPtr& msg) {
         invocations[msg->source] = {};
         if(adaptation_parameter == "reliability") {
             r_curr[msg->source] = 1;
-            r_ref[msg->source] = 0.80;
+            r_ref[msg->source] = 1;
         } else {
             c_curr[msg->source] = 0;
-            c_ref[msg->source] = 5;
+            c_ref[msg->source] = 0;
         }
         //kp[msg->source] = 200;
         kp[msg->source] = KP;

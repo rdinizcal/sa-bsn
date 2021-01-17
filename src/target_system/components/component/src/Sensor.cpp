@@ -1,6 +1,6 @@
 #include "component/Sensor.hpp"
 
-Sensor::Sensor(int &argc, char **argv, const std::string &name, const std::string &type, const bool &active, const double &noise_factor, const bsn::resource::Battery &battery, const bool &instant_recharge) : Component(argc, argv, name), type(type), active(active), buffer_size(1), replicate_collect(1), noise_factor(0), battery(battery), data(0.0), instant_recharge(instant_recharge) {}
+Sensor::Sensor(int &argc, char **argv, const std::string &name, const std::string &type, const bool &active, const double &noise_factor, const bsn::resource::Battery &battery, const bool &instant_recharge) : Component(argc, argv, name), type(type), active(active), buffer_size(1), replicate_collect(1), noise_factor(0), battery(battery), data(0.0), instant_recharge(instant_recharge), cost(0.0) {}
 
 Sensor::~Sensor() {}
 
@@ -71,6 +71,8 @@ void Sensor::body() {
         data = process(data);
         transfer(data);
 		sendStatus("success");
+        sendEnergyStatus(cost);
+        cost = 0.0;
     } else {
         recharge();
         throw std::domain_error("out of charge");

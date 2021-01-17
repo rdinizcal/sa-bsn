@@ -51,6 +51,7 @@ class Sensor : public arch::target_system::Component {
         double data;
         bool instant_recharge;
         bool shouldStart;
+        double cost;
 };
 
 #endif 

@@ -5,6 +5,7 @@
 
 #include "archlib/Event.h"
 #include "archlib/Status.h"
+#include "archlib/EnergyStatus.h"
 #include "archlib/ROSComponent.hpp"
 
 namespace arch {
@@ -27,6 +28,7 @@ namespace arch {
 
                 void collectEvent(const archlib::Event::ConstPtr& /*msg*/);
                 void collectStatus(const archlib::Status::ConstPtr& /*msg*/);
+                void collectEnergyStatus(const archlib::EnergyStatus::ConstPtr& /*msg*/);
 
             protected:
                 ros::NodeHandle handle;
@@ -34,8 +36,10 @@ namespace arch {
             private:
                 ros::Subscriber collect_event;
                 ros::Subscriber collect_status;
+                ros::Subscriber collect_energy_status;
                 ros::Publisher log_event;
                 ros::Publisher log_status;
+                ros::Publisher log_energy_status;
         };
 
     }
