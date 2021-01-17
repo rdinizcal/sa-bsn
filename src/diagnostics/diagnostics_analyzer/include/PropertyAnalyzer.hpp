@@ -25,8 +25,6 @@ class PropertyAnalyzer {
 
         int32_t run();
 
-    private:
-
         void processCentralhubData(const messages::CentralhubDiagnostics::ConstPtr&);
         void processSensorData(const messages::DiagnosticsData::ConstPtr&);
         void processSensorOn(const archlib::Status::ConstPtr&);
@@ -39,15 +37,16 @@ class PropertyAnalyzer {
         std::string yesOrNo(bool);
 
         bool isPropertySatisfied();
+        void flushData(const messages::CentralhubDiagnostics::ConstPtr& msg);
+        void flushData(const messages::DiagnosticsData::ConstPtr& msg);
 
+    private:
         //ros::NodeHandle nh;
         ros::Subscriber sensorSub;
         ros::Subscriber centralhubSub;
         ros::Subscriber detectionSub;
         ros::Subscriber sensorOnSub;
         ros::Subscriber chDetectedSub;
-
-        ros::Publisher logPub;
 
         std::map<std::string, std::string> sensorAlias;
 
@@ -70,12 +69,13 @@ class PropertyAnalyzer {
         bool init;
         bool wait_second, wait_third;
         bool property_satisfied;
-
-        std::map<std::string, uint32_t> expectedMessage;
+        bool violation_flag;
 
         std::map<std::string, bool> gotMessage;
         std::map<std::string, uint32_t> prevIdList, currentIdList;
         std::map<std::string, std::string> prevStatusList, currentStatusList;
+        std::map<std::string, uint32_t> expectedMessage;
+
         uint32_t incomingId;
         uint32_t outgoingId;
         uint32_t prevId, currentId;

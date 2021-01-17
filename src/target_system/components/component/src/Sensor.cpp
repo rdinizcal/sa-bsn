@@ -74,20 +74,25 @@ void Sensor::body() {
         turnOn();
         my_posix_time = ros::Time::now().toBoost();
         timestamp = boost::posix_time::to_iso_extended_string(my_posix_time);
+        msg.id = dataId;
         msg.status = "on";
         msg.timestamp = timestamp;
 
         flushData(msg);
 
         statusPub.publish(msg);
+        dataId++;
+
     } else if (isActive() && battery.getCurrentLevel() < 2){
         //Sends info to diagnostics here
         my_posix_time = ros::Time::now().toBoost();
         timestamp = boost::posix_time::to_iso_extended_string(my_posix_time);
+        msg.id = dataId;
         msg.status = "off";
         msg.timestamp = timestamp;
         flushData(msg);
         statusPub.publish(msg);
+        dataId++;
 
         turnOff();        
     }
