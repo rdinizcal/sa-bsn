@@ -62,14 +62,16 @@ class Sensor : public arch::target_system::Component {
 
         ros::Publisher frequency_pub;
         ros::Publisher statusPub;
+        ros::Publisher detectedPub;
 
         uint32_t dataId;
 
         std::string filepath;
         std::string timestamp; 
         std::fstream fp;
-        std::string foldername;
+        std::string currentProperty;
         std::string pathSuffix;
+        boost::posix_time::ptime my_posix_time;
 };
 
 #endif 

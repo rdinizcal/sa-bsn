@@ -28,6 +28,7 @@ class PropertyAnalyzer {
         void processCentralhubData(const messages::CentralhubDiagnostics::ConstPtr&);
         void processSensorData(const messages::DiagnosticsData::ConstPtr&);
         void processSensorOn(const archlib::Status::ConstPtr&);
+        void processSensorInRange(const messages::DiagnosticsData::ConstPtr&);
         void processCentralhubDetection(const messages::CentralhubDiagnostics::ConstPtr&);
         void processCentralhubOn(const archlib::Status::ConstPtr&);
         void busyWait(const std::string&);
@@ -47,6 +48,7 @@ class PropertyAnalyzer {
         ros::Subscriber detectionSub;
         ros::Subscriber sensorOnSub;
         ros::Subscriber chDetectedSub;
+        ros::Subscriber sensorInRangeSub;
 
         std::map<std::string, std::string> sensorAlias;
 
@@ -79,6 +81,7 @@ class PropertyAnalyzer {
         uint32_t incomingId;
         uint32_t outgoingId;
         uint32_t prevId, currentId;
+        uint32_t expectedId;
 
         std::fstream fp;
         std::string filepath;

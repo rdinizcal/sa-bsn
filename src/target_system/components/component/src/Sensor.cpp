@@ -21,6 +21,7 @@ int32_t Sensor::run() {
     ros::Subscriber reconfig_subs = nh.subscribe("reconfigure_"+ros::this_node::getName(), 10, &Sensor::reconfigure, this);
     frequency_pub = nh.advertise<messages::SensorFrequency>("sensor_frequency_"+ros::this_node::getName(), 1);
     statusPub = nh.advertise<messages::DiagnosticsData>("sensor_diagnostics", 100);
+    detectedPub = nh.advertise<messages::DiagnosticsData>("sensor_inrange", 100);
 
     ros::Rate loop_rate(rosComponentDescriptor.getFreq());
     messages::DiagnosticsData msg;
@@ -29,9 +30,9 @@ int32_t Sensor::run() {
 
     std::string path = ros::package::getPath("diagnostics_analyzer");
 
-    handle.getParam("property", foldername);
+    handle.getParam("property", currentProperty);
 
-    filepath = path + "/../logs/"+foldername+"/sensors/" +this->type+".log";
+    filepath = path + "/../logs/"+currentProperty+"/sensors/" +this->type+".log";
 
     fp.open(filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
     fp << "\n";
@@ -100,7 +101,19 @@ void Sensor::body() {
 
     if(isActive()) {
         sendStatus("running");
-        
+
+        if (currentProperty == "p3") {
+            my_posix_time = ros::Time::now().toBoost();
+            timestamp = boost::posix_time::to_iso_extended_string(my_posix_time);
+
+            msg.id = this->dataId;
+            msg.source = this->type;
+            msg.status = "ready";
+            msg.timestamp = timestamp;
+            flushData(msg);
+            statusPub.publish(msg);
+        }
+           
         data = collect();
 
         /*for data replication, as if replicate_collect values were collected*/
