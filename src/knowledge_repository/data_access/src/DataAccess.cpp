@@ -53,19 +53,19 @@ void DataAccess::setUp() {
     std::string reliability_formula, cost_formula;
 
     try {
-        reliability_file.open(path + "/../resource/models/reliabilityAND.formula");
+        reliability_file.open(path + "/../resource/models/reliability.formula");
         std::getline(reliability_file, reliability_formula);
         reliability_file.close();
     } catch (std::ifstream::failure e) {
-        std::cerr << "Exception opening/reading/closing file (reliabilityAND.formula)\n";
+        std::cerr << "Exception opening/reading/closing file (reliability.formula)\n";
     }
 
     try {
-        cost_file.open(path + "/../resource/models/costAND.formula");
+        cost_file.open(path + "/../resource/models/cost.formula");
         std::getline(cost_file, cost_formula);
         cost_file.close();
     } catch (std::ifstream::failure e) {
-        std::cerr << "Exception opening/reading/closing file (costAND.formula)\n";
+        std::cerr << "Exception opening/reading/closing file (cost.formula)\n";
     }
 
     cost_expression = bsn::model::Formula(cost_formula);

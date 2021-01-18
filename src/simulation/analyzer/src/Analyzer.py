@@ -28,6 +28,11 @@ class Analyzer:
             exit()
         self.file_id = argv[1]
         self.formula_id = argv[2]
+        if self.formula_id != "reliability" and self.formula_id != "cost":
+            print("---------------------------------------------")
+            print("Metric name is not reliability or cost!")
+            print("---------------------------------------------")
+            exit()
 
         if argv[3] != "True" and argv[3] != "true":
             self.plot_component_metrics = False
@@ -42,7 +47,7 @@ class Analyzer:
             print("---------------------------------------------")
             exit()
 
-        self.stability_margin = 0.03
+        self.stability_margin = 0.02
         self.stability = False
         self.settling_time = 0
         self.overshoot = 0
@@ -133,6 +138,8 @@ class Analyzer:
 
         global_reli_timeseries = dict() 
         local_reli_timeseries = dict()
+        global_cost_timeseries = dict()
+        local_cost_timeseries = dict()
         global_status_timeseries = dict()
         local_status_timeseries = dict()
         adaptation_triggered = dict()
@@ -155,6 +162,12 @@ class Analyzer:
             log_csv = csv.reader(log_file, delimiter=',')
             log_status = list(log_csv)
             del log_status[0] # delete first line
+        
+        ################ load energy status log ################
+        with open("../../knowledge_repository/resource/logs/energystatus_" + self.file_id + ".log", newline='') as log_file:
+            log_csv = csv.reader(log_file, delimiter=',')
+            log_energy_status = list(log_csv)
+            del log_energy_status[0] # delete first line
 
         ################ load event log ################
         with open("../../knowledge_repository/resource/logs/event_" + self.file_id + ".log", newline='') as log_file:
@@ -170,7 +183,10 @@ class Analyzer:
 
         #concatenate lists into one log list
         log = list()
-        log.extend(log_status)
+        if self.formula_id == "reliability":
+            log.extend(log_status)
+        else:
+            log.extend(log_energy_status)
         log.extend(log_event)
         log.extend(log_adaptation)
 
@@ -182,6 +198,7 @@ class Analyzer:
         # read log 
         for reg in log:
             reg_count += 1
+            #print("Analyzing reg " + str(reg_count) + "...")
             # compute time series
             instant = int(reg[2]) - t0
 
@@ -221,11 +238,28 @@ class Analyzer:
 
                     ## compute global formulae
                     for tag in tasks:
-                        formula.compute('R_'+tag, tasks[tag].reliability())
-                        formula.compute('C_'+tag, tasks[tag].cost())
-                        formula.compute('F_'+tag, tasks[tag].frequency())
+                        formula.compute('R_'+tag, tasks[tag].reliability(), self.formula_id)
+                        #formula.compute('C_'+tag, tasks[tag].cost())
+                        formula.compute('F_'+tag, tasks[tag].frequency(), self.formula_id)
 
                         #b_formula.compute('B_'+tag, status.content == 'success')
+
+            elif(reg[0]=="EnergyStatus"):
+                energy_status = EnergyStatus(str([1]),int(reg[2]),str(reg[3]),str(reg[4]),float(reg[5]))
+
+                tag = energy_status.source.upper().replace(".","_").replace("/","").replace("T","_T")
+
+                if not (tag in tasks): 
+                    tsk = Task(tag)
+                    tasks[tag] = tsk
+                
+                if not (tag in local_cost_timeseries):
+                    local_cost_timeseries[tag] = [[instant,energy_status.cost]]
+                else:
+                    local_cost_timeseries[tag].append([instant,energy_status.cost])
+                
+                for tag in tasks:
+                    formula.compute('W_'+tag, energy_status.cost, self.formula_id)
 
             elif(reg[0]=="Event"):
                 event = Event(str(reg[1]),str(reg[2]),str(reg[3]),str(reg[4]),str(reg[5]))
@@ -240,12 +274,16 @@ class Analyzer:
                 elif (event.content == 'activate'): ctxs[tag].activate()
 
                 for ctx in ctxs.values():
-                    formula.compute('CTX_'+ctx.getName(), ctx.isActive())
+                    formula.compute('CTX_'+ctx.getName(), ctx.isActive(), self.formula_id)
 
 
-            if(reg[0]=="Event" or reg[0]=="Status"):
+            if(reg[0]=="Event" or reg[0]=="Status" or reg[0]=="EnergyStatus"):
                 #global_status_timeseries[instant] = b_formula.eval()
-                global_reli_timeseries[instant] = formula.eval()
+                if self.formula_id == "reliability":
+                    global_reli_timeseries[instant] = formula.eval()
+                else:
+                    global_cost_timeseries[instant] = formula.eval()
+                
 
         input_timeseries = dict()
         noise_factor = dict()
@@ -276,8 +314,12 @@ class Analyzer:
         x_triggered = inf
         for tag in adaptation_triggered: x_triggered = adaptation_triggered[tag] if adaptation_triggered[tag] < x_triggered else x_triggered
 
-        x = list(global_reli_timeseries.keys())
-        y = list(global_reli_timeseries.values())
+        if self.formula_id == "reliability":
+            x = list(global_reli_timeseries.keys())
+            y = list(global_reli_timeseries.values())
+        else:
+            x = list(global_cost_timeseries.keys())
+            y = list(global_cost_timeseries.values())
 
         ## discretizing the curve
         #[x,y] = self.discretize(x,y,1) #precision in ms
@@ -314,28 +356,36 @@ class Analyzer:
         ##############################################
         #                 First Plot                 #
         ############################################## 
-        ## First, plot the global reliability against time
+        ## First, plot the global metric against time
         fig, ax = plt.subplots()
+        ax.tick_params(axis="x", labelsize=12)
+        ax.tick_params(axis="y", labelsize=12)
         ax.plot(x, y, label='BSN', color = "#1f77b4", linewidth=2)
-        ax.set_ylim(0,(1+self.stability_margin))
+        if self.formula_id == "reliability":
+            ax.set_ylim(0,(1+self.stability_margin))
         ax.xaxis.set_major_formatter(ticks)
 
         x_max = 0
-        for tag in local_status_timeseries:
-            last = len(local_status_timeseries[tag]) - 1
-            x_max  = local_status_timeseries[tag][last][0] if local_status_timeseries[tag][last][0] > x_max else x_max
-
-        ## Then, plot the local reliabilities against time (same figure)
-        if self.plot_component_metrics:
-            i = 0
-            for tag in local_reli_timeseries:
-                x = [el[0] for el in local_reli_timeseries[tag]]
-                y = [el[1] for el in local_reli_timeseries[tag]]
-                ax.plot(x, y, label=tag, color=colors[tag])
+        if self.formula_id == "reliability":
+            for tag in local_status_timeseries:
+                last = len(local_status_timeseries[tag]) - 1
+                x_max  = local_status_timeseries[tag][last][0] if local_status_timeseries[tag][last][0] > x_max else x_max
+            
+            ## Then, plot the local reliabilities against time (same figure)
+            if self.plot_component_metrics:
+                i = 0
+                for tag in local_reli_timeseries:
+                    x = [el[0] for el in local_reli_timeseries[tag]]
+                    y = [el[1] for el in local_reli_timeseries[tag]]
+                    ax.plot(x, y, label=tag, color=colors[tag])
+        else:
+            for tag in local_cost_timeseries:
+                last = len(local_cost_timeseries[tag]) - 1
+                x_max = local_cost_timeseries[tag][last][0] if local_cost_timeseries[tag][last][0] > x_max else x_max
 
         ## Plot horizontal lines for setpoint
         ax.axhline(y=setpoint, linestyle='--', linewidth=0.7, color="black")
-        ax.text(0.9*x_max, setpoint, "setpoint" , fontsize=8)
+        ax.text(0.9*x_max, setpoint, "setpoint" , fontsize=14)
         ax.axhline(y=self.mean*(1+self.stability_margin), linestyle='--', linewidth=0.3, color="black")
         ax.axhline(y=self.mean, linestyle='-.', linewidth=0.5, color="black")
         ax.axhline(y=self.mean*(1-self.stability_margin), linestyle='--', linewidth=0.3, color="black")
@@ -346,19 +396,25 @@ class Analyzer:
         os = self.overshoot
         sse = self.sse 
         #fig.suptitle('Parametric Formula vs. Monitored')
-        fig.suptitle('Reliability in time')
+        if self.formula_id == "reliability":
+            fig.suptitle('Reliability in time', fontsize=24)
+        else:
+            fig.suptitle('Cost in time', fontsize=24)
         is_stable = "stable" if self.stability else "not stable" 
         subtitle = '%s: %s | converges to %.2f | ST = %.2fs | OS = %.2f%% | SSE = %.2f%%' % ("formula",is_stable,mn,st,os,sse)        
-        fig.text(0.5, 0.92, subtitle, ha='center', color = "grey", fontsize=7) # subtitle
-        fig.text(0.04, 0.5, 'Reliability', va='center', rotation='vertical')
-        fig.text(0.5, 0.035, 'Time (s)', ha='center')
+        fig.text(0.5, 0.92, subtitle, ha='center', color = "grey", fontsize=14) # subtitle
+        if self.formula_id == "reliability":
+            fig.text(0.04, 0.5, 'Reliability', va='center', rotation='vertical', fontsize=20)
+        else:
+            fig.text(0.04, 0.5, 'Cost', va='center', rotation='vertical', fontsize=20)
+        fig.text(0.5, 0.035, 'Time (s)', ha='center', fontsize=20)
         fig.text(0.8, 0.020, self.file_id + '.log', ha='center', color = "grey", fontsize=6) # files used
         fig.text(0.8, 0.005, self.formula_id + '.formula', ha='center', color = "grey", fontsize=6) # files used
         ax.annotate('trigger adaptation', xy=(x_triggered, 0),
             xytext=(x_triggered/x_max, -0.1), textcoords='axes fraction',
             arrowprops=dict(facecolor='black', shrink=0.03),
             horizontalalignment='right', verticalalignment='top',
-            )
+            fontsize=14)
         plt.grid()
         plt.legend()
         
@@ -512,12 +568,22 @@ class Formula:
 
         return arg_val
 
-    def compute(self, arg, value):
-        if self.type == "bool": self.mapping[arg] = bool(value)
-        else: self.mapping[arg] = float(value)
+    def compute(self, arg, value, metric):
+        if self.type == "bool": 
+            self.mapping[arg] = bool(value)
+        else: 
+            if metric == "reliability":
+                self.mapping[arg] = float(value)
+            else:
+                self.mapping[arg] += float(value)
     
     def eval(self):
-        return eval(self.expression, self.mapping)
+        mapping = self.mapping.copy()
+        for arg in mapping.keys():
+            if arg.find("W_") != -1:
+                self.mapping[arg] = 0
+
+        return eval(self.expression, mapping)
 
 class AdaptationCommand:
 
@@ -536,6 +602,15 @@ class Status:
         self.logical_instant = _logical_instant
         self.instant = _instant
         self.content = _content
+
+class EnergyStatus:
+
+    def __init__(self, _logical_instant, _instant, _source, _target, _cost):
+        self.source = _source
+        self.target = _target
+        self.logical_instant = _logical_instant
+        self.instant = _instant
+        self.cost = _cost
 
 class Event:
 

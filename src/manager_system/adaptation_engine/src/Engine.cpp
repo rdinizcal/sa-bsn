@@ -41,9 +41,9 @@ void Engine::setUp() {
 
     try {
         if (adaptation == "reliability")
-            file.open(path + "/formulae/reliabilityAND.formula");
+            file.open(path + "/formulae/reliability.formula");
         else {
-            file.open(path + "/formulae/costAND.formula");
+            file.open(path + "/formulae/cost.formula");
         }
 
         std::getline(file, formula);
