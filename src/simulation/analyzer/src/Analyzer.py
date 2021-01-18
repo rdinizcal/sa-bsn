@@ -382,6 +382,14 @@ class Analyzer:
             for tag in local_cost_timeseries:
                 last = len(local_cost_timeseries[tag]) - 1
                 x_max = local_cost_timeseries[tag][last][0] if local_cost_timeseries[tag][last][0] > x_max else x_max
+            
+            ## Then, plot the local costs against time (same figure)
+            if self.plot_component_metrics:
+                i = 0
+                for tag in local_cost_timeseries:
+                    x = [el[0] for el in local_cost_timeseries[tag]]
+                    y = [el[1] for el in local_cost_timeseries[tag]]
+                    ax.plot(x, y, label=tag, color=colors[tag])
 
         ## Plot horizontal lines for setpoint
         ax.axhline(y=setpoint, linestyle='--', linewidth=0.7, color="black")
