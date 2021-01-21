@@ -3,6 +3,4 @@
 
     <param name="frequency" value="1" />
     <param name="kp" value="150" />
-    <param name="adaptation_parameter" value="freq" />
-
 </launch>

@@ -37,6 +37,7 @@ int32_t Sensor::run() {
         } catch (const std::exception& e) {
             std::cout << "sensor failed: " << e.what() << std::endl;
             sendStatus("fail");
+            cost = 0;
         } 
         loop_rate.sleep();
     }
