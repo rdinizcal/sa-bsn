@@ -16,10 +16,14 @@ class Controller : public Enactor {
         virtual void setUp();
 
         virtual void apply_reli_strategy(const std::string &component);
-        virtual void apply_cost_strategy(const std::string &component); 
+        virtual void apply_cost_strategy(const std::string &component);
+        virtual void receiveEvent(const archlib::Event::ConstPtr& msg);
 
     private:
-        std::string adaptation_parameter;   
+        std::string adaptation_parameter;
+        double KP;
+        std::map<std::string, double> kp;
+
 };
 
 #endif

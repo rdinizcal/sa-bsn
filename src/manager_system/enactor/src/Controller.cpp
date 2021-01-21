@@ -22,6 +22,39 @@ void Controller::setUp() {
     receiveAdaptationParameter();
 }
 
+void Controller::receiveEvent(const archlib::Event::ConstPtr& msg) {
+    if (msg->content=="activate") {
+        invocations[msg->source] = {};
+        if(adaptation_parameter == "reliability") {
+            r_curr[msg->source] = 1;
+            r_ref[msg->source] = 1;
+        } else {
+            c_curr[msg->source] = 0;
+            c_ref[msg->source] = 0;
+        }
+        //kp[msg->source] = 200;
+        kp[msg->source] = KP;
+        replicate_task[msg->source] = 1;
+        //freq[msg->source] = 20;
+        freq[msg->source] = msg->freq;
+        exception_buffer[msg->source] = 0;
+
+    } else if (msg->content=="deactivate") {
+        invocations.erase(msg->source);
+        if(adaptation_parameter == "reliability") {
+            r_curr.erase(msg->source);
+            r_ref.erase(msg->source);
+        } else {
+            c_curr.erase(msg->source);
+            c_ref.erase(msg->source);
+        }
+        kp.erase(msg->source);
+        replicate_task.erase(msg->source);
+        freq.erase(msg->source);
+        exception_buffer.erase(msg->source);
+    }
+}
+
 void Controller::apply_reli_strategy(const std::string &component) {
     std::cout << "r_ref[" << component << "] = "<< r_ref[component] <<std::endl;
     std::cout << "r_curr[" << component << "] = "<< r_curr[component] <<std::endl;
