@@ -129,7 +129,7 @@ class Analyzer:
 
     def run(self): 
         # load formula
-        formula = Formula("../../knowledge_repository/resource/models/"+self.formula_id+".formula", "float")
+        #formula = Formula("../../knowledge_repository/resource/models/"+self.formula_id+".formula", "float")
         #b_formula = Formula("../../knowledge_repository/resource/models/b_"+self.formula_id+".formula", "bool")
 
         # build list of participating tasks
@@ -181,6 +181,32 @@ class Analyzer:
             log_uncert = list(log_csv)
             del log_uncert[0] # delete first line
 
+        deactivated_components = []
+        for event in log_event:
+            if event[5] == "deactivate":
+                component_name = str(event[3])
+                component_name = component_name[1:].upper()
+
+                modified_component_name = ""
+                for i in range(len(component_name)):
+                    if i == 2:
+                        modified_component_name += "_"
+                    modified_component_name += component_name[i]
+
+                deactivated_components.append(modified_component_name)
+        
+        terms_to_remove = []
+        for component in deactivated_components:
+            if self.formula_id == "reliability":
+                term = "R_" + component
+                terms_to_remove.append(term)
+            else:
+                term = "W_" + component
+                terms_to_remove.append(term)
+            term = "CTX_" + component
+            terms_to_remove.append(term)
+
+        formula = Formula("../../knowledge_repository/resource/models/"+self.formula_id+".formula", "float", terms_to_remove)
         #concatenate lists into one log list
         log = list()
         if self.formula_id == "reliability":
@@ -198,7 +224,7 @@ class Analyzer:
         # read log 
         for reg in log:
             reg_count += 1
-            #print("Analyzing reg " + str(reg_count) + "...")
+            print("Analyzing reg " + str(reg_count) + "...")
             # compute time series
             instant = int(reg[2]) - t0
 
@@ -548,8 +574,9 @@ class Analyzer:
 
 class Formula:
 
-    def __init__(self, path, _type): 
+    def __init__(self, path, _type, terms_to_disconsider): 
         self.type = _type
+        self.ignore = terms_to_disconsider
         formula_file = open(path, 'r')
         if formula_file.mode == 'r': 
             self.expression = formula_file.read()
@@ -586,6 +613,13 @@ class Formula:
                 self.mapping[arg] += float(value)
     
     def eval(self):
+        for item in self.ignore:
+            if item.find("R_") != -1:
+                self.mapping[item] = 1
+            elif item.find("W_") != -1:
+                self.mapping[item] = 0
+            else:
+                self.mapping[item] = 1
         mapping = self.mapping.copy()
         for arg in mapping.keys():
             if arg.find("W_") != -1:
