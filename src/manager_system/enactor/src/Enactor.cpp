@@ -7,26 +7,23 @@ Enactor::~Enactor() {}
 
 void Enactor::tearDown() {}
 
-void Enactor::receiveEvent(const archlib::Event::ConstPtr& msg) {
-    if (msg->content=="activate") {
-        invocations[msg->source] = {};
-        r_curr[msg->source] = 1;
-        r_ref[msg->source] = 0.80;
-        //kp[msg->source] = 200;
-        kp[msg->source] = KP;
-        replicate_task[msg->source] = 1;
-        //freq[msg->source] = 20;
-        freq[msg->source] = msg->freq;
-        exception_buffer[msg->source] = 0;
+void Enactor::receiveAdaptationParameter() {
+    ros::NodeHandle client_handler;
+    ros::ServiceClient client_module;
 
-    } else if (msg->content=="deactivate") {
-        invocations.erase(msg->source);
-        r_curr.erase(msg->source);
-        r_ref.erase(msg->source);
-        kp.erase(msg->source);
-        replicate_task.erase(msg->source);
-        freq.erase(msg->source);
-        exception_buffer.erase(msg->source);
+    client_module = client_handler.serviceClient<archlib::EngineRequest>("EngineRequest");
+    archlib::EngineRequest adapt_srv;
+    
+    if(!client_module.call(adapt_srv)) {
+        ROS_ERROR("Failed to connect to Strategy Manager node.");
+        return;
+    }
+
+    adaptation_parameter = adapt_srv.response.content;
+
+    if(adaptation_parameter != "reliability" && adaptation_parameter != "cost") {
+        ROS_ERROR("Invalid adaptation parameter received.");
+        return;
     }
 }
 
@@ -37,7 +34,11 @@ void Enactor::receiveStatus() {
     client_module = client_handler.serviceClient<archlib::DataAccessRequest>("DataAccessRequest");
     archlib::DataAccessRequest r_srv;
     r_srv.request.name = ros::this_node::getName();
-    r_srv.request.query = "all:reliability:";
+    if(adaptation_parameter == "reliability") {
+        r_srv.request.query = "all:reliability:";
+    } else {
+        r_srv.request.query = "all:cost:";
+    }
 
     if (!client_module.call(r_srv)) {
         ROS_ERROR("Failed to connect to data access node.");
@@ -59,8 +60,13 @@ void Enactor::receiveStatus() {
 
         std::vector<std::string> values = bsn::utils::split(content, ',');
 
-        r_curr[component] = stod(values[values.size() - 1]);
-        apply_strategy(component);
+        if(adaptation_parameter == "reliability") {
+            r_curr[component] = stod(values[values.size() - 1]);
+            apply_reli_strategy(component);
+        } else {
+            c_curr[component] = stod(values[values.size() - 1]);
+            apply_cost_strategy(component);
+        }
     }
 }
 
@@ -70,7 +76,11 @@ void Enactor::receiveStrategy(const archlib::Strategy::ConstPtr& msg) {
 
     for(std::vector<std::string>::iterator ref = refs.begin(); ref != refs.end(); ref++){
         std::vector<std::string> pair = bsn::utils::split(*ref, ':'); 
-        r_ref[pair[0]] = stod(pair[1]);
+        if(adaptation_parameter == "reliability") {
+            r_ref[pair[0]] = stod(pair[1]);
+        } else {
+            c_ref[pair[0]] = stod(pair[1]);
+        }
     }
 }
 

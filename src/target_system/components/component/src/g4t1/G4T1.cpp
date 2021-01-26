@@ -87,7 +87,6 @@ void G4T1::collect(const messages::SensorData::ConstPtr& msg) {
     if (msg->type == "null" || int32_t(risk) == -1)  throw std::domain_error("risk data out of boundaries");
 
     /*update battery status for received sensor info*/
-    W(msg->type)
     if (msg->type == "thermometer") {
         trm_batt = batt;
         trm_raw = msg->data;

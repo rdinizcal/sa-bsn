@@ -23,6 +23,7 @@
 #include "archlib/ROSComponent.hpp"
 
 #include "StatusMessage.hpp"
+#include "EnergyStatusMessage.hpp"
 #include "EventMessage.hpp"
 #include "UncertaintyMessage.hpp"
 #include "AdaptationMessage.hpp"
@@ -45,18 +46,20 @@ class DataAccess : public arch::ROSComponent {
 
 		void persistEvent(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content);
 		void persistStatus(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content);
+		void persistEnergyStatus(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content);
 		void persistUncertainty(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content);
 		void persistAdaptation(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content);
 
 		void flush();
 
-		double calculateCost();
+		//double calculateCost();
 		double calculateReliability();
 
 		std::string calculateComponentReliability(const std::string& component);
+		std::string calculateComponentCost(const std::string& component, std::string req_name);
 		void resetStatus();
-		void updateBatteries();
-		void updateCosts();
+		//void updateBatteries();
+		//void updateCosts();
 		void applyTimeWindow();
 	public:
 		virtual void setUp();
@@ -65,6 +68,7 @@ class DataAccess : public arch::ROSComponent {
 
 		void receivePersistMessage(const archlib::Persist::ConstPtr& msg);
 		bool processQuery(archlib::DataAccessRequest::Request &req, archlib::DataAccessRequest::Response &res);
+		void processTargetSystemData(const messages::TargetSystemData::ConstPtr& msg);
 
 	protected:
 		ros::NodeHandle handle;
@@ -72,16 +76,19 @@ class DataAccess : public arch::ROSComponent {
 	private:
 		ros::Subscriber handle_persist;
 		ros::ServiceServer server;
+		ros::Subscriber targetSystemSub;
 
 		std::fstream fp;
 		std::string event_filepath;
 		std::string status_filepath;
+		std::string energy_status_filepath;
 		std::string uncertainty_filepath;
 		std::string adaptation_filepath;
 
 		int64_t logical_clock;
 
 		std::vector<StatusMessage> statusVec;
+		std::vector<EnergyStatusMessage> energystatusVec;
 		std::vector<EventMessage> eventVec;
 		std::vector<UncertaintyMessage> uncertainVec;
 		std::vector<AdaptationMessage> adaptVec;
@@ -91,8 +98,8 @@ class DataAccess : public arch::ROSComponent {
 		int buffer_size;
 
 		std::map<std::string, double> components_reliabilities;
-		std::map<std::string, double> components_batteries, components_last_batteries;
-		std::map<std::string, double> components_costs;
+		std::map<std::string, double> components_batteries;
+		std::map<std::string, double> components_costs_engine, components_costs_enactor;
 		std::map<std::string, uint32_t> contexts;
 
 		bsn::model::Formula reliability_expression;

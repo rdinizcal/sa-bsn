@@ -18,6 +18,7 @@
 
 #include "archlib/DataAccessRequest.h"
 #include "archlib/ROSComponent.hpp"
+#include "archlib/EngineRequest.h"
 
 class Enactor : public arch::ROSComponent {
     public:
@@ -34,10 +35,12 @@ class Enactor : public arch::ROSComponent {
 		virtual void body();
 
 	  	void receiveStatus();
-	  	void receiveEvent(const archlib::Event::ConstPtr& msg);
 	  	void receiveStrategy(const archlib::Strategy::ConstPtr& msg);
+		void receiveAdaptationParameter();
 
-		virtual void apply_strategy(const std::string &component) = 0;
+	  	virtual void receiveEvent(const archlib::Event::ConstPtr& msg) = 0;
+		virtual void apply_reli_strategy(const std::string &component) = 0;
+		virtual void apply_cost_strategy(const std::string &component) = 0;
 
 		void print();
 	
@@ -48,14 +51,14 @@ class Enactor : public arch::ROSComponent {
 		std::map<std::string, std::deque<int>> invocations; //a map of deques where 1s represent successes and 0s represents failures
 		std::map<std::string, int> exception_buffer;
 		std::map<std::string, double> freq;
-		std::map<std::string, double> r_curr;
-		std::map<std::string, double> r_ref;
-		std::map<std::string, double> kp;
+		std::map<std::string, double> r_curr, c_curr;
+		std::map<std::string, double> r_ref, c_ref;
 		std::map<std::string, int> replicate_task;
 
 		int64_t cycles;
 		double stability_margin;
-		double KP;
+
+		std::string adaptation_parameter;
 };
 
 #endif 

@@ -18,6 +18,9 @@ namespace arch {
 			collect_status = handle.advertise<archlib::Status>("collect_status", 10);
 			while(collect_status.getNumSubscribers() < 1) {}
 
+			collect_energy_status = handle.advertise<archlib::EnergyStatus>("collect_energy_status", 10);
+			while(collect_energy_status.getNumSubscribers() < 1) {}
+
 			sendStatus("init");
 			activate();
 
@@ -131,6 +134,15 @@ namespace arch {
 			msg.content = content;
 
 			collect_status.publish(msg);
+		}
+
+		void Component::sendEnergyStatus(const double &cost) {
+			archlib::EnergyStatus msg;
+
+			msg.source = rosComponentDescriptor.getName();
+			msg.content = std::to_string(cost);
+
+			collect_energy_status.publish(msg);
 		}
 
 		void Component::reconfigure(const archlib::AdaptationCommand::ConstPtr& msg) {

@@ -8,6 +8,7 @@
 #include <ros/package.h>
 
 #include "archlib/Status.h"
+#include "archlib/EnergyStatus.h"
 #include "archlib/Event.h"
 #include "archlib/AdaptationCommand.h"
 #include "archlib/Uncertainty.h"
@@ -33,6 +34,7 @@ class Logger : public arch::ROSComponent {
 
 	  	void receiveAdaptationCommand(const archlib::AdaptationCommand::ConstPtr& msg);
 	  	void receiveStatus(const archlib::Status::ConstPtr& msg);
+		void receiveEnergyStatus(const archlib::EnergyStatus::ConstPtr& msg);
 	  	void receiveEvent(const archlib::Event::ConstPtr& msg);
 	  	void receiveUncertainty(const archlib::Uncertainty::ConstPtr& msg);
 

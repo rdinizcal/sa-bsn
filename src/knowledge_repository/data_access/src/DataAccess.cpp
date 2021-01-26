@@ -20,6 +20,7 @@ void DataAccess::setUp() {
 
     event_filepath = path + "/../resource/logs/event_" + now + ".log";
     status_filepath = path + "/../resource/logs/status_" + now + ".log";
+    energy_status_filepath = path + "/../resource/logs/energystatus_" + now + ".log";
     uncertainty_filepath = path + "/../resource/logs/uncertainty_" + now + ".log";
     adaptation_filepath = path + "/../resource/logs/adaptation_" + now + ".log";
 
@@ -28,6 +29,10 @@ void DataAccess::setUp() {
     fp.close();
 
     fp.open(status_filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
+    fp << "\n";
+    fp.close();
+
+    fp.open(energy_status_filepath, std::fstream::in | std::fstream::out | std::fstream::trunc);
     fp << "\n";
     fp.close();
 
@@ -48,11 +53,11 @@ void DataAccess::setUp() {
     std::string reliability_formula, cost_formula;
 
     try {
-        reliability_file.open(path + "/../resource/models/reliabilityAND.formula");
+        reliability_file.open(path + "/../resource/models/reliability.formula");
         std::getline(reliability_file, reliability_formula);
         reliability_file.close();
     } catch (std::ifstream::failure e) {
-        std::cerr << "Exception opening/reading/closing file (reliabilityAND.formula)\n";
+        std::cerr << "Exception opening/reading/closing file (reliability.formula)\n";
     }
 
     try {
@@ -75,12 +80,18 @@ void DataAccess::setUp() {
     components_batteries["g3t1_4"] = 100;
     components_batteries["g3t1_5"] = 100;
     components_batteries["g3t1_6"] = 100;
-    components_costs["g3t1_1"] = 0;
-    components_costs["g3t1_2"] = 0;
-    components_costs["g3t1_3"] = 0;
-    components_costs["g3t1_4"] = 0;
-    components_costs["g3t1_5"] = 0;
-    components_costs["g3t1_6"] = 0;
+    components_costs_enactor["g3t1_1"] = 0;
+    components_costs_enactor["g3t1_2"] = 0;
+    components_costs_enactor["g3t1_3"] = 0;
+    components_costs_enactor["g3t1_4"] = 0;
+    components_costs_enactor["g3t1_5"] = 0;
+    components_costs_enactor["g3t1_6"] = 0;
+    components_costs_engine["g3t1_1"] = 0;
+    components_costs_engine["g3t1_2"] = 0;
+    components_costs_engine["g3t1_3"] = 0;
+    components_costs_engine["g3t1_4"] = 0;
+    components_costs_engine["g3t1_5"] = 0;
+    components_costs_engine["g3t1_6"] = 0;
     components_reliabilities["g3t1_1"] = 1;
     components_reliabilities["g3t1_2"] = 1;
     components_reliabilities["g3t1_3"] = 1;
@@ -90,11 +101,21 @@ void DataAccess::setUp() {
     
     handle_persist = handle.subscribe("persist", 1000, &DataAccess::receivePersistMessage, this);
     server = handle.advertiseService("DataAccessRequest", &DataAccess::processQuery, this);
+    targetSystemSub = handle.subscribe("TargetSystemData", 100, &DataAccess::processTargetSystemData, this);
 }
 
-void DataAccess::tearDown(){}   
+void DataAccess::tearDown(){}
 
-double DataAccess::calculateCost() {
+void DataAccess::processTargetSystemData(const messages::TargetSystemData::ConstPtr& msg) {
+    components_batteries["g3t1_1"] = msg->trm_batt;
+    components_batteries["g3t1_2"] = msg->ecg_batt;
+    components_batteries["g3t1_3"] = msg->oxi_batt;
+    components_batteries["g3t1_4"] = msg->abps_batt;
+    components_batteries["g3t1_5"] = msg->abpd_batt;
+    components_batteries["g3t1_6"] = msg->glc_batt;
+}
+
+/*double DataAccess::calculateCost() {
     std::vector<std::string> keys;
     std::vector<double> values;
     std::string context_key, formated_key, r_key, w_key, f_key;
@@ -128,7 +149,7 @@ double DataAccess::calculateCost() {
     }
 
     return cost_expression.apply(keys, values);
-}
+}*/
 
 double DataAccess::calculateReliability() {
     std::vector<std::string> keys;
@@ -172,9 +193,10 @@ void DataAccess::body() {
             calculateComponentReliability(component.first);
         }
         system_reliability = calculateReliability();
-        updateCosts();
-        system_cost = calculateCost();
-        updateBatteries();
+        //updateCosts();
+        //system_cost = calculateCost();
+        //std::cout << "system cost: " << system_cost << '\n';
+        //updateBatteries();
         count_to_calc_and_reset = 0;
     }
 
@@ -189,7 +211,41 @@ void DataAccess::receivePersistMessage(const archlib::Persist::ConstPtr& msg) {
         arrived_status++;
         persistStatus(msg->timestamp, msg->source, msg->target, msg->content);
         status[msg->source].push_back({nowInSeconds(), msg->content});
-    } else if (msg->type=="Event") {
+    } else if (msg->type == "EnergyStatus") {
+        if(msg->source != "/engine") {
+            std::string component_name = msg->source;
+            component_name = component_name.substr(1,component_name.size()-1);
+            components_costs_engine[component_name] += std::stod(msg->content);
+            components_costs_enactor[component_name] += std::stod(msg->content);
+        } else {
+            std::string content = msg->content;
+            std::replace(content.begin(), content.end(), ';', ' ');
+
+            std::vector<std::string> costs;
+            std::stringstream ss(content);
+            std::string temp;
+            while(ss >> temp) costs.push_back(temp);
+
+            std::vector<std::pair<std::string,double>> components_and_costs;
+            for(std::string cost : costs) {
+                std::replace(cost.begin(),cost.end(),':',' ');
+
+                std::pair<std::string,double> temp_pair;
+                std::stringstream ss(cost);
+                
+                ss >> temp_pair.first;
+                std::string temp;
+                ss >> temp;
+                temp_pair.second = std::stod(temp);
+
+                components_and_costs.push_back(temp_pair);
+            }
+
+            for(std::pair<std::string,double> component_cost : components_and_costs) {
+                persistEnergyStatus(msg->timestamp, component_cost.first, msg->target, std::to_string(component_cost.second));
+            }
+        }
+    }  else if (msg->type=="Event") {
         persistEvent(msg->timestamp, msg->source, msg->target, msg->content);
         if (events[msg->source].size()<=buffer_size) {
             events[msg->source].push_back(msg->content);
@@ -246,6 +302,11 @@ bool DataAccess::processQuery(archlib::DataAccessRequest::Request &req, archlib:
                         res.content += aux;
                     }
                 }
+            } else if (query[1] == "cost") {
+                applyTimeWindow();
+                for (auto it : status) {
+                    res.content += calculateComponentCost(it.first, req.name);
+                }
             }
         } 
     } catch(...) {}
@@ -263,7 +324,14 @@ void DataAccess::persistEvent(const int64_t &timestamp, const std::string &sourc
 
 void DataAccess::persistStatus(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content){
     StatusMessage obj("Status", timestamp, logical_clock, source, target, content);
-    statusVec.push_back(obj);
+    statusVec.push_back(obj);   
+
+    if (logical_clock % 30 == 0) flush();
+}
+
+void DataAccess::persistEnergyStatus(const int64_t &timestamp, const std::string &source, const std::string &target, const std::string &content){
+    EnergyStatusMessage obj("EnergyStatus", timestamp, logical_clock, source, target, content);
+    energystatusVec.push_back(obj);
 
     if (logical_clock % 30 == 0) flush();
 }
@@ -294,6 +362,18 @@ void DataAccess::flush(){
     }
     fp.close();
     statusVec.clear();
+
+    fp.open(energy_status_filepath, std::fstream::in | std::fstream::out | std::fstream::app);   
+    for(std::vector<EnergyStatusMessage>::iterator it = energystatusVec.begin(); it != energystatusVec.end(); ++it) {
+        fp << (*it).getName() << ",";
+        fp << (*it).getLogicalClock() << ",";
+        fp << (*it).getTimestamp() << ",";
+        fp << (*it).getSource() << ",";
+        fp << (*it).getTarget() << ",";
+        fp << (*it).getCost() << "\n";
+    }
+    fp.close();
+    energystatusVec.clear();
 
     fp.open(event_filepath, std::fstream::in | std::fstream::out | std::fstream::app);   
     for(std::vector<EventMessage>::iterator it = eventVec.begin(); it != eventVec.end(); ++it) {
@@ -369,7 +449,29 @@ std::string DataAccess::calculateComponentReliability(const std::string& compone
     return content;
 }
 
-void DataAccess::updateBatteries() {
+/**
+ * Builds the response string and calculate the cost
+ * of the component specified as parameter
+*/
+std::string DataAccess::calculateComponentCost(const std::string& component, std::string req_name) {
+    std::string aux = component;
+    aux += ":";
+
+    std::string key = component;
+    key = key.substr(1, key.size());
+
+    if(req_name == "/engine") {
+        aux += std::to_string(components_costs_engine[key]) + ';';
+        components_costs_engine[key] = 0;
+    } else if(req_name == "/enactor") {
+        aux += std::to_string(components_costs_enactor[key]) + ';';
+        components_costs_enactor[key] = 0;
+    }
+
+    return aux;
+}
+
+/*void DataAccess::updateBatteries() {
     for (auto component : components_batteries) {
         components_last_batteries[component.first] = component.second;
     }
@@ -379,8 +481,14 @@ void DataAccess::updateCosts() {
     for (auto component : components_batteries) {
         components_costs[component.first] = 
             components_last_batteries[component.first] - component.second;
+        
+        while(components_costs[component.first] < 0) {
+            components_costs[component.first] += 100;
+        }
     }
-}
+
+    updateBatteries();
+}*/
 
 void DataAccess::applyTimeWindow() {
     auto now = nowInSeconds();
