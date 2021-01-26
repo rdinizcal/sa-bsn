@@ -140,7 +140,7 @@ namespace arch {
 			archlib::EnergyStatus msg;
 
 			msg.source = rosComponentDescriptor.getName();
-			msg.content = cost;
+			msg.content = std::to_string(cost);
 
 			collect_energy_status.publish(msg);
 		}

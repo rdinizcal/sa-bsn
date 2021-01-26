@@ -26,6 +26,7 @@
 #include "archlib/DataAccessRequest.h"
 #include "archlib/Strategy.h"
 #include "archlib/Exception.h"
+#include "archlib/EnergyStatus.h"
 #include "archlib/ROSComponent.hpp"
 #include "archlib/EngineRequest.h"
 
@@ -78,6 +79,7 @@ class Engine : public arch::ROSComponent {
 
 		ros::NodeHandle handle;
 		ros::Publisher enact;
+		ros::Publisher energy_status;
 		ros::ServiceServer enactor_server;
 
 		int cycles;

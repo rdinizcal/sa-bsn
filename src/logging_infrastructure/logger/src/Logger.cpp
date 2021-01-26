@@ -70,7 +70,7 @@ void Logger::receiveEnergyStatus(const archlib::EnergyStatus::ConstPtr& msg) {
     persistMsg.target = msg->target;
     persistMsg.type = "EnergyStatus";
     persistMsg.timestamp = this->now()-time_ref;
-    persistMsg.content = std::to_string(msg->content);
+    persistMsg.content = msg->content;
 
     persist.publish(persistMsg);
 }

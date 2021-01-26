@@ -273,19 +273,22 @@ class Analyzer:
             elif(reg[0]=="EnergyStatus"):
                 energy_status = EnergyStatus(str([1]),int(reg[2]),str(reg[3]),str(reg[4]),float(reg[5]))
 
-                tag = energy_status.source.upper().replace(".","_").replace("/","").replace("T","_T")
+                if energy_status.source != "global":
+                    tag = energy_status.source.upper().replace(".","_").replace("/","").replace("T","_T")
 
-                if not (tag in tasks): 
-                    tsk = Task(tag)
-                    tasks[tag] = tsk
+                    if not (tag in tasks): 
+                        tsk = Task(tag)
+                        tasks[tag] = tsk
+                    
+                    if not (tag in local_cost_timeseries):
+                        local_cost_timeseries[tag] = [[instant,energy_status.cost]]
+                    else:
+                        local_cost_timeseries[tag].append([instant,energy_status.cost])
                 
-                if not (tag in local_cost_timeseries):
-                    local_cost_timeseries[tag] = [[instant,energy_status.cost]]
+                    for tag in tasks:
+                        formula.compute('W_'+tag, energy_status.cost, self.formula_id)
                 else:
-                    local_cost_timeseries[tag].append([instant,energy_status.cost])
-                
-                for tag in tasks:
-                    formula.compute('W_'+tag, energy_status.cost, self.formula_id)
+                    global_cost_timeseries[instant] = energy_status.cost
 
             elif(reg[0]=="Event"):
                 event = Event(str(reg[1]),str(reg[2]),str(reg[3]),str(reg[4]),str(reg[5]))
@@ -303,13 +306,10 @@ class Analyzer:
                     formula.compute('CTX_'+ctx.getName(), ctx.isActive(), self.formula_id)
 
 
-            if(reg[0]=="Event" or reg[0]=="Status" or reg[0]=="EnergyStatus"):
+            if(reg[0]=="Event" or reg[0]=="Status"):
                 #global_status_timeseries[instant] = b_formula.eval()
                 if self.formula_id == "reliability":
-                    global_reli_timeseries[instant] = formula.eval()
-                else:
-                    global_cost_timeseries[instant] = formula.eval()
-                
+                    global_reli_timeseries[instant] = formula.eval()       
 
         input_timeseries = dict()
         noise_factor = dict()

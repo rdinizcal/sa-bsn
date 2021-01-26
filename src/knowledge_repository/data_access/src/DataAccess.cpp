@@ -212,14 +212,40 @@ void DataAccess::receivePersistMessage(const archlib::Persist::ConstPtr& msg) {
         persistStatus(msg->timestamp, msg->source, msg->target, msg->content);
         status[msg->source].push_back({nowInSeconds(), msg->content});
     } else if (msg->type == "EnergyStatus") {
-        // TODO: persistEnergyStatus function
-        std::string component_name = msg->source;
-        component_name = component_name.substr(1,component_name.size()-1);
-        components_costs_engine[component_name] += std::stod(msg->content);
-        components_costs_enactor[component_name] += std::stod(msg->content);
+        if(msg->source != "/engine") {
+            std::string component_name = msg->source;
+            component_name = component_name.substr(1,component_name.size()-1);
+            components_costs_engine[component_name] += std::stod(msg->content);
+            components_costs_enactor[component_name] += std::stod(msg->content);
+        } else {
+            std::string content = msg->content;
+            std::replace(content.begin(), content.end(), ';', ' ');
 
-        persistEnergyStatus(msg->timestamp, msg->source, msg->target, msg->content);
-    } else if (msg->type=="Event") {
+            std::vector<std::string> costs;
+            std::stringstream ss(content);
+            std::string temp;
+            while(ss >> temp) costs.push_back(temp);
+
+            std::vector<std::pair<std::string,double>> components_and_costs;
+            for(std::string cost : costs) {
+                std::replace(cost.begin(),cost.end(),':',' ');
+
+                std::pair<std::string,double> temp_pair;
+                std::stringstream ss(cost);
+                
+                ss >> temp_pair.first;
+                std::string temp;
+                ss >> temp;
+                temp_pair.second = std::stod(temp);
+
+                components_and_costs.push_back(temp_pair);
+            }
+
+            for(std::pair<std::string,double> component_cost : components_and_costs) {
+                persistEnergyStatus(msg->timestamp, component_cost.first, msg->target, std::to_string(component_cost.second));
+            }
+        }
+    }  else if (msg->type=="Event") {
         persistEvent(msg->timestamp, msg->source, msg->target, msg->content);
         if (events[msg->source].size()<=buffer_size) {
             events[msg->source].push_back(msg->content);

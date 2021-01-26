@@ -33,6 +33,7 @@ void Engine::setUp() {
 	nh.getParam("actuation_freq", actuation_freq);
 
     enact = handle.advertise<archlib::Strategy>("strategy", 10);
+    energy_status = handle.advertise<archlib::EnergyStatus>("log_energy_status", 10);
 
     std::string path = ros::package::getPath("adaptation_engine");
 
@@ -412,6 +413,25 @@ void Engine::analyze() {
     } else {
         c_curr = calculate_cost();
         std::cout << "current system cost: " <<  c_curr << std::endl;
+        
+        archlib::EnergyStatus msg;
+        msg.source = rosComponentDescriptor.getName();
+        msg.content = "global:" + std::to_string(c_curr) + ";";
+
+        for (std::map<std::string,double>::iterator it = strategy.begin(); it != strategy.end(); ++it) {
+            if(it->first.find("W_") != std::string::npos) {
+                std::string component_name = it->first.substr(2,it->first.size()-2);
+                for(auto& c : component_name) {
+                    c = std::tolower(c);
+                }
+                component_name.erase(component_name.begin()+2);
+                component_name = "/" + component_name;
+
+                msg.content += component_name + ":" + std::to_string(it->second) + ";";
+            }
+        }
+
+        energy_status.publish(msg);
 
         error = c_ref - c_curr;
         // if the error is out of the stability margin, plan!
