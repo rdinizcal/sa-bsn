@@ -74,6 +74,7 @@ class Engine : public arch::ROSComponent {
 		bsn::model::Formula expression;
 		std::map<std::string, double> strategy;
 		std::map<std::string, int> priority;
+		std::map<std::string, int> deactivatedComponents;
 
 		ros::NodeHandle handle;
 		ros::Publisher enact;

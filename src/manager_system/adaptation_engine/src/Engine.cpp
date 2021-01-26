@@ -253,13 +253,16 @@ void Engine::monitor_cost() {
                 
                 if (value == "deactivate") {
                     strategy["W_" + first] = 0;
+                    deactivatedComponents["W_" + first] = 1;
                     std::cout << first + " was deactivated and its cost was set to 0" << std::endl;
                 }
             } else {
                 if (value == "activate") {
                     strategy["CTX_" + first] = 1;
+                    deactivatedComponents["W_" + first] = 0;
                 } else {
-                    strategy["CTX_" + first] = 0; 
+                    strategy["CTX_" + first] = 0;
+                    deactivatedComponents["W_" + first] = 1;
                 }
             }
         }
@@ -361,13 +364,16 @@ void Engine::monitor_reli() {
                 
                 if (value == "deactivate") {
                     strategy["R_" + first] = 1;
-                    std::cout << first + " was deactivate and its reliability was set to 1" << std::endl;
+                    deactivatedComponents["R_" + first] = 1;
+                    std::cout << first + " was deactivated and its reliability was set to 1" << std::endl;
                 }
             } else {
                 if (value == "activate") {
                     strategy["CTX_" + first] = 1;
+                    deactivatedComponents["R_" + first] = 0;
                 } else {
                     strategy["CTX_" + first] = 0; 
+                    deactivatedComponents["R_" + first] = 1;
                 }
             }
         }
@@ -424,7 +430,7 @@ void Engine::analyze() {
  * ***************************************************************
 */
 void Engine::plan_reli() {
-    std::cout << "[plan]" << std::endl;
+    std::cout << "[reli plan]" << std::endl;
 
     std::cout << "r_ref= " << r_ref << std::endl;
     double r_curr = calculate_reli();
@@ -449,8 +455,10 @@ void Engine::plan_reli() {
     std::vector<std::string> aux = r_vec;
     r_vec.clear();
     std::set<std::pair<std::string,int>, comp> set(priority.begin(), priority.end());
-    for(auto const &pair: set){
-        if(std::find(aux.begin(), aux.end(), pair.first) != aux.end()){ // key from priority exists in r_vec
+
+    for (auto const &pair : set) {
+        std::cout << "PAIR FIRST " << pair.first << '\n';
+        if (!deactivatedComponents[pair.first] && std::find(aux.begin(), aux.end(), pair.first) != aux.end()) { // key from priority exists in r_vec
             r_vec.push_back(pair.first);
         }
     }
@@ -596,7 +604,7 @@ void Engine::plan_cost() {
     c_vec.clear();
     std::set<std::pair<std::string,int>, comp> set(priority.begin(), priority.end());
     for(auto const &pair: set){
-        if(std::find(aux.begin(), aux.end(), pair.first) != aux.end()){ // key from priority exists in r_vec
+        if(!deactivatedComponents["W_" + pair.first] && std::find(aux.begin(), aux.end(), pair.first) != aux.end()){ // key from priority exists in r_vec
             c_vec.push_back(pair.first);
         }
     }
