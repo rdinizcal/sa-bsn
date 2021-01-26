@@ -445,8 +445,12 @@ void Engine::plan_reli() {
             std::string task = it->first;
             task.erase(0,2);
             if((strategy["CTX_"+task] != 0) && (strategy["F_"+task] != 0)){ // avoid ctx = 0 components thus infinite loops
-                r_vec.push_back(it->first);
-                strategy[it->first] = r_curr;
+                if(!deactivatedComponents[it->first]) {
+                    r_vec.push_back(it->first);
+                    strategy[it->first] = r_curr;
+                } else {
+                    strategy[it->first] = 1;
+                }
             }
         }
     }  
@@ -457,7 +461,6 @@ void Engine::plan_reli() {
     std::set<std::pair<std::string,int>, comp> set(priority.begin(), priority.end());
 
     for (auto const &pair : set) {
-        std::cout << "PAIR FIRST " << pair.first << '\n';
         if (!deactivatedComponents[pair.first] && std::find(aux.begin(), aux.end(), pair.first) != aux.end()) { // key from priority exists in r_vec
             r_vec.push_back(pair.first);
         }
@@ -576,8 +579,12 @@ void Engine::plan_cost() {
             std::string task = it->first;
             task.erase(0,2);
             if((strategy["CTX_"+task] != 0) /*&& (strategy["F_"+task] != 0)*/){ // avoid ctx = 0 components thus infinite loops
-                c_vec.push_back(it->first);
-                strategy[it->first] = c_curr;
+                if(!deactivatedComponents[it->first]) {
+                    c_vec.push_back(it->first);
+                    strategy[it->first] = c_curr;
+                } else {
+                    strategy[it->first] = 0;
+                }
             }
         }
     }  

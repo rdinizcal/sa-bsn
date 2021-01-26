@@ -37,12 +37,12 @@ gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'rosla
 gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch --pid=/var/tmp/g4t1.pid g4t1.launch'
 gnome-terminal --working-directory=${bsn}/configurations/environment   -e 'roslaunch --pid=/var/tmp/patient.pid patient.launch' & sleep 5s
 
-gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch --pid=/var/tmp/g3t1_1.pid g3t1_1.launch' & sleep 1s
-gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch --pid=/var/tmp/g3t1_2.pid g3t1_2.launch' & sleep 1s
-gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch --pid=/var/tmp/g3t1_3.pid g3t1_3.launch' & sleep 1s
-gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch --pid=/var/tmp/g3t1_4.pid g3t1_4.launch' & sleep 1s
-gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch --pid=/var/tmp/g3t1_5.pid g3t1_5.launch' & sleep 1s
-gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch --pid=/var/tmp/g3t1_6.pid g3t1_6.launch' & sleep 1s
+gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch --pid=/var/tmp/g3t1_1.pid g3t1_1.launch' & sleep 2s
+gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch --pid=/var/tmp/g3t1_2.pid g3t1_2.launch' & sleep 2s
+gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch --pid=/var/tmp/g3t1_3.pid g3t1_3.launch' & sleep 2s
+gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch --pid=/var/tmp/g3t1_4.pid g3t1_4.launch' & sleep 2s
+gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch --pid=/var/tmp/g3t1_5.pid g3t1_5.launch' & sleep 2s
+gnome-terminal --working-directory=${bsn}/configurations/target_system -e 'roslaunch --pid=/var/tmp/g3t1_6.pid g3t1_6.launch' & sleep 2s
 
 ################# SIMULATION #################
 gnome-terminal --working-directory=${bsn}/configurations/simulation -e 'roslaunch --pid=/var/tmp/injector.pid injector.launch' & sleep ${exec_time}s
