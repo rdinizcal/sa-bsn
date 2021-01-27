@@ -2,6 +2,8 @@
     <!-- Temperature Measurement Sensor -->
     <node name="g3t1_3" pkg="component" type="g3t1_3" output="screen" />
 
+    <param name="start" value="true" />
+
     <param name="frequency" value="0.6" /> <!-- 1 Hz  -->
 
     <!-- Defines the percentages to consider low, moderate or high risk -->
@@ -10,7 +12,10 @@
     <param name="highrisk" value="66,100" />
 
     <!-- accuracy in percentage -->
-    <param name="data_accuracy" value="90" type="double" />
+    <param name="data_accuracy" value="99" type="double" />
     <param name="comm_accuracy" value="100" type="double" />
+
+    <!-- instant recharge parameter-->
+    <param name="instant_recharge" value="true" type="bool" />
 
 </launch>

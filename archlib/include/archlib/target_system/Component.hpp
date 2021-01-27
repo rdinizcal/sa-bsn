@@ -8,6 +8,7 @@
 
 #include "archlib/Event.h"
 #include "archlib/Status.h"
+#include "archlib/EnergyStatus.h"
 #include "archlib/AdaptationCommand.h"
 #include "archlib/EffectorRegister.h"
 
@@ -34,12 +35,14 @@ namespace arch {
 
                 void sendEvent(const std::string &content);
 		        void sendStatus(const std::string &content);
+                void sendEnergyStatus(const double &cost);
 
                 virtual void reconfigure(const archlib::AdaptationCommand::ConstPtr& msg);
 
             protected:
                 void activate();
                 void deactivate();
+                static void shutdownComponent();
 
                 ros::NodeHandle handle;
                 static void sigIntHandler(int signal);
@@ -48,6 +51,7 @@ namespace arch {
                 bool status;
                 ros::Publisher collect_event;
                 ros::Publisher collect_status;
+                ros::Publisher collect_energy_status;
                 ros::Subscriber effect;
         };
 

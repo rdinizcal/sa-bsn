@@ -26,7 +26,9 @@
 #include "archlib/DataAccessRequest.h"
 #include "archlib/Strategy.h"
 #include "archlib/Exception.h"
+#include "archlib/EnergyStatus.h"
 #include "archlib/ROSComponent.hpp"
+#include "archlib/EngineRequest.h"
 
 
 class Engine : public arch::ROSComponent {
@@ -46,31 +48,39 @@ class Engine : public arch::ROSComponent {
 
 		void receiveException(const archlib::Exception::ConstPtr& msg);
 
-		void monitor();
+		void monitor_reli();
+		void monitor_cost();
     	void analyze();
-    	void plan();
+    	void plan_reli();
+		void plan_cost();
     	void execute();
 
+		bool sendAdaptationParameter(archlib::EngineRequest::Request &req, archlib::EngineRequest::Response &res);
 
   	private:
 	  double calculate_reli();
+	  double calculate_cost();
 	  bool blacklisted(std::map<std::string,double> &);
 
 	private:
-		double r_ref;
+		double r_ref, c_ref;
 		double offset;
 		double Kp;
 		double info_quant;
 		double monitor_freq;
 		double actuation_freq;
 		double stability_margin;
+		std::string adaptation;
 
-		bsn::model::Formula reliability_expression;
+		bsn::model::Formula expression;
 		std::map<std::string, double> strategy;
 		std::map<std::string, int> priority;
+		std::map<std::string, int> deactivatedComponents;
 
 		ros::NodeHandle handle;
 		ros::Publisher enact;
+		ros::Publisher energy_status;
+		ros::ServiceServer enactor_server;
 
 		int cycles;
 		int counter;

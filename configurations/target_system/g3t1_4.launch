@@ -2,6 +2,8 @@
     <!-- Blood Pressure Measurement sensor-->    
     <node name="g3t1_4" pkg="component" type="g3t1_4" output="screen" />
 
+    <param name="start" value="true" />
+
     <param name="frequency" value="5" /> <!-- 1 Hz  -->
 
     <!-- Defines the percentages to consider low, moderate or high risk -->
@@ -17,7 +19,10 @@
     <param name="abpsHighRisk1" value="140,300" />
 
     <!-- accuracy in percentage for abps -->
-    <param name="abpsdata_accuracy" value="90" type="double" />
+    <param name="abpsdata_accuracy" value="99" type="double" />
     <param name="abpscomm_accuracy" value="100" type="double" />
+
+    <!-- instant recharge parameter-->
+    <param name="instant_recharge" value="true" type="bool" />
 
 </launch>

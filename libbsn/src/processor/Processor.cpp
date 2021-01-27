@@ -16,6 +16,8 @@ namespace bsn {
                 return 3;
             else if (type == "abpd")		
                 return 4;
+            else if (type == "glucosemeter")        
+                return 5;
             else {
                 cout << "UNKNOWN TYPE " + type + '\n';
                 return -1;

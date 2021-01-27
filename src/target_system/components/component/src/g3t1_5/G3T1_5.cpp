@@ -9,7 +9,7 @@ using namespace bsn::configuration;
 
 
 G3T1_5::G3T1_5(int &argc, char **argv, const std::string &name) :
-    Sensor(argc, argv, name, "abpd", true, 1, bsn::resource::Battery("abpd_batt", 100, 100, 1)),
+    Sensor(argc, argv, name, "abpd", true, 1, bsn::resource::Battery("abpd_batt", 100, 100, 1), false),
     markov(),
     dataGenerator(),
     filter(1),
@@ -24,18 +24,20 @@ void G3T1_5::setUp() {
     std::array<bsn::range::Range,5> ranges;
     std::string s;
 
+    handle.getParam("start", shouldStart);
+
     { // Get ranges
         std::vector<std::string> lrs,mrs0,hrs0,mrs1,hrs1;
 
-        handle.getParam("LowRisk", s);
+        handle.getParam("abpd_LowRisk", s);
         lrs = bsn::utils::split(s, ',');
-        handle.getParam("MidRisk0", s);
+        handle.getParam("abpd_MidRisk0", s);
         mrs0 = bsn::utils::split(s, ',');
-        handle.getParam("HighRisk0", s);
+        handle.getParam("abpd_HighRisk0", s);
         hrs0 = bsn::utils::split(s, ',');
-        handle.getParam("MidRisk1", s);
+        handle.getParam("abpd_MidRisk1", s);
         mrs1 = bsn::utils::split(s, ',');
-        handle.getParam("HighRisk1", s);
+        handle.getParam("abpd_HighRisk1", s);
         hrs1 = bsn::utils::split(s, ',');
 
         ranges[0] = Range(std::stod(hrs0[0]), std::stod(hrs0[1]));
@@ -72,6 +74,10 @@ void G3T1_5::setUp() {
 
         sensorConfig = SensorConfiguration(0, low_range, midRanges, highRanges, percentages);
     }
+
+    { //Check for instant recharge parameter
+        handle.getParam("instant_recharge", instant_recharge);
+    }
 }
 
 void G3T1_5::tearDown() {
@@ -93,6 +99,7 @@ double G3T1_5::collect() {
     }
 
     battery.consume(BATT_UNIT);
+    cost += BATT_UNIT;
 
     collected_risk = sensorConfig.evaluateNumber(m_data);
 
@@ -106,6 +113,7 @@ double G3T1_5::process(const double &m_data) {
     filter.insert(m_data);
     filtered_data = filter.getValue();
     battery.consume(BATT_UNIT*filter.getRange());
+    cost += BATT_UNIT*filter.getRange();
 
     ROS_INFO("filtered data: [%s]", std::to_string(filtered_data).c_str());
     return filtered_data;
@@ -128,6 +136,7 @@ void G3T1_5::transfer(const double &m_data) {
     data_pub.publish(msg);
     
     battery.consume(BATT_UNIT);
+    cost += BATT_UNIT;
 
     ROS_INFO("risk calculated and transferred: [%.2f%%]", risk);
 }

@@ -1,6 +1,6 @@
 #include "component/g3t1_1/G3T1_1.hpp"
 
-#define BATT_UNIT 0.2
+#define BATT_UNIT 0.05
 
 #include <algorithm>
 #include <cmath>
@@ -10,7 +10,7 @@ using namespace bsn::generator;
 using namespace bsn::configuration;
 
 G3T1_1::G3T1_1(int &argc, char **argv, const std::string &name) :
-    Sensor(argc, argv, name, "oximeter", true, 1, bsn::resource::Battery("oxi_batt", 100, 100, 1)),
+    Sensor(argc, argv, name, "oximeter", true, 1, bsn::resource::Battery("oxi_batt", 100, 100, 1), false),
     markov(),
     dataGenerator(),
     filter(1),
@@ -25,19 +25,21 @@ void G3T1_1::setUp() {
     std::string s;
 
     std::array<bsn::range::Range,5> ranges;
+
+    handle.getParam("start", shouldStart);
     
     { // Configure markov chain
         std::vector<std::string> lrs,mrs0,hrs0,mrs1,hrs1;
 
-        handle.getParam("LowRisk", s);
+        handle.getParam("oxigenation_LowRisk", s);
         lrs = bsn::utils::split(s, ',');
-        handle.getParam("MidRisk0", s);
+        handle.getParam("oxigenation_MidRisk0", s);
         mrs0 = bsn::utils::split(s, ',');
-        handle.getParam("HighRisk0", s);
+        handle.getParam("oxigenation_HighRisk0", s);
         hrs0 = bsn::utils::split(s, ',');
-        handle.getParam("MidRisk1", s);
+        handle.getParam("oxigenation_MidRisk1", s);
         mrs1 = bsn::utils::split(s, ',');
-        handle.getParam("HighRisk1", s);
+        handle.getParam("oxigenation_HighRisk1", s);
         hrs1 = bsn::utils::split(s, ',');
 
         ranges[0] = Range(std::stod(hrs0[0]), std::stod(hrs0[1]));
@@ -75,6 +77,9 @@ void G3T1_1::setUp() {
         sensorConfig = SensorConfiguration(0, low_range, midRanges, highRanges, percentages);
     }
     
+    { //Check for instant recharge parameter
+        handle.getParam("instant_recharge", instant_recharge);
+    }
 }
 
 void G3T1_1::tearDown() {
@@ -96,6 +101,7 @@ double G3T1_1::collect() {
     }
 
     battery.consume(BATT_UNIT);
+    cost += BATT_UNIT;
 
     collected_risk = sensorConfig.evaluateNumber(m_data);
 
@@ -105,10 +111,10 @@ double G3T1_1::collect() {
 double G3T1_1::process(const double &m_data) {
     double filtered_data;
     
-    
     filter.insert(m_data);
     filtered_data = filter.getValue();
     battery.consume(BATT_UNIT*filter.getRange());
+    cost += BATT_UNIT*filter.getRange();
 
     ROS_INFO("filtered data: [%s]", std::to_string(filtered_data).c_str());
     return filtered_data;
@@ -131,6 +137,7 @@ void G3T1_1::transfer(const double &m_data) {
 
     data_pub.publish(msg);
     battery.consume(BATT_UNIT);
+    cost += BATT_UNIT;
 
     ROS_INFO("risk calculated and transferred: [%.2f%%]", risk);
 }

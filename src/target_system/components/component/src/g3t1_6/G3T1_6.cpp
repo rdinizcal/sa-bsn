@@ -1,41 +1,44 @@
-#include "component/g3t1_2/G3T1_2.hpp"
+#include "component/g3t1_6/G3T1_6.hpp"
 
 #define BATT_UNIT 0.05
+#define INCREMENT 0.1
 
 using namespace bsn::range;
+using namespace bsn::resource;
 using namespace bsn::generator;
 using namespace bsn::configuration;
 
-G3T1_2::G3T1_2(int &argc, char **argv, const std::string &name) :
-    Sensor(argc, argv, name, "ecg", true, 1, bsn::resource::Battery("ecg_batt", 100, 100, 1), false),
+
+G3T1_6::G3T1_6(int &argc, char **argv, const std::string &name) :
+    Sensor(argc, argv, name, "glucosemeter", true, 1, bsn::resource::Battery("glc_batt", 100, 100, 1), false),
     markov(),
     dataGenerator(),
     filter(1),
     sensorConfig(),
     collected_risk() {}
 
-G3T1_2::~G3T1_2() {}
+G3T1_6::~G3T1_6() {}
 
-void G3T1_2::setUp() {
+void G3T1_6::setUp() {
     Component::setUp();
     
     std::array<bsn::range::Range,5> ranges;
     std::string s;
 
     handle.getParam("start", shouldStart);
-    
-    { // Configure markov chain
+
+    { // Get ranges
         std::vector<std::string> lrs,mrs0,hrs0,mrs1,hrs1;
 
-        handle.getParam("heart_rate_LowRisk", s);
+        handle.getParam("glucose_LowRisk", s);
         lrs = bsn::utils::split(s, ',');
-        handle.getParam("heart_rate_MidRisk0", s);
+        handle.getParam("glucose_MidRisk0", s);
         mrs0 = bsn::utils::split(s, ',');
-        handle.getParam("heart_rate_HighRisk0", s);
+        handle.getParam("glucose_HighRisk0", s);
         hrs0 = bsn::utils::split(s, ',');
-        handle.getParam("heart_rate_MidRisk1", s);
+        handle.getParam("glucose_MidRisk1", s);
         mrs1 = bsn::utils::split(s, ',');
-        handle.getParam("heart_rate_HighRisk1", s);
+        handle.getParam("glucose_HighRisk1", s);
         hrs1 = bsn::utils::split(s, ',');
 
         ranges[0] = Range(std::stod(hrs0[0]), std::stod(hrs0[1]));
@@ -78,16 +81,16 @@ void G3T1_2::setUp() {
     }
 }
 
-void G3T1_2::tearDown() {
+void G3T1_6::tearDown() {
     Component::tearDown();
 }
 
-double G3T1_2::collect() {
+double G3T1_6::collect() {
     double m_data = 0;
     ros::ServiceClient client = handle.serviceClient<services::PatientData>("getPatientData");
     services::PatientData srv;
 
-    srv.request.vitalSign = "heart_rate";
+    srv.request.vitalSign = "glucose";
 
     if (client.call(srv)) {
         m_data = srv.response.data;
@@ -98,12 +101,13 @@ double G3T1_2::collect() {
 
     battery.consume(BATT_UNIT);
     cost += BATT_UNIT;
+
     collected_risk = sensorConfig.evaluateNumber(m_data);
 
     return m_data;
 }
 
-double G3T1_2::process(const double &m_data) {
+double G3T1_6::process(const double &m_data) {
     double filtered_data;
     
     
@@ -116,15 +120,14 @@ double G3T1_2::process(const double &m_data) {
     return filtered_data;
 }
 
-void G3T1_2::transfer(const double &m_data) {
+void G3T1_6::transfer(const double &m_data) {
     double risk;
     risk = sensorConfig.evaluateNumber(m_data);
-
     if (risk < 0 || risk > 100) throw std::domain_error("risk data out of boundaries");
     if (label(risk) != label(collected_risk)) throw std::domain_error("sensor accuracy fail");
 
     ros::NodeHandle handle;
-    data_pub = handle.advertise<messages::SensorData>("ecg_data", 10);
+    data_pub = handle.advertise<messages::SensorData>("glucosemeter_data", 10);
     messages::SensorData msg;
     msg.type = type;
     msg.data = m_data;
@@ -137,10 +140,9 @@ void G3T1_2::transfer(const double &m_data) {
     cost += BATT_UNIT;
 
     ROS_INFO("risk calculated and transferred: [%.2f%%]", risk);
-    
 }
 
-std::string G3T1_2::label(double &risk) {
+std::string G3T1_6::label(double &risk) {
     std::string ans;
     if(sensorConfig.isLowRisk(risk)){
         ans = "low";

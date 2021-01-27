@@ -2,6 +2,8 @@
     <!-- Blood Oxigenation Measurement Sensor -->    
     <node name="g3t1_1" pkg="component" type="g3t1_1" output="screen" />
 
+    <param name="start" value="true" />
+
     <param name="frequency" value="1.3" /> <!-- 0.2 Hz  -->
 
     <!-- Defines the percentages to consider low, moderate or high risk -->
@@ -17,6 +19,9 @@
     <param name="HighRisk1" value="0,55" />
 
     <!-- accuracy in percentage -->
-    <param name="accuracy" value="90" type="double" />
+    <param name="accuracy" value="99" type="double" />
+
+    <!-- instant recharge parameter-->
+    <param name="instant_recharge" value="true" type="bool" />
 
 </launch>

@@ -6,7 +6,7 @@
 #include <numeric>
 
 #include "archlib/target_system/Component.hpp"
-#include "archlib/AdaptationCommand.h"
+#include "archlib/AdaptationCommand.h"  
 #include "messages/SensorData.h"
 
 #include "bsn/resource/Battery.hpp"
@@ -45,7 +45,7 @@ class CentralHub : public arch::target_system::Component {
 		bool active;
         int max_size;
         int total_buffer_size;
-        std::array<int, 5> buffer_size;
+        std::array<int, 6> buffer_size;
 		bsn::resource::Battery battery;
         std::vector<std::list<double>> data_buffer;
 };
