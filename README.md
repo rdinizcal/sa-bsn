@@ -1,16 +1,32 @@
-# BSN implementation on ROS
+# Self-Adaptive Body Sensor Network (SA-BSN)
 
-This is a Body Sensor Network implementation on ROS. So far, the BSN was used for experimentation on solutions for adaptation on the Self-Adaptive Software Systems domain, refer to https://doi.org/10.1145/3194133.3194147 and https://doi.org/10.1109/SEAMS.2019.00020 for more information.  Moreover, information regarding the prototype behaviour and how to develop your own manager is provided in the https://bodysensornetwork.herokuapp.com/ website, which contains an executable instance of the BSN. The following instructions will guide you to to compile, deploy and run the BSN on Linux Ubuntu 18.04 with ROS Melodic distributions. We have not yet tested on other distributions.
+This is an implementation of the SA-BSN. So far, the BSN was used for experimentation on solutions for adaptation on the Self-Adaptive Software Systems domain, refer to https://doi.org/10.1145/3194133.3194147 and https://doi.org/10.1109/SEAMS.2019.00020 for more information.  Moreover, information regarding the prototype behaviour and how to develop your own manager is provided in the https://bodysensornetwork.herokuapp.com/ website, which contains an executable instance of the BSN. The following instructions will guide you to to compile, deploy and run the BSN on Linux Ubuntu 18.04 with ROS Melodic distributions. We have not yet tested on other distributions.
 
-Virtual machine with bsn: https://drive.google.com/file/d/1G1A5_VIuqTvzTUchiGsM7bAMVYl6eE15/view
+How to use the SA-BSN exemplar?
 
-## Dependencies:
+1) Use our ready-to-go Ubuntu Virtual Machine (https://drive.google.com/file/d/1G1A5_VIuqTvzTUchiGsM7bAMVYl6eE15/view)
+
+    1.1. Download mount the .iso with your favorite VM Manager (tested with VirtualBox)
+    
+    1.2. Execute the BSN (see 2.2)
+ 
+2) Install at your own computer.
+
+    2.1. Download and Install Dependencies
+    
+    2.2. Execute the SA-BSN
+
+
+## 2.1) Download and Install Dependencies
+
+Dependencies:
+
 * [Ros Melodic](http://wiki.ros.org/melodic) which provides software libraries for BSN engines.
 * [Lepton](https://github.com/rdinizcal/lepton) ("lightweight expression parser") is a small C++ library for parsing, evaluating, differentiating, and analyzing mathematical expressions.
 * [Bsn Library](https://github.com/rdinizcal/libbsn)  provides the implementation of sensors, data fusers and emergency detection
 * [Bsn arch](https://github.com/rdinizcal/arch)
 
-## ROS:
+### ROS:
 First it is required to install ROS Melodic. Our development team is strictly using Ubuntu 18.04 (Bionic). To install it please follow this [link](http://wiki.ros.org/melodic/Installation/Ubuntu).  
 Also, it is strongly advised to use catkin for managing the ROS packages, refer to this [link](http://wiki.ros.org/ROS/Tutorials/InstallingandConfiguringROSEnvironment) after installing ROS Melodic. As such you will need to create a catkin workspace. You can do so by following the steps:
 
@@ -20,7 +36,7 @@ cd ~/catkin_ws/
 catkin_make
 ```
 
-## Lepton, Libbsn and Archlib Build
+### Lepton, Libbsn and Archlib Build
 For these 3 dependencies, one must first clone this repository into the 'src' folder inside the catkin workspace previously created:
 
 ```
@@ -40,11 +56,11 @@ Inside the 'bsn_ros' folder, simply run the following command to effectively ins
 bash install.sh
 ```
 
-## Configuration and Execution
+## 2.2) Execute the SA-BSN
 
-3. Configure roslaunch files for personalized execution under '/catkin_ws/src/bsn/configurations';
+Configure roslaunch files for personalized execution under '/catkin_ws/src/bsn/configurations';
 
-4. Execute the BSN either by executing the pre-set run.sh file, that executes all nodes, 
+Execute the BSN either by executing the pre-set run.sh file, that executes all nodes, 
 or use roslaunch x.launch to execute a single node:
 ```
 cd ~/catkin_ws/src/bsn/ && 
