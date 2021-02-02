@@ -6,7 +6,7 @@ How to use the SA-BSN exemplar?
 
 1) Use our ready-to-go Ubuntu Virtual Machine (https://drive.google.com/file/d/1G1A5_VIuqTvzTUchiGsM7bAMVYl6eE15/view)
 
-    1.1. Download mount the .iso with your favorite VM Manager (tested with VirtualBox)
+    1.1. Download mount the .vbox with your favorite VM Manager (recommended VirtualBox)
     
     1.2. Execute the SA-BSN (see 2.2)
  
