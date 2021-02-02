@@ -8,7 +8,7 @@ How to use the SA-BSN exemplar?
 
     1.1. Download mount the .iso with your favorite VM Manager (tested with VirtualBox)
     
-    1.2. Execute the BSN (see 2.2)
+    1.2. Execute the SA-BSN (see 2.2)
  
 2) Install at your own computer.
 
