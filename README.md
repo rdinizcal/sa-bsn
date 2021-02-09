@@ -4,7 +4,7 @@ This is an implementation of the SA-BSN. So far, the BSN was used for experiment
 
 How to use the SA-BSN exemplar?
 
-1) Use our ready-to-go Ubuntu Virtual Machine (https://drive.google.com/file/d/1xNtEgFB9SpPmIN0KvM8v_c0zvYAEkIqj/view?usp=sharing)
+1) Use our ready-to-go Ubuntu Virtual Machine (https://drive.google.com/file/d/18O8yp9ciCv0DhMMm-7iuPwJgqh67to2R/view?usp=sharing)
 
     1.1. Download mount the .vbox with your favorite VM Manager (recommended VirtualBox)
     
