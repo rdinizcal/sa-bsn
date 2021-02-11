@@ -20,7 +20,7 @@ There are two ways to install and use the SA-BSN:
 
 ### 1.1) Download, Extract and Mount the bsn.vbox
 
-Download the bsn virtual box from (https://drive.google.com/file/d/1sQH4sh__a-3ZOy3GtrZPKq5p70jaET2K/view?usp=sharing)
+Download the bsn virtual box from (https://drive.google.com/file/d/18APQNBNZM7Pp_bFGyuChOH1uivf4YEV1/view?usp=sharing)
 
 Then, extract it. It is recommend for Ubuntu 20.04 users to extract it with unrar.
 
