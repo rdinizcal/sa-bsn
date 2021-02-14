@@ -1,6 +1,6 @@
 # Self-Adaptive Body Sensor Network (SA-BSN)
 
-This is an implementation of the SA-BSN. So far, the BSN was used for experimentation on solutions for adaptation on the Self-Adaptive Software Systems domain, refer to https://doi.org/10.1145/3194133.3194147 and https://doi.org/10.1109/SEAMS.2019.00020 for more information.  Moreover, information regarding the prototype behaviour and how to develop your own manager is provided in the https://bodysensornetwork.herokuapp.com/ website, which contains an executable instance of the BSN. The following instructions will guide you to to compile, deploy and run the BSN on Linux Ubuntu 18.04 with ROS Melodic distributions. We have not yet tested on other distributions.
+This is an implementation of the SA-BSN. So far, the BSN was used for experimentation on solutions for adaptation on the Self-Adaptive Software Systems domain, refer to https://doi.org/10.1145/3194133.3194147 and https://doi.org/10.1109/SEAMS.2019.00020 for more information.  Moreover, information regarding the prototype behaviour and how to develop your own manager is provided in the https://bodysensornetwork.herokuapp.com/ website, which contains an executable instance of the BSN. The following instructions will guide you to to compile, deploy and run the BSN on Linux Ubuntu 18.04 with ROS Melodic distributions. We have not yet tested on other distributions. Check our Youtube video for a demonstration of the BSN: https://youtu.be/iDEd_tW9JZE
 
 There are two ways to install and use the SA-BSN:
 
