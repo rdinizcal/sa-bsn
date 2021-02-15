@@ -10,13 +10,15 @@ There are two ways to install and use the SA-BSN:
     
     1.2. Execute the SA-BSN
  
-2) Build at your own computer.
+2) Build from scratch.
 
     2.1. Download and Install Dependencies
     
     2.2. Execute the SA-BSN
+    
+Below we further detail how to proceed to get BSN running following each of the ways above.  
 
-## Detailed instructions
+## 1. Detailed instructions via our ready-to-go Ubuntu VM 
 
 ### 1.1) Download, Extract and Mount the bsn.vbox
 
@@ -61,6 +63,7 @@ One example of the command usage would be:
 ```
 python3 analyzer.py 1610549979516318295 reliability False 0.9
 ```
+## 2. Detailed instructions to build the BSN from scratch
 
 ### 2.1) Download and Install Dependencies
 
