@@ -84,8 +84,11 @@ cd ~/catkin_ws/
 catkin_make
 ```
 
-#### Lepton, Libbsn and Archlib Build
-For these 3 dependencies, one must first clone this repository into the 'src' folder inside the catkin workspace previously created:
+#### Lepton, Libbsn 
+
+First, clone and install [Lepton]((https://github.com/rdinizcal/lepton) and [Libbsn](https://github.com/rdinizcal/libbsn).
+
+Then, clone the bsn:
 
 ```
 cd ~/catkin_ws/src
@@ -98,7 +101,7 @@ When cloned, go to the 'bsn_ros' folder and then proceed to install the dependen
 cd bsn_ros
 ```
 
-Inside the 'bsn_ros' folder, simply run the following command to effectively install and build the 3 dependencies:
+Inside the 'bsn_ros' folder, simply run the following command to effectively install and build the 2 dependencies:
 
 ```
 bash install.sh
