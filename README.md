@@ -86,7 +86,7 @@ catkin_make
 
 #### Lepton, Libbsn 
 
-First, clone and install [Lepton]((https://github.com/rdinizcal/lepton) and [Libbsn](https://github.com/rdinizcal/libbsn).
+First, clone and install [Lepton](https://github.com/rdinizcal/lepton) and [Libbsn](https://github.com/rdinizcal/libbsn).
 
 Then, clone the bsn:
 
