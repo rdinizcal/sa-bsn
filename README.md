@@ -72,7 +72,6 @@ Dependencies:
 * [Ros Melodic](http://wiki.ros.org/melodic) which provides software libraries for BSN engines.
 * [Lepton](https://github.com/rdinizcal/lepton) ("lightweight expression parser") is a small C++ library for parsing, evaluating, differentiating, and analyzing mathematical expressions.
 * [Bsn Library](https://github.com/rdinizcal/libbsn)  provides the implementation of sensors, data fusers and emergency detection
-* [Bsn arch](https://github.com/rdinizcal/arch)
 
 #### Robotic Operating System (ROS):
 First it is required to install ROS Melodic. Our development team is strictly using Ubuntu 18.04 (Bionic). To install it please follow this [link](http://wiki.ros.org/melodic/Installation/Ubuntu).  
