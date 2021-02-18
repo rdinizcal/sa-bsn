@@ -86,7 +86,7 @@ python3 analyzer.py 1610549979516318295 reliability False 0.9
 
 ## Common Mistakes
 
-### In case or error due to the ROS path
+### In case of error due to the ROS path
 
 You might want to source the setup.bash inside the catkin workspace:
 ```
