@@ -1,82 +1,27 @@
 # Self-Adaptive Body Sensor Network (SA-BSN)
 
-This is an implementation of the SA-BSN. So far, the BSN was used for experimentation on solutions for adaptation on the Self-Adaptive Software Systems domain, refer to https://doi.org/10.1145/3194133.3194147 and https://doi.org/10.1109/SEAMS.2019.00020 for more information.  Moreover, information regarding the prototype behaviour and how to develop your own manager is provided in the https://bodysensornetwork.herokuapp.com/ website, which contains an executable instance of the BSN. The following instructions will guide you to to compile, deploy and run the BSN on Linux Ubuntu 18.04 with ROS Melodic distributions. We have not yet tested on other distributions. Check our Youtube video for a demonstration of the BSN: https://youtu.be/iDEd_tW9JZE
+This is an implementation of the SA-BSN. So far, the SA-BSN was used for experimentation on solutions for adaptation on the Self-Adaptive Software Systems domain [[1]](https://doi.org/10.1145/3194133.3194147)[[2]](https://doi.org/10.1109/SEAMS.2019.00020)[[3]](https://doi.org/10.1145/3387939.3391595). Moreover, information regarding the prototype behavior and how to develop your own manager is provided in the [website](https://bodysensornetwork.herokuapp.com/), which contains an executable instance of the BSN. 
 
-There are two ways to install and use the SA-BSN:
+Check our [demonstration video of the SA-BSN](https://youtu.be/iDEd_tW9JZE).
 
-1) Use our ready-to-go Ubuntu Virtual Machine
+Download our [SA-BSN Virtual Machine (Virtual Box) for People in a Hurry](https://drive.google.com/file/d/18APQNBNZM7Pp_bFGyuChOH1uivf4YEV1/view?usp=sharing). 
+(_~10 minutes!!_)
 
-    1.1. Download, extract and mount the .vbox
-    
-    1.2. Execute the SA-BSN
- 
-2) Build from scratch.
+To compile and run the SA-BSN, follow the instructions (tested on Linux Ubuntu 18.04 with ROS Melodic): 
 
-    2.1. Download and Install Dependencies
-    
-    2.2. Execute the SA-BSN
-    
-Below we further detail how to proceed to get BSN running following each of the ways above.  
+## Detailed instructions to build, execute and analyze the SA-BSN
 
-## 1. Detailed instructions via our ready-to-go Ubuntu VM 
+### Build the SA-BSN
 
-### 1.1) Download, Extract and Mount the bsn.vbox
+_Jump this step if you are in our provided VM_
 
-Download the bsn virtual box from (https://drive.google.com/file/d/18APQNBNZM7Pp_bFGyuChOH1uivf4YEV1/view?usp=sharing)
+#### **Dependencies**
 
-Then, extract it. It is recommend for Ubuntu 20.04 users to extract it with unrar.
+ROS Melodic is the underlying framework in which the SA-BSN runs. We suggest the installation of the [ROS Melodic for Ubuntu 18.04](http://wiki.ros.org/melodic/Installation/Ubuntu). Also, we suggest [Catkin](http://wiki.ros.org/ROS/Tutorials/InstallingandConfiguringROSEnvironment) for ROS packages management. 
 
-Finally, mount the bsn.vbox with your favorite VM Manager (we recommend VirtualBox)
+#### **Create workspace, clone and build**
 
-### 1.2) Execute the SA-BSN
-
-Configure roslaunch files for personalized execution under '/catkin_ws/src/bsn/configurations';
-
-Execute the BSN either by executing the pre-set run.sh file, that executes all nodes, 
-or use roslaunch x.launch to execute a single node:
-```
-cd ~/catkin_ws/src/bsn/ && 
-bash run.sh 600
-``` 
-
-For this example we chose to use the run.sh script with 600 seconds of execution time, but it can be any user-defined value. If no value is provided , the default value used is 300 seconds (5 minutes).
-
-#### Logs' Analysis
-After running the system, four log files of the execution will appear inside the 'bsn_ros/src/knowledge_repository/resource/logs' folder. Remember that each execution generates different log files in the form logName_logID, where the logID is the timestamp of the beginning of the execution.
-
-In order to analyze these log files, one can run the Analyzer python code inside the 'bsn_ros/src/simulation/analyzer' folder using the following command
-
-```
-cd ~/catkin_ws/src/bsn_ros/src/simulation/analyzer/
-python3 analyzer.py [logID] [metric] [plot_component_metrics] [setpoint]
-```
-
-where:
-
-* [logID] is the ID for the execution log files previously mentioned
-* [metric] is the metric to be analyzed. This can be reliability or cost depending on what was the metric used for the execution
-* [plot_component_metrics] is a parameter that defines if the graphic which will be shown at the end of analysis will contain components local reliabilities or not. The components local reliabilities will be present if this is equal to True or true and only the system's global reliability will be present otherwise
-* [setpoint] will be the value of the setpoint used in the execution. This needs to be the same as the one defined in the System Manager launch file
-
-One example of the command usage would be:
-
-```
-python3 analyzer.py 1610549979516318295 reliability False 0.9
-```
-## 2. Detailed instructions to build the BSN from scratch
-
-### 2.1) Download and Install Dependencies
-
-Dependencies:
-
-* [Ros Melodic](http://wiki.ros.org/melodic) which provides software libraries for BSN engines.
-* [Lepton](https://github.com/rdinizcal/lepton) ("lightweight expression parser") is a small C++ library for parsing, evaluating, differentiating, and analyzing mathematical expressions.
-* [Bsn Library](https://github.com/rdinizcal/libbsn)  provides the implementation of sensors, data fusers and emergency detection
-* [Bsn arch](https://github.com/rdinizcal/arch)
-
-#### Robotic Operating System (ROS):
-First it is required to install ROS Melodic. Our development team is strictly using Ubuntu 18.04 (Bionic). To install it please follow this [link](http://wiki.ros.org/melodic/Installation/Ubuntu).  
-Also, it is strongly advised to use catkin for managing the ROS packages, refer to this [link](http://wiki.ros.org/ROS/Tutorials/InstallingandConfiguringROSEnvironment) after installing ROS Melodic. As such you will need to create a catkin workspace. You can do so by following the steps:
+Once ROS Melodic and catkin are properly installed, you need to create and initialize the catkin workspace:
 
 ```
 mkdir -p ~/catkin_ws/src
@@ -84,29 +29,60 @@ cd ~/catkin_ws/
 catkin_make
 ```
 
-#### Lepton, Libbsn and Archlib Build
-For these 3 dependencies, one must first clone this repository into the 'src' folder inside the catkin workspace previously created:
+Then, inside the catkin/src folder, clone the sa-bsn.
 
 ```
 cd ~/catkin_ws/src
-git clone https://github.com/rdinizcal/bsn_ros.git
+git clone https://github.com/rdinizcal/sa-bsn.git
 ```
 
-When cloned, go to the 'bsn_ros' folder and then proceed to install the dependencies
+When cloned, enter the sa-bsn folder and then compile the SA-BSN:
 
 ```
-cd bsn_ros
-```
-
-Inside the 'bsn_ros' folder, simply run the following command to effectively install and build the 3 dependencies:
-
-```
+cd sa-bsn
 bash install.sh
 ```
 
-### 2.2) Execute the SA-BSN
+The skilled user can rely on the catkin commands to compile the SA-BSN.
 
-Same instructions as 1.2.
+### Execute the SA-BSN
+
+The SA-BSN's execution rely on a single command, where the argument (i.e., 600) represents the amount of seconds of execution:
+
+```
+cd ~/catkin_ws/src/sa-bsn/ && 
+bash run.sh 600
+``` 
+
+For a customized execution, check the configuration files under sa-bsn/configurations.
+
+### Analyze the SA-BSN
+
+During the execution a logging mechanism records data in logfiles, that can be found in sa-bsn/src/knowledge_repository/resource/logs. Each logfile is named after a type of message and an id (i.e., logName_logID) and the entries are composed by the messages content.
+
+To compute the evolution of the QoS attributes (i.e., reliability and cost) over time and how well the adaptation manager adapts the system, we use a python script that reads the logs as input and plots a timeseries + displays adaptation metrics as output.
+
+The python script can be found at sa-bsn/src/simulation/analyzer.
+
+To compute the QoS attributes and analyze the adaptation, type:
+
+```
+cd ~/catkin_ws/src/sa-bsn/src/simulation/analyzer/
+python3 analyzer.py [logID] [metric] [plot_component_metrics] [setpoint]
+```
+
+where:
+
+* [logID] is the ID for the execution log files.
+* [metric] is the name of the QoS attribute (e.g., reliability)
+* [plot_component_metrics] is a boolean parameter that defines whether individual component's QoS attribute should be plotted or not.
+* [setpoint] is the value of the setpoint used in the execution.
+
+One example of the command usage is:
+
+```
+python3 analyzer.py 1610549979516318295 reliability False 0.9
+```
 
 ## Common Mistakes
 
@@ -118,11 +94,11 @@ echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
 source ~/.bashrc
 ```
 
-## Main Authors
+Main Authors
 
-* **Ricardo D. Caldas** - https://github.com/rdinizcal
-* **Gabriel Levi** - https://github.com/gabrielevi10
-* **Léo Moraes** - https://github.com/leooleo  
-* **Eric B. Gil** - https://github.com/ericbg27/
+* [**Ricardo Caldas**](https://github.com/rdinizcal)
+* [**Gabriel Levi**](https://github.com/gabrielevi10)
+* [**Léo Moraes**](https://github.com/leooleo)  
+* [**Eric B. Gil**](https://github.com/ericbg27)
 
-Adviser: **Genaína N. Rodrigues** - https://cic.unb.br/~genaina/
+Adviser: [**Genaína N. Rodrigues**](https://cic.unb.br/~genaina)
