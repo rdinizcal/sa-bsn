@@ -6,13 +6,13 @@
 
 #include "ros/ros.h"
 
-#include "bsn/resource/Battery.hpp"
-#include "bsn/range/Range.hpp"
-#include "bsn/generator/Markov.hpp"
-#include "bsn/generator/DataGenerator.hpp"
-#include "bsn/filters/MovingAverage.hpp"
-#include "bsn/utils/utils.hpp"
-#include "bsn/configuration/SensorConfiguration.hpp"
+#include "libbsn/resource/Battery.hpp"
+#include "libbsn/range/Range.hpp"
+#include "libbsn/generator/Markov.hpp"
+#include "libbsn/generator/DataGenerator.hpp"
+#include "libbsn/filters/MovingAverage.hpp"
+#include "libbsn/utils/utils.hpp"
+#include "libbsn/configuration/SensorConfiguration.hpp"
 
 #include "component/Sensor.hpp"
 

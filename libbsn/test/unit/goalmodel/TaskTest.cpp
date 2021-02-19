@@ -1,12 +1,12 @@
 #include <gtest/gtest.h>
 #include <memory>
 
-#include "goalmodel/Context.hpp"
-#include "goalmodel/Property.hpp"
-#include "goalmodel/Task.hpp"
-#include "goalmodel/LeafTask.hpp"
-#include "goalmodel/Node.hpp"
-#include "goalmodel/Goal.hpp"
+#include "libbsn/goalmodel/Context.hpp"
+#include "libbsn/goalmodel/Property.hpp"
+#include "libbsn/goalmodel/Task.hpp"
+#include "libbsn/goalmodel/LeafTask.hpp"
+#include "libbsn/goalmodel/Node.hpp"
+#include "libbsn/goalmodel/Goal.hpp"
 
 using namespace bsn::goalmodel;
 

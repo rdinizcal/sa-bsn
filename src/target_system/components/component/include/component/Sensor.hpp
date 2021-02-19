@@ -9,8 +9,8 @@
 #include "archlib/AdaptationCommand.h"
 #include "archlib/Uncertainty.h"
 
-#include "bsn/resource/Battery.hpp"
-#include "bsn/utils/utils.hpp"
+#include "libbsn/resource/Battery.hpp"
+#include "libbsn/utils/utils.hpp"
 
 class Sensor : public arch::target_system::Component {
 

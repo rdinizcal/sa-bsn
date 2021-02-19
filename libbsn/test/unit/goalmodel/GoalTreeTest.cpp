@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 
-#include "goalmodel/GoalTree.hpp"
-#include "goalmodel/Goal.hpp"
-#include "goalmodel/Task.hpp"
-#include "goalmodel/LeafTask.hpp"
+#include "libbsn/goalmodel/GoalTree.hpp"
+#include "libbsn/goalmodel/Goal.hpp"
+#include "libbsn/goalmodel/Task.hpp"
+#include "libbsn/goalmodel/LeafTask.hpp"
 
 #include <ostream>
 #include <algorithm> // std::find

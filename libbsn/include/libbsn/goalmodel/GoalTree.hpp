@@ -7,10 +7,10 @@
 #include <vector>
 #include <memory>
 
-#include "goalmodel/Node.hpp"
-#include "goalmodel/Goal.hpp"
-#include "goalmodel/Task.hpp"
-#include "goalmodel/LeafTask.hpp"
+#include "libbsn/goalmodel/Node.hpp"
+#include "libbsn/goalmodel/Goal.hpp"
+#include "libbsn/goalmodel/Task.hpp"
+#include "libbsn/goalmodel/LeafTask.hpp"
  
 namespace bsn {
     namespace goalmodel {

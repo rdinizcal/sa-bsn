@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <vector>
 
-#include "range/Range.hpp"
+#include "libbsn/range/Range.hpp"
 
 using namespace std;
 using namespace bsn::range;

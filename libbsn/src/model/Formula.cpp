@@ -1,4 +1,4 @@
-#include "model/Formula.hpp"
+#include "libbsn/model/Formula.hpp"
 
 namespace bsn {
     namespace model {

@@ -32,9 +32,9 @@
  * USE OR OTHER DEALINGS IN THE SOFTWARE.                                     *
  * -------------------------------------------------------------------------- */
 
-#include "windowsIncludes.h"
-#include "CustomFunction.h"
-#include "Exception.h"
+#include "lepton/windowsIncludes.h"
+#include "lepton/CustomFunction.h"
+#include "lepton/Exception.h"
 #include <cmath>
 #include <map>
 #include <string>

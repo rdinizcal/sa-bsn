@@ -1,5 +1,5 @@
 #include <memory>
-#include "goalmodel/Task.hpp"
+#include "libbsn/goalmodel/Task.hpp"
 
 namespace bsn {
     namespace goalmodel {

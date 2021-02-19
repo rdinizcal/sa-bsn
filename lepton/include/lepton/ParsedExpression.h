@@ -32,8 +32,8 @@
  * USE OR OTHER DEALINGS IN THE SOFTWARE.                                     *
  * -------------------------------------------------------------------------- */
 
-#include "ExpressionTreeNode.h"
-#include "windowsIncludes.h"
+#include "lepton/ExpressionTreeNode.h"
+#include "lepton/windowsIncludes.h"
 #include <map>
 #include <string>
 

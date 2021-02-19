@@ -1,5 +1,5 @@
-#include "generator/DataGenerator.hpp"
-#include "range/Range.hpp"
+#include "libbsn/generator/DataGenerator.hpp"
+#include "libbsn/range/Range.hpp"
 
 namespace bsn {
     namespace generator {

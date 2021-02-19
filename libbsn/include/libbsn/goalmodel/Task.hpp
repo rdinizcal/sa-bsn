@@ -5,9 +5,9 @@
 #include <vector>
 #include <stdexcept> 
 
-#include "goalmodel/Node.hpp"
+#include "libbsn/goalmodel/Node.hpp"
 #include <memory>
-#include "goalmodel/Goal.hpp"
+#include "libbsn/goalmodel/Goal.hpp"
 
 namespace bsn {
     namespace goalmodel {

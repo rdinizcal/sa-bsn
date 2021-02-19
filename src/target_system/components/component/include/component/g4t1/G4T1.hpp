@@ -9,8 +9,8 @@
 #include <ros/package.h>
 #include "ros/ros.h"
 
-#include "bsn/processor/Processor.hpp"
-#include "bsn/utils/utils.hpp"
+#include "libbsn/processor/Processor.hpp"
+#include "libbsn/utils/utils.hpp"
 
 #include "component/CentralHub.hpp" 
 

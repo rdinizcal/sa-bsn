@@ -4,9 +4,9 @@
 #include <string>
 #include <vector>
 
-#include "goalmodel/Context.hpp"
-#include "goalmodel/Property.hpp"
-#include "goalmodel/Task.hpp"
+#include "libbsn/goalmodel/Context.hpp"
+#include "libbsn/goalmodel/Property.hpp"
+#include "libbsn/goalmodel/Task.hpp"
 
 namespace bsn {
     namespace goalmodel {

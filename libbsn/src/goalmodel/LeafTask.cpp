@@ -1,4 +1,4 @@
-#include "goalmodel/LeafTask.hpp"
+#include "libbsn/goalmodel/LeafTask.hpp"
 #include <memory>
 
 namespace bsn {

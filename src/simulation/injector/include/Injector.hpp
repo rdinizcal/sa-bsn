@@ -11,7 +11,7 @@
 #include "archlib/Uncertainty.h"
 #include "archlib/ROSComponent.hpp"
 
-#include "bsn/utils/utils.hpp"
+#include "libbsn/utils/utils.hpp"
 
 class Injector : public arch::ROSComponent {
 

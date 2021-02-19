@@ -29,9 +29,9 @@
  * USE OR OTHER DEALINGS IN THE SOFTWARE.                                     *
  * -------------------------------------------------------------------------- */
 
-#include "CompiledExpression.h"
-#include "Operation.h"
-#include "ParsedExpression.h"
+#include "lepton/CompiledExpression.h"
+#include "lepton/Operation.h"
+#include "lepton/ParsedExpression.h"
 #include <utility>
 
 using namespace Lepton;

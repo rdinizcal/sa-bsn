@@ -1,7 +1,7 @@
 #ifndef DATAGENERATOR_HPP
 #define DATAGENERATOR_HPP
 
-#include "Markov.hpp"
+#include "libbsn/generator/Markov.hpp"
 
 #include <random>
 #include <stdint.h>

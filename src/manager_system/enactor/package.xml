@@ -15,11 +15,13 @@
   <build_depend>messages</build_depend>
   <build_depend>roslib</build_depend>
   <build_depend>archlib</build_depend>
+  <build_depend>libbsn</build_depend>
 
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>messages</exec_depend>
   <exec_depend>message_runtime</exec_depend>
   <exec_depend>archlib</exec_depend>
+  <exec_depend>libbsn</exec_depend>
 
   <export>
   </export>

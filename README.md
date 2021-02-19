@@ -39,8 +39,8 @@ git clone https://github.com/rdinizcal/sa-bsn.git
 When cloned, enter the sa-bsn folder and then compile the SA-BSN:
 
 ```
-cd sa-bsn
-bash install.sh
+cd ~/catkin_ws
+catkin_make
 ```
 
 The skilled user can rely on the catkin commands to compile the SA-BSN.

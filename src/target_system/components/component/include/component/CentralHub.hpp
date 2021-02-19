@@ -9,8 +9,8 @@
 #include "archlib/AdaptationCommand.h"  
 #include "messages/SensorData.h"
 
-#include "bsn/resource/Battery.hpp"
-#include "bsn/utils/utils.hpp"
+#include "libbsn/resource/Battery.hpp"
+#include "libbsn/utils/utils.hpp"
 
 
 class CentralHub : public arch::target_system::Component {

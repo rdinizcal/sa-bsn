@@ -30,8 +30,8 @@
  * USE OR OTHER DEALINGS IN THE SOFTWARE.                                     *
  * -------------------------------------------------------------------------- */
 
-#include "Operation.h"
-#include "ExpressionTreeNode.h"
+#include "lepton/Operation.h"
+#include "lepton/ExpressionTreeNode.h"
 #include "MSVC_erfc.h"
 
 using namespace Lepton;

@@ -5,7 +5,7 @@
 #include <vector>
 #include <stdexcept> 
 
-#include "goalmodel/Node.hpp"
+#include "libbsn/goalmodel/Node.hpp"
 
 namespace bsn {
     namespace goalmodel {

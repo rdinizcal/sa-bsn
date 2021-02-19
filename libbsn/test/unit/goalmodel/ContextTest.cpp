@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "goalmodel/Context.hpp"
+#include "libbsn/goalmodel/Context.hpp"
 
 using namespace bsn::goalmodel;
 

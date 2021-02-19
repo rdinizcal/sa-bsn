@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "goalmodel/Property.hpp"
+#include "libbsn/goalmodel/Property.hpp"
 
 using namespace bsn::goalmodel;
 

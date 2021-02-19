@@ -1,4 +1,4 @@
-#include "goalmodel/Node.hpp"
+#include "libbsn/goalmodel/Node.hpp"
 
 #include <iostream>
 #include <memory>

@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <vector>
 
-#include "processor/Processor.hpp"
+#include "libbsn/processor/Processor.hpp"
 
 using namespace std;
 using namespace bsn::processor;

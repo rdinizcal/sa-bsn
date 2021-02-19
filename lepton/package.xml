@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>lepton</name>
+  <version>1.0.0</version>
+  <description>lepton</description>
+
+  <maintainer email="ricardo.caldas@chalmers.se">Ricardo Caldas</maintainer>
+
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <export>
+  </export>
+</package>

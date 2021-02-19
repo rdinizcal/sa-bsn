@@ -1,5 +1,5 @@
-#ifndef LEPTON_H_
-#define LEPTON_H_
+#ifndef LEPTON_PARSER_H_
+#define LEPTON_PARSER_H_
 
 /* -------------------------------------------------------------------------- *
  *                                   Lepton                                   *
@@ -32,12 +32,46 @@
  * USE OR OTHER DEALINGS IN THE SOFTWARE.                                     *
  * -------------------------------------------------------------------------- */
 
-#include "CompiledExpression.h"
-#include "CustomFunction.h"
-#include "ExpressionProgram.h"
-#include "ExpressionTreeNode.h"
-#include "Operation.h"
-#include "ParsedExpression.h"
-#include "Parser.h"
+#include "lepton/windowsIncludes.h"
+#include <map>
+#include <string>
+#include <vector>
 
-#endif /*LEPTON_H_*/
+namespace Lepton {
+
+class CustomFunction;
+class ExpressionTreeNode;
+class Operation;
+class ParsedExpression;
+class ParseToken;
+
+/**
+ * This class provides the main interface for parsing expressions.
+ */
+
+class LEPTON_EXPORT Parser {
+public:
+    /**
+     * Parse a mathematical expression and return a representation of it as an abstract syntax tree.
+     */
+    static ParsedExpression parse(const std::string& expression);
+    /**
+     * Parse a mathematical expression and return a representation of it as an abstract syntax tree.
+     *
+     * @param customFunctions   a map specifying user defined functions that may appear in the expression.
+     *                          The key are function names, and the values are corresponding CustomFunction objects.
+     */
+    static ParsedExpression parse(const std::string& expression, const std::map<std::string, CustomFunction*>& customFunctions);
+private:
+    static std::string trim(const std::string& expression);
+    static std::vector<ParseToken> tokenize(const std::string& expression);
+    static ParseToken getNextToken(const std::string& expression, int start);
+    static ExpressionTreeNode parsePrecedence(const std::vector<ParseToken>& tokens, int& pos, const std::map<std::string, CustomFunction*>& customFunctions,
+            const std::map<std::string, ExpressionTreeNode>& subexpressionDefs, int precedence);
+    static Operation* getOperatorOperation(const std::string& name);
+    static Operation* getFunctionOperation(const std::string& name, const std::map<std::string, CustomFunction*>& customFunctions);
+};
+
+} // namespace Lepton
+
+#endif /*LEPTON_PARSER_H_*/

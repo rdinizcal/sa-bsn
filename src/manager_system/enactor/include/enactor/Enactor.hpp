@@ -8,7 +8,7 @@
 #include "ros/ros.h"
 #include "ros/package.h"
 
-#include "bsn/utils/utils.hpp"
+#include "libbsn/utils/utils.hpp"
 
 #include "archlib/Status.h"
 #include "archlib/Event.h"

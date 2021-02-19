@@ -32,7 +32,7 @@
  * USE OR OTHER DEALINGS IN THE SOFTWARE.                                     *
  * -------------------------------------------------------------------------- */
 
-#include "windowsIncludes.h"
+#include "lepton/windowsIncludes.h"
 
 namespace Lepton {
 

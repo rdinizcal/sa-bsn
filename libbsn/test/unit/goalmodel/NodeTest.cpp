@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <memory>
 
-#include "goalmodel/Node.hpp"
+#include "libbsn/goalmodel/Node.hpp"
 
 using namespace bsn::goalmodel;
 

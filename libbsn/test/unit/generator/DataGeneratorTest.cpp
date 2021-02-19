@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 #include <stdint.h>
 
-#include "generator/DataGenerator.hpp"
-#include "generator/Markov.hpp"
-#include "range/Range.hpp"
+#include "libbsn/generator/DataGenerator.hpp"
+#include "libbsn/generator/Markov.hpp"
+#include "libbsn/range/Range.hpp"
 
 using namespace bsn::range;
 using namespace bsn::generator;

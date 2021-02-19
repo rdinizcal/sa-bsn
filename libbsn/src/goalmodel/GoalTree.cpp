@@ -1,4 +1,4 @@
-#include "goalmodel/GoalTree.hpp"
+#include "libbsn/goalmodel/GoalTree.hpp"
 
 #include <iostream>
 #include <memory>

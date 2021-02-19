@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "resource/Battery.hpp"
+#include "libbsn/resource/Battery.hpp"
 
 using namespace std;
 using namespace bsn::resource;

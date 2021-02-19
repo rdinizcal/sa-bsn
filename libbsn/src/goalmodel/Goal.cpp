@@ -1,4 +1,4 @@
-#include "goalmodel/Goal.hpp"
+#include "libbsn/goalmodel/Goal.hpp"
 
 namespace bsn {
     namespace goalmodel {

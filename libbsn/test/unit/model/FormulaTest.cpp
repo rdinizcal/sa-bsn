@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "model/Formula.hpp"
+#include "libbsn/model/Formula.hpp"
 
 class FormulaTest : public testing::Test {
     protected:

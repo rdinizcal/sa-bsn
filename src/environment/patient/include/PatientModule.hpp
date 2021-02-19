@@ -1,7 +1,7 @@
 #include <ros/ros.h>
-#include "bsn/generator/DataGenerator.hpp"
-#include "bsn/utils/utils.hpp"
-#include "bsn/range/Range.hpp"
+#include "libbsn/generator/DataGenerator.hpp"
+#include "libbsn/utils/utils.hpp"
+#include "libbsn/range/Range.hpp"
 #include <string>
 #include "services/PatientData.h"
 #include <ros/console.h>

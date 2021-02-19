@@ -29,9 +29,9 @@
  * USE OR OTHER DEALINGS IN THE SOFTWARE.                                     *
  * -------------------------------------------------------------------------- */
 
-#include "ExpressionTreeNode.h"
-#include "Exception.h"
-#include "Operation.h"
+#include "lepton/ExpressionTreeNode.h"
+#include "lepton/Exception.h"
+#include "lepton/Operation.h"
 
 using namespace Lepton;
 using namespace std;
