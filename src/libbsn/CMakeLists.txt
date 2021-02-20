@@ -44,7 +44,6 @@ TARGET_LINK_LIBRARIES (${PROJECT_NAME} ${catkin_LIBRARIES} ${LIBRARIES})
 ###########################################################################
 ## Add gtest based cpp test target and link libraries
 ENABLE_TESTING()
-FIND_PACKAGE(GTest REQUIRED)
 INCLUDE_DIRECTORIES(${GTEST_INCLUDE_DIRS})
 
 FILE(GLOB_RECURSE files "${CMAKE_CURRENT_SOURCE_DIR}/test/*.cpp")
