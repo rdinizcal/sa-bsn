@@ -6,56 +6,58 @@ using namespace bsn::filters;
 
 class FiltersTest : public testing::Test {
     protected:
-        MovingAverage avg1;
-        MovingAverage avg2;
-        MovingAverage avg5;
+        FiltersTest() {}
 
-        FiltersTest() : avg1(), avg2(), avg5() {}
-
-        virtual void SetUp() {
-            avg1.setRange(1);
-            avg5.setRange(5);
-            avg2.setRange(2);
-        }
+        virtual void SetUp() {}
 };
 
 TEST_F(FiltersTest, InitialAverage) {
-    ASSERT_EQ(avg1.getValue(), 0.0);
+    MovingAverage filter(1);
+
+    ASSERT_EQ(filter.getValue(), 0.0);
 }
 
 TEST_F(FiltersTest, AverageWithOneValue) {
-    avg1.insert(1);
+    MovingAverage filter(1);
 
-    ASSERT_EQ(avg1.getValue(), 1.0);
+    filter.insert(1);
+
+    ASSERT_EQ(filter.getValue(), 1.0);
 }
 
 TEST_F(FiltersTest, AverageWithFiveValues) {
-    avg5.insert(32.0);
-    avg5.insert(35.0);
-    avg5.insert(36.0);
-    avg5.insert(34.0);
-    avg5.insert(35.0);
+    MovingAverage filter(5);
 
-    ASSERT_EQ(avg5.getValue(), 34.4);
+    filter.insert(32.0);
+    filter.insert(35.0);
+    filter.insert(36.0);
+    filter.insert(34.0);
+    filter.insert(35.0);
+
+    ASSERT_EQ(filter.getValue(), 34.4);
 }
 
 TEST_F(FiltersTest, AverageWithLessValues) {
-    avg5.insert(32.0);
-    avg5.insert(35.0);
-    avg5.insert(36.0);
-    avg5.insert(34.0);
+    MovingAverage filter(5);
 
-    ASSERT_EQ(avg5.getValue(), 34.0);
+    filter.insert(32.0);
+    filter.insert(35.0);
+    filter.insert(36.0);
+    filter.insert(34.0);
+
+    ASSERT_EQ(filter.getValue(), 34.25);
 }
 
 TEST_F(FiltersTest, AverageWithMoreValues) {
-    avg5.insert(200);
-    avg5.insert(32.0);
-    avg5.insert(35.0);
-    avg5.insert(36.0);
-    avg5.insert(34.0);
-    avg5.insert(35.0);
-    avg5.insert(37.0);
+    MovingAverage filter(5);
 
-    ASSERT_EQ(avg5.getValue(), 35.4);
+    filter.insert(200);
+    filter.insert(32.0);
+    filter.insert(35.0);
+    filter.insert(36.0);
+    filter.insert(34.0);
+    filter.insert(35.0);
+    filter.insert(37.0);
+
+    ASSERT_EQ(filter.getValue(), 35.4);
 }
