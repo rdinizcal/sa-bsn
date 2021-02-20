@@ -4,12 +4,9 @@
   <version>1.0.0</version>
   <description>Static messages package for bsn</description>
 
-  <maintainer email="rdinizcal@gmail.com">rdiniz</maintainer>
+  <author email="ricardo.caldas@chalmers.se">Ricardo Caldas</author>
 
-  <!-- One license tag required, multiple allowed, one license per tag -->
-  <!-- Commonly used license strings: -->
-  <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
-  <license>TODO</license>
+  <license>MIT License</license>
 
   <buildtool_depend>catkin</buildtool_depend>
 
