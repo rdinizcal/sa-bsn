@@ -36,5 +36,5 @@ TEST_F(DataGeneratorTest, GetValue) {
     DataGenerator dg(m4);
     
     double x = dg.getValue();
-    ASSERT_TRUE(1 <= x && x <= 3);
+    ASSERT_TRUE(12 <= x && x <= 13);
 }
