@@ -48,9 +48,8 @@ FIND_PACKAGE(GTest REQUIRED)
 INCLUDE_DIRECTORIES(${GTEST_INCLUDE_DIRS})
 
 FILE(GLOB_RECURSE files "${CMAKE_CURRENT_SOURCE_DIR}/test/*.cpp")
-ADD_EXECUTABLE(run_test ${files})
+CATKIN_ADD_GTEST(run_test ${files})
 TARGET_LINK_LIBRARIES(run_test ${PROJECT_NAME} ${LIBRARIES} ${GTEST_LIBRARIES} ${GTEST_MAIN_LIBRARIES} pthread)
-ADD_TEST(run_test run_test)
 
 ###########################################################################
 # Install this project.

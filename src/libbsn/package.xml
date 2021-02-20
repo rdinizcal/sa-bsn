@@ -11,7 +11,8 @@
   <buildtool_depend>catkin</buildtool_depend>
   
   <build_depend>lepton</build_depend>
-  <build_depend>gtest</build_depend>
+  
+  <test_depend>gtest</test_depend>
 
   <exec_depend>lepton</exec_depend>
 

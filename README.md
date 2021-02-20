@@ -17,40 +17,39 @@ _Jump this step if you are in our provided VM_
 
 #### **Dependencies**
 
-ROS Melodic is the underlying framework in which the SA-BSN runs. We suggest the installation of the [ROS Melodic for Ubuntu 18.04](http://wiki.ros.org/melodic/Installation/Ubuntu). Also, we suggest [Catkin](http://wiki.ros.org/ROS/Tutorials/InstallingandConfiguringROSEnvironment) for ROS packages management. 
+[ROS Melodic for Ubuntu 18.04](http://wiki.ros.org/melodic/Installation/Ubuntu) is the underlying framework in which the SA-BSN runs.
 
-#### **Create workspace, clone and build**
+[Catkin](http://wiki.ros.org/ROS/Tutorials/InstallingandConfiguringROSEnvironment) for ROS packages management. 
 
-Once ROS Melodic and catkin are properly installed, you need to create and initialize the catkin workspace:
+[Rosdep](https://wiki.ros.org/rosdep#Installing_rosdep) for ROS dependencies management.
 
-```
-mkdir -p ~/catkin_ws/src
-cd ~/catkin_ws/
-catkin_make
-```
+#### **Create clone and build**
 
-Then, inside the catkin/src folder, clone the sa-bsn.
+Clone the sa-bsn.
 
 ```
-cd ~/catkin_ws/src
 git clone https://github.com/rdinizcal/sa-bsn.git
 ```
 
-When cloned, enter the sa-bsn folder and then compile the SA-BSN:
+Enter the sa-bsn folder, install internal dependencies, and then compile it with catkin.
 
 ```
-cd ~/catkin_ws
+cd sa-bsn &&
+rosdep install --from-paths src --ignore-src -r -y &&
 catkin_make
 ```
 
-The skilled user can rely on the catkin commands to compile the SA-BSN.
+To run tests:
+```
+catkin_make run_tests && catkin_test_results
+```
 
 ### Execute the SA-BSN
 
-The SA-BSN's execution rely on a single command, where the argument (i.e., 600) represents the amount of seconds of execution:
+The SA-BSN's execution relies on a single command, where the argument (i.e., 600) represents the execution time (in seconds):
 
 ```
-cd ~/catkin_ws/src/sa-bsn/ && 
+cd sa-bsn && 
 bash run.sh 600
 ``` 
 
@@ -62,12 +61,12 @@ During the execution a logging mechanism records data in logfiles, that can be f
 
 To compute the evolution of the QoS attributes (i.e., reliability and cost) over time and how well the adaptation manager adapts the system, we use a python script that reads the logs as input and plots a timeseries + displays adaptation metrics as output.
 
-The python script can be found at sa-bsn/src/simulation/analyzer.
+The python script can be found at sa-bsn/src/sa-bsn/simulation/analyzer.
 
 To compute the QoS attributes and analyze the adaptation, type:
 
 ```
-cd ~/catkin_ws/src/sa-bsn/src/simulation/analyzer/
+cd sa-bsn/src/sa-bsn/simulation/analyzer
 python3 analyzer.py [logID] [metric] [plot_component_metrics] [setpoint]
 ```
 
@@ -90,7 +89,7 @@ python3 analyzer.py 1610549979516318295 reliability False 0.9
 
 You might want to source the setup.bash inside the catkin workspace:
 ```
-echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
+echo "source ~/sa-bsn/devel/setup.bash" >> ~/.bashrc
 source ~/.bashrc
 ```
 
