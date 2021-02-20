@@ -1,4 +1,4 @@
-bsn=$PWD/src
+bsn=$PWD/src/sa-bsn
 exec_time=0
 
 if [[ "$#" -gt 1 ]]; then
