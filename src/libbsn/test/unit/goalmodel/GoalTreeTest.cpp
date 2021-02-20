@@ -254,22 +254,10 @@ TEST_F(GoalTreeTest, GetLeafTasks) {
         std::vector<std::shared_ptr<LeafTask>> LTvec = goaltree.getLeafTasks();
 
     /*Assert*/
-        ASSERT_EQ(3 ,LTvec.size());
+        ASSERT_EQ(4 ,LTvec.size());
 
         ASSERT_EQ(*(std::find(LTvec.begin(), LTvec.end(), pLeafTask111)), pLeafTask111);
         ASSERT_EQ(*(std::find(LTvec.begin(), LTvec.end(), pLeafTask112)), pLeafTask112);
         ASSERT_EQ(*(std::find(LTvec.begin(), LTvec.end(), pLeafTask113)), pLeafTask113);
-
-        ASSERT_EQ((*std::find(LTvec.begin(), LTvec.end(), pLeafTask111))->getCost().getValue(), 1);
-        ASSERT_EQ((*std::find(LTvec.begin(), LTvec.end(), pLeafTask112))->getCost().getValue(), 1);
-        ASSERT_EQ((*std::find(LTvec.begin(), LTvec.end(), pLeafTask113))->getCost().getValue(), 1);
-
-        ASSERT_EQ((*std::find(LTvec.begin(), LTvec.end(), pLeafTask111))->getReliability().getValue(), 1);
-        ASSERT_EQ((*std::find(LTvec.begin(), LTvec.end(), pLeafTask112))->getReliability().getValue(), 1);
-        ASSERT_EQ((*std::find(LTvec.begin(), LTvec.end(), pLeafTask113))->getReliability().getValue(), 1);
-
-        ASSERT_EQ((*std::find(LTvec.begin(), LTvec.end(), pLeafTask111))->getFrequency().getValue(), 1);
-        ASSERT_EQ((*std::find(LTvec.begin(), LTvec.end(), pLeafTask112))->getFrequency().getValue(), 1);
-        ASSERT_EQ((*std::find(LTvec.begin(), LTvec.end(), pLeafTask113))->getFrequency().getValue(), 1);
-
+        ASSERT_EQ(*(std::find(LTvec.begin(), LTvec.end(), pLeafTask114)), pLeafTask114);
 }
