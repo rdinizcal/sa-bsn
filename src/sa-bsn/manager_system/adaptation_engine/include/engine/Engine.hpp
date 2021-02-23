@@ -58,8 +58,7 @@ class Engine : public arch::ROSComponent {
 		bool sendAdaptationParameter(archlib::EngineRequest::Request &req, archlib::EngineRequest::Response &res);
 
   	private:
-	  double calculate_reli();
-	  double calculate_cost();
+	  double calculate_qos();
 	  bool blacklisted(std::map<std::string,double> &);
 
 	private:
