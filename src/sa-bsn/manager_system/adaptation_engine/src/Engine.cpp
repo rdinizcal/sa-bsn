@@ -17,6 +17,24 @@ Engine::Engine(int  &argc, char **argv, std::string name): ROSComponent(argc, ar
 
 Engine::~Engine() {}
 
+std::string load_formula(std::string name) {
+    std::string formula;
+
+    std::string path = ros::package::getPath("adaptation_engine");
+    std::string filename = "/formulae/" + name + ".formula";
+
+    try{
+        std::ifstream file;
+        file.open(path + filename);
+        std::getline(file, formula);
+        file.close();
+    } catch (std::ifstream::failure e) { 
+        std::cerr << "Error: Could not load " + name +  " formula into memory\n"; 
+    }
+
+    return formula;
+}
+
 void Engine::setUp() {
     ros::NodeHandle nh;
     nh.getParam("adaptation", adaptation);
@@ -35,23 +53,7 @@ void Engine::setUp() {
     enact = handle.advertise<archlib::Strategy>("strategy", 10);
     energy_status = handle.advertise<archlib::EnergyStatus>("log_energy_status", 10);
 
-    std::string path = ros::package::getPath("adaptation_engine");
-
-    std::ifstream file;
-    std::string formula;
-
-    try {
-        if (adaptation == "reliability")
-            file.open(path + "/formulae/reliability.formula");
-        else {
-            file.open(path + "/formulae/cost.formula");
-        }
-
-        std::getline(file, formula);
-        file.close();
-
-    } catch (std::ifstream::failure e) { std::cerr << "Exception opening/reading/closing file (reliability.formula) or (cost.formula)\n"; }
-
+    std::string formula = load_formula(adaptation);
     expression = bsn::model::Formula(formula);
 
     //parse formula:
