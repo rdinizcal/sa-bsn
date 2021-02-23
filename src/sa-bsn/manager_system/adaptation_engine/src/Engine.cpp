@@ -35,6 +35,43 @@ std::string load_formula(std::string name) {
     return formula;
 }
 
+/**
+   Parses the formula and returns the extracted terms.
+   @param formula Is the model that computes a QoS attribute of the system.
+   @return The terms of the formula.
+ */
+std::vector<std::string> get_terms(std::string formula) {
+
+    //parse formula:
+    std::replace(formula.begin(), formula.end(), '+',' ');
+    std::replace(formula.begin(), formula.end(), '-',' ');
+    std::replace(formula.begin(), formula.end(), '*',' ');
+    std::replace(formula.begin(), formula.end(), '/',' ');
+    std::replace(formula.begin(), formula.end(), '(',' ');
+    std::replace(formula.begin(), formula.end(), ')',' ');
+
+    std::vector<std::string> terms = bsn::utils::split(formula, ' ');
+
+    return terms ;
+}
+
+/**
+   Returns an initialized strategy with init_value values.
+   @param formula Is the model that computes a QoS attribute of the system.
+   @param init_value Is the value that will be used to initialize the strategy.
+   @return The map containing terms of the formula and initial values.
+ */
+std::map<std::string, double> initialize_strategy(std::string formula, double init_value){
+    std::map<std::string, double> strategy;
+    
+    std::vector<std::string> terms = get_terms(formula);
+    for (std::vector<std::string>::iterator it = terms.begin(); it != terms.end(); ++it) {
+        strategy[*it] = init_value;
+    }
+
+    return strategy;
+}
+
 void Engine::setUp() {
     ros::NodeHandle nh;
     nh.getParam("adaptation", adaptation);
@@ -56,19 +93,8 @@ void Engine::setUp() {
     std::string formula = load_formula(adaptation);
     expression = bsn::model::Formula(formula);
 
-    //parse formula:
-    std::replace(formula.begin(), formula.end(), '+',' ');
-    std::replace(formula.begin(), formula.end(), '-',' ');
-    std::replace(formula.begin(), formula.end(), '*',' ');
-    std::replace(formula.begin(), formula.end(), '/',' ');
-    std::replace(formula.begin(), formula.end(), '(',' ');
-    std::replace(formula.begin(), formula.end(), ')',' ');
-    std::vector<std::string> terms = bsn::utils::split(formula, ' ');
-
     if(adaptation == "reliability") {
-        for (std::vector<std::string>::iterator it = terms.begin(); it != terms.end(); ++it) {
-            strategy[*it] = 1;
-        }
+        strategy = initialize_strategy(formula, 1);
 
         //initialize:
         calculate_reli();
@@ -80,9 +106,7 @@ void Engine::setUp() {
             }
         } 
     } else {
-        for (std::vector<std::string>::iterator it = terms.begin(); it != terms.end(); ++it) {
-            strategy[*it] = 0; //Do we initialize it with 1 as in reliability or 0 because this is the maximum cost?
-        }
+        strategy = initialize_strategy(formula, 0);
 
         //initialize:
         calculate_cost();
