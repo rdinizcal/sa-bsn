@@ -17,9 +17,7 @@ Engine::Engine(int  &argc, char **argv, std::string name): ROSComponent(argc, ar
 
 Engine::~Engine() {}
 
-std::string load_formula(std::string name) {
-    std::string formula;
-
+std::string fetch_formula(){
     std::string path = ros::package::getPath("adaptation_engine");
     std::string filename = "/formulae/" + name + ".formula";
 
@@ -90,6 +88,36 @@ std::map<std::string, int> initialize_priority(std::vector<std::string> terms, i
     return priority;
 }
 
+/**
+   Sets up formula-related structures (i.e, expression, strategy, and priority)
+   @param formula A string containing the algebraic formula.
+   @return void
+ */
+void Engine::setUp_formula(std::string formula) {
+
+    this.expression = bsn::model::Formula(formula);
+    
+    // Extracts the terms that will compose the strategy
+    std::vector<std::string> terms = get_terms(formula);
+
+    if(qos_attribute == "reliability") { 
+        this.strategy = initialize_strategy(terms, 1);
+    } else {
+        this.strategy = initialize_strategy(terms, 0);
+    } 
+
+    // Initializes the expression
+    calculate_qos();
+
+    if(qos_attribute == "reliability") { 
+        this.priority = initialize_priority(terms, 50, "R_");
+    } else {
+        this.priority = initialize_priority(terms, 50, "W_");
+    }
+
+    return;
+}
+
 void Engine::setUp() {
     ros::NodeHandle nh;
     nh.getParam("qos_attribute", qos_attribute);
@@ -108,26 +136,8 @@ void Engine::setUp() {
     enact = handle.advertise<archlib::Strategy>("strategy", 10);
     energy_status = handle.advertise<archlib::EnergyStatus>("log_energy_status", 10);
 
-    std::string formula = load_formula(qos_attribute);
-    expression = bsn::model::Formula(formula);
-    
-    // Extracts the terms that will compose the strategy
-    std::vector<std::string> terms = get_terms(formula);
-
-    if(qos_attribute == "reliability") { 
-        strategy = initialize_strategy(terms, 1);
-    } else {
-        strategy = initialize_strategy(terms, 0);
-    } 
-
-    // Initializes the expression
-    calculate_qos();
-
-    if(qos_attribute == "reliability") { 
-        priority = initialize_priority(terms, 50, "R_");
-    } else {
-        priority = initialize_priority(terms, 50, "W_");
-    }
+    std::string formula = fetch_formula(qos_attribute);
+    setUp_formula(formula);
 
     enactor_server = handle.advertiseService("EngineRequest", &Engine::sendAdaptationParameter, this);
 }

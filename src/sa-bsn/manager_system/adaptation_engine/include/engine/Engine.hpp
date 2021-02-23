@@ -46,6 +46,7 @@ class Engine : public arch::ROSComponent {
     	virtual void tearDown();
 		virtual void body();
 
+		void setUp_formula(std::string formula);
 		void receiveException(const archlib::Exception::ConstPtr& msg);
 
 		void monitor_reli();
