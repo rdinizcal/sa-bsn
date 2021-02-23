@@ -57,19 +57,37 @@ std::vector<std::string> get_terms(std::string formula) {
 
 /**
    Returns an initialized strategy with init_value values.
-   @param formula Is the model that computes a QoS attribute of the system.
+   @param terms The terms that compose the strategy.
    @param init_value Is the value that will be used to initialize the strategy.
    @return The map containing terms of the formula and initial values.
  */
-std::map<std::string, double> initialize_strategy(std::string formula, double init_value){
+std::map<std::string, double> initialize_strategy(std::vector<std::string> terms, double init_value){
     std::map<std::string, double> strategy;
     
-    std::vector<std::string> terms = get_terms(formula);
     for (std::vector<std::string>::iterator it = terms.begin(); it != terms.end(); ++it) {
         strategy[*it] = init_value;
     }
 
     return strategy;
+}
+
+/**
+   Returns an initialized priorities vector with init_value values.
+   @param terms The terms that compose the strategy.
+   @param init_value Is the value that will be used to initialize the strategy.
+   @param prefix A prefix of the term (e.g., R_ for reliability and W_ for cost).
+   @return The map containing terms of the formula and initial values.
+ */
+std::map<std::string, int> initialize_priority(std::vector<std::string> terms, int init_value, std::string prefix) {
+    std::map<std::string, int> priority;
+    
+    for (std::vector<std::string>::iterator it = terms.begin(); it != terms.end(); ++it) {
+        if((*it).find(prefix) != std::string::npos) {
+            priority[*it] = init_value;
+        }
+    }
+
+    return priority;
 }
 
 void Engine::setUp() {
@@ -92,31 +110,23 @@ void Engine::setUp() {
 
     std::string formula = load_formula(qos_attribute);
     expression = bsn::model::Formula(formula);
+    
+    // Extracts the terms that will compose the strategy
+    std::vector<std::string> terms = get_terms(formula);
 
-    if(qos_attribute == "reliability") {
-        strategy = initialize_strategy(formula, 1);
-
-        //initializes the expression
-        calculate_qos();
-
-        //initialize priorities
-        for (std::map<std::string,double>::iterator it = strategy.begin(); it != strategy.end(); ++it) {
-            if(it->first.find("R_") != std::string::npos) {
-                priority[it->first] = 50;
-            }
-        } 
+    if(qos_attribute == "reliability") { 
+        strategy = initialize_strategy(terms, 1);
     } else {
-        strategy = initialize_strategy(formula, 0);
+        strategy = initialize_strategy(terms, 0);
+    } 
 
-        //initializes the expression
-        calculate_qos();
+    // Initializes the expression
+    calculate_qos();
 
-        //initialize priorities
-        for (std::map<std::string,double>::iterator it = strategy.begin(); it != strategy.end(); ++it) {
-            if(it->first.find("W_") != std::string::npos) {
-                priority[it->first] = 50;
-            }
-        } 
+    if(qos_attribute == "reliability") { 
+        priority = initialize_priority(terms, 50, "R_");
+    } else {
+        priority = initialize_priority(terms, 50, "W_");
     }
 
     enactor_server = handle.advertiseService("EngineRequest", &Engine::sendAdaptationParameter, this);
