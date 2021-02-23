@@ -74,8 +74,8 @@ std::map<std::string, double> initialize_strategy(std::string formula, double in
 
 void Engine::setUp() {
     ros::NodeHandle nh;
-    nh.getParam("adaptation", adaptation);
-    if(adaptation == "reliability") {
+    nh.getParam("qos_attribute", qos_attribute);
+    if(qos_attribute == "reliability") {
 	    nh.getParam("setpoint", r_ref);
     } else {
         nh.getParam("setpoint", c_ref);
@@ -90,10 +90,10 @@ void Engine::setUp() {
     enact = handle.advertise<archlib::Strategy>("strategy", 10);
     energy_status = handle.advertise<archlib::EnergyStatus>("log_energy_status", 10);
 
-    std::string formula = load_formula(adaptation);
+    std::string formula = load_formula(qos_attribute);
     expression = bsn::model::Formula(formula);
 
-    if(adaptation == "reliability") {
+    if(qos_attribute == "reliability") {
         strategy = initialize_strategy(formula, 1);
 
         //initialize:
@@ -126,7 +126,7 @@ void Engine::tearDown() {}
 
 bool Engine::sendAdaptationParameter(archlib::EngineRequest::Request &req, archlib::EngineRequest::Response &res) {
     try {
-        res.content = adaptation;
+        res.content = qos_attribute;
     } catch(...) {}
 }
 
@@ -140,7 +140,7 @@ void Engine::receiveException(const archlib::Exception::ConstPtr& msg){
     std::transform(first.begin(), first.end(),first.begin(), ::toupper); // /G3T1_1
     first.erase(0,1); // G3T1_1
     first.insert(int(first.find('T')), "_"); // G3_T1_1
-    if(adaptation == "reliability") {
+    if(qos_attribute == "reliability") {
         first = "R_" + first; 
     } else {
         first = "W_" + first;
@@ -424,7 +424,7 @@ void Engine::analyze() {
 
     double r_curr, c_curr;
     double error;
-    if (adaptation == "reliability") {
+    if (qos_attribute == "reliability") {
         r_curr = calculate_reli();
         std::cout << "current system reliability: " <<  r_curr << std::endl;
 
@@ -809,7 +809,7 @@ void Engine::execute() {
     size_t index = 0;
     bool flag = false;  //nasty
     bool flagO = false; //uber nasty
-    if(adaptation == "reliability") {
+    if(qos_attribute == "reliability") {
         //get the reliabilities in the formula and send!
         // send in form "/g3t1_1:0.89;/g4t1=0.2;..."
         for (std::map<std::string,double>::iterator it = strategy.begin(); it != strategy.end(); ++it) {
@@ -886,9 +886,9 @@ void Engine::body(){
 
     ros::Rate loop_rate(rosComponentDescriptor.getFreq());
     while (ros::ok){
-        if(adaptation == "reliability") {
+        if(qos_attribute == "reliability") {
             monitor_reli();
-        } else if(adaptation == "cost") {
+        } else if(qos_attribute == "cost") {
             monitor_cost();
         }
         ros::spinOnce();

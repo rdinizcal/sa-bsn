@@ -70,7 +70,7 @@ class Engine : public arch::ROSComponent {
 		double monitor_freq;
 		double actuation_freq;
 		double stability_margin;
-		std::string adaptation;
+		std::string qos_attribute;
 
 		bsn::model::Formula expression;
 		std::map<std::string, double> strategy;
