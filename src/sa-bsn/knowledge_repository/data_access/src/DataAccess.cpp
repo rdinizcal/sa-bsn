@@ -115,74 +115,6 @@ void DataAccess::processTargetSystemData(const messages::TargetSystemData::Const
     components_batteries["g3t1_6"] = msg->glc_batt;
 }
 
-/*double DataAccess::calculateCost() {
-    std::vector<std::string> keys;
-    std::vector<double> values;
-    std::string context_key, formated_key, r_key, w_key, f_key;
-
-    for (auto x : components_costs) {
-        formated_key = x.first;
-        std::transform(formated_key.begin(), formated_key.end(), formated_key.begin(), ::toupper);
-        formated_key.insert(int(formated_key.find('T')), "_");
-
-        w_key = "W_" + formated_key;
-        keys.push_back(w_key);
-        values.push_back(x.second);
-    }
-
-    for (auto x : contexts) {
-        formated_key = x.first;
-        std::transform(formated_key.begin(), formated_key.end(), formated_key.begin(), ::toupper);
-        formated_key.insert(int(formated_key.find('T')), "_");
-
-        context_key = "CTX_" + formated_key;
-        keys.push_back(context_key);
-        values.push_back(x.second);
-
-        r_key = "R_" + formated_key;
-        keys.push_back(r_key);
-        values.push_back(1);
-
-        f_key = "F_" + formated_key;
-        keys.push_back(f_key);
-        values.push_back(1);
-    }
-
-    return cost_expression.apply(keys, values);
-}*/
-
-double DataAccess::calculateReliability() {
-    std::vector<std::string> keys;
-    std::vector<double> values;
-    std::string context_key, formated_key, r_key, f_key;
-
-    for (auto x : components_reliabilities) {
-        formated_key = x.first;
-        std::transform(formated_key.begin(), formated_key.end(), formated_key.begin(), ::toupper);
-        formated_key.insert(int(formated_key.find('T')), "_");
-
-        r_key = "R_" + formated_key;
-        keys.push_back(r_key);
-        values.push_back(x.second);
-    }
-
-    for (auto x : contexts) {
-        formated_key = x.first;
-        std::transform(formated_key.begin(), formated_key.end(), formated_key.begin(), ::toupper);
-        formated_key.insert(int(formated_key.find('T')), "_");
-
-        context_key = "CTX_" + formated_key;
-        keys.push_back(context_key);
-        values.push_back(x.second);
-
-        f_key = "F_" + formated_key;
-        keys.push_back(f_key);
-        values.push_back(1);
-    }
-
-    return reliability_expression.apply(keys, values);
-}
-
 void DataAccess::body() {
     count_to_calc_and_reset++;
     frequency = rosComponentDescriptor.getFreq();
@@ -192,11 +124,7 @@ void DataAccess::body() {
         for (auto component : status) {
             calculateComponentReliability(component.first);
         }
-        system_reliability = calculateReliability();
-        //updateCosts();
-        //system_cost = calculateCost();
-        //std::cout << "system cost: " << system_cost << '\n';
-        //updateBatteries();
+
         count_to_calc_and_reset = 0;
     }
 
@@ -470,25 +398,6 @@ std::string DataAccess::calculateComponentCost(const std::string& component, std
 
     return aux;
 }
-
-/*void DataAccess::updateBatteries() {
-    for (auto component : components_batteries) {
-        components_last_batteries[component.first] = component.second;
-    }
-}
-
-void DataAccess::updateCosts() {
-    for (auto component : components_batteries) {
-        components_costs[component.first] = 
-            components_last_batteries[component.first] - component.second;
-        
-        while(components_costs[component.first] < 0) {
-            components_costs[component.first] += 100;
-        }
-    }
-
-    updateBatteries();
-}*/
 
 void DataAccess::applyTimeWindow() {
     auto now = nowInSeconds();
