@@ -17,7 +17,9 @@ Engine::Engine(int  &argc, char **argv, std::string name): ROSComponent(argc, ar
 
 Engine::~Engine() {}
 
-std::string fetch_formula(){
+std::string fetch_formula(std::string name){
+    std::string formula;
+
     std::string path = ros::package::getPath("adaptation_engine");
     std::string filename = "/formulae/" + name + ".formula";
 
@@ -95,24 +97,24 @@ std::map<std::string, int> initialize_priority(std::vector<std::string> terms, i
  */
 void Engine::setUp_formula(std::string formula) {
 
-    this.expression = bsn::model::Formula(formula);
+    expression = bsn::model::Formula(formula);
     
     // Extracts the terms that will compose the strategy
     std::vector<std::string> terms = get_terms(formula);
 
     if(qos_attribute == "reliability") { 
-        this.strategy = initialize_strategy(terms, 1);
+        strategy = initialize_strategy(terms, 1);
     } else {
-        this.strategy = initialize_strategy(terms, 0);
+        strategy = initialize_strategy(terms, 0);
     } 
 
     // Initializes the expression
     calculate_qos();
 
     if(qos_attribute == "reliability") { 
-        this.priority = initialize_priority(terms, 50, "R_");
+        priority = initialize_priority(terms, 50, "R_");
     } else {
-        this.priority = initialize_priority(terms, 50, "W_");
+        priority = initialize_priority(terms, 50, "W_");
     }
 
     return;
