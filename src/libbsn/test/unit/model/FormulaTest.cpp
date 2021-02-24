@@ -42,24 +42,19 @@ TEST_F(FormulaTest, InvalidFormulaConstruction) {
     }
 }
 
-TEST_F(FormulaTest, SetAndGetTerms) {
+TEST_F(FormulaTest, SetAndGetTermsValueMap) {
     bsn::model::Formula formula("x+y");
     std::vector<std::string> terms{"x","y"};
-
-    formula.setTerms({"x","y"});
-    std::vector<std::string> returned_terms = formula.getTerms();
-
-    ASSERT_EQ(returned_terms, terms);
-}
-
-TEST_F(FormulaTest, SetAndGetValues) {
-    bsn::model::Formula formula("x+y");
     std::vector<double> values{1,2};
+    std::map<std::string, double> tvmap {
+        {"x",1},
+        {"y",2}
+    };
 
-    formula.setValues(values);
-    std::vector<double> returned_values = formula.getValues();
+    formula.setTermValueMap(terms,values);
+    std::map<std::string, double> returned_map = formula.getTermValueMap();
 
-    ASSERT_EQ(returned_values, values);
+    ASSERT_EQ(returned_map, tvmap);
 }
 
 TEST_F(FormulaTest, EvaluateForOneTermFormula) {

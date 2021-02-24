@@ -3,18 +3,19 @@
 namespace bsn {
     namespace model {
         
-        Formula::Formula(): expression(), terms(), values() {};
-        Formula::Formula(const std::string& text) : expression(), terms(), values() {
+        Formula::Formula(): expression(), term_value() {};
+        Formula::Formula(const std::string& text) : expression(), term_value() {
             expression = Lepton::Parser::parse(text).createCompiledExpression();
         }
-        Formula::Formula(const std::string& text, const std::vector<std::string> _terms, const std::vector<double> _values) : expression(), terms(), values() {
-            if (_terms.size() != _values.size()) {
-                throw std::length_error("ERROR: There can't be more terms than values.");
+        Formula::Formula(const std::string& text, const std::vector<std::string> terms, const std::vector<double> values) : expression(), term_value() {
+            if (terms.size() != values.size()) {
+                throw std::length_error("ERROR: terms and values size do not correspond to each other.");
             }
 
             expression = Lepton::Parser::parse(text).createCompiledExpression();
-            terms = _terms;
-            values = _values;
+            for (size_t i = 0; i < terms.size(); i++){
+                term_value[terms.at(i)] = values.at(i);
+            }
         }
 
         Formula::~Formula() {};
@@ -32,26 +33,37 @@ namespace bsn {
             this->expression = newExpression;
         }
 
-        std::vector<std::string> Formula::getTerms() const{
-            return this->terms;
+        std::map<std::string,double> Formula::getTermValueMap() const {
+            return this-> term_value;
         }
 
-        void Formula::setTerms(const std::vector<std::string> &terms){
-            this->terms = terms;
+        void Formula::setTermValueMap(const std::vector<std::string> &terms, const std::vector<double> &values) {
+            std::vector<std::string>::const_iterator t_iter;
+            std::vector<double>::const_iterator v_iter;
+            for( t_iter = terms.begin(), v_iter = values.begin();
+                    t_iter != terms.end() && v_iter != values.end(); 
+                    ++t_iter, ++v_iter ) {
+                    term_value[*t_iter] = *v_iter;
+            }
         }
 
-        std::vector<double> Formula::getValues() const{
-            return this->values;
-        }
-
-        void Formula::setValues(const std::vector<double> &values){
-            this->values = values;
+        void Formula::setTermValueMap(const std::map<std::string,double> &_term_value){
+            term_value = _term_value;
         }
 
         double Formula::evaluate(){
-            return apply(terms,values);
+            std::vector<std::string> keys;
+            std::vector<double> values;
+            for(std::map<std::string,double>::iterator it = term_value.begin(); it != term_value.end(); ++it) {
+                expression.getVariableReference(it->first) = it->second;
+            }
+
+            return expression.evaluate();
         }
 
+        /**
+         * DEPRECATED
+         */ 
         double Formula::apply(const std::vector<std::string> terms, const std::vector<double> values) {
             if (terms.size() != values.size()) throw std::length_error("ERROR: terms and values size do not correspond to each other.");
 

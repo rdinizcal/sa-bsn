@@ -24,19 +24,16 @@ namespace bsn {
                 Lepton::CompiledExpression getExpression() const;
                 void setExpression(const Lepton::CompiledExpression &);
 
-                std::vector<std::string> getTerms() const;
-                void setTerms(const std::vector<std::string> &);
-
-                std::vector<double> getValues() const;
-                void setValues(const std::vector<double> &);
+                std::map<std::string,double> getTermValueMap() const;
+                void setTermValueMap(const std::vector<std::string> &, const std::vector<double> &);
+                void setTermValueMap(const std::map<std::string,double> &);
 
                 double evaluate();
                 double apply(const std::vector<std::string> terms, const std::vector<double> values);
 
             private:
                 Lepton::CompiledExpression expression;
-                std::vector<std::string> terms;
-                std::vector<double> values;
+                std::map<std::string,double> term_value;
 
         };
     }
