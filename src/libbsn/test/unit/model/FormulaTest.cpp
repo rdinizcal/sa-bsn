@@ -97,3 +97,12 @@ TEST_F(FormulaTest, EvaluateForTwoTermFormula) {
 
     ASSERT_EQ(answer, 9);
 }
+
+TEST_F(FormulaTest, GetTerms) {
+    bsn::model::Formula formula("x+y");
+    std::vector<std::string> terms = {"x","y"};
+
+    std::vector<std::string> r_terms = formula.getTerms();
+
+    ASSERT_EQ(r_terms, terms);
+}

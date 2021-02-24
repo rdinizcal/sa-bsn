@@ -42,26 +42,6 @@ std::string fetch_formula(std::string name){
 }
 
 /**
-   Parses the formula and returns the extracted terms.
-   @param formula Is the model that computes a QoS attribute of the system.
-   @return The terms of the formula.
- */
-std::vector<std::string> get_terms(std::string formula) {
-
-    //parse formula:
-    std::replace(formula.begin(), formula.end(), '+',' ');
-    std::replace(formula.begin(), formula.end(), '-',' ');
-    std::replace(formula.begin(), formula.end(), '*',' ');
-    std::replace(formula.begin(), formula.end(), '/',' ');
-    std::replace(formula.begin(), formula.end(), '(',' ');
-    std::replace(formula.begin(), formula.end(), ')',' ');
-
-    std::vector<std::string> terms = bsn::utils::split(formula, ' ');
-
-    return terms ;
-}
-
-/**
    Returns an initialized strategy with init_value values.
    @param terms The terms that compose the strategy.
    @param init_value Is the value that will be used to initialize the strategy.
@@ -105,7 +85,7 @@ void Engine::setUp_formula(std::string formula) {
     expression = bsn::model::Formula(formula);
     
     // Extracts the terms that will compose the strategy
-    std::vector<std::string> terms = get_terms(formula);
+    std::vector<std::string> terms = expression.getTerms();
 
     if(qos_attribute == "reliability") { 
         strategy = initialize_strategy(terms, 1);

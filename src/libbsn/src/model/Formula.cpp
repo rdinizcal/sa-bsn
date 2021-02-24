@@ -62,6 +62,27 @@ namespace bsn {
         }
 
         /**
+         @return All terms of the formula.
+        */
+        std::vector<std::string> Formula::getTerms() {
+
+            std::set<std::string> terms = expression.getVariables();
+            std::vector<std::string> vec_terms(terms.begin(),terms.end());
+            return vec_terms;
+
+            ////parse formula:
+            //std::replace(formula.begin(), formula.end(), '+',' ');
+            //std::replace(formula.begin(), formula.end(), '-',' ');
+            //std::replace(formula.begin(), formula.end(), '*',' ');
+            //std::replace(formula.begin(), formula.end(), '/',' ');
+            //std::replace(formula.begin(), formula.end(), '(',' ');
+            //std::replace(formula.begin(), formula.end(), ')',' ');
+            //
+            //std::vector<std::string> terms = bsn::utils::split(formula, ' ');
+            //
+            //return terms ;
+        }
+        /**
          * DEPRECATED
          */ 
         double Formula::apply(const std::vector<std::string> terms, const std::vector<double> values) {
