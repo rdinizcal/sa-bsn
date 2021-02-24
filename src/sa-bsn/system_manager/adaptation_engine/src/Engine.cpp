@@ -13,7 +13,7 @@ struct comp{
     }
 };
 
-Engine::Engine(int  &argc, char **argv, std::string name): ROSComponent(argc, argv, name), r_ref(0.9), stability_margin(0.02), offset(0), info_quant(0), monitor_freq(1), actuation_freq(1), expression(), strategy(),  priority(),  Kp(0.01), cycles(0) {}
+Engine::Engine(int  &argc, char **argv, std::string name): ROSComponent(argc, argv, name), r_ref(0.9), stability_margin(0.02), offset(0), info_quant(0), monitor_freq(1), actuation_freq(1), target_system_model(), strategy(),  priority(),  Kp(0.01), cycles(0) {}
 
 Engine::~Engine() {}
 
@@ -28,17 +28,17 @@ std::string fetch_formula(std::string name){
     r_srv.request.query = name + "_formula";
 
     if(!client_module.call(r_srv)) {
-        ROS_ERROR("Tried to fetch formula, but Data Access is not responding.");
+        ROS_ERROR("Tried to fetch formula string, but Data Access is not responding.");
         return "";
     }
     
-    std::string formula = r_srv.response.content;
+    std::string formula_str = r_srv.response.content;
 
-    if(formula == ""){
-        ROS_ERROR("ERROR: Empty formula received.");
+    if(formula_str == ""){
+        ROS_ERROR("ERROR: Empty formula string received.");
     }
 
-    return formula;
+    return formula_str;
 }
 
 /**
@@ -77,15 +77,15 @@ std::map<std::string, int> initialize_priority(std::vector<std::string> terms, i
 }
 
 /**
-   Sets up formula-related structures (i.e, expression, strategy, and priority)
-   @param formula A string containing the algebraic formula.
+   Sets up formula-related structures (i.e, target system model, strategy, and priority)
+   @param formula_str A string containing the algebraic formula.
    @return void
  */
-void Engine::setUp_formula(std::string formula) {
-    expression = bsn::model::Formula(formula);
+void Engine::setUp_formula(std::string formula_str) {
+    target_system_model = bsn::model::Formula(formula_str);
     
     // Extracts the terms that will compose the strategy
-    std::vector<std::string> terms = expression.getTerms();
+    std::vector<std::string> terms = target_system_model.getTerms();
 
     if(qos_attribute == "reliability") { 
         strategy = initialize_strategy(terms, 1);
@@ -93,8 +93,8 @@ void Engine::setUp_formula(std::string formula) {
         strategy = initialize_strategy(terms, 0);
     } 
 
-    // Initializes the expression
-    calculate_qos(expression,strategy);
+    // Initializes the target system model
+    calculate_qos(target_system_model,strategy);
 
     if(qos_attribute == "reliability") { 
         priority = initialize_priority(terms, 50, "R_");
@@ -120,13 +120,13 @@ void Engine::setUp() {
     rosComponentDescriptor.setFreq(monitor_freq);
 	nh.getParam("actuation_freq", actuation_freq);
 
-    std::string formula = "";
+    std::string formula_str = "";
     do{
-        formula = fetch_formula(qos_attribute);
+        formula_str = fetch_formula(qos_attribute);
         ros::Duration(1.0).sleep() ;
-    } while(formula=="");
+    } while(formula_str=="");
     
-    setUp_formula(formula);
+    setUp_formula(formula_str);
 
     enact = handle.advertise<archlib::Strategy>("strategy", 10);
     energy_status = handle.advertise<archlib::EnergyStatus>("log_energy_status", 10);
@@ -169,14 +169,14 @@ void Engine::receiveException(const archlib::Exception::ConstPtr& msg){
 
 
 /**
- * Calculates the overall QoS attribute based on the expression and configuration of parameters
- * @param expr An algebraic expression that represents the QoS attribute
- * @param conf A map of the expression terms and values
+ * Calculates the overall QoS attribute based on the target system model and configuration of parameters
+ * @param model An algebraic target system model that represents the QoS attribute
+ * @param conf A map of the target system model terms and values
  * @return The value of QoS attribute given the strategy
  */
-double Engine::calculate_qos(bsn::model::Formula expr, std::map<std::string, double> conf) {
-    expr.setTermValueMap(conf);
-    return expr.evaluate();
+double Engine::calculate_qos(bsn::model::Formula model, std::map<std::string, double> conf) {
+    model.setTermValueMap(conf);
+    return model.evaluate();
 }
 
 /*bool Engine::blacklisted(std::map<std::string,double> &strat) {
@@ -202,7 +202,7 @@ void Engine::monitor_cost() {
 
     client_module = client_handler.serviceClient<archlib::DataAccessRequest>("DataAccessRequest");
     
-    //reset the formula
+    //reset the formula_str
     for (std::map<std::string,double>::iterator it = strategy.begin(); it != strategy.end(); ++it){
         if(it->first.find("CTX_") != std::string::npos)  it->second = 0;
         if(it->first.find("W_") != std::string::npos)  it->second = 1;
@@ -313,7 +313,7 @@ void Engine::monitor_reli() {
 
     client_module = client_handler.serviceClient<archlib::DataAccessRequest>("DataAccessRequest");
     
-    //reset the formula
+    //reset the formula_str
     for (std::map<std::string,double>::iterator it = strategy.begin(); it != strategy.end(); ++it){
         if(it->first.find("CTX_") != std::string::npos)  it->second = 0;
         if(it->first.find("R_") != std::string::npos)  it->second = 1;
@@ -425,7 +425,7 @@ void Engine::analyze() {
     double r_curr, c_curr;
     double error;
     if (qos_attribute == "reliability") {
-        r_curr = calculate_qos(expression,strategy);
+        r_curr = calculate_qos(target_system_model,strategy);
 
         error = r_ref - r_curr;
         // if the error is out of the stability margin, plan!
@@ -436,7 +436,7 @@ void Engine::analyze() {
             }
         }
     } else {
-        c_curr = calculate_qos(expression,strategy);
+        c_curr = calculate_qos(target_system_model,strategy);
         std::cout << "current system cost: " <<  c_curr << std::endl;
         
         archlib::EnergyStatus msg;
@@ -478,12 +478,12 @@ void Engine::plan_reli() {
     std::cout << "[reli plan]" << std::endl;
 
     std::cout << "r_ref= " << r_ref << std::endl;
-    double r_curr = calculate_qos(expression,strategy);
+    double r_curr = calculate_qos(target_system_model,strategy);
     std::cout << "r_curr= " << r_curr << std::endl;
     double error = r_ref - r_curr;
     std::cout << "error= " << error << std::endl;
 
-    //reset the formula
+    //reset the formula_str
     std::vector<std::string> r_vec;
     for (std::map<std::string,double>::iterator it = strategy.begin(); it != strategy.end(); ++it) {
         if(it->first.find("R_") != std::string::npos) {
@@ -532,7 +532,7 @@ void Engine::plan_reli() {
                 strategy[*it] = (r_curr*(1+offset)>1)?1:r_curr*(1+offset);
             }
         }
-        double r_new = calculate_qos(expression,strategy);
+        double r_new = calculate_qos(target_system_model,strategy);
         std::cout << "offset=" << r_new << std::endl;
 
         std::map<std::string,double> prev;
@@ -542,19 +542,19 @@ void Engine::plan_reli() {
                 prev = strategy;
                 r_prev = r_new;
                 strategy[*i] += Kp*error;
-                r_new = calculate_qos(expression,strategy);
+                r_new = calculate_qos(target_system_model,strategy);
             } while(r_new < r_ref && r_prev < r_new && strategy[*i] > 0 && strategy[*i] < 1);
         } else if (error < 0){
             do {
                 prev = strategy;
                 r_prev = r_new;
                 strategy[*i] += Kp*error;
-                r_new = calculate_qos(expression,strategy);
+                r_new = calculate_qos(target_system_model,strategy);
             } while(r_new > r_ref && r_prev > r_new && strategy[*i] > 0 && strategy[*i] < 1);
         }
 
         strategy = prev;
-        r_new = calculate_qos(expression,strategy);
+        r_new = calculate_qos(target_system_model,strategy);
 
         for(std::vector<std::string>::iterator j = r_vec.begin(); j != r_vec.end(); ++j) { // all the others
             if(*i == *j) continue;
@@ -565,26 +565,26 @@ void Engine::plan_reli() {
                     prev = strategy;
                     r_prev = r_new;
                     strategy[*j] += Kp*error;
-                    r_new = calculate_qos(expression,strategy);
+                    r_new = calculate_qos(target_system_model,strategy);
                 } while(r_new < r_ref && r_prev < r_new && strategy[*j] > 0 && strategy[*j] < 1);
             } else if (error < 0) {
                 do {
                     prev = strategy;
                     r_prev = r_new;
                     strategy[*j] += Kp*error;
-                    r_new = calculate_qos(expression,strategy);
+                    r_new = calculate_qos(target_system_model,strategy);
                 } while(r_new > r_ref && r_prev > r_new && strategy[*j] > 0 && strategy[*j] < 1);
             }
             
             strategy = prev;
-            r_new = calculate_qos(expression,strategy);
+            r_new = calculate_qos(target_system_model,strategy);
         }
         solutions.push_back(strategy);
     }
 
     for (std::vector<std::map<std::string,double>>::iterator it = solutions.begin(); it != solutions.end(); it++){
         strategy = *it;
-        double r_new = calculate_qos(expression,strategy);
+        double r_new = calculate_qos(target_system_model,strategy);
 
         std::cout << "strategy: [";
         for (std::map<std::string,double>::iterator itt = (*it).begin(); itt != (*it).end(); ++itt) {
@@ -612,12 +612,12 @@ void Engine::plan_cost() {
     std::cout << "[plan]" << std::endl;
 
     std::cout << "c_ref= " << c_ref << std::endl;
-    double c_curr = calculate_qos(expression,strategy);
+    double c_curr = calculate_qos(target_system_model,strategy);
     std::cout << "c_curr= " << c_curr << std::endl;
     double error = c_ref - c_curr;
     std::cout << "error= " << error << std::endl;
 
-    //reset the formula
+    //reset the formula_str
     std::vector<std::string> c_vec;
     for (std::map<std::string,double>::iterator it = strategy.begin(); it != strategy.end(); ++it) {
         if(it->first.find("W_") != std::string::npos) {
@@ -686,7 +686,7 @@ void Engine::plan_cost() {
                 strategy[*it] = 0;
             }
         }
-        double c_new = calculate_qos(expression,strategy); // set offset
+        double c_new = calculate_qos(target_system_model,strategy); // set offset
         c_new /= sensor_num;
         std::cout << "offset=" << c_new << std::endl;
 
@@ -701,7 +701,7 @@ void Engine::plan_cost() {
                 } else {
                     strategy[*i] = 0;
                 }
-                c_new = calculate_qos(expression,strategy);
+                c_new = calculate_qos(target_system_model,strategy);
                 c_new /= sensor_num;
             } while(c_new < c_ref && c_prev < c_new && strategy[*i] > 0);
         } else if (error < 0){
@@ -713,13 +713,13 @@ void Engine::plan_cost() {
                 } else {
                     strategy[*i] = 0;
                 }
-                c_new = calculate_qos(expression,strategy);
+                c_new = calculate_qos(target_system_model,strategy);
                 c_new /= sensor_num;
             } while(c_new > c_ref && c_prev > c_new && strategy[*i] > 0);
         }
 
         strategy = prev;
-        c_new = calculate_qos(expression,strategy);
+        c_new = calculate_qos(target_system_model,strategy);
         c_new /= sensor_num;
 
         for(std::vector<std::string>::iterator j = c_vec.begin(); j != c_vec.end(); ++j) { // all the others
@@ -735,7 +735,7 @@ void Engine::plan_cost() {
                     } else {
                         strategy[*i] = 0;
                     }
-                    c_new = calculate_qos(expression,strategy);
+                    c_new = calculate_qos(target_system_model,strategy);
                     c_new /= sensor_num;
                 } while(c_new < c_ref && c_prev < c_new && strategy[*j] > 0);
             } else if (error < 0) {
@@ -747,13 +747,13 @@ void Engine::plan_cost() {
                     } else {
                         strategy[*i] = 0;
                     }
-                    c_new = calculate_qos(expression,strategy);
+                    c_new = calculate_qos(target_system_model,strategy);
                     c_new /= sensor_num;
                 } while(c_new > c_ref && c_prev > c_new && strategy[*j] > 0);
             }
             
             strategy = prev;
-            c_new = calculate_qos(expression,strategy);
+            c_new = calculate_qos(target_system_model,strategy);
             c_new /= sensor_num;
         }
 
@@ -776,7 +776,7 @@ void Engine::plan_cost() {
 
     for (std::vector<std::map<std::string,double>>::iterator it = solutions.begin(); it != solutions.end(); it++){
         strategy = *it;
-        double c_new = calculate_qos(expression,strategy);
+        double c_new = calculate_qos(target_system_model,strategy);
 
         std::cout << "strategy: [";
         for (std::map<std::string,double>::iterator itt = (*it).begin(); itt != (*it).end(); ++itt) {
@@ -809,11 +809,11 @@ void Engine::execute() {
     bool flag = false;  //nasty
     bool flagO = false; //uber nasty
     if(qos_attribute == "reliability") {
-        //get the reliabilities in the formula and send!
+        //get the reliabilities in the formula_str and send!
         // send in form "/g3t1_1:0.89;/g4t1=0.2;..."
         for (std::map<std::string,double>::iterator it = strategy.begin(); it != strategy.end(); ++it) {
             std::string aux = "";
-            if(it->first.find("R_") != std::string::npos) { //if it is a R_ term of the formula 
+            if(it->first.find("R_") != std::string::npos) { //if it is a R_ term of the formula_str 
                 aux += it->first;
                 std::transform(aux.begin(), aux.end(), aux.begin(), ::tolower);
 
@@ -836,11 +836,11 @@ void Engine::execute() {
             aux.clear();
         }
     } else {
-         //get the costs in the formula and send!
+         //get the costs in the formula_str and send!
         // send in form "/g3t1_1:0.89;/g4t1=0.2;..."
         for (std::map<std::string,double>::iterator it = strategy.begin(); it != strategy.end(); ++it) {
             std::string aux = "";
-            if(it->first.find("W_") != std::string::npos) { //if it is a W_ term of the formula 
+            if(it->first.find("W_") != std::string::npos) { //if it is a W_ term of the formula_str 
                 aux += it->first;
                 std::transform(aux.begin(), aux.end(), aux.begin(), ::tolower);
 
@@ -889,9 +889,9 @@ void Engine::body(){
         update++;
         if (update >= rosComponentDescriptor.getFreq()*10){
             update = 0;
-            std::string formula = fetch_formula(qos_attribute);
-            if(formula=="") continue;
-            setUp_formula(formula);
+            std::string formula_str = fetch_formula(qos_attribute);
+            if(formula_str=="") continue;
+            setUp_formula(formula_str);
         }
 
 

@@ -72,7 +72,7 @@ class Engine : public arch::ROSComponent {
 		double stability_margin;
 		std::string qos_attribute;
 
-		bsn::model::Formula expression;
+		bsn::model::Formula target_system_model;
 		std::map<std::string, double> strategy;
 		std::map<std::string, int> priority;
 		std::map<std::string, int> deactivatedComponents;
