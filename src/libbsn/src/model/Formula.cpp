@@ -32,6 +32,10 @@ namespace bsn {
             this->expression = newExpression;
         }
 
+        double Formula::evaluate(){
+            return apply(parameters,values);
+        }
+
         double Formula::apply(const std::vector<std::string> parameters, const std::vector<double> values) {
             if (parameters.size() != values.size()) throw std::length_error("ERROR: Parameters and values size do not correspond to each other.");
 

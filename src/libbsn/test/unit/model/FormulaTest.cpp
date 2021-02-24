@@ -43,12 +43,12 @@ TEST_F(FormulaTest, InvalidFormulaConstruction) {
 }
 
 
-TEST_F(FormulaTest, ApplyForOneParameterFormula) {
-    bsn::model::Formula formula("x+x");
+TEST_F(FormulaTest, EvaluateForOneParameterFormula) {
+    bsn::model::Formula formula("x+x",{"x"}, {2});
     double answer = 0;
 
     try {
-        answer = formula.apply({"x"}, {2});
+        answer = formula.evaluate();
 
     } catch (const std::exception& e){
         FAIL() << e.what();
@@ -57,43 +57,29 @@ TEST_F(FormulaTest, ApplyForOneParameterFormula) {
     ASSERT_EQ(answer, 4);
 }
 
-TEST_F(FormulaTest, ApplyNonExistentParameter) {
-    bsn::model::Formula formula("x+x");
+TEST_F(FormulaTest, EvaluateNonExistentParameter) {
+    bsn::model::Formula formula("x+x", {"y"}, {2});
     double answer = 0;
 
     try {
-        answer = formula.apply({"y"}, {2});
-        ASSERT_EQ(answer, 4);
+        answer = formula.evaluate();
+        FAIL();
     } catch (const std::exception&){
         ASSERT_TRUE(true);
     }
 }
 
-TEST_F(FormulaTest, ApplyForTwoParameterFormula) {
-    bsn::model::Formula formula("x+y");
+TEST_F(FormulaTest, EvaluateForTwoParameterFormula) {
     std::vector<std::string> parameters = {"x","y"};
     std::vector<double> values = {2,7};
+    bsn::model::Formula formula("x+y", parameters, values);
     double answer = 0;
 
     try {
-        answer = formula.apply(parameters, values);
+        answer = formula.evaluate();
     } catch (const std::exception& e){
         FAIL() << e.what();
     }
 
     ASSERT_EQ(answer, 9);
-}
-
-TEST_F(FormulaTest, ApplyForDistinctNumberOfParameters) {
-    bsn::model::Formula formula("x+y");
-    std::vector<std::string> parameters = {"x","y"};
-    std::vector<double> values = {2};
-    double answer = 0;
-
-    try {
-        answer = formula.apply(parameters, values);
-        ASSERT_EQ(answer, 4);
-    } catch (const std::length_error& e){
-        ASSERT_TRUE(true);   
-    }
 }
