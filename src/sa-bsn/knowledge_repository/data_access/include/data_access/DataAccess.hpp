@@ -102,12 +102,10 @@ class DataAccess : public arch::ROSComponent {
 		std::map<std::string, double> components_costs_engine, components_costs_enactor;
 		std::map<std::string, uint32_t> contexts;
 
-		bsn::model::Formula reliability_expression;
-		bsn::model::Formula cost_expression;
+		std::string reliability_formula;
+		std::string cost_formula;
 
 		double frequency;
-		double system_reliability;
-		double system_cost;
 		int32_t count_to_calc_and_reset;
 		int32_t arrived_status;
 };

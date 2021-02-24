@@ -18,18 +18,24 @@ Engine::Engine(int  &argc, char **argv, std::string name): ROSComponent(argc, ar
 Engine::~Engine() {}
 
 std::string fetch_formula(std::string name){
-    std::string formula;
+    ros::NodeHandle client_handler;
+    ros::ServiceClient client_module;
 
-    std::string path = ros::package::getPath("adaptation_engine");
-    std::string filename = "/formulae/" + name + ".formula";
+    client_module = client_handler.serviceClient<archlib::DataAccessRequest>("DataAccessRequest");
 
-    try{
-        std::ifstream file;
-        file.open(path + filename);
-        std::getline(file, formula);
-        file.close();
-    } catch (std::ifstream::failure e) { 
-        std::cerr << "Error: Could not load " + name +  " formula into memory\n"; 
+    archlib::DataAccessRequest r_srv;
+    r_srv.request.name = ros::this_node::getName();
+    r_srv.request.query = name + "_formula";
+
+    if(!client_module.call(r_srv)) {
+        ROS_ERROR("Tried to fetch formula, but Data Access is not responding.");
+        return "";
+    }
+    
+    std::string formula = r_srv.response.content;
+
+    if(formula == ""){
+        ROS_ERROR("ERROR: Empty formula received.");
     }
 
     return formula;
@@ -96,7 +102,6 @@ std::map<std::string, int> initialize_priority(std::vector<std::string> terms, i
    @return void
  */
 void Engine::setUp_formula(std::string formula) {
-
     expression = bsn::model::Formula(formula);
     
     // Extracts the terms that will compose the strategy
@@ -137,9 +142,6 @@ void Engine::setUp() {
 
     enact = handle.advertise<archlib::Strategy>("strategy", 10);
     energy_status = handle.advertise<archlib::EnergyStatus>("log_energy_status", 10);
-
-    std::string formula = fetch_formula(qos_attribute);
-    setUp_formula(formula);
 
     enactor_server = handle.advertiseService("EngineRequest", &Engine::sendAdaptationParameter, this);
 }
@@ -902,7 +904,15 @@ void Engine::body(){
     ros::Subscriber t_sub = n.subscribe("exception", 1000, &Engine::receiveException, this);
 
     ros::Rate loop_rate(rosComponentDescriptor.getFreq());
+    bool update=true;
     while (ros::ok){
+        if (update){
+            std::string formula = fetch_formula(qos_attribute);
+            if(formula=="") continue;
+            setUp_formula(formula);
+            update = false;
+        }
+
         if(qos_attribute == "reliability") {
             monitor_reli();
         } else if(qos_attribute == "cost") {

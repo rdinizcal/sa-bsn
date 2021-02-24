@@ -2,7 +2,7 @@
 
 #define W(x) std::cerr << #x << " = " << x << std::endl;
 
-DataAccess::DataAccess(int  &argc, char **argv, const std::string &name) : ROSComponent(argc, argv, name), fp(), event_filepath(), status_filepath(), logical_clock(0), statusVec(), eventVec(), status(), buffer_size() {}
+DataAccess::DataAccess(int  &argc, char **argv, const std::string &name) : ROSComponent(argc, argv, name), fp(), event_filepath(), status_filepath(), logical_clock(0), statusVec(), eventVec(), status(), buffer_size(), reliability_formula(), cost_formula() {}
 DataAccess::~DataAccess() {}
 
 int64_t DataAccess::now() const{
@@ -11,6 +11,25 @@ int64_t DataAccess::now() const{
 
 std::chrono::high_resolution_clock::time_point DataAccess::nowInSeconds() const {
     return std::chrono::high_resolution_clock::now();
+}
+
+std::string fetch_formula(std::string name){
+    std::string formula;
+    std::string path = ros::package::getPath("repository");
+
+    //std::string path = ros::package::getPath("adaptation_engine");
+    std::string filename = "/../resource/models/" + name + ".formula";
+
+    try{
+        std::ifstream file;
+        file.open(path + filename);
+        std::getline(file, formula);
+        file.close();
+    } catch (std::ifstream::failure e) { 
+        std::cerr << "Error: Could not load " + name +  " formula into memory\n"; 
+    }
+
+    return formula;
 }
 
 void DataAccess::setUp() {
@@ -49,28 +68,9 @@ void DataAccess::setUp() {
 
     buffer_size = 1000;
 
-    std::ifstream reliability_file, cost_file;
-    std::string reliability_formula, cost_formula;
-
-    try {
-        reliability_file.open(path + "/../resource/models/reliability.formula");
-        std::getline(reliability_file, reliability_formula);
-        reliability_file.close();
-    } catch (std::ifstream::failure e) {
-        std::cerr << "Exception opening/reading/closing file (reliability.formula)\n";
-    }
-
-    try {
-        cost_file.open(path + "/../resource/models/cost.formula");
-        std::getline(cost_file, cost_formula);
-        cost_file.close();
-    } catch (std::ifstream::failure e) {
-        std::cerr << "Exception opening/reading/closing file (cost.formula)\n";
-    }
-
-    cost_expression = bsn::model::Formula(cost_formula);
-    reliability_expression = bsn::model::Formula(reliability_formula);
-
+    reliability_formula = fetch_formula("reliability");
+    cost_formula = fetch_formula("cost");
+    
     count_to_calc_and_reset = 0;
     arrived_status = 0;
 
@@ -201,41 +201,52 @@ bool DataAccess::processQuery(archlib::DataAccessRequest::Request &req, archlib:
             // wait smth like "all:status:100" -> return the last 100 success and failures of all active modules
             std::vector<std::string> query = bsn::utils::split(req.query,':');
 
-            if (query[1] == "reliability") {
-                applyTimeWindow();
-                for (auto it : status) {
-                    res.content += calculateComponentReliability(it.first);
-                }
-            } else if (query[1] == "event") {
-                int num = stoi(query[2]);
+            if (query.size() == 1){
+                if (query[0] == "reliability_formula") {
+                    res.content = reliability_formula;
+                } else if (query[0] == "cost_formula") {
+                    res.content = cost_formula;
+                } 
+            }
 
-                for (std::map<std::string, std::deque<std::string>>::iterator it = events.begin(); it != events.end(); it++){
-                    std::string aux = it->first;
-                    aux += ":";
-                    bool flag = false;
-                    std::string content = "";
-                    for(int i = it->second.size()-num; i < it->second.size(); ++i){
-                        flag = true;
-                        aux += it->second[i];
-                        content += it->second[i];
-                        //if(i < num && i+1 < it->second.size()) 
-                        aux += ",";
+            if (query.size() > 1){
+                if (query[1] == "reliability") {
+                    applyTimeWindow();
+                    for (auto it : status) {
+                        res.content += calculateComponentReliability(it.first);
                     }
-                    aux += ";";
+                } else if (query[1] == "event") {
+                    int num = stoi(query[2]);
 
-                    if (flag) {
-                        std::string key = it->first;
-                        key = key.substr(1, key.size());
-                        contexts[key] = content == "activate" ? 1 : 0;
-                        res.content += aux;
+                    for (std::map<std::string, std::deque<std::string>>::iterator it = events.begin(); it != events.end(); it++){
+                        std::string aux = it->first;
+                        aux += ":";
+                        bool flag = false;
+                        std::string content = "";
+                        for(int i = it->second.size()-num; i < it->second.size(); ++i){
+                            flag = true;
+                            aux += it->second[i];
+                            content += it->second[i];
+                            //if(i < num && i+1 < it->second.size()) 
+                            aux += ",";
+                        }
+                        aux += ";";
+
+                        if (flag) {
+                            std::string key = it->first;
+                            key = key.substr(1, key.size());
+                            contexts[key] = content == "activate" ? 1 : 0;
+                            res.content += aux;
+                        }
                     }
-                }
-            } else if (query[1] == "cost") {
-                applyTimeWindow();
-                for (auto it : status) {
-                    res.content += calculateComponentCost(it.first, req.name);
+                } else if (query[1] == "cost") {
+                    applyTimeWindow();
+                    for (auto it : status) {
+                        res.content += calculateComponentCost(it.first, req.name);
+                    }
                 }
             }
+            
         } 
     } catch(...) {}
 	
