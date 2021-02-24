@@ -94,7 +94,7 @@ void Engine::setUp_formula(std::string formula) {
     } 
 
     // Initializes the expression
-    calculate_qos();
+    calculate_qos(expression,strategy);
 
     if(qos_attribute == "reliability") { 
         priority = initialize_priority(terms, 50, "R_");
@@ -169,21 +169,14 @@ void Engine::receiveException(const archlib::Exception::ConstPtr& msg){
 
 
 /**
- * Calculates the overall QoS attribute based on the strategy
- * @param strategy A map of formula terms and respective values
- * @param expression An algebraic expression that represents the QoS attribute
+ * Calculates the overall QoS attribute based on the expression and configuration of parameters
+ * @param expr An algebraic expression that represents the QoS attribute
+ * @param conf A map of the expression terms and values
  * @return The value of QoS attribute given the strategy
  */
-double Engine::calculate_qos() {
-    std::vector<std::string> keys;
-    std::vector<double> values;
-
-    for (std::map<std::string,double>::iterator it = strategy.begin(); it != strategy.end(); ++it) {
-        keys.push_back(it->first);
-        values.push_back(it->second);
-    }
-
-    return expression.apply(keys, values);
+double Engine::calculate_qos(bsn::model::Formula expr, std::map<std::string, double> conf) {
+    expr.setTermValueMap(conf);
+    return expr.evaluate();
 }
 
 /*bool Engine::blacklisted(std::map<std::string,double> &strat) {
@@ -432,7 +425,7 @@ void Engine::analyze() {
     double r_curr, c_curr;
     double error;
     if (qos_attribute == "reliability") {
-        r_curr = calculate_qos();
+        r_curr = calculate_qos(expression,strategy);
 
         error = r_ref - r_curr;
         // if the error is out of the stability margin, plan!
@@ -443,7 +436,7 @@ void Engine::analyze() {
             }
         }
     } else {
-        c_curr = calculate_qos();
+        c_curr = calculate_qos(expression,strategy);
         std::cout << "current system cost: " <<  c_curr << std::endl;
         
         archlib::EnergyStatus msg;
@@ -485,7 +478,7 @@ void Engine::plan_reli() {
     std::cout << "[reli plan]" << std::endl;
 
     std::cout << "r_ref= " << r_ref << std::endl;
-    double r_curr = calculate_qos();
+    double r_curr = calculate_qos(expression,strategy);
     std::cout << "r_curr= " << r_curr << std::endl;
     double error = r_ref - r_curr;
     std::cout << "error= " << error << std::endl;
@@ -539,7 +532,7 @@ void Engine::plan_reli() {
                 strategy[*it] = (r_curr*(1+offset)>1)?1:r_curr*(1+offset);
             }
         }
-        double r_new = calculate_qos();
+        double r_new = calculate_qos(expression,strategy);
         std::cout << "offset=" << r_new << std::endl;
 
         std::map<std::string,double> prev;
@@ -549,19 +542,19 @@ void Engine::plan_reli() {
                 prev = strategy;
                 r_prev = r_new;
                 strategy[*i] += Kp*error;
-                r_new = calculate_qos();
+                r_new = calculate_qos(expression,strategy);
             } while(r_new < r_ref && r_prev < r_new && strategy[*i] > 0 && strategy[*i] < 1);
         } else if (error < 0){
             do {
                 prev = strategy;
                 r_prev = r_new;
                 strategy[*i] += Kp*error;
-                r_new = calculate_qos();
+                r_new = calculate_qos(expression,strategy);
             } while(r_new > r_ref && r_prev > r_new && strategy[*i] > 0 && strategy[*i] < 1);
         }
 
         strategy = prev;
-        r_new = calculate_qos();
+        r_new = calculate_qos(expression,strategy);
 
         for(std::vector<std::string>::iterator j = r_vec.begin(); j != r_vec.end(); ++j) { // all the others
             if(*i == *j) continue;
@@ -572,26 +565,26 @@ void Engine::plan_reli() {
                     prev = strategy;
                     r_prev = r_new;
                     strategy[*j] += Kp*error;
-                    r_new = calculate_qos();
+                    r_new = calculate_qos(expression,strategy);
                 } while(r_new < r_ref && r_prev < r_new && strategy[*j] > 0 && strategy[*j] < 1);
             } else if (error < 0) {
                 do {
                     prev = strategy;
                     r_prev = r_new;
                     strategy[*j] += Kp*error;
-                    r_new = calculate_qos();
+                    r_new = calculate_qos(expression,strategy);
                 } while(r_new > r_ref && r_prev > r_new && strategy[*j] > 0 && strategy[*j] < 1);
             }
             
             strategy = prev;
-            r_new = calculate_qos();
+            r_new = calculate_qos(expression,strategy);
         }
         solutions.push_back(strategy);
     }
 
     for (std::vector<std::map<std::string,double>>::iterator it = solutions.begin(); it != solutions.end(); it++){
         strategy = *it;
-        double r_new = calculate_qos();
+        double r_new = calculate_qos(expression,strategy);
 
         std::cout << "strategy: [";
         for (std::map<std::string,double>::iterator itt = (*it).begin(); itt != (*it).end(); ++itt) {
@@ -619,7 +612,7 @@ void Engine::plan_cost() {
     std::cout << "[plan]" << std::endl;
 
     std::cout << "c_ref= " << c_ref << std::endl;
-    double c_curr = calculate_qos();
+    double c_curr = calculate_qos(expression,strategy);
     std::cout << "c_curr= " << c_curr << std::endl;
     double error = c_ref - c_curr;
     std::cout << "error= " << error << std::endl;
@@ -693,7 +686,7 @@ void Engine::plan_cost() {
                 strategy[*it] = 0;
             }
         }
-        double c_new = calculate_qos(); // set offset
+        double c_new = calculate_qos(expression,strategy); // set offset
         c_new /= sensor_num;
         std::cout << "offset=" << c_new << std::endl;
 
@@ -708,7 +701,7 @@ void Engine::plan_cost() {
                 } else {
                     strategy[*i] = 0;
                 }
-                c_new = calculate_qos();
+                c_new = calculate_qos(expression,strategy);
                 c_new /= sensor_num;
             } while(c_new < c_ref && c_prev < c_new && strategy[*i] > 0);
         } else if (error < 0){
@@ -720,13 +713,13 @@ void Engine::plan_cost() {
                 } else {
                     strategy[*i] = 0;
                 }
-                c_new = calculate_qos();
+                c_new = calculate_qos(expression,strategy);
                 c_new /= sensor_num;
             } while(c_new > c_ref && c_prev > c_new && strategy[*i] > 0);
         }
 
         strategy = prev;
-        c_new = calculate_qos();
+        c_new = calculate_qos(expression,strategy);
         c_new /= sensor_num;
 
         for(std::vector<std::string>::iterator j = c_vec.begin(); j != c_vec.end(); ++j) { // all the others
@@ -742,7 +735,7 @@ void Engine::plan_cost() {
                     } else {
                         strategy[*i] = 0;
                     }
-                    c_new = calculate_qos();
+                    c_new = calculate_qos(expression,strategy);
                     c_new /= sensor_num;
                 } while(c_new < c_ref && c_prev < c_new && strategy[*j] > 0);
             } else if (error < 0) {
@@ -754,13 +747,13 @@ void Engine::plan_cost() {
                     } else {
                         strategy[*i] = 0;
                     }
-                    c_new = calculate_qos();
+                    c_new = calculate_qos(expression,strategy);
                     c_new /= sensor_num;
                 } while(c_new > c_ref && c_prev > c_new && strategy[*j] > 0);
             }
             
             strategy = prev;
-            c_new = calculate_qos();
+            c_new = calculate_qos(expression,strategy);
             c_new /= sensor_num;
         }
 
@@ -783,7 +776,7 @@ void Engine::plan_cost() {
 
     for (std::vector<std::map<std::string,double>>::iterator it = solutions.begin(); it != solutions.end(); it++){
         strategy = *it;
-        double c_new = calculate_qos();
+        double c_new = calculate_qos(expression,strategy);
 
         std::cout << "strategy: [";
         for (std::map<std::string,double>::iterator itt = (*it).begin(); itt != (*it).end(); ++itt) {

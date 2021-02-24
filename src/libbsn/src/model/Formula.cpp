@@ -20,8 +20,11 @@ namespace bsn {
 
         Formula::~Formula() {};
 
+        Formula::Formula(const Formula &obj) : expression(obj.getExpression()), term_value(obj.getTermValueMap()) {}
+
         Formula& Formula::operator=(const Formula &obj) {
             expression = obj.getExpression();
+            term_value = obj.getTermValueMap();
             return (*this);
         }
 
@@ -69,22 +72,6 @@ namespace bsn {
             std::set<std::string> terms = expression.getVariables();
             std::vector<std::string> vec_terms(terms.begin(),terms.end());
             return vec_terms;
-        }
-        /**
-         * DEPRECATED
-         */ 
-        double Formula::apply(const std::vector<std::string> terms, const std::vector<double> values) {
-            if (terms.size() != values.size()) throw std::length_error("ERROR: terms and values size do not correspond to each other.");
-
-            std::vector<std::string>::const_iterator p_iter;
-            std::vector<double>::const_iterator v_iter;
-            for( p_iter = terms.begin(), v_iter = values.begin();
-                    p_iter != terms.end() && v_iter != values.end(); 
-                    ++p_iter, ++v_iter ) {
-                expression.getVariableReference(*p_iter) = *v_iter;
-            }
-
-            return expression.evaluate();
         }
     }
 }

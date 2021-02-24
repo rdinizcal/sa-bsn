@@ -30,7 +30,6 @@ namespace bsn {
 
                 double evaluate();
                 std::vector<std::string> getTerms();
-                double apply(const std::vector<std::string> terms, const std::vector<double> values);
 
             private:
                 Lepton::CompiledExpression expression;

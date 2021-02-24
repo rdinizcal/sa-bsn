@@ -59,7 +59,7 @@ class Engine : public arch::ROSComponent {
 		bool sendAdaptationParameter(archlib::EngineRequest::Request &req, archlib::EngineRequest::Response &res);
 
   	private:
-	  double calculate_qos();
+	  double calculate_qos(bsn::model::Formula, std::map<std::string, double>);
 	  bool blacklisted(std::map<std::string,double> &);
 
 	private:
