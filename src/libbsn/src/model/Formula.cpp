@@ -3,9 +3,14 @@
 namespace bsn {
     namespace model {
         
-        Formula::Formula(): expression() {};
-        Formula::Formula(const std::string& text) :expression() {
+        Formula::Formula(): expression(), parameters(), values() {};
+        Formula::Formula(const std::string& text) : expression(), parameters(), values() {
             expression = Lepton::Parser::parse(text).createCompiledExpression();
+        }
+        Formula::Formula(const std::string& text, const std::vector<std::string> _parameters, const std::vector<double> _values) : expression(), parameters(), values() {                       
+            expression = Lepton::Parser::parse(text).createCompiledExpression();
+            parameters = _parameters;
+            values = _values;
         }
 
         Formula::~Formula() {};

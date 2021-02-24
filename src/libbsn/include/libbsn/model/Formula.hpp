@@ -15,6 +15,7 @@ namespace bsn {
             public:
                 Formula();
                 Formula(const std::string& text);
+                Formula(const std::string& text, const std::vector<std::string> parameters, const std::vector<double> values);
                 ~Formula();
 
                 Formula(const Formula &);
@@ -26,6 +27,9 @@ namespace bsn {
 
             private:
                 Lepton::CompiledExpression expression;
+                std::vector<std::string> parameters;
+                std::vector<double> values;
+
         };
     }
 }

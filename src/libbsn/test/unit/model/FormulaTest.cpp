@@ -21,6 +21,18 @@ TEST_F(FormulaTest, SimpleConstruct) {
     ASSERT_TRUE(true);
 }
 
+TEST_F(FormulaTest, ConstructWithParametersAndValues) {
+
+    try {
+        bsn::model::Formula formula("x+y",{"x","y"},{1,2});
+    } catch (const std::exception& e){
+        FAIL() << e.what();
+    }
+
+    ASSERT_TRUE(true);
+}
+
+
 TEST_F(FormulaTest, ApplyForOneParameterFormula) {
     bsn::model::Formula formula("x+x");
     double answer = 0;
