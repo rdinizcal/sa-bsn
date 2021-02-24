@@ -7,7 +7,11 @@ namespace bsn {
         Formula::Formula(const std::string& text) : expression(), parameters(), values() {
             expression = Lepton::Parser::parse(text).createCompiledExpression();
         }
-        Formula::Formula(const std::string& text, const std::vector<std::string> _parameters, const std::vector<double> _values) : expression(), parameters(), values() {                       
+        Formula::Formula(const std::string& text, const std::vector<std::string> _parameters, const std::vector<double> _values) : expression(), parameters(), values() {
+            if (_parameters.size() > _values.size()) {
+                throw std::length_error("ERROR: There can't be more parameters than values.");
+            }
+
             expression = Lepton::Parser::parse(text).createCompiledExpression();
             parameters = _parameters;
             values = _values;

@@ -32,6 +32,16 @@ TEST_F(FormulaTest, ConstructWithParametersAndValues) {
     ASSERT_TRUE(true);
 }
 
+TEST_F(FormulaTest, InvalidFormulaConstruction) {
+
+    try {
+        bsn::model::Formula formula("x+y",{"x","y","z"},{1,2});
+        FAIL();
+    } catch (const std::length_error& e){
+        ASSERT_TRUE(true);
+    }
+}
+
 
 TEST_F(FormulaTest, ApplyForOneParameterFormula) {
     bsn::model::Formula formula("x+x");
