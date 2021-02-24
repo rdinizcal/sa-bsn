@@ -42,8 +42,27 @@ TEST_F(FormulaTest, InvalidFormulaConstruction) {
     }
 }
 
+TEST_F(FormulaTest, SetAndGetTerms) {
+    bsn::model::Formula formula("x+y");
+    std::vector<std::string> terms{"x","y"};
 
-TEST_F(FormulaTest, EvaluateForOneParameterFormula) {
+    formula.setTerms({"x","y"});
+    std::vector<std::string> returned_terms = formula.getTerms();
+
+    ASSERT_EQ(returned_terms, terms);
+}
+
+TEST_F(FormulaTest, SetAndGetValues) {
+    bsn::model::Formula formula("x+y");
+    std::vector<double> values{1,2};
+
+    formula.setValues(values);
+    std::vector<double> returned_values = formula.getValues();
+
+    ASSERT_EQ(returned_values, values);
+}
+
+TEST_F(FormulaTest, EvaluateForOneTermFormula) {
     bsn::model::Formula formula("x+x",{"x"}, {2});
     double answer = 0;
 
@@ -57,7 +76,7 @@ TEST_F(FormulaTest, EvaluateForOneParameterFormula) {
     ASSERT_EQ(answer, 4);
 }
 
-TEST_F(FormulaTest, EvaluateNonExistentParameter) {
+TEST_F(FormulaTest, EvaluateNonExistentTerm) {
     bsn::model::Formula formula("x+x", {"y"}, {2});
     double answer = 0;
 
@@ -69,7 +88,7 @@ TEST_F(FormulaTest, EvaluateNonExistentParameter) {
     }
 }
 
-TEST_F(FormulaTest, EvaluateForTwoParameterFormula) {
+TEST_F(FormulaTest, EvaluateForTwoTermFormula) {
     std::vector<std::string> terms = {"x","y"};
     std::vector<double> values = {2,7};
     bsn::model::Formula formula("x+y", terms, values);

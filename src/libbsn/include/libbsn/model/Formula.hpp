@@ -21,10 +21,17 @@ namespace bsn {
                 Formula(const Formula &);
                 Formula &operator=(const Formula &);
 
-                double evaluate();
-                double apply(const std::vector<std::string> terms, const std::vector<double> values);
                 Lepton::CompiledExpression getExpression() const;
                 void setExpression(const Lepton::CompiledExpression &);
+
+                std::vector<std::string> getTerms() const;
+                void setTerms(const std::vector<std::string> &);
+
+                std::vector<double> getValues() const;
+                void setValues(const std::vector<double> &);
+
+                double evaluate();
+                double apply(const std::vector<std::string> terms, const std::vector<double> values);
 
             private:
                 Lepton::CompiledExpression expression;

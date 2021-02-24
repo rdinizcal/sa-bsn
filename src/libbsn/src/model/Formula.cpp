@@ -32,6 +32,22 @@ namespace bsn {
             this->expression = newExpression;
         }
 
+        std::vector<std::string> Formula::getTerms() const{
+            return this->terms;
+        }
+
+        void Formula::setTerms(const std::vector<std::string> &terms){
+            this->terms = terms;
+        }
+
+        std::vector<double> Formula::getValues() const{
+            return this->values;
+        }
+
+        void Formula::setValues(const std::vector<double> &values){
+            this->values = values;
+        }
+
         double Formula::evaluate(){
             return apply(terms,values);
         }
