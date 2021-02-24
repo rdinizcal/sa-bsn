@@ -15,20 +15,20 @@ namespace bsn {
             public:
                 Formula();
                 Formula(const std::string& text);
-                Formula(const std::string& text, const std::vector<std::string> parameters, const std::vector<double> values);
+                Formula(const std::string& text, const std::vector<std::string> terms, const std::vector<double> values);
                 ~Formula();
 
                 Formula(const Formula &);
                 Formula &operator=(const Formula &);
 
                 double evaluate();
-                double apply(const std::vector<std::string> parameters, const std::vector<double> values);
+                double apply(const std::vector<std::string> terms, const std::vector<double> values);
                 Lepton::CompiledExpression getExpression() const;
                 void setExpression(const Lepton::CompiledExpression &);
 
             private:
                 Lepton::CompiledExpression expression;
-                std::vector<std::string> parameters;
+                std::vector<std::string> terms;
                 std::vector<double> values;
 
         };

@@ -21,7 +21,7 @@ TEST_F(FormulaTest, SimpleConstruct) {
     ASSERT_TRUE(true);
 }
 
-TEST_F(FormulaTest, ConstructWithParametersAndValues) {
+TEST_F(FormulaTest, ConstructWithTermsAndValues) {
 
     try {
         bsn::model::Formula formula("x+y",{"x","y"},{1,2});
@@ -70,9 +70,9 @@ TEST_F(FormulaTest, EvaluateNonExistentParameter) {
 }
 
 TEST_F(FormulaTest, EvaluateForTwoParameterFormula) {
-    std::vector<std::string> parameters = {"x","y"};
+    std::vector<std::string> terms = {"x","y"};
     std::vector<double> values = {2,7};
-    bsn::model::Formula formula("x+y", parameters, values);
+    bsn::model::Formula formula("x+y", terms, values);
     double answer = 0;
 
     try {
