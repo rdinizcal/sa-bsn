@@ -140,6 +140,14 @@ void Engine::setUp() {
     rosComponentDescriptor.setFreq(monitor_freq);
 	nh.getParam("actuation_freq", actuation_freq);
 
+    std::string formula = "";
+    do{
+        formula = fetch_formula(qos_attribute);
+        ros::Duration(1.0).sleep() ;
+    } while(formula=="");
+    
+    setUp_formula(formula);
+
     enact = handle.advertise<archlib::Strategy>("strategy", 10);
     energy_status = handle.advertise<archlib::EnergyStatus>("log_energy_status", 10);
 
@@ -445,7 +453,6 @@ void Engine::analyze() {
     double error;
     if (qos_attribute == "reliability") {
         r_curr = calculate_qos();
-        std::cout << "current system reliability: " <<  r_curr << std::endl;
 
         error = r_ref - r_curr;
         // if the error is out of the stability margin, plan!
@@ -904,14 +911,16 @@ void Engine::body(){
     ros::Subscriber t_sub = n.subscribe("exception", 1000, &Engine::receiveException, this);
 
     ros::Rate loop_rate(rosComponentDescriptor.getFreq());
-    bool update=true;
+    int update=0;
     while (ros::ok){
-        if (update){
+        update++;
+        if (update >= rosComponentDescriptor.getFreq()*10){
+            update = 0;
             std::string formula = fetch_formula(qos_attribute);
             if(formula=="") continue;
             setUp_formula(formula);
-            update = false;
         }
+
 
         if(qos_attribute == "reliability") {
             monitor_reli();

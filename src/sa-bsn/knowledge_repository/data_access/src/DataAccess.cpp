@@ -116,6 +116,7 @@ void DataAccess::processTargetSystemData(const messages::TargetSystemData::Const
 }
 
 void DataAccess::body() {
+    count_to_fetch++;
     count_to_calc_and_reset++;
     frequency = rosComponentDescriptor.getFreq();
 
@@ -126,6 +127,13 @@ void DataAccess::body() {
         }
 
         count_to_calc_and_reset = 0;
+    }
+
+    if (count_to_fetch >= frequency*10){
+        reliability_formula = fetch_formula("reliability");
+        cost_formula = fetch_formula("cost");
+
+        count_to_fetch = 0;
     }
 
     ros::spinOnce();

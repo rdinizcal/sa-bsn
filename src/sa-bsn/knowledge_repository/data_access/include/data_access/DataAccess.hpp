@@ -107,6 +107,7 @@ class DataAccess : public arch::ROSComponent {
 
 		double frequency;
 		int32_t count_to_calc_and_reset;
+		int32_t count_to_fetch;
 		int32_t arrived_status;
 };
 
