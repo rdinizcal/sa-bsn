@@ -2,7 +2,7 @@
 
 #define W(x) std::cerr << #x << " = " << x << std::endl;
 
-DataAccess::DataAccess(int  &argc, char **argv, const std::string &name) : ROSComponent(argc, argv, name), fp(), event_filepath(), status_filepath(), logical_clock(0), statusVec(), eventVec(), status(), buffer_size() {}
+DataAccess::DataAccess(int  &argc, char **argv, const std::string &name) : ROSComponent(argc, argv, name), fp(), event_filepath(), status_filepath(), logical_clock(0), statusVec(), eventVec(), status(), buffer_size(), reliability_formula(), cost_formula() {}
 DataAccess::~DataAccess() {}
 
 int64_t DataAccess::now() const{
@@ -11,6 +11,25 @@ int64_t DataAccess::now() const{
 
 std::chrono::high_resolution_clock::time_point DataAccess::nowInSeconds() const {
     return std::chrono::high_resolution_clock::now();
+}
+
+std::string fetch_formula(std::string name){
+    std::string formula;
+    std::string path = ros::package::getPath("repository");
+
+    //std::string path = ros::package::getPath("adaptation_engine");
+    std::string filename = "/../resource/models/" + name + ".formula";
+
+    try{
+        std::ifstream file;
+        file.open(path + filename);
+        std::getline(file, formula);
+        file.close();
+    } catch (std::ifstream::failure e) { 
+        std::cerr << "Error: Could not load " + name +  " formula into memory\n"; 
+    }
+
+    return formula;
 }
 
 void DataAccess::setUp() {
@@ -49,28 +68,9 @@ void DataAccess::setUp() {
 
     buffer_size = 1000;
 
-    std::ifstream reliability_file, cost_file;
-    std::string reliability_formula, cost_formula;
-
-    try {
-        reliability_file.open(path + "/../resource/models/reliability.formula");
-        std::getline(reliability_file, reliability_formula);
-        reliability_file.close();
-    } catch (std::ifstream::failure e) {
-        std::cerr << "Exception opening/reading/closing file (reliability.formula)\n";
-    }
-
-    try {
-        cost_file.open(path + "/../resource/models/cost.formula");
-        std::getline(cost_file, cost_formula);
-        cost_file.close();
-    } catch (std::ifstream::failure e) {
-        std::cerr << "Exception opening/reading/closing file (cost.formula)\n";
-    }
-
-    cost_expression = bsn::model::Formula(cost_formula);
-    reliability_expression = bsn::model::Formula(reliability_formula);
-
+    reliability_formula = fetch_formula("reliability");
+    cost_formula = fetch_formula("cost");
+    
     count_to_calc_and_reset = 0;
     arrived_status = 0;
 
@@ -115,75 +115,8 @@ void DataAccess::processTargetSystemData(const messages::TargetSystemData::Const
     components_batteries["g3t1_6"] = msg->glc_batt;
 }
 
-/*double DataAccess::calculateCost() {
-    std::vector<std::string> keys;
-    std::vector<double> values;
-    std::string context_key, formated_key, r_key, w_key, f_key;
-
-    for (auto x : components_costs) {
-        formated_key = x.first;
-        std::transform(formated_key.begin(), formated_key.end(), formated_key.begin(), ::toupper);
-        formated_key.insert(int(formated_key.find('T')), "_");
-
-        w_key = "W_" + formated_key;
-        keys.push_back(w_key);
-        values.push_back(x.second);
-    }
-
-    for (auto x : contexts) {
-        formated_key = x.first;
-        std::transform(formated_key.begin(), formated_key.end(), formated_key.begin(), ::toupper);
-        formated_key.insert(int(formated_key.find('T')), "_");
-
-        context_key = "CTX_" + formated_key;
-        keys.push_back(context_key);
-        values.push_back(x.second);
-
-        r_key = "R_" + formated_key;
-        keys.push_back(r_key);
-        values.push_back(1);
-
-        f_key = "F_" + formated_key;
-        keys.push_back(f_key);
-        values.push_back(1);
-    }
-
-    return cost_expression.apply(keys, values);
-}*/
-
-double DataAccess::calculateReliability() {
-    std::vector<std::string> keys;
-    std::vector<double> values;
-    std::string context_key, formated_key, r_key, f_key;
-
-    for (auto x : components_reliabilities) {
-        formated_key = x.first;
-        std::transform(formated_key.begin(), formated_key.end(), formated_key.begin(), ::toupper);
-        formated_key.insert(int(formated_key.find('T')), "_");
-
-        r_key = "R_" + formated_key;
-        keys.push_back(r_key);
-        values.push_back(x.second);
-    }
-
-    for (auto x : contexts) {
-        formated_key = x.first;
-        std::transform(formated_key.begin(), formated_key.end(), formated_key.begin(), ::toupper);
-        formated_key.insert(int(formated_key.find('T')), "_");
-
-        context_key = "CTX_" + formated_key;
-        keys.push_back(context_key);
-        values.push_back(x.second);
-
-        f_key = "F_" + formated_key;
-        keys.push_back(f_key);
-        values.push_back(1);
-    }
-
-    return reliability_expression.apply(keys, values);
-}
-
 void DataAccess::body() {
+    count_to_fetch++;
     count_to_calc_and_reset++;
     frequency = rosComponentDescriptor.getFreq();
 
@@ -192,12 +125,15 @@ void DataAccess::body() {
         for (auto component : status) {
             calculateComponentReliability(component.first);
         }
-        system_reliability = calculateReliability();
-        //updateCosts();
-        //system_cost = calculateCost();
-        //std::cout << "system cost: " << system_cost << '\n';
-        //updateBatteries();
+
         count_to_calc_and_reset = 0;
+    }
+
+    if (count_to_fetch >= frequency*10){
+        reliability_formula = fetch_formula("reliability");
+        cost_formula = fetch_formula("cost");
+
+        count_to_fetch = 0;
     }
 
     ros::spinOnce();
@@ -273,41 +209,52 @@ bool DataAccess::processQuery(archlib::DataAccessRequest::Request &req, archlib:
             // wait smth like "all:status:100" -> return the last 100 success and failures of all active modules
             std::vector<std::string> query = bsn::utils::split(req.query,':');
 
-            if (query[1] == "reliability") {
-                applyTimeWindow();
-                for (auto it : status) {
-                    res.content += calculateComponentReliability(it.first);
-                }
-            } else if (query[1] == "event") {
-                int num = stoi(query[2]);
+            if (query.size() == 1){
+                if (query[0] == "reliability_formula") {
+                    res.content = reliability_formula;
+                } else if (query[0] == "cost_formula") {
+                    res.content = cost_formula;
+                } 
+            }
 
-                for (std::map<std::string, std::deque<std::string>>::iterator it = events.begin(); it != events.end(); it++){
-                    std::string aux = it->first;
-                    aux += ":";
-                    bool flag = false;
-                    std::string content = "";
-                    for(int i = it->second.size()-num; i < it->second.size(); ++i){
-                        flag = true;
-                        aux += it->second[i];
-                        content += it->second[i];
-                        //if(i < num && i+1 < it->second.size()) 
-                        aux += ",";
+            if (query.size() > 1){
+                if (query[1] == "reliability") {
+                    applyTimeWindow();
+                    for (auto it : status) {
+                        res.content += calculateComponentReliability(it.first);
                     }
-                    aux += ";";
+                } else if (query[1] == "event") {
+                    int num = stoi(query[2]);
 
-                    if (flag) {
-                        std::string key = it->first;
-                        key = key.substr(1, key.size());
-                        contexts[key] = content == "activate" ? 1 : 0;
-                        res.content += aux;
+                    for (std::map<std::string, std::deque<std::string>>::iterator it = events.begin(); it != events.end(); it++){
+                        std::string aux = it->first;
+                        aux += ":";
+                        bool flag = false;
+                        std::string content = "";
+                        for(int i = it->second.size()-num; i < it->second.size(); ++i){
+                            flag = true;
+                            aux += it->second[i];
+                            content += it->second[i];
+                            //if(i < num && i+1 < it->second.size()) 
+                            aux += ",";
+                        }
+                        aux += ";";
+
+                        if (flag) {
+                            std::string key = it->first;
+                            key = key.substr(1, key.size());
+                            contexts[key] = content == "activate" ? 1 : 0;
+                            res.content += aux;
+                        }
                     }
-                }
-            } else if (query[1] == "cost") {
-                applyTimeWindow();
-                for (auto it : status) {
-                    res.content += calculateComponentCost(it.first, req.name);
+                } else if (query[1] == "cost") {
+                    applyTimeWindow();
+                    for (auto it : status) {
+                        res.content += calculateComponentCost(it.first, req.name);
+                    }
                 }
             }
+            
         } 
     } catch(...) {}
 	
@@ -470,25 +417,6 @@ std::string DataAccess::calculateComponentCost(const std::string& component, std
 
     return aux;
 }
-
-/*void DataAccess::updateBatteries() {
-    for (auto component : components_batteries) {
-        components_last_batteries[component.first] = component.second;
-    }
-}
-
-void DataAccess::updateCosts() {
-    for (auto component : components_batteries) {
-        components_costs[component.first] = 
-            components_last_batteries[component.first] - component.second;
-        
-        while(components_costs[component.first] < 0) {
-            components_costs[component.first] += 100;
-        }
-    }
-
-    updateBatteries();
-}*/
 
 void DataAccess::applyTimeWindow() {
     auto now = nowInSeconds();

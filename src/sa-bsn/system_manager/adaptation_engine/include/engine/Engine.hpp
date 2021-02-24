@@ -46,6 +46,7 @@ class Engine : public arch::ROSComponent {
     	virtual void tearDown();
 		virtual void body();
 
+		void setUp_formula(std::string formula);
 		void receiveException(const archlib::Exception::ConstPtr& msg);
 
 		void monitor_reli();
@@ -58,8 +59,7 @@ class Engine : public arch::ROSComponent {
 		bool sendAdaptationParameter(archlib::EngineRequest::Request &req, archlib::EngineRequest::Response &res);
 
   	private:
-	  double calculate_reli();
-	  double calculate_cost();
+	  double calculate_qos(bsn::model::Formula, std::map<std::string, double>);
 	  bool blacklisted(std::map<std::string,double> &);
 
 	private:
@@ -70,9 +70,9 @@ class Engine : public arch::ROSComponent {
 		double monitor_freq;
 		double actuation_freq;
 		double stability_margin;
-		std::string adaptation;
+		std::string qos_attribute;
 
-		bsn::model::Formula expression;
+		bsn::model::Formula target_system_model;
 		std::map<std::string, double> strategy;
 		std::map<std::string, int> priority;
 		std::map<std::string, int> deactivatedComponents;

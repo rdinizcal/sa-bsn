@@ -15,17 +15,26 @@ namespace bsn {
             public:
                 Formula();
                 Formula(const std::string& text);
+                Formula(const std::string& text, const std::vector<std::string> terms, const std::vector<double> values);
                 ~Formula();
 
                 Formula(const Formula &);
                 Formula &operator=(const Formula &);
 
-                double apply(const std::vector<std::string> parameters, const std::vector<double> values);
                 Lepton::CompiledExpression getExpression() const;
                 void setExpression(const Lepton::CompiledExpression &);
 
+                std::map<std::string,double> getTermValueMap() const;
+                void setTermValueMap(const std::vector<std::string> &, const std::vector<double> &);
+                void setTermValueMap(const std::map<std::string,double> &);
+
+                double evaluate();
+                std::vector<std::string> getTerms();
+
             private:
                 Lepton::CompiledExpression expression;
+                std::map<std::string,double> term_value;
+
         };
     }
 }
