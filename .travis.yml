@@ -132,7 +132,7 @@ script:
   # Run the tests, ensuring the path is set correctly.
   - source devel/setup.bash
   - catkin_make run_tests && catkin_test_results
-  - doxygen Doxyfile
+  - doxygen doxyfile
 
 deploy:
   provider: pages
