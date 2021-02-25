@@ -38,7 +38,6 @@
 #    OPTIONAL after_deploy
 
 ################################################################################
-
 sudo: required
 cache:
   - apt
@@ -50,6 +49,15 @@ matrix:
   - name: "Bionic melodic"
     dist: bionic
     env: ROS_DISTRO=melodic
+
+branches:
+  only:
+    - master
+
+addons:
+  apt:
+    packages:
+      - doxygen
 
 # Configuration variables. All variables are global now, but this can be used to
 # trigger a build matrix for different ROS distributions if desired.
@@ -124,3 +132,12 @@ script:
   # Run the tests, ensuring the path is set correctly.
   - source devel/setup.bash
   - catkin_make run_tests && catkin_test_results
+  - doxygen Doxyfile
+
+deploy:
+  provider: pages
+  skip_cleanup: true
+  local_dir: docs/html
+  github_token: $GH_REPO_TOKEN
+  on:
+    branch: master
