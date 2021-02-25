@@ -15,7 +15,7 @@ To compile and run the SA-BSN, follow the instructions (tested on Linux Ubuntu 1
 
 ### Build the SA-BSN
 
-_Jump this step if you are in our provided VM_
+_(Jump this step if you are in our provided VM)_
 
 #### **Dependencies**
 
@@ -101,5 +101,6 @@ Main Authors
 * [**Gabriel Levi**](https://github.com/gabrielevi10)
 * [**Léo Moraes**](https://github.com/leooleo)  
 * [**Eric B. Gil**](https://github.com/ericbg27)
+* [**Samuel Couto**](https://github.com/SCouto97)
 
 Adviser: [**Genaína N. Rodrigues**](https://cic.unb.br/~genaina)
