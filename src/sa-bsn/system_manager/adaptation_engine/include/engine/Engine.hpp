@@ -49,21 +49,17 @@ class Engine : public arch::ROSComponent {
 		void setUp_formula(std::string formula);
 		void receiveException(const archlib::Exception::ConstPtr& msg);
 
-		void monitor_reli();
-		void monitor_cost();
-    	void analyze();
-    	void plan_reli();
-		void plan_cost();
-    	void execute();
+		virtual void monitor() = 0;
+    	virtual void analyze() = 0;
+    	virtual void plan()    = 0;
+    	virtual void execute() = 0;
 
 		bool sendAdaptationParameter(archlib::EngineRequest::Request &req, archlib::EngineRequest::Response &res);
 
-  	private:
-	  double calculate_qos(bsn::model::Formula, std::map<std::string, double>);
-	  bool blacklisted(std::map<std::string,double> &);
+	  	double calculate_qos(bsn::model::Formula, std::map<std::string, double>);
+	  	bool blacklisted(std::map<std::string,double> &);
 
-	private:
-		double r_ref, c_ref;
+		double ref;
 		double offset;
 		double Kp;
 		double info_quant;
@@ -84,6 +80,7 @@ class Engine : public arch::ROSComponent {
 
 		int cycles;
 		int counter;
+	private:
 };
 
 #endif 

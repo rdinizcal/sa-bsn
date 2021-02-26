@@ -1,5 +1,5 @@
-#ifndef COSTENGINE_HPP
-#define COSTENGINE_HPP
+#ifndef RELIABILITYENGINE_HPP
+#define RELIABILITYENGINE_HPP
 
 #include <fstream>
 #include <sstream>
@@ -30,8 +30,9 @@
 #include "archlib/ROSComponent.hpp"
 #include "archlib/EngineRequest.h"
 
+#include "engine/Engine.hpp"
 
-class ReliabilityEngine : public arch::ROSComponent {
+class ReliabilityEngine : public Engine {
 	
 	public: 
 		ReliabilityEngine(int &argc, char **argv, std::string name);
@@ -42,46 +43,10 @@ class ReliabilityEngine : public arch::ROSComponent {
     	ReliabilityEngine &operator=(const ReliabilityEngine &);
 
   	public:
-        virtual void setUp();
-    	virtual void tearDown();
-		virtual void body();
-
-		void setUp_formula(std::string formula);
-		void receiveException(const archlib::Exception::ConstPtr& msg);
-
 		void monitor();
     	void analyze();
 		void plan();
     	void execute();
-
-		bool sendAdaptationParameter(archlib::EngineRequest::Request &req, archlib::EngineRequest::Response &res);
-
-  	private:
-	  double calculate_qos(bsn::model::Formula, std::map<std::string, double>);
-	  bool blacklisted(std::map<std::string,double> &);
-
-	private:
-		double c_ref;
-		double offset;
-		double Kp;
-		double info_quant;
-		double monitor_freq;
-		double actuation_freq;
-		double stability_margin;
-		std::string qos_attribute;
-
-		bsn::model::Formula target_system_model;
-		std::map<std::string, double> strategy;
-		std::map<std::string, int> priority;
-		std::map<std::string, int> deactivatedComponents;
-
-		ros::NodeHandle handle;
-		ros::Publisher enact;
-		ros::Publisher energy_status;
-		ros::ServiceServer enactor_server;
-
-		int cycles;
-		int counter;
 };
 
 #endif 

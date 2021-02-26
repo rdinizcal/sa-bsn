@@ -1,7 +1,6 @@
 <launch> 
-    <node name="engine" pkg="adaptation_engine" type="engine" output="screen" />
+    <node name="reli_engine" pkg="adaptation_engine" type="reli_engine" output="screen" />
 
-    <!--<param name="frequency" value="1" /> --> <!--1 Hz the module frequency is the same as the monitors--> 
     <param name="monitor_freq" value="1" />        <!-- Hz -->
 
     <param name="setpoint" value="0.9" />          <!-- -->
