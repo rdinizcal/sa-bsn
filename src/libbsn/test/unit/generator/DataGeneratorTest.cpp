@@ -80,3 +80,20 @@ TEST_F(DataGeneratorTest, NextState) {
     //should generate a value from state 0 (the next state according to transition matrix)
     ASSERT_TRUE(states[0].getLowerBound() <= x && x <= states[0].getUpperBound());
 }
+
+TEST_F(DataGeneratorTest, NextButSameState) {
+    transitions = {{
+                0,100,0,0,0,
+                0,0,100,0,0,
+                0,0,0,100,0,
+                0,0,0,0,100,
+                0,0,0,0,100}};
+    mk.transitions = transitions;
+    DataGenerator dg(mk);
+    
+    dg.nextState();
+    double x = dg.getValue();
+
+    //should generate a value from state 0 (the next state according to transition matrix)
+    ASSERT_TRUE(states[4].getLowerBound() <= x && x <= states[4].getUpperBound());
+}
