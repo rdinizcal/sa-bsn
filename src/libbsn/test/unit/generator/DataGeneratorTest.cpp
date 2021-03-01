@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <stdint.h>
+#include <stdexcept>
 
 #include "libbsn/generator/DataGenerator.hpp"
 #include "libbsn/generator/Markov.hpp"
@@ -52,4 +53,16 @@ TEST_F(DataGeneratorTest, GetValueWithWrongCurrentState) {
     double x = dg.getValue();
 
     ASSERT_FALSE(states[wrong_state].getLowerBound() <= x && x <= states[wrong_state].getUpperBound());
+}
+
+TEST_F(DataGeneratorTest, GetValueWithOutOfBoundsState) {
+    mk.currentState = 10;
+    DataGenerator dg(mk);
+    
+    try{
+        double x = dg.getValue();
+        FAIL();
+    } catch (const std::exception& e) {
+        ASSERT_TRUE(true);
+    }
 }
