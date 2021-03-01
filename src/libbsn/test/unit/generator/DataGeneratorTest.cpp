@@ -34,7 +34,12 @@ class DataGeneratorTest : public testing::Test {
 TEST_F(DataGeneratorTest, GetValue) {
     DataGenerator dg(mk);
     
-    double x = dg.getValue();
+    for(int i=0; i < 10; i++){
+        double x = dg.getValue();
+        if ( !(states[4].getLowerBound() <= x && x <= states[4].getUpperBound()) )
+            FAIL();
+            return;
+    }
 
-    ASSERT_TRUE(12 <= x && x <= 13);
+    ASSERT_TRUE(true);
 }
