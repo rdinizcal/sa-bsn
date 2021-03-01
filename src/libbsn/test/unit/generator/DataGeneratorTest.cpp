@@ -12,8 +12,9 @@ class DataGeneratorTest : public testing::Test {
     protected:
         std::array<float,25> transitions;
         std::array<Range, 5> states;
+        Markov mk;
 
-        DataGeneratorTest() : transitions(), states() {}
+        DataGeneratorTest() : transitions(), states(), mk() {}
 
         virtual void SetUp() {
             transitions = {{
@@ -24,17 +25,16 @@ class DataGeneratorTest : public testing::Test {
                 100,0,0,0,0}};
 
             states = {{Range(1, 3), Range(4, 6), Range(7, 9), Range(10, 11), Range(12, 13)}};
+            mk.transitions = transitions;
+            mk.states = states;
+            mk.currentState = 4;
         }
 };
 
 TEST_F(DataGeneratorTest, GetValue) {
-    Markov m4;
-    m4.transitions = transitions;
-    m4.states = states;
-    m4.currentState = 4;
-
-    DataGenerator dg(m4);
+    DataGenerator dg(mk);
     
     double x = dg.getValue();
+
     ASSERT_TRUE(12 <= x && x <= 13);
 }
