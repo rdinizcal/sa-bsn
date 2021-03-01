@@ -43,3 +43,13 @@ TEST_F(DataGeneratorTest, GetValue) {
 
     ASSERT_TRUE(true);
 }
+
+TEST_F(DataGeneratorTest, GetValueWithWrongCurrentState) {
+    mk.currentState = 3;
+    int wrong_state = 4;
+    DataGenerator dg(mk);
+    
+    double x = dg.getValue();
+
+    ASSERT_FALSE(states[wrong_state].getLowerBound() <= x && x <= states[wrong_state].getUpperBound());
+}
