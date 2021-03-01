@@ -43,10 +43,31 @@ class CostEngine : public Engine {
     	CostEngine &operator=(const CostEngine &);
 
   	public:
+        void setUp();
+    	void tearDown();
+
+		std::string get_prefix();
+
+		std::map<std::string, int> initialize_priority(std::vector<std::string>);
+		std::map<std::string, double> initialize_strategy(std::vector<std::string>);
+
 		void monitor();
     	void analyze();
 		void plan();
     	void execute();
+
+	private: 
+        double setpoint;
+		double offset;
+		double gain;
+		double tolerance;
+
+        int cycles;
+
+		std::string prefix;
+
+		ros::Publisher enact;
+		ros::Publisher energy_status;
 };
 
 #endif 

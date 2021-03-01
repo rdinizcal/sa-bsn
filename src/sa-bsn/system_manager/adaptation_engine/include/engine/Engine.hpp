@@ -46,41 +46,37 @@ class Engine : public arch::ROSComponent {
     	virtual void tearDown();
 		virtual void body();
 
-		void setUp_formula(std::string formula);
 		void receiveException(const archlib::Exception::ConstPtr& msg);
+		bool sendAdaptationParameter(archlib::EngineRequest::Request &req, archlib::EngineRequest::Response &res);
+
+		virtual std::string get_prefix() = 0;
+		virtual std::map<std::string, int> initialize_priority(std::vector<std::string>) = 0;
+		virtual std::map<std::string, double> initialize_strategy(std::vector<std::string>) = 0;
+		std::string fetch_formula(std::string);
+		void setUp_formula(std::string formula);
+
+	  	double calculate_qos(bsn::model::Formula, std::map<std::string, double>);
+	  	bool blacklisted(std::map<std::string,double> &);
 
 		virtual void monitor() = 0;
     	virtual void analyze() = 0;
     	virtual void plan()    = 0;
     	virtual void execute() = 0;
 
-		bool sendAdaptationParameter(archlib::EngineRequest::Request &req, archlib::EngineRequest::Response &res);
+	private: 
+		std::string qos_attribute;
 
-	  	double calculate_qos(bsn::model::Formula, std::map<std::string, double>);
-	  	bool blacklisted(std::map<std::string,double> &);
-
-		double ref;
-		double offset;
-		double Kp;
+	public:
 		double info_quant;
 		double monitor_freq;
 		double actuation_freq;
-		double stability_margin;
-		std::string qos_attribute;
 
 		bsn::model::Formula target_system_model;
 		std::map<std::string, double> strategy;
 		std::map<std::string, int> priority;
 		std::map<std::string, int> deactivatedComponents;
 
-		ros::NodeHandle handle;
-		ros::Publisher enact;
-		ros::Publisher energy_status;
 		ros::ServiceServer enactor_server;
-
-		int cycles;
-		int counter;
-	private:
 };
 
 #endif 

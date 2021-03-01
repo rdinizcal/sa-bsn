@@ -13,9 +13,60 @@ struct comp{
     }
 };
 
-ReliabilityEngine::ReliabilityEngine(int  &argc, char **argv, std::string name): Engine(argc, argv, name) {}
+ReliabilityEngine::ReliabilityEngine(int  &argc, char **argv, std::string name): Engine(argc, argv, name), setpoint(), offset(), gain(), tolerance(0.02), prefix("R_"), enact() {}
 
 ReliabilityEngine::~ReliabilityEngine() {}
+
+void ReliabilityEngine::setUp() {
+    Engine::setUp();
+    ros::NodeHandle handle;
+    handle.getParam("setpoint", setpoint);
+	handle.getParam("offset", offset);
+	handle.getParam("gain", gain);
+
+    enact = handle.advertise<archlib::Strategy>("strategy", 10);
+}
+
+void ReliabilityEngine::tearDown() {
+    Engine::tearDown();
+}
+
+std::string ReliabilityEngine::get_prefix() {
+    return prefix;
+}
+
+
+/**
+   Returns an initialized strategy with init_value values.
+   @param terms The terms that compose the strategy.
+   @return The map containing terms of the formula and initial values.
+ */
+std::map<std::string, double> ReliabilityEngine::initialize_strategy(std::vector<std::string> terms){
+    std::map<std::string, double> strategy;
+    
+    for (std::vector<std::string>::iterator it = terms.begin(); it != terms.end(); ++it) {
+        strategy[*it] = 1;
+    }
+
+    return strategy;
+}
+
+/**
+   Returns an initialized priorities vector with init_value values.
+   @param terms The terms that compose the strategy.
+   @return The map containing terms of the formula and initial values.
+ */
+std::map<std::string, int> ReliabilityEngine::initialize_priority(std::vector<std::string> terms) {
+    std::map<std::string, int> priority;
+    
+    for (std::vector<std::string>::iterator it = terms.begin(); it != terms.end(); ++it) {
+        if((*it).find("R_") != std::string::npos) {
+            priority[*it] = 50;
+        }
+    }
+
+    return priority;
+}
 
 void ReliabilityEngine::monitor() {
     std::cout << "[monitoring]" << std::endl;
@@ -136,9 +187,9 @@ void ReliabilityEngine::analyze() {
 
     r_curr = calculate_qos(target_system_model,strategy);
 
-    error = ref - r_curr;
+    error = setpoint - r_curr;
     // if the error is out of the stability margin, plan!
-    if ((error > ref * stability_margin) || (error < -stability_margin * ref)) {
+    if ((error > setpoint * tolerance) || (error < -tolerance * setpoint)) {
         if (cycles >= monitor_freq / actuation_freq) {
             cycles = 0;
             plan();
@@ -150,10 +201,10 @@ void ReliabilityEngine::analyze() {
 void ReliabilityEngine::plan() {
     std::cout << "[reli plan]" << std::endl;
 
-    std::cout << "ref= " << ref << std::endl;
+    std::cout << "setpoint= " << setpoint << std::endl;
     double r_curr = calculate_qos(target_system_model,strategy);
     std::cout << "r_curr= " << r_curr << std::endl;
-    double error = ref - r_curr;
+    double error = setpoint - r_curr;
     std::cout << "error= " << error << std::endl;
 
     //reset the formula_str
@@ -214,16 +265,16 @@ void ReliabilityEngine::plan() {
             do {
                 prev = strategy;
                 r_prev = r_new;
-                strategy[*i] += Kp*error;
+                strategy[*i] += gain*error;
                 r_new = calculate_qos(target_system_model,strategy);
-            } while(r_new < ref && r_prev < r_new && strategy[*i] > 0 && strategy[*i] < 1);
+            } while(r_new < setpoint && r_prev < r_new && strategy[*i] > 0 && strategy[*i] < 1);
         } else if (error < 0){
             do {
                 prev = strategy;
                 r_prev = r_new;
-                strategy[*i] += Kp*error;
+                strategy[*i] += gain*error;
                 r_new = calculate_qos(target_system_model,strategy);
-            } while(r_new > ref && r_prev > r_new && strategy[*i] > 0 && strategy[*i] < 1);
+            } while(r_new > setpoint && r_prev > r_new && strategy[*i] > 0 && strategy[*i] < 1);
         }
 
         strategy = prev;
@@ -237,16 +288,16 @@ void ReliabilityEngine::plan() {
                 do {
                     prev = strategy;
                     r_prev = r_new;
-                    strategy[*j] += Kp*error;
+                    strategy[*j] += gain*error;
                     r_new = calculate_qos(target_system_model,strategy);
-                } while(r_new < ref && r_prev < r_new && strategy[*j] > 0 && strategy[*j] < 1);
+                } while(r_new < setpoint && r_prev < r_new && strategy[*j] > 0 && strategy[*j] < 1);
             } else if (error < 0) {
                 do {
                     prev = strategy;
                     r_prev = r_new;
-                    strategy[*j] += Kp*error;
+                    strategy[*j] += gain*error;
                     r_new = calculate_qos(target_system_model,strategy);
-                } while(r_new > ref && r_prev > r_new && strategy[*j] > 0 && strategy[*j] < 1);
+                } while(r_new > setpoint && r_prev > r_new && strategy[*j] > 0 && strategy[*j] < 1);
             }
             
             strategy = prev;
@@ -267,7 +318,7 @@ void ReliabilityEngine::plan() {
         }
         std::cout << "] = " << r_new << std::endl;
 
-        if(/*!blacklisted(*it) && */(r_new > ref*(1-stability_margin) && r_new < ref*(1+stability_margin))){ // if not listed and converges, yay!
+        if(/*!blacklisted(*it) && */(r_new > setpoint*(1-tolerance) && r_new < setpoint*(1+tolerance))){ // if not listed and converges, yay!
             execute();
             return;
         }

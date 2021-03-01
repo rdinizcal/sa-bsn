@@ -13,9 +13,61 @@ struct comp{
     }
 };
 
-CostEngine::CostEngine(int  &argc, char **argv, std::string name): Engine(argc, argv, name) {}
+CostEngine::CostEngine(int  &argc, char **argv, std::string name): Engine(argc, argv, name), setpoint(), offset(), gain(), tolerance(0.02), prefix("W_"), enact(), energy_status() {}
 
 CostEngine::~CostEngine() {}
+
+void CostEngine::setUp() {
+    Engine::setUp();
+    ros::NodeHandle handle;
+    handle.getParam("setpoint", setpoint);
+	handle.getParam("offset", offset);
+	handle.getParam("gain", gain);
+
+    enact = handle.advertise<archlib::Strategy>("strategy", 10);
+}
+
+void CostEngine::tearDown() {
+    Engine::tearDown();
+}
+
+
+std::string CostEngine::get_prefix() {
+    return prefix;
+}
+
+/**
+   Returns an initialized strategy with init_value values.
+   @param terms The terms that compose the strategy.
+   @return The map containing terms of the formula and initial values.
+ */
+std::map<std::string, double> CostEngine::initialize_strategy(std::vector<std::string> terms){
+    std::map<std::string, double> strategy;
+    
+    for (std::vector<std::string>::iterator it = terms.begin(); it != terms.end(); ++it) {
+        strategy[*it] = 0;
+    }
+
+    return strategy;
+}
+
+/**
+   Returns an initialized priorities vector with init_value values.
+   @param terms The terms that compose the strategy.
+   @param prefix A prefix of the term (e.g., R_ for reliability and W_ for cost).
+   @return The map containing terms of the formula and initial values.
+ */
+std::map<std::string, int> CostEngine::initialize_priority(std::vector<std::string> terms) {
+    std::map<std::string, int> priority;
+    
+    for (std::vector<std::string>::iterator it = terms.begin(); it != terms.end(); ++it) {
+        if((*it).find("W_") != std::string::npos) {
+            priority[*it] = 50;
+        }
+    }
+
+    return priority;
+}
 
 void CostEngine::monitor() {
     std::cout << "[monitoring]" << std::endl;
@@ -155,9 +207,9 @@ void CostEngine::analyze() {
 
     energy_status.publish(msg);
 
-    error = ref - c_curr;
+    error = setpoint - c_curr;
     // if the error is out of the stability margin, plan!
-    if ((error > ref * stability_margin) || (error < -stability_margin * ref)) {
+    if ((error > setpoint * tolerance) || (error < -tolerance * setpoint)) {
         if (cycles >= monitor_freq / actuation_freq) {
             cycles = 0;
             plan();
@@ -168,10 +220,10 @@ void CostEngine::analyze() {
 void CostEngine::plan() {
     std::cout << "[plan]" << std::endl;
 
-    std::cout << "ref= " << ref << std::endl;
+    std::cout << "setpoint= " << setpoint << std::endl;
     double c_curr = calculate_qos(target_system_model,strategy);
     std::cout << "c_curr= " << c_curr << std::endl;
-    double error = ref - c_curr;
+    double error = setpoint - c_curr;
     std::cout << "error= " << error << std::endl;
 
     //reset the formula_str
@@ -204,9 +256,9 @@ void CostEngine::plan() {
         }
     }
 
-    //Divide error and ref by the number of sensors
+    //Divide error and setpoint by the number of sensors
     error /= sensor_num; 
-    ref /= sensor_num;
+    setpoint /= sensor_num;
 
     //reorder r_vec based on priority
     std::vector<std::string> aux = c_vec;
@@ -254,25 +306,25 @@ void CostEngine::plan() {
                 prev = strategy;
                 c_prev = c_new;
                 if(*i != "W_G4_T1") {
-                    strategy[*i] += Kp*error;
+                    strategy[*i] += gain*error;
                 } else {
                     strategy[*i] = 0;
                 }
                 c_new = calculate_qos(target_system_model,strategy);
                 c_new /= sensor_num;
-            } while(c_new < ref && c_prev < c_new && strategy[*i] > 0);
+            } while(c_new < setpoint && c_prev < c_new && strategy[*i] > 0);
         } else if (error < 0){
             do {
                 prev = strategy;
                 c_prev = c_new;
                 if(*i != "W_G4_T1") {
-                    strategy[*i] += Kp*error;
+                    strategy[*i] += gain*error;
                 } else {
                     strategy[*i] = 0;
                 }
                 c_new = calculate_qos(target_system_model,strategy);
                 c_new /= sensor_num;
-            } while(c_new > ref && c_prev > c_new && strategy[*i] > 0);
+            } while(c_new > setpoint && c_prev > c_new && strategy[*i] > 0);
         }
 
         strategy = prev;
@@ -288,25 +340,25 @@ void CostEngine::plan() {
                     prev = strategy;
                     c_prev = c_new;
                     if(*j != "W_G4_T1") {
-                        strategy[*j] += Kp*error;
+                        strategy[*j] += gain*error;
                     } else {
                         strategy[*i] = 0;
                     }
                     c_new = calculate_qos(target_system_model,strategy);
                     c_new /= sensor_num;
-                } while(c_new < ref && c_prev < c_new && strategy[*j] > 0);
+                } while(c_new < setpoint && c_prev < c_new && strategy[*j] > 0);
             } else if (error < 0) {
                 do {
                     prev = strategy;
                     c_prev = c_new;
                     if(*i != "W_G4_T1") {
-                        strategy[*i] += Kp*error;
+                        strategy[*i] += gain*error;
                     } else {
                         strategy[*i] = 0;
                     }
                     c_new = calculate_qos(target_system_model,strategy);
                     c_new /= sensor_num;
-                } while(c_new > ref && c_prev > c_new && strategy[*j] > 0);
+                } while(c_new > setpoint && c_prev > c_new && strategy[*j] > 0);
             }
             
             strategy = prev;
@@ -329,7 +381,7 @@ void CostEngine::plan() {
         }
     }
 
-    ref *= sensor_num;
+    setpoint *= sensor_num;
 
     for (std::vector<std::map<std::string,double>>::iterator it = solutions.begin(); it != solutions.end(); it++){
         strategy = *it;
@@ -343,7 +395,7 @@ void CostEngine::plan() {
         }
         std::cout << "] = " << c_new << std::endl;
 
-        if(/*!blacklisted(*it) && */(c_new > ref*(1-stability_margin) && c_new < ref*(1+stability_margin))){ // if not listed and converges, yay!
+        if(/*!blacklisted(*it) && */(c_new > setpoint*(1-tolerance) && c_new < setpoint*(1+tolerance))){ // if not listed and converges, yay!
             execute();
             return;
         }

@@ -2,104 +2,14 @@
 
 using namespace bsn::goalmodel;
 
-Engine::Engine(int  &argc, char **argv, std::string name): ROSComponent(argc, argv, name), ref(0.9), stability_margin(0.02), offset(0), info_quant(0), monitor_freq(1), actuation_freq(1), target_system_model(), strategy(),  priority(),  Kp(0.01), cycles(0) {}
+Engine::Engine(int  &argc, char **argv, std::string name): ROSComponent(argc, argv, name), info_quant(0), monitor_freq(1), actuation_freq(1), target_system_model(), strategy(),  priority() {}
 
 Engine::~Engine() {}
 
-std::string fetch_formula(std::string name){
-    ros::NodeHandle client_handler;
-    ros::ServiceClient client_module;
-
-    client_module = client_handler.serviceClient<archlib::DataAccessRequest>("DataAccessRequest");
-
-    archlib::DataAccessRequest r_srv;
-    r_srv.request.name = "/engine";
-    r_srv.request.query = name + "_formula";
-
-    if(!client_module.call(r_srv)) {
-        ROS_ERROR("Tried to fetch formula string, but Data Access is not responding.");
-        return "";
-    }
-    
-    std::string formula_str = r_srv.response.content;
-
-    if(formula_str == ""){
-        ROS_ERROR("ERROR: Empty formula string received.");
-    }
-
-    return formula_str;
-}
-
-/**
-   Returns an initialized strategy with init_value values.
-   @param terms The terms that compose the strategy.
-   @param init_value Is the value that will be used to initialize the strategy.
-   @return The map containing terms of the formula and initial values.
- */
-std::map<std::string, double> initialize_strategy(std::vector<std::string> terms, double init_value){
-    std::map<std::string, double> strategy;
-    
-    for (std::vector<std::string>::iterator it = terms.begin(); it != terms.end(); ++it) {
-        strategy[*it] = init_value;
-    }
-
-    return strategy;
-}
-
-/**
-   Returns an initialized priorities vector with init_value values.
-   @param terms The terms that compose the strategy.
-   @param init_value Is the value that will be used to initialize the strategy.
-   @param prefix A prefix of the term (e.g., R_ for reliability and W_ for cost).
-   @return The map containing terms of the formula and initial values.
- */
-std::map<std::string, int> initialize_priority(std::vector<std::string> terms, int init_value, std::string prefix) {
-    std::map<std::string, int> priority;
-    
-    for (std::vector<std::string>::iterator it = terms.begin(); it != terms.end(); ++it) {
-        if((*it).find(prefix) != std::string::npos) {
-            priority[*it] = init_value;
-        }
-    }
-
-    return priority;
-}
-
-/**
-   Sets up formula-related structures (i.e, target system model, strategy, and priority)
-   @param formula_str A string containing the algebraic formula.
-   @return void
- */
-void Engine::setUp_formula(std::string formula_str) {
-    target_system_model = bsn::model::Formula(formula_str);
-    
-    // Extracts the terms that will compose the strategy
-    std::vector<std::string> terms = target_system_model.getTerms();
-
-    if(qos_attribute == "reliability") { 
-        strategy = initialize_strategy(terms, 1);
-    } else {
-        strategy = initialize_strategy(terms, 0);
-    } 
-
-    // Initializes the target system model
-    calculate_qos(target_system_model,strategy);
-
-    if(qos_attribute == "reliability") { 
-        priority = initialize_priority(terms, 50, "R_");
-    } else {
-        priority = initialize_priority(terms, 50, "W_");
-    }
-
-    return;
-}
 
 void Engine::setUp() {
     ros::NodeHandle handle;
     handle.getParam("qos_attribute", qos_attribute);
-    handle.getParam("setpoint", ref);
-	handle.getParam("offset", offset);
-	handle.getParam("gain", Kp);
 	handle.getParam("info_quant", info_quant);
 	handle.getParam("monitor_freq", monitor_freq);
 	handle.getParam("actuation_freq", actuation_freq);
@@ -113,9 +23,6 @@ void Engine::setUp() {
     } while(formula_str=="");
     
     setUp_formula(formula_str);
-
-    enact = handle.advertise<archlib::Strategy>("strategy", 10);
-    energy_status = handle.advertise<archlib::EnergyStatus>("log_energy_status", 10);
 
     enactor_server = handle.advertiseService("EngineRequest", &Engine::sendAdaptationParameter, this);
 }
@@ -138,11 +45,7 @@ void Engine::receiveException(const archlib::Exception::ConstPtr& msg){
     std::transform(first.begin(), first.end(),first.begin(), ::toupper); // /G3T1_1
     first.erase(0,1); // G3T1_1
     first.insert(int(first.find('T')), "_"); // G3_T1_1
-    if(qos_attribute == "reliability") {
-        first = "R_" + first; 
-    } else {
-        first = "W_" + first;
-    }
+    first = get_prefix() + first; 
 
     if (priority.find(first) != priority.end()) {
         priority[first] += stoi(param[1]);
@@ -153,6 +56,48 @@ void Engine::receiveException(const archlib::Exception::ConstPtr& msg){
     }
 }
 
+/**
+   Sets up formula-related structures (i.e, target system model, strategy, and priority)
+   @param formula_str A string containing the algebraic formula.
+   @return void
+ */
+void Engine::setUp_formula(std::string formula_str) {
+    target_system_model = bsn::model::Formula(formula_str);
+    
+    // Extracts the terms that will compose the strategy
+    std::vector<std::string> terms = target_system_model.getTerms();
+    strategy = initialize_strategy(terms);
+    // Initializes the target system model
+    calculate_qos(target_system_model,strategy);
+    priority = initialize_priority(terms);
+
+    return;
+}
+
+
+std::string Engine::fetch_formula(std::string name){
+    ros::NodeHandle client_handler;
+    ros::ServiceClient client_module;
+
+    client_module = client_handler.serviceClient<archlib::DataAccessRequest>("DataAccessRequest");
+
+    archlib::DataAccessRequest r_srv;
+    r_srv.request.name = "/engine";
+    r_srv.request.query = name + "_formula";
+
+    if(!client_module.call(r_srv)) {
+        ROS_ERROR("Tried to fetch formula string, but Data Access is not responding.");
+        return "";
+    }
+    
+    std::string formula_str = r_srv.response.content;
+
+    if(formula_str == ""){
+        ROS_ERROR("ERROR: Empty formula string received.");
+    }
+
+    return formula_str;
+}
 
 /**
  * Calculates the overall QoS attribute based on the target system model and configuration of parameters
