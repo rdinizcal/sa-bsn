@@ -66,3 +66,17 @@ TEST_F(DataGeneratorTest, GetValueWithOutOfBoundsState) {
         ASSERT_TRUE(true);
     }
 }
+
+TEST_F(DataGeneratorTest, NextState) {
+    DataGenerator dg(mk);
+    
+    dg.nextState();
+    /* Ideally:
+     * ASSERT_TRUE(dg.markovChain.getCurrentState()==0);
+     * but dg.markovChain is not accessible
+     */
+    double x = dg.getValue();
+
+    //should generate a value from state 0 (the next state according to transition matrix)
+    ASSERT_TRUE(states[0].getLowerBound() <= x && x <= states[0].getUpperBound());
+}
