@@ -25,6 +25,7 @@ void CostEngine::setUp() {
 	handle.getParam("gain", gain);
 
     enact = handle.advertise<archlib::Strategy>("strategy", 10);
+    energy_status = handle.advertise<archlib::EnergyStatus>("log_energy_status", 10);
 }
 
 void CostEngine::tearDown() {
@@ -189,7 +190,7 @@ void CostEngine::analyze() {
     std::cout << "current system cost: " <<  c_curr << std::endl;
     
     archlib::EnergyStatus msg;
-    msg.source = rosComponentDescriptor.getName();
+    msg.source = "/engine";
     msg.content = "global:" + std::to_string(c_curr) + ";";
 
     for (std::map<std::string,double>::iterator it = strategy.begin(); it != strategy.end(); ++it) {
