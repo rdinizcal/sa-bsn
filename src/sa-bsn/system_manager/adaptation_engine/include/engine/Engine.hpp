@@ -46,44 +46,37 @@ class Engine : public arch::ROSComponent {
     	virtual void tearDown();
 		virtual void body();
 
-		void setUp_formula(std::string formula);
 		void receiveException(const archlib::Exception::ConstPtr& msg);
-
-		void monitor_reli();
-		void monitor_cost();
-    	void analyze();
-    	void plan_reli();
-		void plan_cost();
-    	void execute();
-
 		bool sendAdaptationParameter(archlib::EngineRequest::Request &req, archlib::EngineRequest::Response &res);
 
-  	private:
-	  double calculate_qos(bsn::model::Formula, std::map<std::string, double>);
-	  bool blacklisted(std::map<std::string,double> &);
+		virtual std::string get_prefix() = 0;
+		virtual std::map<std::string, int> initialize_priority(std::vector<std::string>) = 0;
+		virtual std::map<std::string, double> initialize_strategy(std::vector<std::string>) = 0;
+		std::string fetch_formula(std::string);
+		void setUp_formula(std::string formula);
 
-	private:
-		double r_ref, c_ref;
-		double offset;
-		double Kp;
+	  	double calculate_qos(bsn::model::Formula, std::map<std::string, double>);
+	  	bool blacklisted(std::map<std::string,double> &);
+
+		virtual void monitor() = 0;
+    	virtual void analyze() = 0;
+    	virtual void plan()    = 0;
+    	virtual void execute() = 0;
+
+	private: 
+		std::string qos_attribute;
+
+	public:
 		double info_quant;
 		double monitor_freq;
 		double actuation_freq;
-		double stability_margin;
-		std::string qos_attribute;
 
 		bsn::model::Formula target_system_model;
 		std::map<std::string, double> strategy;
 		std::map<std::string, int> priority;
 		std::map<std::string, int> deactivatedComponents;
 
-		ros::NodeHandle handle;
-		ros::Publisher enact;
-		ros::Publisher energy_status;
 		ros::ServiceServer enactor_server;
-
-		int cycles;
-		int counter;
 };
 
 #endif 

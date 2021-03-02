@@ -26,10 +26,13 @@ INCLUDE_DIRECTORIES(include)
 # Build this project.
 FILE(GLOB ${PROJECT_NAME}-src "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
-SET(engine-src "${CMAKE_CURRENT_SOURCE_DIR}/src/Engine.cpp")
-ADD_EXECUTABLE (engine  "${CMAKE_CURRENT_SOURCE_DIR}/apps/engine.cpp" ${${PROJECT_NAME}-src} ${engine-src})
-TARGET_LINK_LIBRARIES (engine ${catkin_LIBRARIES} ${LIBRARIES})
-ADD_DEPENDENCIES(engine messages_generate_messages_cpp)
+ADD_EXECUTABLE (reli_engine  "${CMAKE_CURRENT_SOURCE_DIR}/apps/reli_engine.cpp" ${${PROJECT_NAME}-src} )
+TARGET_LINK_LIBRARIES (reli_engine ${catkin_LIBRARIES} ${LIBRARIES})
+ADD_DEPENDENCIES(reli_engine messages_generate_messages_cpp)
+
+ADD_EXECUTABLE (cost_engine  "${CMAKE_CURRENT_SOURCE_DIR}/apps/cost_engine.cpp" ${${PROJECT_NAME}-src} )
+TARGET_LINK_LIBRARIES (cost_engine ${catkin_LIBRARIES} ${LIBRARIES})
+ADD_DEPENDENCIES(cost_engine messages_generate_messages_cpp)
 
 ###########################################################################
 # Install this project.
