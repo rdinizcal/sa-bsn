@@ -7,6 +7,8 @@
 #include <ros/console.h>
 
 #include "archlib/ROSComponent.hpp"
+#include <patient/PatientConfig.h>
+#include <dynamic_reconfigure/server.h>
 
 class PatientModule : public arch::ROSComponent {
     public:
@@ -30,4 +32,7 @@ class PatientModule : public arch::ROSComponent {
         double period;
         ros::NodeHandle nh;
         ros::ServiceServer service;
+
+        dynamic_reconfigure::Server<patient::PatientConfig> server;
+        void callback(patient::PatientConfig &config, uint32_t level);
 };

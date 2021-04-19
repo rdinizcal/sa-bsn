@@ -36,6 +36,10 @@ void PatientModule::setUp() {
     rosComponentDescriptor.setFreq(frequency);
     
     period = 1/frequency;
+
+    dynamic_reconfigure::Server<patient::PatientConfig>::CallbackType f;
+    f = boost::bind(&PatientModule::callback, this, _1, _2);
+    server.setCallback(f);
 }
 
 bsn::generator::DataGenerator PatientModule::configureDataGenerator(const std::string& vitalSign) {
@@ -81,6 +85,13 @@ bsn::generator::DataGenerator PatientModule::configureDataGenerator(const std::s
     bsn::generator::DataGenerator dataGenerator(markov);
     dataGenerator.setSeed();
 
+    std::cout << "Setting DataGenerator of: " << vitalSign << std::endl;    
+    std::cout << "HighRisk0: " << hrs0[0] << " to " << hrs0[1] << std::endl; 
+    std::cout << "MidRisk0 : " << mrs0[0] << " to " << mrs0[1] << std::endl; 
+    std::cout << "LowRisk  : " << lrs[0]  << " to " << lrs[1] << std::endl; 
+    std::cout << "MidRisk1 : " << mrs1[0] << " to " << mrs1[1] << std::endl; 
+    std::cout << "HighRisk1: " << hrs1[0] << " to " << hrs1[1] << std::endl; 
+    
     return dataGenerator;
 }
 
@@ -110,3 +121,91 @@ void PatientModule::body() {
     }
 }
 
+void PatientModule::callback(patient::PatientConfig &config, uint32_t level){
+
+    ros::NodeHandle handle;
+
+    handle.setParam("oxigenation_LowRisk", config.oxigenation_LowRisk.c_str());
+    handle.setParam("oxigenation_MidRisk0", config.oxigenation_MidRisk0.c_str());
+    handle.setParam("oxigenation_HighRisk0", config.oxigenation_HighRisk0.c_str());
+    handle.setParam("oxigenation_MidRisk1", config.oxigenation_MidRisk1.c_str());
+    handle.setParam("oxigenation_HighRisk1", config.oxigenation_HighRisk1.c_str());
+
+    handle.setParam("oxigenation_State0", config.oxigenation_State0.c_str());
+    handle.setParam("oxigenation_State1", config.oxigenation_State1.c_str());
+    handle.setParam("oxigenation_State2", config.oxigenation_State2.c_str());
+    handle.setParam("oxigenation_State3", config.oxigenation_State3.c_str());
+    handle.setParam("oxigenation_State4", config.oxigenation_State4.c_str());
+
+
+    handle.setParam("heart_rate_LowRisk", config.heart_rate_LowRisk.c_str());
+    handle.setParam("heart_rate_MidRisk0", config.heart_rate_MidRisk0.c_str());
+    handle.setParam("heart_rate_HighRisk0", config.heart_rate_HighRisk0.c_str());
+    handle.setParam("heart_rate_MidRisk1", config.heart_rate_MidRisk1.c_str());
+    handle.setParam("heart_rate_HighRisk1", config.heart_rate_HighRisk1.c_str());
+
+    handle.setParam("heart_rate_State0", config.heart_rate_State0.c_str());
+    handle.setParam("heart_rate_State1", config.heart_rate_State1.c_str());
+    handle.setParam("heart_rate_State2", config.heart_rate_State2.c_str());
+    handle.setParam("heart_rate_State3", config.heart_rate_State3.c_str());
+    handle.setParam("heart_rate_State4", config.heart_rate_State4.c_str());
+
+
+    handle.setParam("temperature_LowRisk", config.temperature_LowRisk.c_str());
+    handle.setParam("temperature_MidRisk0", config.temperature_MidRisk0.c_str());
+    handle.setParam("temperature_HighRisk0", config.temperature_HighRisk0.c_str());
+    handle.setParam("temperature_MidRisk1", config.temperature_MidRisk1.c_str());
+    handle.setParam("temperature_HighRisk1", config.temperature_HighRisk1.c_str());
+
+    handle.setParam("temperature_State0", config.temperature_State0.c_str());
+    handle.setParam("temperature_State1", config.temperature_State1.c_str());
+    handle.setParam("temperature_State2", config.temperature_State2.c_str());
+    handle.setParam("temperature_State3", config.temperature_State3.c_str());
+    handle.setParam("temperature_State4", config.temperature_State4.c_str());
+
+
+    handle.setParam("abpd_LowRisk", config.abpd_LowRisk.c_str());
+    handle.setParam("abpd_MidRisk0", config.abpd_MidRisk0.c_str());
+    handle.setParam("abpd_HighRisk0", config.abpd_HighRisk0.c_str());
+    handle.setParam("abpd_MidRisk1", config.abpd_MidRisk1.c_str());
+    handle.setParam("abpd_HighRisk1", config.abpd_HighRisk1.c_str());
+
+    handle.setParam("abpd_State0", config.abpd_State0.c_str());
+    handle.setParam("abpd_State1", config.abpd_State1.c_str());
+    handle.setParam("abpd_State2", config.abpd_State2.c_str());
+    handle.setParam("abpd_State3", config.abpd_State3.c_str());
+    handle.setParam("abpd_State4", config.abpd_State4.c_str());
+
+    handle.setParam("abps_LowRisk", config.abps_LowRisk.c_str());
+    handle.setParam("abps_MidRisk0", config.abps_MidRisk0.c_str());
+    handle.setParam("abps_HighRisk0", config.abps_HighRisk0.c_str());
+    handle.setParam("abps_MidRisk1", config.abps_MidRisk1.c_str());
+    handle.setParam("abps_HighRisk1", config.abps_HighRisk1.c_str());
+
+    handle.setParam("abps_State0", config.abps_State0.c_str());
+    handle.setParam("abps_State1", config.abps_State1.c_str());
+    handle.setParam("abps_State2", config.abps_State2.c_str());
+    handle.setParam("abps_State3", config.abps_State3.c_str());
+    handle.setParam("abps_State4", config.abps_State4.c_str());
+
+
+    handle.setParam("glucose_LowRisk", config.glucose_LowRisk.c_str());
+    handle.setParam("glucose_MidRisk0", config.glucose_MidRisk0.c_str());
+    handle.setParam("glucose_HighRisk0", config.glucose_HighRisk0.c_str());
+    handle.setParam("glucose_MidRisk1", config.glucose_MidRisk1.c_str());
+    handle.setParam("glucose_HighRisk1", config.glucose_HighRisk1.c_str());
+
+    handle.setParam("glucose_State0", config.glucose_State0.c_str());
+    handle.setParam("glucose_State1", config.glucose_State1.c_str());
+    handle.setParam("glucose_State2", config.glucose_State2.c_str());
+    handle.setParam("glucose_State3", config.glucose_State3.c_str());
+    handle.setParam("glucose_State4", config.glucose_State4.c_str());
+
+    patientData["oxigenation"] = this->configureDataGenerator("oxigenation");
+    patientData["heart_rate"] = this->configureDataGenerator("heart_rate");
+    patientData["temperature"] = this->configureDataGenerator("temperature");
+    patientData["abpd"] = this->configureDataGenerator("abpd");
+    patientData["abps"] = this->configureDataGenerator("abps");
+    patientData["glucose"] = this->configureDataGenerator("glucose");
+
+}
