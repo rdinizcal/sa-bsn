@@ -5,7 +5,11 @@ add_compile_options(-std=c++11)
 
 ###########################################################################
 ## Find catkin and any catkin packages
-FIND_PACKAGE(catkin REQUIRED COMPONENTS roscpp std_msgs genmsg messages archlib libbsn)
+FIND_PACKAGE(catkin REQUIRED COMPONENTS roscpp std_msgs genmsg messages archlib libbsn dynamic_reconfigure)
+
+generate_dynamic_reconfigure_options(
+     cfg/Patient.cfg
+)
 
 ###########################################################################
 # Export catkin package.
@@ -29,4 +33,4 @@ FILE(GLOB ${PROJECT_NAME}-src "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 SET(patient-src "${CMAKE_CURRENT_SOURCE_DIR}/src/PatientModule.cpp")
 ADD_EXECUTABLE (patient  "${CMAKE_CURRENT_SOURCE_DIR}/apps/patient.cpp" ${${PROJECT_NAME}-src} ${patient-src})
 TARGET_LINK_LIBRARIES (patient ${catkin_LIBRARIES} ${LIBRARIES})
-ADD_DEPENDENCIES(patient services_generate_messages_cpp)
+ADD_DEPENDENCIES(patient services_generate_messages_cpp patient_gencfg)
