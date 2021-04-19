@@ -102,6 +102,7 @@ Main Authors
 * [**Léo Moraes**](https://github.com/leooleo)  
 * [**Eric B. Gil**](https://github.com/ericbg27)
 * [**Samuel Couto**](https://github.com/SCouto97)
+* [**Carlos Lottermann**](https://github.com/carloseduardotl)
 
 Adviser: [**Genaína N. Rodrigues**](https://cic.unb.br/~genaina)
 
