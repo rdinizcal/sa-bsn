@@ -101,9 +101,9 @@
 
     <!-- Risk values for glucose -->
     <param name="glucose_HighRisk0" value="20,39.99" />
-    <param name="glcuose_MidRisk0" value="40,54.99" />
+    <param name="glucose_MidRisk0" value="40,54.99" />
     <param name="glucose_LowRisk" value="55,95.99" />
     <param name="glucose_MidRisk1" value="96,119.99" />
-    <param name="glcusoe_HighRisk1" value="120,200" />
+    <param name="glucose_HighRisk1" value="120,200" />
 
 </launch>
