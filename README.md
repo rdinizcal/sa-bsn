@@ -104,3 +104,5 @@ Main Authors
 * [**Samuel Couto**](https://github.com/SCouto97)
 
 Adviser: [**Genaína N. Rodrigues**](https://cic.unb.br/~genaina)
+
+This work was financed in part by FAPDF under Call 03/2018.
