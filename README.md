@@ -1,6 +1,6 @@
 # Self-Adaptive Body Sensor Network (SA-BSN)
 
-![Travis (.org)](https://img.shields.io/travis/rdinizcal/sa-bsn) ![GitHub](https://img.shields.io/github/license/rdinizcal/sa-bsn) ![GitHub release (latest by date)](https://img.shields.io/github/v/release/rdinizcal/sa-bsn)
+![Travis (.org)](https://travis-ci.com/rdinizcal/sa-bsn.svg?branch=master) ![GitHub](https://img.shields.io/github/license/rdinizcal/sa-bsn) ![GitHub release (latest by date)](https://img.shields.io/github/v/release/rdinizcal/sa-bsn)
 
 This is an implementation of the SA-BSN. So far, the SA-BSN was used for experimentation on solutions for adaptation on the Self-Adaptive Software Systems domain [[1]](https://doi.org/10.1145/3194133.3194147)[[2]](https://doi.org/10.1109/SEAMS.2019.00020)[[3]](https://doi.org/10.1145/3387939.3391595). Moreover, information regarding the prototype behavior and how to develop your own manager is provided in the [website](https://bodysensornetwork.herokuapp.com/), which contains an executable instance of the BSN. 
 
