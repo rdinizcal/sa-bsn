@@ -85,6 +85,57 @@ void G3T1_4::tearDown() {
 }
 
 double G3T1_4::collect() {
+    std::array<bsn::range::Range,5> ranges;
+    std::string s;
+    { // Configure markov chain
+        std::vector<std::string> lrs,mrs0,hrs0,mrs1,hrs1;
+
+        handle.getParam("abps_LowRisk", s);
+        lrs = bsn::utils::split(s, ',');
+        handle.getParam("abps_MidRisk0", s);
+        mrs0 = bsn::utils::split(s, ',');
+        handle.getParam("abps_HighRisk0", s);
+        hrs0 = bsn::utils::split(s, ',');
+        handle.getParam("abps_MidRisk1", s);
+        mrs1 = bsn::utils::split(s, ',');
+        handle.getParam("abps_HighRisk1", s);
+        hrs1 = bsn::utils::split(s, ',');
+
+        ranges[0] = Range(std::stod(hrs0[0]), std::stod(hrs0[1]));
+        ranges[1] = Range(std::stod(mrs0[0]), std::stod(mrs0[1]));
+        ranges[2] = Range(std::stod(lrs[0]), std::stod(lrs[1]));
+        ranges[3] = Range(std::stod(mrs1[0]), std::stod(mrs1[1]));
+        ranges[4] = Range(std::stod(hrs1[0]), std::stod(hrs1[1]));
+    }
+
+    { // Configure sensor configuration
+        Range low_range = ranges[2];
+        
+        std::array<Range,2> midRanges;
+        midRanges[0] = ranges[1];
+        midRanges[1] = ranges[3];
+        
+        std::array<Range,2> highRanges;
+        highRanges[0] = ranges[0];
+        highRanges[1] = ranges[4];
+
+        std::array<Range,3> percentages;
+
+        handle.getParam("lowrisk", s);
+        std::vector<std::string> low_p = bsn::utils::split(s, ',');
+        percentages[0] = Range(std::stod(low_p[0]), std::stod(low_p[1]));
+
+        handle.getParam("midrisk", s);
+        std::vector<std::string> mid_p = bsn::utils::split(s, ',');
+        percentages[1] = Range(std::stod(mid_p[0]), std::stod(mid_p[1]));
+
+        handle.getParam("highrisk", s);
+        std::vector<std::string> high_p = bsn::utils::split(s, ',');
+        percentages[2] = Range(std::stod(high_p[0]), std::stod(high_p[1]));
+
+        sensorConfig = SensorConfiguration(0, low_range, midRanges, highRanges, percentages);
+    }
+
     double m_data = 0;
     ros::ServiceClient client = handle.serviceClient<services::PatientData>("getPatientData");
     services::PatientData srv;
