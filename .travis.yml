@@ -11,6 +11,9 @@ branches:
   only:
   - master
 addons:
+  sonarcloud:
+    organization: "rdinizcal"
+    token: Sp4+gehazIiD+cvW+USFkjByHeG7OnFkQZNUjMqM5un3DY6IA1ZmAAqaTYzY+ESZZvn+Hdx90JCjy/dOAGO1xcdyTnwqH9DpukMbmSMBeVGwB3uLh8PT4IWCLNhghA++Lcf4lAGcz8RskHrvMkODdN8fdXHL3u/9nwUYUuLS5Tg4yegCuKEQlJd0D97M3WCCWwXD99K588wrSheTbVonPcIMcCTo8JKz4iULOOVkE3FHksfCgi9uLVgg78szyJ8Rvja8lkIGbtBzQrddYR9itKvJxrTDGtwyjNE6sUBbnyWQc4x+J+ssgZ8HTytwG/XQhB5ZlmwX8CJS05+cViTtlKSq6mszU03fKMtXWx28v2Sk/9WWulRwelky/5tkP8ZfyOepgN7r8Lxw+Red+jhq7c7sjiUNmJSpxLwnMEL4TgkIRJmMl2Q65u4IJIi4tlwW83BV4KjOtMB9NKKH0v0Ms34jox4uv8e1YVFkvAaSWAKlBaa8Knd040/ToWBKFmYG4hNyMEZA92grMIfdBa68CEz0EpAuBnVwutNv4mdiqdgIWhse2iko2gtvTfbb8GW3yB7lGA6fezmgM7OgFMF9hmml7qBmnOG+Jknm8AZsxl/aNeYv5gHoR5ySNc7cHyO3vUbkZHBK9o/lWtPXFtRocEDJiLALCd4wsiCxVBVcPHg=
   apt:
     packages:
     - doxygen
@@ -26,7 +29,6 @@ env:
   - CATKIN_OPTIONS=$CI_SOURCE_PATH/catkin.options
   - ROS_PARALLEL_JOBS='-j8 -l6'
   - PYTHONPATH=$PYTHONPATH:/usr/lib/python2.7/dist-packages:/usr/local/lib/python2.7/dist-packages
-  - secure: Sp4+gehazIiD+cvW+USFkjByHeG7OnFkQZNUjMqM5un3DY6IA1ZmAAqaTYzY+ESZZvn+Hdx90JCjy/dOAGO1xcdyTnwqH9DpukMbmSMBeVGwB3uLh8PT4IWCLNhghA++Lcf4lAGcz8RskHrvMkODdN8fdXHL3u/9nwUYUuLS5Tg4yegCuKEQlJd0D97M3WCCWwXD99K588wrSheTbVonPcIMcCTo8JKz4iULOOVkE3FHksfCgi9uLVgg78szyJ8Rvja8lkIGbtBzQrddYR9itKvJxrTDGtwyjNE6sUBbnyWQc4x+J+ssgZ8HTytwG/XQhB5ZlmwX8CJS05+cViTtlKSq6mszU03fKMtXWx28v2Sk/9WWulRwelky/5tkP8ZfyOepgN7r8Lxw+Red+jhq7c7sjiUNmJSpxLwnMEL4TgkIRJmMl2Q65u4IJIi4tlwW83BV4KjOtMB9NKKH0v0Ms34jox4uv8e1YVFkvAaSWAKlBaa8Knd040/ToWBKFmYG4hNyMEZA92grMIfdBa68CEz0EpAuBnVwutNv4mdiqdgIWhse2iko2gtvTfbb8GW3yB7lGA6fezmgM7OgFMF9hmml7qBmnOG+Jknm8AZsxl/aNeYv5gHoR5ySNc7cHyO3vUbkZHBK9o/lWtPXFtRocEDJiLALCd4wsiCxVBVcPHg=
 before_install:
 - sudo sh -c "echo \"deb http://packages.ros.org/ros/ubuntu $ROS_CI_DESKTOP main\"
   > /etc/apt/sources.list.d/ros-latest.list"
