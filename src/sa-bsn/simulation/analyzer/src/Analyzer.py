@@ -94,7 +94,7 @@ class Analyzer:
         flag = False
         for value in y:
             if lower_bound <= value and value <= upper_bound:
-                if flag is False:
+                if flag == False:
                     stability_point = pos
                     flag = True
             else:
@@ -103,7 +103,7 @@ class Analyzer:
             pos+=1
         
 
-        self.stability = bool(stability_point is not 0)
+        self.stability = bool(stability_point != 0)
         print('Stability: %r' % self.stability)
 
         #calculate settling time
@@ -360,8 +360,9 @@ class Analyzer:
                 xa.append(x[i])
                 ya.append(y[i])
             i += 1
-                
-        self.analyze(xa, ya, setpoint)
+        
+        # analyzes adaptation (only if there is adaptation (:)
+        if len(xa) > 1: self.analyze(xa, ya, setpoint)
 
         ################################################################## 
         #                                                                #
